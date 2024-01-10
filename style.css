@@ -1,0 +1,40 @@
+body {
+    background-color: rgb(25, 25, 25);
+    font-family: 'Courier New', Courier, monospace;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 700px;
+    width: 350px;
+    background-color: gray;
+}
+.next {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(16, 1fr);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(125%, -67%);
+    height: 525px;
+    width: 140px;
+    background-color: rgb(91, 91, 91);
+}
+.text {
+    color: white;
+    font-family:Arial, Helvetica, sans-serif;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(240%, -950%);
+    font-size:2.5em;
+}
