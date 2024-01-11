@@ -5,6 +5,7 @@ body {
     width: 100vw;
     overflow: hidden;
 }
+
 .board {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
@@ -17,10 +18,11 @@ body {
     width: 350px;
     background-color: gray;
 }
+
 .next {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(16, 1fr);
+    grid-template-rows: repeat(15, 1fr);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -29,12 +31,37 @@ body {
     width: 140px;
     background-color: rgb(91, 91, 91);
 }
-.text {
-    color: white;
-    font-family:Arial, Helvetica, sans-serif;
+
+.hold {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     position: absolute;
     top: 50%;
     left: 50%;
+    transform: translate(-225%, -335%);
+    height: 105px;
+    width: 140px;
+    background-color: rgb(91, 91, 91);
+}
+
+.text {
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 2.5em;
+}
+
+.tnext {
     transform: translate(240%, -950%);
-    font-size:2.5em;
+}
+
+.thold {
+    transform: translate(-350%, -950%);
+}
+
+.gridLine {
+    border: 0.5px solid rgb(113, 113, 113);
 }
