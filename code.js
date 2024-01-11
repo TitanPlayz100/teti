@@ -9,13 +9,19 @@ let remainingpieces = [[], []]
 let dasfunc = null;
 let arrfunc = null;
 let sdarrfunc = null;
+let lockdelayfunc = null;
+let lockcount = 0;
 
 // settings
 const grid = true;
-const arr = 50;
-const das = 150;
-const sdarr = 100;
+const arr = 0;
+const das = 75;
+const sdarr = 50;
 const gravitySpeed = 1000;
+const shadowOpacity = 20;
+const lockDelay = 1000;
+const maxLockMovements = 15;
+const nextPieces = 5;
 
 const rightKey = 'ArrowRight';
 const leftKey = 'ArrowLeft';
@@ -23,40 +29,49 @@ const cwKey = 'ArrowUp';
 const ccwKey = 'z';
 const hdKey = ' ';
 const sdKey = 'ArrowDown';
-const hold = 'c';
+const holdKey = 'c';
+const resetKey = 'd'
+const rotate180Key = 'x'
 
 function main() {
     if (grid) drawGrid();
     drawPiece(randomiser());
-    loopfunction = setInterval(() => { movePieceDown(false) }, gravitySpeed);
+    if (gravitySpeed != 0) loopfunction = setInterval(() => { movePieceDown(false, false) }, gravitySpeed);
 }
 
 // Keyboard listeners
 this.addEventListener('keydown', event => {
     if (event.repeat) return;
     if (gameEnd) return;
-    if (event.key == rightKey) movePiece("RIGHT");
-    if (event.key == leftKey) movePiece("LEFT");
+    if (event.key == resetKey) resetGame();
     if (event.key == cwKey) rotate("CW");
     if (event.key == ccwKey) rotate("CCW");
-    if (event.key == hdKey) movePieceDown(true);
-    if (event.key == hold) holdPiece();
+    if (event.key == rotate180Key) rotate("180");
+    if (event.key == hdKey) movePieceDown(true, false);
+    if (event.key == holdKey) holdPiece();
 
-    // set das times
-    if (event.key == rightKey || event.key == leftKey) {
+    if (event.key == rightKey) {
+        movePiece("RIGHT", false)
+        endDasArr()
         dasfunc = setTimeout(() => {
-            arrfunc = setInterval(() => {
-                if (event.key == rightKey) movePiece("RIGHT");
-                if (event.key == leftKey) movePiece("LEFT");
-            }, arr);
+            if (arr == 0) { movePiece("RIGHT", true) }
+            else { arrfunc = setInterval(() => { movePiece("RIGHT", false); }, arr); }
+        }, das);
+    }
+
+    if (event.key == leftKey) {
+        movePiece("LEFT", false)
+        endDasArr()
+        dasfunc = setTimeout(() => {
+            if (arr == 0) { movePiece("LEFT", true) }
+            else { arrfunc = setInterval(() => { movePiece("LEFT", false); }, arr); }
         }, das);
     }
 
     if (event.key == sdKey) {
-        movePieceDown(false);
-        sdarrfunc = setInterval(() => {
-            if (event.key == sdKey) movePieceDown(false);
-        }, sdarr);
+        if (sdarr == 0) { movePieceDown(false, true) }
+        else {sdarrfunc = setInterval(() => {movePieceDown(false, false);}, sdarr);}
+        
     }
 });
 
@@ -78,6 +93,12 @@ function rotate(type) {
     let newrotationstate = (type == "CW") ?
         rotationState + 1 > 4 ? 1 : rotationState + 1
         : rotationState - 1 < 1 ? 4 : rotationState - 1
+
+    switch (type) {
+        case "CW": newrotationstate = rotationState + 1 > 4 ? 1 : rotationState + 1; break;
+        case "CCW": newrotationstate = rotationState - 1 < 1 ? 4 : rotationState - 1; break;
+        case "180": newrotationstate = rotationState + 2 > 4 ? rotationState - 2 : rotationState + 2; break;
+    }
     const DOMboard = document.getElementsByClassName('board')[0];
     const currentShape = currentPiece['shape' + newrotationstate];
     for (let column = 0; column < currentShape.length; column++) {
@@ -86,7 +107,7 @@ function rotate(type) {
                 let mino = document.createElement('div');
                 let newcol = column + currentLoc[1] + 1
                 let newrow = row + currentLoc[0] + 1
-                if (newrow <= 0 || newrow > 10 || newcol > 19) stoprotate = true;
+                if (newrow <= 0 || newrow > 10 || newcol > 20) stoprotate = true;
                 mino.style.gridArea = newcol + "/" + newrow + "/span 1/span 1"
                 mino.style.backgroundColor = currentPiece.colour;
                 mino.classList.add('rotating')
@@ -110,10 +131,12 @@ function rotate(type) {
         mino.classList.remove('rotating');
         mino.classList.add('active');
     })
-    rotationState = newrotationstate
+    rotationState = newrotationstate;
+    incrementLock();
+    renderShadowPiece();
 }
 
-function movePiece(direction) {
+function movePiece(direction, instant) {
     let stopmove = false;
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
@@ -121,12 +144,12 @@ function movePiece(direction) {
         let gridarea = DOMminos[i].style.gridArea.split('/');
         stopmove = (direction == 'RIGHT') ?
             Number(gridarea[1]) == 10 ? true : stopmove
-            : stopmove = Number(gridarea[1]) == 1 ? true : stopmove
+            : Number(gridarea[1]) == 1 ? true : stopmove;
         for (let j = 0; j < DOMminostopped.length; j++) {
             let gridarea2 = DOMminostopped[j].style.gridArea.split('/');
             stopmove = (direction == 'RIGHT') ?
-                stopmove = (Number(gridarea[1]) + 1 == Number(gridarea2[1]) && gridarea[0] == gridarea2[0]) ? true : stopmove
-                : stopmove = (Number(gridarea[1]) - 1 == Number(gridarea2[1]) && gridarea[0] == gridarea2[0]) ? true : stopmove
+                (Number(gridarea[1]) + 1 == Number(gridarea2[1]) && gridarea[0] == gridarea2[0]) ? true : stopmove
+                : (Number(gridarea[1]) - 1 == Number(gridarea2[1]) && gridarea[0] == gridarea2[0]) ? true : stopmove
         }
     }
 
@@ -139,29 +162,18 @@ function movePiece(direction) {
         gridarea.splice(2, 1);
         DOMminos[i].style.gridArea = gridarea.join('/');
     }
-    currentLoc[0] = direction == 'RIGHT' ? currentLoc[0] + 1 : currentLoc[0] - 1
+    currentLoc[0] = direction == 'RIGHT' ? currentLoc[0] + 1 : currentLoc[0] - 1;
+    renderShadowPiece();
+    incrementLock();
+    if (instant) movePiece(direction, true);
 }
 
-function movePieceDown(instant) {
-    let stopfalling = false;
+function movePieceDown(harddrop, softdrop) {
+    if (lockdelayfunc != null) {
+        if (harddrop) checkFalling(false, true);
+        return;
+    };
     const DOMminos = document.querySelectorAll('.active');
-    const DOMminostopped = document.querySelectorAll('.stopped');
-    DOMminos.forEach((piece) => {
-        let gridarea = piece.style.gridArea.split('/');
-        if (gridarea[0] > 19) { // reached bottom of board
-            stopfalling = true;
-            DOMminos.forEach((mino) => { mino.classList.remove('active'); mino.classList.add('stopped'); });
-        }
-        DOMminostopped.forEach((stoppedmino) => {
-            let gridarea2 = stoppedmino.style.gridArea.split('/');
-            if ((Number(gridarea[0]) + 1) == Number(gridarea2[0]) && Number(gridarea[1]) == Number(gridarea2[1])) {
-                if (Number(gridarea[0]) == 2) endGame();
-                stopfalling = true;
-                DOMminos.forEach((mino) => { mino.classList.remove('active'); mino.classList.add('stopped'); });
-            }
-        });
-    });
-    if (stopfalling == true) { hitGround(); return; }
     DOMminos.forEach((mino) => { // has not hit ground
         let gridarea = mino.style.gridArea.split('/');
         let newheight = Number(gridarea[0]) + 1;
@@ -169,13 +181,61 @@ function movePieceDown(instant) {
         mino.style.gridArea = newheight + "/" + gridarea.join('/');
     })
     currentLoc[1] += 1;
-    if (instant) movePieceDown(true);
+    if (checkFalling(harddrop, false)) return;
+    if (harddrop) movePieceDown(true, false);
+    if (softdrop) movePieceDown(false, true);
+}
+
+function checkFalling(harddrop, lock) {
+    const DOMminos = document.querySelectorAll('.active');
+    if (lock) {
+        DOMminos.forEach((mino) => { mino.classList.remove('active'); mino.classList.add('stopped'); });
+        hitGround();
+        return true;
+    }
+    let falling = true;
+    const DOMminostopped = document.querySelectorAll('.stopped');
+    DOMminos.forEach((piece) => {
+        let gridarea = piece.style.gridArea.split('/');
+        if (Number(gridarea[0]) > 19) falling = false;
+        DOMminostopped.forEach((stoppedmino) => {
+            let gridarea2 = stoppedmino.style.gridArea.split('/');
+            if ((Number(gridarea[0]) + 1) == Number(gridarea2[0]) && Number(gridarea[1]) == Number(gridarea2[1])) {
+                if (Number(gridarea[0]) == 2) endGame();
+                falling = false;
+            }
+        });
+    });
+    if (falling == false) {
+        if (harddrop || lockcount > maxLockMovements) {
+            DOMminos.forEach((mino) => { mino.classList.remove('active'); mino.classList.add('stopped'); });
+            hitGround();
+            return true;
+        } else {
+            lockdelayfunc = setTimeout(() => {
+                DOMminos.forEach((mino) => { mino.classList.remove('active'); mino.classList.add('stopped'); });
+                hitGround();
+            }, lockDelay);
+            return true;
+        }
+    }
+    return false;
+}
+
+function incrementLock() {
+    clearTimeout(lockdelayfunc);
+    lockdelayfunc = null;
+    lockcount++;
+    checkFalling(false, false);
 }
 
 // gameplay mechanics
 function hitGround() {
     rotationState = 1;
     heldpiece.occured = false;
+    clearTimeout(lockdelayfunc);
+    lockdelayfunc = null;
+    lockcount = 0;
     endDasArr()
     clearLines()
     drawPiece(randomiser())
@@ -185,6 +245,22 @@ function endGame() {
     gameEnd = true;
     clearInterval(loopfunction);
     console.log('END');
+}
+
+function resetGame() {
+    rotationState = 1;
+    currentPiece = null;
+    heldpiece = { piece: null, occured: false };
+    currentLoc = null;
+    remainingpieces = [[], []];
+    lockdelayfunc = null;
+    lockcount = 0;
+    endDasArr();
+    clearInterval(loopfunction);
+    document.querySelectorAll('.board')[0].replaceChildren();
+    document.querySelectorAll('.next')[0].replaceChildren();
+    document.querySelectorAll('.hold')[0].replaceChildren();
+    main();
 }
 
 function clearLines() {
@@ -249,10 +325,54 @@ function drawPiece(piece) {
         }
     }
     updateNext();
+    renderShadowPiece();
+}
+
+function renderShadowPiece() {
+    const DOMboard = document.getElementsByClassName('board')[0];
+    const currentShadow = document.querySelectorAll('.shadow');
+    currentShadow.forEach((mino) => mino.remove());
+    const pieceShape = currentPiece["shape" + rotationState];
+    for (let column = 0; column < pieceShape.length; column++) {
+        for (let row = 0; row < pieceShape.length; row++) {
+            if (pieceShape[column][row] != 1) continue; // check pattern specified to colour in
+            let mino = document.createElement('div');
+            let newcol = column + currentLoc[1] + 1;
+            let newrow = row + currentLoc[0] + 1;
+            mino.style.gridArea = newcol + "/" + newrow + "/span 1/span 1"
+            mino.style.backgroundColor = currentPiece.colour;
+            mino.style.opacity = shadowOpacity + "%";
+            mino.classList.add('shadow')
+            DOMboard.appendChild(mino);
+        }
+    }
+
+    let falling = true;
+    const DOMminostopped = document.querySelectorAll('.stopped');
+    while (falling) {
+        const shadowMinos = document.querySelectorAll('.shadow');
+        shadowMinos.forEach((shadow) => {
+            let gridarea = shadow.style.gridArea.split('/');
+            let newheight = Number(gridarea[0]) + 1;
+            if (newheight > 20) falling = false;
+            DOMminostopped.forEach((stoppedmino) => {
+                let gridarea2 = stoppedmino.style.gridArea.split('/');
+                if ((newheight) == Number(gridarea2[0]) && Number(gridarea[1]) == Number(gridarea2[1])) falling = false;
+            });
+        });
+        shadowMinos.forEach((shadow) => {
+            if (falling) {
+                let gridarea = shadow.style.gridArea.split('/');
+                let newheight = Number(gridarea[0]) + 1;
+                gridarea.splice(0, 1);
+                shadow.style.gridArea = newheight + "/" + gridarea.join('/');
+            }
+        })
+    }
 }
 
 function updateNext() {
-    let first5 = remainingpieces[0].concat(remainingpieces[1]).slice(0, 5);
+    let first5 = remainingpieces[0].concat(remainingpieces[1]).slice(0, (nextPieces > 5 ? 5 : nextPieces));
     const DOMNext = document.getElementsByClassName('next')[0];
     DOMNext.replaceChildren()
     for (let i = 0; i < first5.length; i++) {
@@ -285,6 +405,9 @@ function holdPiece() {
         heldpiece.piece = currentPiece;
         currentPiece = newpiece;
         rotationState = 1;
+        clearTimeout(lockdelayfunc);
+        lockdelayfunc = null;
+        lockcount = 0;
         drawPiece(currentPiece);
     }
 
