@@ -42,8 +42,7 @@ function main() {
     };
 }
 
-// Keyboard listeners
-this.addEventListener('keydown', event => {
+this.addEventListener('keydown', event => { // Keyboard listeners
     if (event.repeat) return;
     if (gameEnd) return;
     if (event.key == resetKey) resetGame();
@@ -52,26 +51,8 @@ this.addEventListener('keydown', event => {
     if (event.key == rotate180Key) rotate("180");
     if (event.key == hdKey) movePieceDown(true, false);
     if (event.key == holdKey) holdPiece();
-
-    // apply custom das and arr
-    if (event.key == rightKey) {
-        movePiece("RIGHT", false)
-        endDasArr()
-        dasfunc = setTimeout(() => {
-            if (arr == 0) { movePiece("RIGHT", true) }
-            else { arrfunc = setInterval(() => { movePiece("RIGHT", false); }, arr); }
-        }, das);
-    }
-
-    if (event.key == leftKey) {
-        movePiece("LEFT", false)
-        endDasArr()
-        dasfunc = setTimeout(() => {
-            if (arr == 0) { movePiece("LEFT", true) }
-            else { arrfunc = setInterval(() => { movePiece("LEFT", false); }, arr); }
-        }, das);
-    }
-
+    if (event.key == rightKey) { startDas("RIGHT") }
+    if (event.key == leftKey) { startDas("LEFT") }
     if (event.key == sdKey) {
         if (sdarr == 0) { movePieceDown(false, true) }
         else { sdarrfunc = setInterval(() => { movePieceDown(false, false); }, sdarr); }
@@ -79,8 +60,17 @@ this.addEventListener('keydown', event => {
 });
 
 this.addEventListener('keyup', event => {
-    if (event.key == rightKey || event.key == leftKey || event.key == sdKey) endDasArr()
+    if (event.key == rightKey || event.key == leftKey || event.key == sdKey) endDasArr();
 });
+
+function startDas(direction) { // apply custom das and arr
+    movePieceSide(direction, false)
+    endDasArr()
+    dasfunc = setTimeout(() => {
+        if (arr == 0) { movePieceSide(direction, true) }
+        else { arrfunc = setInterval(() => { movePieceSide(direction, false); }, arr); }
+    }, das);
+}
 
 function endDasArr() {
     clearTimeout(dasfunc);
@@ -92,127 +82,47 @@ function endDasArr() {
 }
 
 // piece movements
-function rotate(type) {
-    if (currentPiece.name == 'o') { return; }
-    const DOMboard = document.getElementsByClassName('board')[0];
-    const DOMstopped = document.querySelectorAll('.stopped');
-    let newrotationstate =
-        type == "CW" ? (rotationState + 1) % 4 :
-            type == "CCW" ? (rotationState - 1) % 4 :
-                type == "180" ? (rotationState + 2) % 4 :
-                    null
-    if (newrotationstate == 0) newrotationstate = 4; // get correct rotation state after spin
-    const newPiece = currentPiece['shape' + newrotationstate];
-    let newtranformations = [0, 0];
-    let rotate = false;
-    let rotatingCoords = [];
-    newPiece.forEach((row, column) => { // get coords of new rotated minos
-        row.forEach((cell, rowIdx) => {
-            if (cell === 1) rotatingCoords.push([rowIdx + currentLoc[0], column + currentLoc[1]]);
-        });
+// # checks
+function checkCollisionRotate(x, y, stoppedMinos) {
+    let collision = false;
+    if (x < 1 || x > 10 || y < 1) collision = true; // mino off board
+    stoppedMinos.forEach((mino) => {
+        let stoppedgridmino = mino.style.gridArea.split('/');
+        let x2 = Number(stoppedgridmino[1]);
+        let y2 = 21 - Number(stoppedgridmino[0]);
+        if (y == y2 && x == x2) collision = true; // mino collided with other mino
     });
-    let indexIsI = (currentPiece.name == 'i') ? 1 : 0; // check if i piece
-    let kickdataindex = (type == "CCW") ? (newrotationstate > 3) ? 0 : newrotationstate
-        : newrotationstate - 1; // change row to one below for correct info when CCW
-    let kickdata = // get correct kick data
-        type == "180" ? KickData180[indexIsI][kickdataindex] :
-            type == "CW" ? KickDataCW[indexIsI][kickdataindex] :
-                type == "CCW" ? KickDataCW[indexIsI][kickdataindex]
-                    .map(row => row.map(element => element * -1))
-                    : null
-    kickdata.forEach((transformation) => {
-        if (rotate == true) return;
-        let canspin = true;
-        rotatingCoords.forEach((coord) => {
-            let newposX = coord[0] + transformation[0];
-            let newposY = 21 - coord[1] + transformation[1];
-            if (newposX < 1 || newposX > 10 || newposY < 1) canspin = false; // mino off board
-            DOMstopped.forEach((stoppedmino) => {
-                let stoppedgridmino = stoppedmino.style.gridArea.split('/');
-                if (newposY == (21 - Number(stoppedgridmino[0]))
-                    && newposX == Number(stoppedgridmino[1])) canspin = false; // mino collided with board
-            });
-        });
-        if (canspin == true) { newtranformations = transformation; rotate = true; } // if nothing failed, then use that transformations for spin
-    });
-    if (!rotate) { return; }
-
-    document.querySelectorAll('.active').forEach((mino) => { mino.remove() });
-    rotatingCoords.forEach((coord) => { 
-        let mino = document.createElement('div');
-        let newrow = coord[0] + newtranformations[0];
-        let newcol = coord[1] - newtranformations[1];
-        mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`; // render new minos based of transformations
-        mino.style.backgroundColor = currentPiece.colour;
-        mino.style.outline = `1px solid ${currentPiece.colour}`;
-        mino.classList.add('active')
-        DOMboard.appendChild(mino);
-    })
-    currentLoc = [currentLoc[0] + newtranformations[0], currentLoc[1] - newtranformations[1]]
-    rotationState = newrotationstate;
-    incrementLock();
-    renderShadowPiece();
+    return collision;
 }
 
-function movePiece(direction, instant) {
-    let stopmove = false;
-    const DOMminos = document.querySelectorAll('.active');
-    const DOMminostopped = document.querySelectorAll('.stopped');
-    for (let i = 0; i < DOMminos.length; i++) {
-        let gridarea = DOMminos[i].style.gridArea.split('/');
-        stopmove = (direction == 'RIGHT') ? // check boundaries of 1 and 10
-            Number(gridarea[1]) == 10 ? true : stopmove
-            : Number(gridarea[1]) == 1 ? true : stopmove;
-        for (let j = 0; j < DOMminostopped.length; j++) {
-            let gridarea2 = DOMminostopped[j].style.gridArea.split('/');
-            stopmove = (direction == 'RIGHT') ?
-                (Number(gridarea[1]) + 1 == Number(gridarea2[1]) && // moving right and hit placed mino
-                    gridarea[0] == gridarea2[0]) ?
-                    true : stopmove
-                : (Number(gridarea[1]) - 1 == Number(gridarea2[1]) && // moving left and hit placed mino
-                    gridarea[0] == gridarea2[0]) ?
-                    true : stopmove
+function checkCollisionSide(minos, stoppedMinos, direction) {
+    for (let i = 0; i < minos.length; i++) {
+        let gridarea = minos[i].style.gridArea.split('/');
+        let x = Number(gridarea[1]);
+        let y = Number(gridarea[0]);
+        if (direction == "RIGHT") {
+            if (x == 10) return true;
+        } else {
+            if (x == 1) return true;
+        }
+        for (let j = 0; j < stoppedMinos.length; j++) {
+            let gridarea2 = stoppedMinos[j].style.gridArea.split('/');
+            let x2 = Number(gridarea2[1]);
+            let y2 = Number(gridarea2[0]);
+            if (direction == 'RIGHT') {
+                if (x + 1 == x2 && y == y2) return true;
+            } else {
+                if (x - 1 == x2 && y == y2) return true
+            }
         }
     }
-    if (stopmove) return;
-
-    for (let i = 0; i < DOMminos.length; i++) { 
-        let gridarea = DOMminos[i].style.gridArea.split('/');
-        let newrow = null
-        newrow = (direction == 'RIGHT') ? Number(gridarea[1]) + 1 : Number(gridarea[1]) - 1
-        gridarea.splice(1, 1, newrow);
-        gridarea.splice(2, 1);
-        DOMminos[i].style.gridArea = gridarea.join('/'); // render moved minos
-    }
-    currentLoc[0] = direction == 'RIGHT' ? currentLoc[0] + 1 : currentLoc[0] - 1;
-    renderShadowPiece();
-    incrementLock();
-    if (instant) movePiece(direction, true);
+    return false;
 }
 
-function movePieceDown(harddrop, softdrop) {
-    if (lockdelayfunc != null) { // if piece is locking and used harddrop
-        if (harddrop) checkFalling(false, true);
-        return;
-    };
-    const DOMminos = document.querySelectorAll('.active');
-    DOMminos.forEach((mino) => { // piece has not hit ground by now
-        let gridarea = mino.style.gridArea.split('/');
-        let newheight = Number(gridarea[0]) + 1; // render piece 1 down
-        gridarea.splice(0, 1);
-        mino.style.gridArea = newheight + "/" + gridarea.join('/');
-    })
-    currentLoc[1] += 1;
-    if (checkFalling(harddrop, false)) return; // after drop if piece is on floor then dont harddrop or softdrop 
-    if (harddrop) movePieceDown(true, false);
-    if (softdrop) movePieceDown(false, true);
-}
-
-function checkFalling(harddrop, lock) {
+function checkFalling(harddrop) {
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
     let falling = true;
-    if (lock) { lockPiece(DOMminos); return true; }
     DOMminos.forEach((piece) => {
         let gridarea = piece.style.gridArea.split('/');
         if (Number(gridarea[0]) > 19) falling = false; // reached bottom of board
@@ -233,12 +143,106 @@ function checkFalling(harddrop, lock) {
     return false;
 }
 
-// gameplay mechanics
-function lockPiece(DOMminos) { // set piece from active to stopped
-    DOMminos.forEach((mino) => { 
-        mino.classList.remove('active'); 
-        mino.classList.add('stopped'); });
-    hitGround();
+// movement logic
+function rotate(type) {
+    if (currentPiece.name == 'o') { return; }
+    const DOMboard = document.getElementsByClassName('board')[0];
+    const DOMstopped = document.querySelectorAll('.stopped');
+    const newrotationstate = getNewRotationState(type);
+    const newPiece = currentPiece['shape' + newrotationstate];
+    const kickdata = getKickData(currentPiece, type, newrotationstate);
+    let newtranformations = [0, 0];
+    let rotate = false;
+    let rotatingCoords = [];
+
+    newPiece.forEach((row, column) => { // get coords of new rotated minos
+        row.forEach((cell, rowIdx) => {
+            if (cell === 1) rotatingCoords.push([rowIdx + currentLoc[0], column + currentLoc[1]]);
+        });
+    });
+    kickdata.forEach((transformation) => {
+        if (rotate == true) return;
+        let canspin = true;
+        rotatingCoords.forEach((coord) => {
+            const x = coord[0] + transformation[0];
+            const y = (21 - coord[1]) + transformation[1];
+            if (checkCollisionRotate(x, y, DOMstopped) == true) canspin = false;
+        });
+        if (canspin == true) { newtranformations = transformation; rotate = true; } // if nothing failed, then use that transformations for spin
+    });
+    if (rotate == false) { return; }
+
+    document.querySelectorAll('.active').forEach((mino) => { mino.remove() });
+    renderPieceFromCoords(DOMboard,
+        rotatingCoords, -1 * newtranformations[1],
+        newtranformations[0], currentPiece, 'active');
+    currentLoc = [currentLoc[0] + newtranformations[0], currentLoc[1] - newtranformations[1]]
+    rotationState = newrotationstate;
+    incrementLock();
+    renderShadowPiece();
+}
+
+function getNewRotationState(type) {
+    let state =
+        type == "CW" ? (rotationState + 1) % 4 :
+            type == "CCW" ? (rotationState - 1) % 4 :
+                type == "180" ? (rotationState + 2) % 4 :
+                    null
+    if (state == 0) state = 4;
+    return state;
+}
+
+function getKickData(piece, rotationType, rotation) {
+    let indexIsI = (piece.name == 'i') ? 1 : 0; // check if i piece
+    let kickdataindex =
+        (rotationType == "CCW") ?
+            (rotation > 3) ? 0
+                : rotation
+            : rotation - 1; // change row to one below for correct info when CCW
+    let kickdata = // get correct kick data
+        rotationType == "180" ? KickData180[indexIsI][kickdataindex] :
+            rotationType == "CW" ? KickDataCW[indexIsI][kickdataindex] :
+                rotationType == "CCW" ? KickDataCW[indexIsI][kickdataindex]
+                    .map(row => row.map(element => element * -1))
+                    : null
+    return kickdata;
+}
+
+function movePieceSide(direction, instant) {
+    const DOMminos = document.querySelectorAll('.active');
+    const DOMminostopped = document.querySelectorAll('.stopped');
+    if (checkCollisionSide(DOMminos, DOMminostopped, direction)) return;
+    renderPieceMovement(direction, DOMminos);
+    currentLoc[0] = direction == 'RIGHT' ? currentLoc[0] + 1 : currentLoc[0] - 1;
+    renderShadowPiece();
+    incrementLock();
+    if (instant) movePieceSide(direction, true);
+}
+
+function movePieceDown(harddrop, softdrop) {
+    const DOMminos = document.querySelectorAll('.active');
+    if (lockdelayfunc != null) { // if piece is locking and used harddrop
+        if (harddrop) lockPiece(DOMminos);
+        return;
+    };
+    renderPieceMovement('DOWN', DOMminos);
+    currentLoc[1] += 1;
+    if (checkFalling(harddrop, false)) return; // after drop if piece is on floor then dont harddrop or softdrop 
+    if (harddrop) movePieceDown(true, false);
+    if (softdrop) movePieceDown(false, true);
+}
+
+// mechanics
+function lockPiece(DOMminos=[]) { // set piece from active to stopped
+    DOMminos.forEach((mino) => {
+        mino.classList.remove('active');
+        mino.classList.add('stopped');
+    });
+    resetVariables();
+    heldpiece.occured = false;
+    endDasArr();
+    clearLines();
+    drawPiece(randomiser());
 }
 
 function incrementLock() { // reset lockdelay, increment lock count
@@ -248,15 +252,11 @@ function incrementLock() { // reset lockdelay, increment lock count
     checkFalling(false, false);
 }
 
-function hitGround() {
+function resetVariables() {
     rotationState = 1;
-    heldpiece.occured = false;
     clearTimeout(lockdelayfunc);
     lockdelayfunc = null;
     lockcount = 0;
-    endDasArr()
-    clearLines()
-    drawPiece(randomiser())
 }
 
 function endGame() {
@@ -295,7 +295,7 @@ function clearLines() {
             if (Number(stoppedmino.style.gridArea.split('/')[0]) != key) return;
             stoppedmino.remove();
         });
-        DOMminostopped.forEach((stoppedmino) => { 
+        DOMminostopped.forEach((stoppedmino) => {
             let row = Number(stoppedmino.style.gridArea.split('/')[0]);
             if (row >= key) return;
             let gridarea = stoppedmino.style.gridArea.split('/');
@@ -332,21 +332,9 @@ function shuffleArray(array) {
 
 function drawPiece(piece) {
     const DOMboard = document.getElementsByClassName('board')[0];
-    for (let column = 0; column < piece.shape1.length; column++) {
-        for (let row = 0; row < piece.shape1.length; row++) {
-            if (piece.shape1[column][row] != 1) continue; // check pattern specified to colour in
-            let mino = document.createElement('div');
-            let offset = (piece.name == 'o') ? 4 : 3 // since o is smaller, set different starting pos
-            const newcol = column + 1;
-            const newrow = row + 1 + offset;
-            mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`
-            mino.style.backgroundColor = piece.colour;
-            mino.style.outline = `1px solid ${piece.colour}`
-            mino.classList.add('active')
-            DOMboard.appendChild(mino);
-            currentLoc = [offset + 1, 1];
-        }
-    }
+    let offset = (piece.name == 'o') ? 4 : 3 // since o is smaller, set different starting pos
+    renderPiece(DOMboard, piece, 'shape1', 1, 1 + offset, undefined, undefined, 'active');
+    currentLoc = [offset + 1, 1];
     currentPiece = piece;
     updateNext();
     renderShadowPiece();
@@ -354,22 +342,9 @@ function drawPiece(piece) {
 
 function renderShadowPiece() {
     const DOMboard = document.getElementsByClassName('board')[0];
-    const currentShadow = document.querySelectorAll('.shadow');
-    currentShadow.forEach((mino) => mino.remove()); // remove shadow
-    const pieceShape = currentPiece["shape" + rotationState];
-    for (let column = 0; column < pieceShape.length; column++) {
-        for (let row = 0; row < pieceShape.length; row++) {
-            if (pieceShape[column][row] != 1) continue; // check pattern specified to colour in
-            let mino = document.createElement('div');
-            let newcol = column + currentLoc[1];
-            let newrow = row + currentLoc[0];
-            mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1` // render shadow minos
-            mino.style.backgroundColor = colouredShadow ? currentPiece.colour : "#1a1a1a";
-            mino.style.opacity = shadowOpacity + "%";
-            mino.classList.add('shadow')
-            DOMboard.appendChild(mino);
-        }
-    }
+    document.querySelectorAll('.shadow').forEach((mino) => mino.remove()); // remove shadow
+    renderPiece(DOMboard, currentPiece, ("shape" + rotationState), currentLoc[1], currentLoc[0],
+        (colouredShadow ? currentPiece.colour : "#1a1a1a"), shadowOpacity + "%", 'shadow')
 
     let falling = true;
     const DOMminostopped = document.querySelectorAll('.stopped');
@@ -404,19 +379,7 @@ function updateNext() {
     DOMNext.replaceChildren()
     for (let i = 0; i < first5.length; i++) {
         const piece = pieces.filter((element) => { return element.name == first5[i] })[0]; // get piece object
-        const pieceheight = piece.shape1.length;
-        const piecelength = piece.shape1[0].length;
-        for (let column = 0; column < pieceheight; column++) {
-            for (let row = 0; row < piecelength; row++) {
-                if (piece.shape1[column][row] != 1) continue; // pattern to colour in
-                let mino = document.createElement('div');
-                const newcol = column + (3 * i) + 1;
-                const newrow = row + ((piece.name == 'o') ? 2 : 1);
-                mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1` // render next minos
-                mino.style.backgroundColor = piece.colour;
-                DOMNext.appendChild(mino);
-            }
-        }
+        renderPiece(DOMNext, piece, 'shape1', 1 + (3 * i), ((piece.name == 'o') ? 2 : 1))
     }
 }
 
@@ -427,33 +390,16 @@ function holdPiece() { // similar to next queue
 
     if (heldpiece.piece == null) { // first time holding
         heldpiece.piece = currentPiece;
-        hitGround();
+        lockPiece();
     } else { // swap hold and current piece
-        let newpiece = heldpiece.piece;
-        heldpiece.piece = currentPiece;
-        currentPiece = newpiece;
-        rotationState = 1;
-        clearTimeout(lockdelayfunc);
-        lockdelayfunc = null;
-        lockcount = 0;
+        [heldpiece.piece, currentPiece] = [currentPiece, heldpiece.piece]
+        resetVariables();
         drawPiece(currentPiece);
     }
 
     const DOMheldpiece = document.querySelectorAll('.hold')[0];
     DOMheldpiece.replaceChildren();
-    const pieceheight = heldpiece.piece.shape1.length;
-    const piecelength = heldpiece.piece.shape1[0].length;
-    for (let column = 0; column < pieceheight; column++) {
-        for (let row = 0; row < piecelength; row++) {
-            if (heldpiece.piece.shape1[column][row] != 1) continue; // pattern to colour in
-            let mino = document.createElement('div');
-            const newcol = column + 1;
-            const newrow = row + ((heldpiece.piece.name == 'o') ? 2 : 1);
-            mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`
-            mino.style.backgroundColor = heldpiece.piece.colour;
-            DOMheldpiece.appendChild(mino);
-        }
-    }
+    renderPiece(DOMheldpiece, heldpiece.piece, 'shape1', 1, ((heldpiece.piece.name == 'o') ? 2 : 1));
     heldpiece.occured = true;
 }
 
@@ -469,6 +415,48 @@ function drawGrid() {
     }
 }
 
+function renderPiece(parentDiv, piece, shape, coladjust, rowadjust, bg = piece.colour, opacity = "100%", classname = null) {
+    for (let column = 0; column < piece[shape].length; column++) {
+        for (let row = 0; row < piece[shape].length; row++) {
+            if (piece[shape][column][row] != 1) continue; // pattern to colour in
+            let mino = document.createElement('div');
+            const newcol = column + coladjust;
+            const newrow = row + rowadjust;
+            mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`
+            mino.style.backgroundColor = bg;
+            mino.style.opacity = opacity;
+            parentDiv.appendChild(mino);
+            if (classname != null) mino.classList.add(classname);
+        }
+    }
+}
+
+function renderPieceFromCoords(parentDiv, coords, coladjust, rowadjust, piece, classname) {
+    coords.forEach((coord) => {
+        let mino = document.createElement('div');
+        let newrow = coord[0] + rowadjust;
+        let newcol = coord[1] + coladjust;
+        mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`; // render new minos based of transformations
+        mino.style.backgroundColor = piece.colour;
+        mino.style.outline = `1px solid ${piece.colour}`;
+        mino.classList.add(classname)
+        parentDiv.appendChild(mino);
+    })
+}
+
+function renderPieceMovement(direction, minos) {
+    for (let i = 0; i < minos.length; i++) {
+        let gridarea = minos[i].style.gridArea.split('/');
+        newrow = direction == 'RIGHT' ? Number(gridarea[1]) + 1 :
+            direction == 'LEFT' ? Number(gridarea[1]) - 1 :
+                Number(gridarea[1])
+        newheight = direction == 'DOWN' ? Number(gridarea[0]) + 1 :
+            Number(gridarea[0])
+        minos[i].style.gridArea = `${newheight} / ${newrow} / span 1 / span 1`; // render moved minos
+    }
+}
+
+// data
 const pieces = [
     {
         name: "z",
