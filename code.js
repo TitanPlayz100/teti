@@ -81,66 +81,38 @@ function endDasArr() {
     sdarrfunc = null;
 }
 
-// piece movements
-// # checks
-function checkCollisionRotate(x, y, stoppedMinos) {
-    let collision = false;
-    if (x < 1 || x > 10 || y < 1) collision = true; // mino off board
-    stoppedMinos.forEach((mino) => {
-        let stoppedgridmino = mino.style.gridArea.split('/');
-        let x2 = Number(stoppedgridmino[1]);
-        let y2 = 21 - Number(stoppedgridmino[0]);
-        if (y == y2 && x == x2) collision = true; // mino collided with other mino
-    });
-    return collision;
-}
-
-function checkCollisionSide(minos, stoppedMinos, direction) {
-    for (let i = 0; i < minos.length; i++) {
-        let gridarea = minos[i].style.gridArea.split('/');
-        let x = Number(gridarea[1]);
-        let y = Number(gridarea[0]);
-        if (direction == "RIGHT") {
-            if (x == 10) return true;
-        } else {
-            if (x == 1) return true;
+function checkCollision(coords, stoppedMinos, action) {
+    for (let coord of coords) {
+        const x = coord[0], y = coord[1];
+        switch (action) {
+            case "RIGHT": if (x == 10) return true; break;
+            case "LEFT": if (x == 1) return true; break;
+            case "DOWN": if (y > 19) return true; break;
+            case "ROTATE": if (x < 1 || x > 10 || y < 1) return true; break;
         }
-        for (let j = 0; j < stoppedMinos.length; j++) {
-            let gridarea2 = stoppedMinos[j].style.gridArea.split('/');
+        for (let stopped of stoppedMinos) {
+            let gridarea2 = stopped.style.gridArea.split('/');
             let x2 = Number(gridarea2[1]);
             let y2 = Number(gridarea2[0]);
-            if (direction == 'RIGHT') {
-                if (x + 1 == x2 && y == y2) return true;
-            } else {
-                if (x - 1 == x2 && y == y2) return true
+            switch (action) {
+                case "RIGHT": if (x + 1 == x2 && y == y2) return true; break;
+                case "LEFT": if (x - 1 == x2 && y == y2) return true; break;
+                case "ROTATE": if (y == 21 - y2 && x == x2) return true; break;
+                case "DOWN": if (x == x2 && y + 1 == y2) {
+                    if (y == 2) endGame();
+                    return true;
+                } break;
             }
         }
     }
-    return false;
+    return false
 }
 
-function checkFalling(harddrop) {
-    const DOMminos = document.querySelectorAll('.active');
-    const DOMminostopped = document.querySelectorAll('.stopped');
-    let falling = true;
-    DOMminos.forEach((piece) => {
-        let gridarea = piece.style.gridArea.split('/');
-        if (Number(gridarea[0]) > 19) falling = false; // reached bottom of board
-        DOMminostopped.forEach((stoppedmino) => {
-            let gridarea2 = stoppedmino.style.gridArea.split('/');
-            if ((Number(gridarea[0]) + 1) == Number(gridarea2[0])
-                && Number(gridarea[1]) == Number(gridarea2[1])) {
-                if (Number(gridarea[0]) == 2) endGame();// reached top of board
-                falling = false;                        // hit mino
-            }
-        });
-    });
-    if (!falling) { // cannot go down further
-        if (harddrop || lockcount > maxLockMovements) { lockPiece(DOMminos); } // harddrop instant
-        else { lockdelayfunc = setTimeout(() => { lockPiece(DOMminos); }, lockDelay); } // set lock start
-        return true;
-    }
-    return false;
+function ConvertToCoords(minos) {
+    return [...minos].map((mino) => {
+        let gridarea = mino.style.gridArea.split('/');
+        return [Number(gridarea[1]), Number(gridarea[0])];
+    })
 }
 
 // movement logic
@@ -160,21 +132,20 @@ function rotate(type) {
             if (cell === 1) rotatingCoords.push([rowIdx + currentLoc[0], column + currentLoc[1]]);
         });
     });
-    kickdata.forEach((transformation) => {
-        if (rotate == true) return;
-        let canspin = true;
-        rotatingCoords.forEach((coord) => {
-            const x = coord[0] + transformation[0];
-            const y = (21 - coord[1]) + transformation[1];
-            if (checkCollisionRotate(x, y, DOMstopped) == true) canspin = false;
+    for (let transformation of kickdata) {
+        const coords = rotatingCoords.map((coord) => {
+            return [coord[0] + transformation[0], (21 - coord[1]) + transformation[1]]
         });
-        if (canspin == true) { newtranformations = transformation; rotate = true; } // if nothing failed, then use that transformations for spin
-    });
-    if (rotate == false) { return; }
+        if (!checkCollision(coords, DOMstopped, 'ROTATE')) {
+            newtranformations = transformation;
+            rotate = true;
+            break;
+        }
+    }
+    if (rotate == false) return;
 
     document.querySelectorAll('.active').forEach((mino) => { mino.remove() });
-    renderPieceFromCoords(DOMboard,
-        rotatingCoords, -1 * newtranformations[1],
+    renderPieceFromCoords(DOMboard, rotatingCoords, -1 * newtranformations[1],
         newtranformations[0], currentPiece, 'active');
     currentLoc = [currentLoc[0] + newtranformations[0], currentLoc[1] - newtranformations[1]]
     rotationState = newrotationstate;
@@ -211,7 +182,7 @@ function getKickData(piece, rotationType, rotation) {
 function movePieceSide(direction, instant) {
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
-    if (checkCollisionSide(DOMminos, DOMminostopped, direction)) return;
+    if (checkCollision(ConvertToCoords(DOMminos), DOMminostopped, direction)) return;
     renderPieceMovement(direction, DOMminos);
     currentLoc[0] = direction == 'RIGHT' ? currentLoc[0] + 1 : currentLoc[0] - 1;
     renderShadowPiece();
@@ -221,19 +192,24 @@ function movePieceSide(direction, instant) {
 
 function movePieceDown(harddrop, softdrop) {
     const DOMminos = document.querySelectorAll('.active');
+    const DOMminostopped = document.querySelectorAll('.stopped');
     if (lockdelayfunc != null) { // if piece is locking and used harddrop
         if (harddrop) lockPiece(DOMminos);
         return;
     };
     renderPieceMovement('DOWN', DOMminos);
     currentLoc[1] += 1;
-    if (checkFalling(harddrop, false)) return; // after drop if piece is on floor then dont harddrop or softdrop 
+    if (checkCollision(ConvertToCoords(DOMminos), DOMminostopped, 'DOWN')) {
+        if (harddrop || lockcount > maxLockMovements) { lockPiece(DOMminos); } // harddrop instant
+        else { lockdelayfunc = setTimeout(() => { lockPiece(DOMminos); }, lockDelay); } // set lock start
+        return;
+    }
     if (harddrop) movePieceDown(true, false);
     if (softdrop) movePieceDown(false, true);
 }
 
 // mechanics
-function lockPiece(DOMminos=[]) { // set piece from active to stopped
+function lockPiece(DOMminos = []) { // set piece from active to stopped 
     DOMminos.forEach((mino) => {
         mino.classList.remove('active');
         mino.classList.add('stopped');
@@ -246,10 +222,15 @@ function lockPiece(DOMminos=[]) { // set piece from active to stopped
 }
 
 function incrementLock() { // reset lockdelay, increment lock count
+    const DOMminos = document.querySelectorAll('.active');
+    const DOMminostopped = document.querySelectorAll('.stopped');
     clearTimeout(lockdelayfunc);
     lockdelayfunc = null;
     lockcount++;
-    checkFalling(false, false);
+    if (checkCollision(ConvertToCoords(DOMminos), DOMminostopped, 'DOWN')) {
+        if (lockcount > maxLockMovements) { lockPiece(DOMminos); }
+        else { lockdelayfunc = setTimeout(() => { lockPiece(DOMminos); }, lockDelay); } // set lock start
+    }
 }
 
 function resetVariables() {
@@ -307,13 +288,12 @@ function clearLines() {
 }
 
 function randomiser() {
-    if (remainingpieces[1].length == 0) { // empty bag 2
-        pieces.forEach((piece) => remainingpieces[1].push(piece.name)) // add pieces
-        remainingpieces[1] = shuffleArray(remainingpieces[1]) // shuffle bag 2
+    if (remainingpieces[1].length == 0) { 
+        pieces.forEach((piece) => remainingpieces[1].push(piece.name)) 
+        remainingpieces[1] = shuffleArray(remainingpieces[1]) 
     }
-    if (remainingpieces[0].length == 0) { // empty bag 1, move bag 2 to bag 1, refill bag 2
-        remainingpieces[0] = remainingpieces[1];
-        remainingpieces[1] = [];
+    if (remainingpieces[0].length == 0) { 
+        remainingpieces = [remainingpieces[1], []]
         pieces.forEach((piece) => remainingpieces[1].push(piece.name))
         remainingpieces[1] = shuffleArray(remainingpieces[1])
     }
@@ -385,8 +365,7 @@ function updateNext() {
 
 function holdPiece() { // similar to next queue
     if (heldpiece.occured == true) return;
-    const DOMminos = document.querySelectorAll('.active');
-    DOMminos.forEach((mino) => mino.remove());
+    document.querySelectorAll('.active').forEach((mino) => mino.remove());
 
     if (heldpiece.piece == null) { // first time holding
         heldpiece.piece = currentPiece;
