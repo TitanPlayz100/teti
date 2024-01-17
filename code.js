@@ -1,4 +1,5 @@
 // GLOBALS
+let timeouts = { 'btbtext': 0, 'tspintext': 0, 'cleartext': 0, 'combotext': 0, 'perfectcleartext': 0 }
 let loopfunction, currentPiece, currentLoc, dasfunc, arrfunc, sdarrfunc, lockdelayfunc;
 let rotationState = 1;
 let heldpiece = { piece: null, occured: false };
@@ -10,18 +11,25 @@ let tspin = false;
 let minispin = false;
 let BTBcount = -1;
 
-// settings
+// display
+const bgcolour = 'rgb(25, 25, 25)';
+const boardcolour = 'black'
+const gridopacity = 0;
+const shadowOpacity = 20;
+const BoardHeightPercent = 70;
 const grid = true;
+const colouredShadow = true;
+
+// settings
 const arr = 0;
 const das = 75;
 const sdarr = 0;
 const gravitySpeed = 1000;
-const shadowOpacity = 20;
 const lockDelay = 1000;
 const maxLockMovements = 15;
 const nextPieces = 5;
-const colouredShadow = true;
 
+// keys
 const rightKey = 'ArrowRight';
 const leftKey = 'ArrowLeft';
 const cwKey = 'ArrowUp';
@@ -33,6 +41,11 @@ const resetKey = 'd'
 const rotate180Key = 'x'
 
 function main() {
+    document.getElementById('body').style.backgroundColor = bgcolour;
+    document.getElementById('board').style.backgroundColor = boardcolour;
+    document.getElementById('hold').style.backgroundColor = boardcolour;
+    document.getElementById('next').style.backgroundColor = boardcolour;
+    document.getElementById('board').style.height = `${BoardHeightPercent}vh`;
     if (grid) drawGrid();
     drawPiece(randomiser()); // render first piece
     if (gravitySpeed != 0) { // loop for dropping piece through gravity
@@ -127,7 +140,7 @@ function rotate(type) {
     const DOMstopped = document.querySelectorAll('.stopped');
     const newRotation = getNewRotationState(type);
     const kickdata = getKickData(currentPiece, type, newRotation);
-    const rotatingCoords = pieceToCoords(currentPiece, 'shape' + newRotation, currentLoc[0], currentLoc[1]);
+    const rotatingCoords = pieceToCoords(currentPiece, 'shape' + newRotation, currentLoc);
     const newTransformation = kickdata.find((transformation) => {
         const dx = transformation[0], dy = transformation[1]
         const coords = rotatingCoords.map((coord) => [coord[0] + dx, coord[1] - dy]);
@@ -135,7 +148,7 @@ function rotate(type) {
     });
     if (newTransformation == undefined) return;
     removeMinos('.active')
-    renderPieceFromCoords(document.getElementsByClassName('board')[0],
+    renderPieceFromCoords(document.getElementById('playingfield'),
         rotatingCoords, -1 * newTransformation[1], newTransformation[0], currentPiece, 'active');
     currentLoc = [currentLoc[0] + newTransformation[0], currentLoc[1] - newTransformation[1]]
     if (checkTspin(newRotation, currentLoc, DOMstopped, newTransformation)) tspin = true;
@@ -229,7 +242,7 @@ function resetGame() {
     endDasArr();
     resetVariables()
     clearInterval(loopfunction);
-    resetBoard([".board", ".next", ".hold"]);
+    removeElements(["#grid", "#next", "#hold", "#playingfield"]);
     main();
 }
 
@@ -245,31 +258,7 @@ function clearLines() {
             .filter((mino) => Number(mino.style.gridArea.split('/')[0]) < row);
         renderPieceMovement('DOWN', moveMinos) // move other minos down
     }
-    displayLineClear(clearRows.length, document.querySelectorAll('.stopped'))
-}
-
-function displayLineClear(count, remainingMinos) {
-    let cleartype = '';
-    if (tspin || minispin || count == 4) {
-        BTBcount += 1;
-        if (BTBcount > 0) cleartype += `BTB ${BTBcount} `
-    } else {
-        if (count != 0) BTBcount = -1;
-    }
-
-    if (minispin) cleartype += 'mini ';
-    if (tspin) cleartype += 'tspin ';
-
-    switch (count) {
-        case 0: cleartype += ''; combonumber = -1; break;
-        case 1: cleartype += 'single '; combonumber += 1; break;
-        case 2: cleartype += 'double '; combonumber += 1; break;
-        case 3: cleartype += 'triple '; combonumber += 1; break;
-        case 4: cleartype += 'tetris '; combonumber += 1; break;
-    }
-    if (combonumber > 0) cleartype += `combo ${combonumber} `
-    if (remainingMinos.length == 0) cleartype += "perfect clear "
-    if (cleartype != '') console.log(cleartype)
+    renderActionText(clearRows.length, document.querySelectorAll('.stopped'))
 }
 
 function randomiser() {
@@ -284,7 +273,7 @@ function randomiser() {
     }
     const piece = remainingpieces[0][0]; // take first piece from first bag
     remainingpieces[0].splice(0, 1);
-    return pieces.filter((element) => { return element.name == piece })[0]; // return piece object from pieces
+    return pieces.filter((element) => { return element.name == piece })[0];
 }
 
 function shuffleArray(array) {
@@ -296,7 +285,7 @@ function shuffleArray(array) {
 }
 
 function drawPiece(piece) {
-    const DOMboard = document.getElementsByClassName('board')[0];
+    const DOMboard = document.getElementById('playingfield');
     let offset = (piece.name == 'o') ? 4 : 3 // since o is smaller, set different starting pos
     renderPieceFromCoords(DOMboard, pieceToCoords(piece, 'shape1'), 1, 1 + offset, piece, 'active')
     currentLoc = [offset + 1, 1];
@@ -307,7 +296,7 @@ function drawPiece(piece) {
 
 function renderShadowPiece() {
     removeMinos('.shadow')
-    const DOMboard = document.getElementsByClassName('board')[0];
+    const DOMboard = document.getElementById('playingfield');
     const DOMminostopped = document.querySelectorAll('.stopped');
     const coords = pieceToCoords(currentPiece, 'shape' + rotationState);
     const colour = colouredShadow ? currentPiece.colour : "#1a1a1a";
@@ -322,13 +311,13 @@ function renderShadowPiece() {
 }
 
 function updateNext() {
-    const DOMNext = document.getElementsByClassName('next')[0];
+    const DOMNext = document.getElementById('next');
     removeMinos('.nextmino')
     let first5 = remainingpieces[0]
         .concat(remainingpieces[1])
         .slice(0, (nextPieces > 5 ? 5 : nextPieces));
     for (let i = 0; i < first5.length; i++) {
-        const piece = pieces.filter((element) => { return element.name == first5[i] })[0]; // get piece object
+        const piece = pieces.filter((element) => { return element.name == first5[i] })[0];
         renderPieceFromCoords(DOMNext, pieceToCoords(piece, 'shape1'),
             1 + (3 * i), ((piece.name == 'o') ? 2 : 1), piece, 'nextmino');
     }
@@ -348,7 +337,7 @@ function holdPiece() {
         resetVariables();
         drawPiece(currentPiece);
     }
-    const DOMheldpiece = document.querySelectorAll('.hold')[0];
+    const DOMheldpiece = document.getElementById('hold');
     DOMheldpiece.replaceChildren();
     renderPieceFromCoords(DOMheldpiece, pieceToCoords(heldpiece.piece, 'shape1'),
         1, ((heldpiece.piece.name == 'o') ? 2 : 1), heldpiece.piece)
@@ -357,11 +346,13 @@ function holdPiece() {
 
 // screen rendering
 function drawGrid() {
-    const DOMboard = document.getElementsByClassName('board')[0];
+    const DOMboard = document.getElementById('grid');
     for (let col = 0; col < 20; col++) {
         for (let row = 0; row < 10; row++) {
             let mino = document.createElement('div');
             mino.style.gridArea = `${col + 1} / ${row + 1} /span 1/span 1`
+            mino.style.border = '0.5px solid white'
+            mino.style.opacity = `${gridopacity}%`;
             mino.classList.add('gridLine');
             if (col < 2) mino.classList.add('dangerZone')
             DOMboard.appendChild(mino);
@@ -369,12 +360,13 @@ function drawGrid() {
     }
 }
 
-function renderPieceFromCoords(parentDiv, coords, heightadjust = 0, rowadjust = 0, piece, classname = null, colour = piece.colour, opacity = "100%") {
+function renderPieceFromCoords(parentDiv, coords, heightadjust = 0, rowadjust = 0, piece,
+    classname = null, colour = piece.colour, opacity = "100%") {
     coords.forEach((coord) => {
         let mino = document.createElement('div');
         let newrow = coord[0] + rowadjust;
         let newcol = coord[1] + heightadjust;
-        mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`; // render new minos based of transformations
+        mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`; // render new minos
         mino.style.backgroundColor = colour;
         mino.style.opacity = opacity;
         if (classname != null) mino.classList.add(classname)
@@ -396,11 +388,33 @@ function renderPieceMovement(direction, minos) {
     }
 }
 
+function renderActionText(count, remainingMinos) {
+    const isBTB = ((tspin || minispin || count == 4) && count > 0);
+    if (isBTB) { BTBcount += 1; }
+    else if (count != 0) { BTBcount = -1 };
+    combonumber = count == 0 ? -1 : combonumber + 1
+    let clear = cleartypes[count];
+    let mini = minispin ? 'Mini ' : '';
+
+    if (isBTB && BTBcount > 0) setText('btbtext', `BTB ${BTBcount} `, 2000);
+    if (tspin) setText('tspintext', mini + 'T-Spin', 2000);
+    if (clear != '') setText('cleartext', clear, 2000);
+    if (combonumber > 0) setText('combotext', `Combo ${combonumber}`, 2000);
+    if (remainingMinos.length == 0) setText('perfectcleartext', "Perfect Clear", 3000);
+}
+
+function setText(id, text, duration) {
+    const textbox = document.getElementById(id)
+    textbox.textContent = text;
+    if (timeouts[id] != 0) { clearTimeout(timeouts[id]); timeouts[id] = 0; }
+    timeouts[id] = setTimeout(() => textbox.textContent = '', duration);
+}
+
 // misc functions
 function removeMinos(id) { document.querySelectorAll(id).forEach((mino) => mino.remove()); }
 
-function resetBoard(classes) {
-    classes.forEach((classname) => { document.querySelectorAll(classname)[0].replaceChildren(); })
+function removeElements(names) {
+    names.forEach((name) => { document.querySelectorAll(name)[0].replaceChildren(); })
 }
 
 function minoToCoords(minos) {
@@ -410,7 +424,8 @@ function minoToCoords(minos) {
     })
 }
 
-function pieceToCoords(piece, shape, dx = 0, dy = 0) {
+function pieceToCoords(piece, shape, change = [0, 0]) {
+    const dx = change[0], dy = change[1]
     return piece[shape].flatMap((row, column) =>
         row.reduce((acc, cell, rowIdx) => {
             if (cell == 1) acc.push([rowIdx + dx, column + dy]);
@@ -590,31 +605,31 @@ const pieces = [
     }
 ];
 
-// CCW data is CW data * -1  |   i piece is 2nd array
-const KickDataCW = [[
-    [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]], // 4 -> 1 -> 4
-    [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]], // 1 -> 2 -> 1
-    [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]], // 2 -> 3 -> 2
-    [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]] // 3 -> 4 -> 3
-], [
-    [[0, 0], [1, 0], [-2, 0], [1, -2], [-2, 1]], // 4 -> 1
-    [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]], // 1 -> 2
-    [[0, 0], [-1, 0], [2, 0], [-1, 2], [2, -1]], // 2 -> 3
-    [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]] // 3 -> 4
+const KickDataCW = [[                           // CCW data is CW data * -1
+    [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],   // 4 -> 1 -> 4
+    [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],  // 1 -> 2 -> 1
+    [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],      // 2 -> 3 -> 2
+    [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]]      // 3 -> 4 -> 3
+], [                                            // I piece kicks
+    [[0, 0], [1, 0], [-2, 0], [1, -2], [-2, 1]],    // 4 -> 1      
+    [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],    // 1 -> 2
+    [[0, 0], [-1, 0], [2, 0], [-1, 2], [2, -1]],    // 2 -> 3
+    [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]]     // 3 -> 4
 ]]
 
 const KickData180 = [[
-    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]], // 3 -> 1
-    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]], // 4 -> 2
-    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]], // 1 -> 3
-    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]], // 2 -> 4
-], [
-    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]], // 3 -> 1
-    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]], // 4 -> 2
-    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]], // 1 -> 3
-    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]], // 2 -> 4
+    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 3 -> 1
+    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],    // 4 -> 2
+    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],    // 1 -> 3
+    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 2 -> 4
+], [                                            // I piece kicks
+    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 3 -> 1      
+    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],    // 4 -> 2
+    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],    // 1 -> 3
+    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 2 -> 4
 ]];
 
 const spinMinoChecks = [[[0, 0], [2, 0]], [[2, 0], [2, 2]], [[0, 2], [2, 2]], [[0, 0], [0, 2]]]
+const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' }
 
 main();

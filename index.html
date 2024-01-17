@@ -1,4 +1,5 @@
-<!DOCTYPE html lang="en">
+<!DOCTYPE html>
+<html  lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,12 +7,20 @@
     <link rel="stylesheet" href="style.css">
     <script defer src="code.js"></script>
 </head>
-<body>
-    <div class="board field"></div>
-    <div class="next field"></div>
-    <div class="hold field"></div>
-    <p class="tnext text field">Next</p>
-    <p class="thold text field">Hold</p>
+<body id="body">
+    <div id="board">
+        <div id="grid"></div>
+        <div id="next"></div>
+        <div id="hold"></div>
+        <div id="playingfield"></div>
+        <p class="text" style="left: 110%; bottom: 100%;">Next</p>
+        <p class="text" style="right: 110%; bottom: 100%;">Hold</p>
+        <p class="actiontext" id="tspintext" style="right: 105%; top: 20%;"> </p>
+        <p class="actiontext" id="cleartext" style="right: 105%; top: 25%;"> </p>
+        <p class="actiontext" id="combotext" style="right: 105%; top: 35%;"> </p>
+        <p class="actiontext" id="btbtext" style="right: 105%; top: 40%;"> </p>
+        <p class="actiontext" id="perfectcleartext" style="right: 105%; top: 50%;"> </p>
+    </div>
 </body>
 </html>
 
@@ -19,5 +28,4 @@
     TODO
 - set settings
 - stat display
-- score
 -->
