@@ -44,7 +44,7 @@ body {
     grid-template-rows: repeat(15, 1fr);
     height: 75%;
     width: 40%;
-    border: 2px solid rgb(255, 202, 202);
+    border: 2px solid rgb(255, 255, 255);
 }
 
 #hold {
@@ -56,12 +56,11 @@ body {
     grid-template-rows: repeat(3, 1fr);
     height: 15%;
     width: 40%;
-    border: 2px solid rgb(202, 195, 255);
 }
 
 .actiontext {
     position: fixed;
-    font-size: 2vw;
+    font-size: 3.5vh;
     margin: 0;
     text-align: right;
     width: 200%;
@@ -69,7 +68,7 @@ body {
 
 .text {
     position: fixed;
-    font-size: 2vw;
+    font-size: 3.5vh;
     margin: 0;
 }
 
