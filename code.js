@@ -1,19 +1,10 @@
 // GLOBALS
-let timeouts = { 'btbtext': 0, 'tspintext': 0, 'cleartext': 0, 'combotext': 0, 'pctext': 0, 'das': 0, 'arr': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0 }
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack;
-let heldpiece = { piece: null, occured: false };
-let gameEnd = false;
-let remainingpieces = [[], []]
-let lockcount = 0;
-let combonumber = -1;
-let BTBcount = -1;
-let tspin = false;
-let minispin = false;
-let firstMovement = false;
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, BTBcount, isTspin, isMini, firstMovement;
+let timeouts = { 'btbtext': 0, 'tspintext': 0, 'cleartext': 0, 'combotext': 0, 'pctext': 0, 'rightarr': 0, 'leftarr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0 }
 
 // display
 const bgcolour = 'rgb(25, 25, 25)';
-const boardcolour = 'black'
+const boardcolour = 'black';
 const gridopacity = 10;
 const shadowOpacity = 20;
 const BoardHeightPercent = 70;
@@ -23,12 +14,15 @@ const colouredQueues = true;
 
 // settings
 const arr = 0;
-const das = 75;
+const das = 70;
 const sdarr = 0;
 const gravitySpeed = 1000;
-const lockDelay = 1000;
+const lockDelay = 600;
 const maxLockMovements = 15;
 const nextPieces = 5;
+const allowLockout = false;
+const preserveARR = true;
+const infiniteHold = true;
 
 // keys
 const rightKey = 'ArrowRight';
@@ -38,70 +32,87 @@ const ccwKey = 'z';
 const hdKey = ' ';
 const sdKey = 'ArrowDown';
 const holdKey = 'c';
-const resetKey = 'd'
-const rotate180Key = 'x'
+const resetKey = 'd';
+const rotate180Key = 'x';
 
 function StartGame() {
+    resetState();
     renderStyles();
     resetStats();
     renderStats();
-    drawPiece(randomiser()); // render first piece
-    if (gravitySpeed != 0) { // loop for dropping piece through gravity
-        timeouts['gravity'] = setInterval(() => { movePieceDown(false, false) }, gravitySpeed);
-    };
+    drawPiece(randomiser());
 }
 
 this.addEventListener('keydown', event => { // Keyboard listeners
-    if (!firstMovement) {
-        timeouts['stats'] = setInterval(() => { renderStats() }, 100);
-        firstMovement = true;
-    }
-    if (event.repeat) return;
+    if (!firstMovement) firstMove();
     if (gameEnd) return;
-    if (event.key == resetKey) resetGame();
+    if (event.repeat) return;
+    if (event.key == resetKey) StartGame();
     if (event.key == cwKey) rotate("CW");
     if (event.key == ccwKey) rotate("CCW");
     if (event.key == rotate180Key) rotate("180");
     if (event.key == hdKey) movePieceDown(true, false);
     if (event.key == holdKey) holdPiece();
-    if (event.key == rightKey) { startDas("RIGHT") }
-    if (event.key == leftKey) { startDas("LEFT") }
-    if (event.key == sdKey) {
-        if (sdarr == 0) { movePieceDown(false, true) }
-        else { timeouts['sd'] = setInterval(() => { movePieceDown(false, false); }, sdarr); }
-    }
+    if (event.key == rightKey) startDas("RIGHT");
+    if (event.key == leftKey) startDas("LEFT");
+    if (event.key == sdKey) startArrSD();
 });
 
 this.addEventListener('keyup', event => {
-    if (event.key == rightKey || event.key == leftKey || event.key == sdKey) endDasArr();
+    if (event.key == rightKey) endDasArr('rightarr');
+    if (event.key == leftKey) endDasArr('leftarr');
+    if (event.key == sdKey) endDasArr('sd');
 });
 
-function startDas(direction) { // apply custom das and arr
-    movePieceSide(direction, false)
-    endDasArr()
-    timeouts['das'] = setTimeout(() => {
-        if (arr == 0) { movePieceSide(direction, true) }
-        else { timeouts['arr'] = setInterval(() => { movePieceSide(direction, false); }, arr); }
-    }, das);
+function startDas(direction) {
+    movePieceSide(direction, false);
+    timeouts['das'] = setTimeout(() => { startArr(direction) }, das);
 }
 
-function endDasArr() {
-    clearTimeout(timeouts['das']);
-    clearInterval(timeouts['arr']);
-    clearInterval(timeouts['sd'])
-    timeouts['das'] = 0;
-    timeouts['arr'] = 0;
-    timeouts['sd'] = 0;
+function startArr(direction) {
+    if (direction == null) return;
+    if (direction == 'RIGHT') clearTimeout(timeouts['leftarr']);
+    if (direction == 'LEFT') clearTimeout(timeouts['rightarr']);
+    const arrname = direction.toLowerCase() + 'arr'
+    if (arr == 0) { timeouts[arrname] = -1; movePieceSide(direction, true); return; }
+    timeouts[arrname] = setInterval(() => { movePieceSide(direction, false); }, arr);
 }
 
+function startArrSD() {
+    if (sdarr == 0) { timeouts['sd'] = -1; movePieceDown(false, true); return; }
+    timeouts['sd'] = setInterval(() => { movePieceDown(false, false); }, sdarr);
+}
+
+function endDasArr(direction = 'all', preserve = false) {
+    if (direction == 'all') { endDasArr('rightarr'); endDasArr('leftarr'); endDasArr('sd'); }
+    clearInterval(timeouts['das']); timeouts['das'] = 0;
+    if (preserve) return;
+    clearTimeout(timeouts[direction]); timeouts[direction] = 0;
+    if (direction == 'rightarr' && timeouts['leftarr'] != 0) startDas('LEFT');
+    if (direction == 'leftarr' && timeouts['rightarr'] != 0) startDas('RIGHT');
+}
+
+function firstMove() {
+    if (gravitySpeed != 0) { // loop for dropping piece through gravity
+        const DOMminostopped = document.querySelectorAll('.stopped');
+        const coords = minoToCoords(document.querySelectorAll('.active'));
+        if (checkCollision(coords, DOMminostopped, 'DOWN')) incrementLock();
+        timeouts['gravity'] = setInterval(() => { movePieceDown(false, false) }, gravitySpeed);
+    };
+    timeouts['stats'] = setInterval(() => { renderStats() }, 100);
+    firstMovement = true;
+}
+
+// movement
 function checkCollision(coords, stoppedMinos, action) {
     for (let coord of coords) {
         const x = coord[0], y = coord[1];
         switch (action) {
-            case "RIGHT": if (x == 10) return true; break;
-            case "LEFT": if (x == 1) return true; break;
-            case "DOWN": if (y > 19) return true; break;
-            case "ROTATE": if (x < 1 || x > 10 || y > 20) return true; break;
+            case "RIGHT": if (x >= 10) return true; break;
+            case "LEFT": if (x <= 1) return true; break;
+            case "DOWN": if (y <= 1) return true; break;
+            case "ROTATE": if (x < 1 || x > 10 || y < 1) return true; break;
+            case "PLACE": if (y > 20) return true; break;
         }
         for (let stopped of stoppedMinos) {
             let gridarea2 = stopped.style.gridArea.split('/');
@@ -109,11 +120,9 @@ function checkCollision(coords, stoppedMinos, action) {
             switch (action) {
                 case "RIGHT": if (x + 1 == x2 && y == y2) return true; break;
                 case "LEFT": if (x - 1 == x2 && y == y2) return true; break;
-                case "ROTATE": if (y == y2 && x == x2) return true; break;
-                case "DOWN": if (x == x2 && y + 1 == y2) {
-                    if (y == 2) endGame();
-                    return true;
-                } break;
+                case "ROTATE": if (x == x2 && y == y2) return true; break;
+                case "DOWN": if (x == x2 && y - 1 == y2) return true; break;
+                case "SPAWN": if (x == x2 && y == y2) return true; break;
             }
         }
     }
@@ -123,42 +132,44 @@ function checkCollision(coords, stoppedMinos, action) {
 function checkTspin(rotation, location, stoppedMinos, transformation) {
     if (currentPiece.name != 't') return false;
     const x = location[0], y = location[1];
-    const backminos = spinMinoChecks[(rotation + 1) % 4].map((coord) => [coord[0] + x, coord[1] + y]);
-    const frontminos = spinMinoChecks[rotation - 1].map((coord) => [coord[0] + x, coord[1] + y]);
+    const backminos = spinChecks[(rotation + 1) % 4].map((coord) => [coord[0] + x, coord[1] + y]);
+    const frontminos = spinChecks[rotation - 1].map((coord) => [coord[0] + x, coord[1] + y]);
     const back1 = checkCollision([backminos[0]], stoppedMinos, "ROTATE")
     const back2 = checkCollision([backminos[1]], stoppedMinos, "ROTATE")
     const front1 = checkCollision([frontminos[0]], stoppedMinos, "ROTATE")
     const front2 = checkCollision([frontminos[1]], stoppedMinos, "ROTATE")
-    if ((front1 && front2) && (back1 || back2)) { return true; }
-    else if ((front1 || front2) && (back1 && back2)) {
-        if (transformation[0] == 1 && transformation[1] == -2) return true;
-        if (transformation[0] == -1 && transformation[1] == -2) return true;
-        minispin = true; return true;
+    if ((front1 && front2) && (back1 || back2)) { isMini = false; return true };
+    if ((front1 || front2) && (back1 && back2)) {
+        if (transformation[0] == 1 && transformation[1] == -2) { isMini = false; return true };
+        if (transformation[0] == -1 && transformation[1] == -2) { isMini = false; return true };
+        isMini = true; return true;
     }
     return false;
 }
 
 // movement logic
 function rotate(type) {
-    if (currentPiece.name == 'o') { return; }
+    if (currentPiece.name == 'o') return;
     const DOMstopped = document.querySelectorAll('.stopped');
     const newRotation = getNewRotationState(type);
     const kickdata = getKickData(currentPiece, type, newRotation);
-    const rotatingCoords = pieceToCoords(currentPiece, 'shape' + newRotation, currentLoc);
+    const rotatingCoords = pieceToCoords(currentPiece, 'shape' + newRotation, currentLoc, true);
     const newTransformation = kickdata.find((transformation) => {
         const dx = transformation[0], dy = transformation[1]
-        const coords = rotatingCoords.map((coord) => [coord[0] + dx, coord[1] - dy]);
-        if (!checkCollision(coords, DOMstopped, 'ROTATE')) return true;
+        const coords = rotatingCoords.map((coord) => [coord[0] + dx, coord[1] + dy]);
+        return !checkCollision(coords, DOMstopped, 'ROTATE');
     });
     if (newTransformation == undefined) return;
     removeMinos('.active')
     renderPieceFromCoords(document.getElementById('playingfield'),
-        rotatingCoords, -1 * newTransformation[1], newTransformation[0], currentPiece, 'active');
-    currentLoc = [currentLoc[0] + newTransformation[0], currentLoc[1] - newTransformation[1]]
-    if (checkTspin(newRotation, currentLoc, DOMstopped, newTransformation)) tspin = true;
+        rotatingCoords, newTransformation[1], newTransformation[0], currentPiece, 'active');
+    currentLoc = [currentLoc[0] + newTransformation[0], currentLoc[1] + newTransformation[1]]
+    isTspin = checkTspin(newRotation, currentLoc, DOMstopped, newTransformation);
     rotationState = newRotation;
     incrementLock();
     displayShadow();
+    startArr(getCurrentDirection());
+    if (timeouts['sd'] != 0) startArrSD();
 }
 
 function getNewRotationState(type) {
@@ -170,97 +181,121 @@ function getNewRotationState(type) {
 function movePieceSide(direction, instant) {
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
-    if (checkCollision(minoToCoords(DOMminos), DOMminostopped, direction)) return;
+    if (checkCollision(minoToCoords(DOMminos), DOMminostopped, direction)) {
+        clearInterval(timeouts[direction.toLowerCase() + 'arr']);
+        if (timeouts['sd'] != 0) startArrSD();
+        return;
+    };
     renderPieceMovement(direction, DOMminos);
     currentLoc[0] = direction == 'RIGHT' ? currentLoc[0] + 1 : currentLoc[0] - 1;
     displayShadow();
     incrementLock();
-    tspin = false;
-    minispin = false;
-    if (instant) movePieceSide(direction, true);
+    isTspin = false; isMini = false;
+    if (instant) { movePieceSide(direction, true); return; }
+    if (timeouts['sd'] != 0) startArrSD();
 }
 
 function movePieceDown(harddrop, softdrop) {
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
     if (timeouts['lockdelay'] != 0) { // if piece is locking and used harddrop
+        clearInterval(timeouts['sd']);
         if (harddrop) lockPiece(DOMminos);
         return;
     };
     renderPieceMovement('DOWN', DOMminos);
-    tspin = false;
-    minispin = false;
-    currentLoc[1] += 1;
+    isTspin = false; isMini = false;
+    currentLoc[1] -= 1;
     if (checkCollision(minoToCoords(DOMminos), DOMminostopped, 'DOWN')) {
         if (harddrop || lockcount > maxLockMovements) { lockPiece(DOMminos); } // harddrop instant
         else { timeouts['lockdelay'] = setTimeout(() => { lockPiece(DOMminos); }, lockDelay); }
         return;
     }
+    startArr(getCurrentDirection())
     if (harddrop) movePieceDown(true, false);
     if (softdrop) movePieceDown(false, true);
 }
 
+function getCurrentDirection() {
+    let currentDirection = (timeouts['leftarr'] != 0 && timeouts['rightarr'] != 0) ? null
+        : (timeouts['leftarr'] != 0) ? 'LEFT' : (timeouts['rightarr'] != 0) ? 'RIGHT'
+            : null;
+    return currentDirection;
+}
+
 // mechanics
-function lockPiece(DOMminos = []) {
-    DOMminos.forEach((mino) => { mino.classList.remove('active'); mino.classList.add('stopped'); });
+function lockPiece(active = []) {
+    const coordsPlaced = minoToCoords(document.querySelectorAll('.active'));
+    clearTimeout(timeouts['lockdelay']);
+    timeouts['lockdelay'] = 0;
+    lockcount = 0;
+
+    if (checkCollision(coordsPlaced, document.querySelectorAll('.stopped'), 'PLACE') && allowLockout) {
+        endGame('lockout');
+        return;
+    }
+    active.forEach((mino) => { mino.classList.remove('active'); mino.classList.add('stopped'); });
+    clearTimeout(timeouts['gravity']);
     clearLines();
-    resetVariables();
     totalPieceCount++;
     heldpiece.occured = false;
-    endDasArr();
+    isTspin = false; isMini = false;
+    endDasArr(true);
     drawPiece(randomiser());
+
+    const coordsSpawned = minoToCoords(document.querySelectorAll('.active'));
+    if (checkCollision(coordsSpawned, document.querySelectorAll('.stopped'), 'DOWN')) incrementLock();
+    timeouts['gravity'] = setInterval(() => { movePieceDown(false, false); }, gravitySpeed);
 }
 
 function incrementLock() { // reset lockdelay, increment lock count
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
-    clearTimeout(timeouts['lockdelay']);
-    timeouts['lockdelay'] = 0;
-    lockcount++;
+    if (timeouts['lockdelay'] != 0) {
+        clearTimeout(timeouts['lockdelay']);
+        timeouts['lockdelay'] = 0;
+        lockcount++;
+    }
     if (checkCollision(minoToCoords(DOMminos), DOMminostopped, 'DOWN')) {
         if (lockcount > maxLockMovements) { lockPiece(DOMminos); }
         else { timeouts['lockdelay'] = setTimeout(() => { lockPiece(DOMminos); }, lockDelay); }
     }
 }
 
-function resetVariables() {
-    clearTimeout(timeouts['lockdelay']);
-    timeouts['lockdelay'] = 0;
-    lockcount = 0;
-    tspin = false;
-    minispin = false;
-}
-
-function endGame() {
+function endGame(type) {
     gameEnd = true;
     clearInterval(timeouts['gravity']);
     clearInterval(timeouts['stats']);
-    console.log('END');
+    console.log('END', type);
 }
 
-function resetGame() {
+function resetState() {
+    gameEnd = false;
     currentPiece = null; currentLoc = null;
     heldpiece = { piece: null, occured: false };
     remainingpieces = [[], []];
     BTBcount = -1;
     combonumber = -1;
     endDasArr();
-    resetVariables()
     clearInterval(timeouts['gravity']);
+    clearTimeout(timeouts['lockdelay']);
+    timeouts['lockdelay'] = 0;
+    lockcount = 0;
+    isTspin = false; isMini = false;
     removeElements(["#grid", "#next", "#hold", "#playingfield"]);
-    StartGame();
 }
 
 function clearLines() {
     const rows = minoToCoords(document.querySelectorAll('.stopped')).map((coord) => coord[1])
         .reduce((prev, curr) => (prev[curr] = ++prev[curr] || 1, prev), {}) // count minos in row
     const clearRows = Object.keys(rows).filter((key) => rows[key] >= 10).map((row) => Number(row))
+    clearRows.reverse()
     for (let row of clearRows) {
         const DOMstopped = document.querySelectorAll('.stopped');
         [...DOMstopped].filter((mino) => Number(mino.style.gridArea.split('/')[0]) == row)
             .forEach((mino) => mino.remove()) // remove minos on row
         const moveMinos = [...DOMstopped]
-            .filter((mino) => Number(mino.style.gridArea.split('/')[0]) < row);
+            .filter((mino) => Number(mino.style.gridArea.split('/')[0]) > row);
         renderPieceMovement('DOWN', moveMinos) // move other minos down
     }
     renderActionText(clearRows.length, document.querySelectorAll('.stopped'))
@@ -291,24 +326,29 @@ function shuffleArray(array) {
 
 function drawPiece(piece) {
     const DOMboard = document.getElementById('playingfield');
-    let offset = (piece.name == 'o') ? 4 : 3 // since o is smaller, set different starting pos
-    renderPieceFromCoords(DOMboard, pieceToCoords(piece, 'shape1'), 1, 1 + offset, piece, 'active')
-    currentLoc = [offset + 1, 1];
+    const DOMstopped = document.querySelectorAll('.stopped');
+    let offsetx = (piece.name == 'o') ? 5 : 4 // o is smaller, set different pos
+    let offsety = (piece.name == 'o') ? 21 : 20
+    const coords = pieceToCoords(piece, 'shape1', undefined, true);
+    const coordsmapped = coords.map((coord) => [coord[0] + offsetx, coord[1] + offsety]);
+    if (checkCollision(coordsmapped, DOMstopped, 'SPAWN') == true) { endGame('blockout'); return; }
+    renderPieceFromCoords(DOMboard, coords, offsety, offsetx, piece, 'active');
+    currentLoc = [offsetx, offsety];
     rotationState = 1;
     currentPiece = piece;
     updateNext();
     displayShadow();
+    if (preserveARR) startArr(getCurrentDirection());
 }
 
 function displayShadow() {
     removeMinos('.shadow')
     const DOMboard = document.getElementById('playingfield');
     const DOMminostopped = document.querySelectorAll('.stopped');
-    const coords = pieceToCoords(currentPiece, 'shape' + rotationState);
+    const coords = pieceToCoords(currentPiece, 'shape' + rotationState, undefined, true);
     const colour = colouredShadow ? currentPiece.colour : "#1a1a1a";
     const dx = currentLoc[0], dy = currentLoc[1]
     renderPieceFromCoords(DOMboard, coords, dy, dx, currentPiece, 'shadow', colour, shadowOpacity + "%");
-
     while (true) {
         const shadowMinos = document.querySelectorAll('.shadow');
         if (checkCollision(minoToCoords(shadowMinos), DOMminostopped, "DOWN")) break;
@@ -336,13 +376,17 @@ function holdPiece() {
     removeMinos('.active')
     if (heldpiece.piece == null) {
         heldpiece.piece = currentPiece;// first time holding
-        resetVariables();
-        heldpiece.occured = false;
-        endDasArr();
+        clearTimeout(timeouts['lockdelay']);
+        timeouts['lockdelay'] = 0;
+        lockcount = 0;
+        isTspin = false; isMini = false;
         drawPiece(randomiser());
     } else {
         [heldpiece.piece, currentPiece] = [currentPiece, heldpiece.piece]
-        resetVariables();
+        clearTimeout(timeouts['lockdelay']);
+        timeouts['lockdelay'] = 0;
+        lockcount = 0;
+        isTspin = false; isMini = false;
         drawPiece(currentPiece);
     }
     const DOMheldpiece = document.getElementById('hold');
@@ -350,7 +394,7 @@ function holdPiece() {
     renderPieceFromCoords(DOMheldpiece, pieceToCoords(heldpiece.piece, 'shape1'),
         1, ((heldpiece.piece.name == 'o') ? 2 : 1), heldpiece.piece)
     changeColour('hold', heldpiece.piece.colour)
-    heldpiece.occured = true;
+    if (!infiniteHold) heldpiece.occured = true;
 }
 
 // screen rendering
@@ -392,17 +436,18 @@ function renderPieceMovement(direction, minos) {
         switch (direction) {
             case "RIGHT": x += 1; break;
             case "LEFT": x -= 1; break;
-            case "DOWN": y += 1; break;
+            case "DOWN": y -= 1; break;
         }
         mino.style.gridArea = `${y} / ${x} / span 1 / span 1`; // render moved minos
     }
 }
 
 function renderActionText(linecount, remainingMinos) {
-    const isBTB = (tspin || minispin || linecount == 4) && linecount > 0; 
+    const isBTB = ((isTspin || isMini || linecount == 4) && linecount > 0);
     const isPC = remainingMinos.length == 0;
-    const damagetype = (tspin?'Tspin ':'') + (minispin?'mini ':'') + cleartypes[linecount];
-    BTBcount = isBTB? BTBcount + 1: linecount != 0? BTBcount - 1: BTBcount; // increment stats
+    const damagetype = (isTspin ? 'Tspin ' : '') + (isMini ? 'mini ' : '') + cleartypes[linecount];
+    BTBcount = isBTB ? BTBcount + 1 :
+        (linecount != 0) ? - 1 : BTBcount; // increment stats
     combonumber = linecount == 0 ? -1 : combonumber + 1
     totalAttack += calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, BTBcount, isBTB);
 
@@ -438,7 +483,7 @@ function renderStats() {
 }
 
 function changeColour(id, colour) {
-    if (colouredQueues) {document.getElementById(id).style.border = `2px solid ${colour}`;}
+    if (colouredQueues) { document.getElementById(id).style.border = `2px solid ${colour}`; }
 }
 
 // misc functions
@@ -455,25 +500,27 @@ function minoToCoords(minos) {
     })
 }
 
-function pieceToCoords(piece, shape, change = [0, 0]) {
+function pieceToCoords(piece, shape, change = [0, 0], reverseY = false) {
     const dx = change[0], dy = change[1]
-    return piece[shape].flatMap((row, column) =>
-        row.reduce((acc, cell, rowIdx) => {
-            if (cell == 1) acc.push([rowIdx + dx, column + dy]);
-            return acc
-        }, [])
-    );
+    let coords = []
+    for (let col = 0; col < piece[shape].length; col++) {
+        for (let row = 0; row < piece[shape][col].length; row++) {
+            if (piece[shape][col][row] == 1) {
+                coords.push([row + dx, (reverseY ? (piece[shape].length - 1 - col) : col) + dy])
+            }
+        }
+    }
+    return coords;
 }
 
-function getKickData(piece, rotationType, shapeNumber) {
+function getKickData(piece, rotationType, shapeNo) {
     let indexIsI = (piece.name == 'i') ? 1 : 0; // check if i piece
-    let kickdataindex = (rotationType == "CCW") ? (shapeNumber > 3) ? 0 : shapeNumber : shapeNumber - 1;
-    let kickdata = // get correct kick data
-        rotationType == "180" ? KickData180[indexIsI][kickdataindex] :
-            rotationType == "CW" ? KickDataCW[indexIsI][kickdataindex] :
-                rotationType == "CCW" ? KickDataCW[indexIsI][kickdataindex]
-                    .map(row => row.map(element => element * -1)) : null
-    return kickdata;
+    let kickdataindex = (rotationType == "CCW") ? (shapeNo > 3) ? 0 : shapeNo : shapeNo - 1;
+    return {
+        "180": KickData180[indexIsI][kickdataindex],
+        "CW": KickDataCW[indexIsI][kickdataindex],
+        "CCW": KickDataCW[indexIsI][kickdataindex].map(row => row.map(element => element * -1))
+    }[rotationType]
 }
 
 function resetStats() {
@@ -486,7 +533,7 @@ function resetStats() {
 
 function calcDamage(combonumber, damagetype, isPC, btb, isBTB) {
     let calccombo = combonumber > 20 ? 20 : combonumber < 0 ? 0 : combonumber;
-    let damage = 0;    
+    let damage = 0;
     damage += attackValues[damagetype][calccombo]
     if (isPC) damage += attackValues['ALL_CLEAR'];
     if (btb > 0 && isBTB) {
@@ -680,7 +727,7 @@ const KickData180 = [[
     [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 2 -> 4
 ]];
 
-const spinMinoChecks = [[[0, 0], [2, 0]], [[2, 0], [2, 2]], [[0, 2], [2, 2]], [[0, 0], [0, 2]]]
+const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]]
 const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' }
 
 const attackValues = {
