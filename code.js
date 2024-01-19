@@ -1,112 +1,128 @@
-// GLOBALS
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, BTBcount, isTspin, isMini, firstMovement;
-let timeouts = { 'btbtext': 0, 'tspintext': 0, 'cleartext': 0, 'combotext': 0, 'pctext': 0, 'rightarr': 0, 'leftarr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0 }
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, BTBcount, isTspin, isMini, firstMove;
+let timeouts = { 'btbtext': 0, 'tspintext': 0, 'cleartext': 0, 'combotext': 0, 'pctext': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'arr': 0 }
+let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 
-// display
-const bgcolour = 'rgb(25, 25, 25)';
-const boardcolour = 'black';
-const gridopacity = 10;
-const shadowOpacity = 20;
-const BoardHeightPercent = 70;
-const grid = true;
-const colouredShadow = true;
-const colouredQueues = true;
+const displaySettings = {
+    bgcolour: 'rgb(25, 25, 25)',
+    boardcolour: 'black',
+    gridopacity: 10,
+    shadowOpacity: 20,
+    BoardHeightPercent: 70,
+    showGrid: true,
+    colouredShadow: true,
+    colouredQueues: true
+}
 
-// settings
-const arr = 0;
-const das = 70;
-const sdarr = 0;
-const gravitySpeed = 1000;
-const lockDelay = 600;
-const maxLockMovements = 15;
-const nextPieces = 5;
-const allowLockout = false;
-const preserveARR = true;
-const infiniteHold = true;
+const gameSettings = {
+    arr: 0,
+    das: 75,
+    sdarr: 0,
+    gravitySpeed: 1000,
+    lockDelay: 600,
+    maxLockMovements: 15,
+    nextPieces: 5,
+    allowLockout: false,
+    preserveARR: true,
+    infiniteHold: false
+}
 
-// keys
-const rightKey = 'ArrowRight';
-const leftKey = 'ArrowLeft';
-const cwKey = 'ArrowUp';
-const ccwKey = 'z';
-const hdKey = ' ';
-const sdKey = 'ArrowDown';
-const holdKey = 'c';
-const resetKey = 'd';
-const rotate180Key = 'x';
+const keybinds = {
+    rightKey: 'ArrowRight',
+    leftKey: 'ArrowLeft',
+    cwKey: 'ArrowUp',
+    ccwKey: 'z',
+    hdKey: ' ',
+    sdKey: 'ArrowDown',
+    holdKey: 'c',
+    resetKey: 'd',
+    rotate180Key: 'x'
+}
 
 function StartGame() {
     resetState();
     renderStyles();
     resetStats();
     renderStats();
+
     drawPiece(randomiser());
 }
 
-this.addEventListener('keydown', event => { // Keyboard listeners
-    if (!firstMovement) firstMove();
+this.addEventListener('keydown', event => {
+    if (!firstMove) firstMovement();
     if (gameEnd) return;
     if (event.repeat) return;
-    if (event.key == resetKey) StartGame();
-    if (event.key == cwKey) rotate("CW");
-    if (event.key == ccwKey) rotate("CCW");
-    if (event.key == rotate180Key) rotate("180");
-    if (event.key == hdKey) movePieceDown(true, false);
-    if (event.key == holdKey) holdPiece();
-    if (event.key == rightKey) startDas("RIGHT");
-    if (event.key == leftKey) startDas("LEFT");
-    if (event.key == sdKey) startArrSD();
+    if (event.key == keybinds.resetKey) StartGame();
+    if (event.key == keybinds.cwKey) rotate("CW");
+    if (event.key == keybinds.ccwKey) rotate("CCW");
+    if (event.key == keybinds.rotate180Key) rotate("180");
+    if (event.key == keybinds.hdKey) movePieceDown(true, false);
+    if (event.key == keybinds.holdKey) holdPiece();
+    if (event.key == keybinds.rightKey) startDas("RIGHT");
+    if (event.key == keybinds.leftKey) startDas("LEFT");
+    if (event.key == keybinds.sdKey) startArrSD(true);
 });
 
 this.addEventListener('keyup', event => {
-    if (event.key == rightKey) endDasArr('rightarr');
-    if (event.key == leftKey) endDasArr('leftarr');
-    if (event.key == sdKey) endDasArr('sd');
+    if (event.key == keybinds.rightKey) endDasArr('RIGHT');
+    if (event.key == keybinds.leftKey) endDasArr('LEFT');
+    if (event.key == keybinds.sdKey) endDasArr('DOWN');
 });
+
+function firstMovement() {
+    startGravity(); timeouts['stats'] = setInterval(() => { renderStats() }, 100); firstMove = true;
+}
 
 function startDas(direction) {
     movePieceSide(direction, false);
-    timeouts['das'] = setTimeout(() => { startArr(direction) }, das);
+    directionState[direction] = 'das'
+    clearTimeout(timeouts['das']); timeouts['das'] = 0;
+    clearInterval(timeouts['arr']); timeouts['arr'] = 0;
+    timeouts['das'] = setTimeout(() => { startArr(direction); }, gameSettings.das)
 }
 
 function startArr(direction) {
-    if (direction == null) return;
-    if (direction == 'RIGHT') clearTimeout(timeouts['leftarr']);
-    if (direction == 'LEFT') clearTimeout(timeouts['rightarr']);
-    const arrname = direction.toLowerCase() + 'arr'
-    if (arr == 0) { timeouts[arrname] = -1; movePieceSide(direction, true); return; }
-    timeouts[arrname] = setInterval(() => { movePieceSide(direction, false); }, arr);
+    if (direction == 'current') {
+        if (directionState['RIGHT'] == 'arr' && directionState['LEFT'] == 'arr') return;
+        if (directionState['RIGHT'] == 'arr') startArr('RIGHT');
+        if (directionState['LEFT'] == 'arr') startArr('LEFT');
+        return;
+    }
+    directionState[direction] = 'arr';
+    clearInterval(timeouts['arr']);
+    timeouts['arr'] = 0
+    if (gameSettings.arr == 0) { timeouts['arr'] = -1; movePieceSide(direction, true); return; }
+    timeouts['arr'] = setInterval(() => { movePieceSide(direction, false); }, gameSettings.arr);
 }
 
 function startArrSD() {
-    if (sdarr == 0) { timeouts['sd'] = -1; movePieceDown(false, true); return; }
-    timeouts['sd'] = setInterval(() => { movePieceDown(false, false); }, sdarr);
+    directionState['DOWN'] = 'arr';
+    clearInterval(timeouts['sd']);
+    if (gameSettings.sdarr == 0) { timeouts['sd'] = -1; movePieceDown(false, true); return; }
+    timeouts['sd'] = setInterval(() => { movePieceDown(false, false); }, gameSettings.sdarr);
 }
 
-function endDasArr(direction = 'all', preserve = false) {
-    if (direction == 'all') { endDasArr('rightarr'); endDasArr('leftarr'); endDasArr('sd'); }
-    clearInterval(timeouts['das']); timeouts['das'] = 0;
-    if (preserve) return;
-    clearTimeout(timeouts[direction]); timeouts[direction] = 0;
-    if (direction == 'rightarr' && timeouts['leftarr'] != 0) startDas('LEFT');
-    if (direction == 'leftarr' && timeouts['rightarr'] != 0) startDas('RIGHT');
-}
-
-function firstMove() {
-    if (gravitySpeed != 0) { // loop for dropping piece through gravity
-        const DOMminostopped = document.querySelectorAll('.stopped');
-        const coords = minoToCoords(document.querySelectorAll('.active'));
-        if (checkCollision(coords, DOMminostopped, 'DOWN')) incrementLock();
-        timeouts['gravity'] = setInterval(() => { movePieceDown(false, false) }, gravitySpeed);
-    };
-    timeouts['stats'] = setInterval(() => { renderStats() }, 100);
-    firstMovement = true;
+function endDasArr(direction = 'all') {
+    if (direction == 'all') {
+        if (!gameSettings.preserveARR) {
+            directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false }
+            endDasArr('RIGHT'); endDasArr('LEFT'); endDasArr('DOWN');
+        };
+        return;
+    }
+    directionState[direction] = false;
+    if (direction == 'RIGHT' || direction == 'LEFT') {
+        if (directionState[direction == 'RIGHT' ? 'LEFT' : 'RIGHT'] == 'das') return;
+        if (directionState[direction] == 'arr') { startArr(direction); return }
+        clearTimeout(timeouts['das']); timeouts['das'] = 0;
+        clearInterval(timeouts['arr']); timeouts['arr'] = 0;
+    }
+    if (direction == 'DOWN') { clearInterval(timeouts['sd']); timeouts['sd'] = 0; }
 }
 
 // movement
 function checkCollision(coords, stoppedMinos, action) {
     for (let coord of coords) {
-        const x = coord[0], y = coord[1];
+        const [x, y] = coord;
         switch (action) {
             case "RIGHT": if (x >= 10) return true; break;
             case "LEFT": if (x <= 1) return true; break;
@@ -126,55 +142,52 @@ function checkCollision(coords, stoppedMinos, action) {
             }
         }
     }
-    return false
 }
 
 function checkTspin(rotation, location, stoppedMinos, transformation) {
     if (currentPiece.name != 't') return false;
-    const x = location[0], y = location[1];
+    const [x, y] = location;
+    const [dx, dy] = transformation;
+    isMini = false;
     const backminos = spinChecks[(rotation + 1) % 4].map((coord) => [coord[0] + x, coord[1] + y]);
     const frontminos = spinChecks[rotation - 1].map((coord) => [coord[0] + x, coord[1] + y]);
     const back1 = checkCollision([backminos[0]], stoppedMinos, "ROTATE")
     const back2 = checkCollision([backminos[1]], stoppedMinos, "ROTATE")
     const front1 = checkCollision([frontminos[0]], stoppedMinos, "ROTATE")
     const front2 = checkCollision([frontminos[1]], stoppedMinos, "ROTATE")
-    if ((front1 && front2) && (back1 || back2)) { isMini = false; return true };
+    if ((front1 && front2) && (back1 || back2)) return true;
     if ((front1 || front2) && (back1 && back2)) {
-        if (transformation[0] == 1 && transformation[1] == -2) { isMini = false; return true };
-        if (transformation[0] == -1 && transformation[1] == -2) { isMini = false; return true };
+        if ((dx == 1) || (dx == -1) && dy == -2) return true;
         isMini = true; return true;
     }
-    return false;
 }
 
-// movement logic
 function rotate(type) {
     if (currentPiece.name == 'o') return;
     const DOMstopped = document.querySelectorAll('.stopped');
     const newRotation = getNewRotationState(type);
     const kickdata = getKickData(currentPiece, type, newRotation);
     const rotatingCoords = pieceToCoords(currentPiece, 'shape' + newRotation, currentLoc, true);
-    const newTransformation = kickdata.find((transformation) => {
-        const dx = transformation[0], dy = transformation[1]
+    const posChange = kickdata.find((transformation) => {
+        const [dx, dy] = transformation;
         const coords = rotatingCoords.map((coord) => [coord[0] + dx, coord[1] + dy]);
         return !checkCollision(coords, DOMstopped, 'ROTATE');
     });
-    if (newTransformation == undefined) return;
+    if (posChange == undefined) return;
     removeMinos('.active')
-    renderPieceFromCoords(document.getElementById('playingfield'),
-        rotatingCoords, newTransformation[1], newTransformation[0], currentPiece, 'active');
-    currentLoc = [currentLoc[0] + newTransformation[0], currentLoc[1] + newTransformation[1]]
-    isTspin = checkTspin(newRotation, currentLoc, DOMstopped, newTransformation);
+    renderPieceFromCoords(document.getElementById('playingfield'), rotatingCoords, posChange[1],
+        posChange[0], currentPiece, 'active');
+    currentLoc = [currentLoc[0] + posChange[0], currentLoc[1] + posChange[1]]
+    isTspin = checkTspin(newRotation, currentLoc, DOMstopped, posChange);
     rotationState = newRotation;
     incrementLock();
     displayShadow();
-    startArr(getCurrentDirection());
-    if (timeouts['sd'] != 0) startArrSD();
+    startArr('current');
+    if (directionState['DOWN'] == 'arr') startArrSD();
 }
 
 function getNewRotationState(type) {
-    const rotationMapping = { "CW": 1, "CCW": -1, "180": 2 };
-    let newState = (rotationState + rotationMapping[type] || 0) % 4;
+    let newState = (rotationState + rmap[type] || 0) % 4;
     return newState == 0 ? 4 : newState;
 }
 
@@ -182,8 +195,9 @@ function movePieceSide(direction, instant) {
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
     if (checkCollision(minoToCoords(DOMminos), DOMminostopped, direction)) {
-        clearInterval(timeouts[direction.toLowerCase() + 'arr']);
-        if (timeouts['sd'] != 0) startArrSD();
+        clearInterval(timeouts['arr']);
+        timeouts['arr'] = 0
+        if (directionState['DOWN'] == 'arr') startArrSD();
         return;
     };
     renderPieceMovement(direction, DOMminos);
@@ -192,74 +206,75 @@ function movePieceSide(direction, instant) {
     incrementLock();
     isTspin = false; isMini = false;
     if (instant) { movePieceSide(direction, true); return; }
-    if (timeouts['sd'] != 0) startArrSD();
+
 }
 
 function movePieceDown(harddrop, softdrop) {
     const DOMminos = document.querySelectorAll('.active');
-    const DOMminostopped = document.querySelectorAll('.stopped');
+    const stopped = document.querySelectorAll('.stopped');
     if (timeouts['lockdelay'] != 0) { // if piece is locking and used harddrop
-        clearInterval(timeouts['sd']);
-        if (harddrop) lockPiece(DOMminos);
+        if (harddrop) scheduleLock(true);
         return;
     };
     renderPieceMovement('DOWN', DOMminos);
     isTspin = false; isMini = false;
     currentLoc[1] -= 1;
-    if (checkCollision(minoToCoords(DOMminos), DOMminostopped, 'DOWN')) {
-        if (harddrop || lockcount > maxLockMovements) { lockPiece(DOMminos); } // harddrop instant
-        else { timeouts['lockdelay'] = setTimeout(() => { lockPiece(DOMminos); }, lockDelay); }
-        return;
-    }
-    startArr(getCurrentDirection())
+    if (checkCollision(minoToCoords(DOMminos), stopped, 'DOWN')) { scheduleLock(harddrop); return; }
+    startArr('current')
     if (harddrop) movePieceDown(true, false);
     if (softdrop) movePieceDown(false, true);
 }
 
-function getCurrentDirection() {
-    let currentDirection = (timeouts['leftarr'] != 0 && timeouts['rightarr'] != 0) ? null
-        : (timeouts['leftarr'] != 0) ? 'LEFT' : (timeouts['rightarr'] != 0) ? 'RIGHT'
-            : null;
-    return currentDirection;
+// mechanics
+function clearLines() {
+    const rows = minoToCoords(document.querySelectorAll('.stopped')).map((coord) => coord[1])
+        .reduce((prev, curr) => (prev[curr] = ++prev[curr] || 1, prev), {}) // count minos in row
+    const clearRows = Object.keys(rows).filter((key) => rows[key] >= 10).map((row) => Number(row))
+    clearRows.reverse()
+    for (let row of clearRows) {
+        const DOMstopped = document.querySelectorAll('.stopped');
+        [...DOMstopped].filter((mino) => Number(mino.style.gridArea.split('/')[0]) == row)
+            .forEach((mino) => mino.remove()) // remove minos on row
+        const moveMinos = [...DOMstopped]
+            .filter((mino) => Number(mino.style.gridArea.split('/')[0]) > row);
+        renderPieceMovement('DOWN', moveMinos) // move other minos down
+    }
+    renderActionText(clearRows.length, document.querySelectorAll('.stopped'))
 }
 
-// mechanics
-function lockPiece(active = []) {
-    const coordsPlaced = minoToCoords(document.querySelectorAll('.active'));
-    clearTimeout(timeouts['lockdelay']);
-    timeouts['lockdelay'] = 0;
-    lockcount = 0;
+function incrementLock() {
+    const DOMminos = document.querySelectorAll('.active');
+    const DOMminostopped = document.querySelectorAll('.stopped');
+    if (timeouts['lockdelay'] != 0) {
+        clearTimeout(timeouts['lockdelay']); timeouts['lockdelay'] = 0; lockcount++;
+    }
+    if (checkCollision(minoToCoords(DOMminos), DOMminostopped, 'DOWN')) scheduleLock(false);
+}
 
-    if (checkCollision(coordsPlaced, document.querySelectorAll('.stopped'), 'PLACE') && allowLockout) {
+function scheduleLock(harddrop) {
+    if (lockcount > gameSettings.maxLockMovements || harddrop) { lockPiece(); }
+    else { timeouts['lockdelay'] = setTimeout(() => { lockPiece(); }, gameSettings.lockDelay); }
+}
+
+function lockPiece() {
+    const active = document.querySelectorAll('.active');
+    const coordsPlaced = minoToCoords(active);
+    const stoppedMinos = document.querySelectorAll('.stopped');
+    clearTimeout(timeouts['lockdelay']); timeouts['lockdelay'] = 0;
+    lockcount = 0;
+    endDasArr();
+    if (checkCollision(coordsPlaced, stoppedMinos, 'PLACE') && gameSettings.allowLockout) {
         endGame('lockout');
         return;
     }
     active.forEach((mino) => { mino.classList.remove('active'); mino.classList.add('stopped'); });
-    clearTimeout(timeouts['gravity']);
+    clearInterval(timeouts['gravity']);
     clearLines();
     totalPieceCount++;
     heldpiece.occured = false;
     isTspin = false; isMini = false;
-    endDasArr(true);
     drawPiece(randomiser());
-
-    const coordsSpawned = minoToCoords(document.querySelectorAll('.active'));
-    if (checkCollision(coordsSpawned, document.querySelectorAll('.stopped'), 'DOWN')) incrementLock();
-    timeouts['gravity'] = setInterval(() => { movePieceDown(false, false); }, gravitySpeed);
-}
-
-function incrementLock() { // reset lockdelay, increment lock count
-    const DOMminos = document.querySelectorAll('.active');
-    const DOMminostopped = document.querySelectorAll('.stopped');
-    if (timeouts['lockdelay'] != 0) {
-        clearTimeout(timeouts['lockdelay']);
-        timeouts['lockdelay'] = 0;
-        lockcount++;
-    }
-    if (checkCollision(minoToCoords(DOMminos), DOMminostopped, 'DOWN')) {
-        if (lockcount > maxLockMovements) { lockPiece(DOMminos); }
-        else { timeouts['lockdelay'] = setTimeout(() => { lockPiece(DOMminos); }, lockDelay); }
-    }
+    startGravity();
 }
 
 function endGame(type) {
@@ -278,27 +293,10 @@ function resetState() {
     combonumber = -1;
     endDasArr();
     clearInterval(timeouts['gravity']);
-    clearTimeout(timeouts['lockdelay']);
-    timeouts['lockdelay'] = 0;
+    clearTimeout(timeouts['lockdelay']); timeouts['lockdelay'] = 0;
     lockcount = 0;
     isTspin = false; isMini = false;
     removeElements(["#grid", "#next", "#hold", "#playingfield"]);
-}
-
-function clearLines() {
-    const rows = minoToCoords(document.querySelectorAll('.stopped')).map((coord) => coord[1])
-        .reduce((prev, curr) => (prev[curr] = ++prev[curr] || 1, prev), {}) // count minos in row
-    const clearRows = Object.keys(rows).filter((key) => rows[key] >= 10).map((row) => Number(row))
-    clearRows.reverse()
-    for (let row of clearRows) {
-        const DOMstopped = document.querySelectorAll('.stopped');
-        [...DOMstopped].filter((mino) => Number(mino.style.gridArea.split('/')[0]) == row)
-            .forEach((mino) => mino.remove()) // remove minos on row
-        const moveMinos = [...DOMstopped]
-            .filter((mino) => Number(mino.style.gridArea.split('/')[0]) > row);
-        renderPieceMovement('DOWN', moveMinos) // move other minos down
-    }
-    renderActionText(clearRows.length, document.querySelectorAll('.stopped'))
 }
 
 function randomiser() {
@@ -311,7 +309,7 @@ function randomiser() {
         pieces.forEach((piece) => remainingpieces[1].push(piece.name))
         remainingpieces[1] = shuffleArray(remainingpieces[1])
     }
-    const piece = remainingpieces[0][0]; // take first piece from first bag
+    const piece = remainingpieces[0][0];
     remainingpieces[0].splice(0, 1);
     return pieces.filter((element) => { return element.name == piece })[0];
 }
@@ -338,7 +336,7 @@ function drawPiece(piece) {
     currentPiece = piece;
     updateNext();
     displayShadow();
-    if (preserveARR) startArr(getCurrentDirection());
+    if (gameSettings.preserveARR) startArr('current');
 }
 
 function displayShadow() {
@@ -346,9 +344,9 @@ function displayShadow() {
     const DOMboard = document.getElementById('playingfield');
     const DOMminostopped = document.querySelectorAll('.stopped');
     const coords = pieceToCoords(currentPiece, 'shape' + rotationState, undefined, true);
-    const colour = colouredShadow ? currentPiece.colour : "#1a1a1a";
+    const colour = displaySettings.colouredShadow ? currentPiece.colour : "#1a1a1a";
     const dx = currentLoc[0], dy = currentLoc[1]
-    renderPieceFromCoords(DOMboard, coords, dy, dx, currentPiece, 'shadow', colour, shadowOpacity + "%");
+    renderPieceFromCoords(DOMboard, coords, dy, dx, currentPiece, 'shadow', colour, displaySettings.shadowOpacity + "%");
     while (true) {
         const shadowMinos = document.querySelectorAll('.shadow');
         if (checkCollision(minoToCoords(shadowMinos), DOMminostopped, "DOWN")) break;
@@ -361,7 +359,7 @@ function updateNext() {
     removeMinos('.nextmino')
     let first5 = remainingpieces[0]
         .concat(remainingpieces[1])
-        .slice(0, (nextPieces > 5 ? 5 : nextPieces));
+        .slice(0, (gameSettings.nextPieces > 5 ? 5 : gameSettings.nextPieces));
     for (let i = 0; i < first5.length; i++) {
         const piece = pieces.filter((element) => { return element.name == first5[i] })[0];
         renderPieceFromCoords(DOMNext, pieceToCoords(piece, 'shape1'),
@@ -374,19 +372,19 @@ function updateNext() {
 function holdPiece() {
     if (heldpiece.occured) return;
     removeMinos('.active')
-    if (heldpiece.piece == null) {
-        heldpiece.piece = currentPiece;// first time holding
-        clearTimeout(timeouts['lockdelay']);
-        timeouts['lockdelay'] = 0;
+    if (heldpiece.piece == null) {              // first time holding
+        heldpiece.piece = currentPiece;
+        clearTimeout(timeouts['lockdelay']); timeouts['lockdelay'] = 0;
         lockcount = 0;
         isTspin = false; isMini = false;
+        endDasArr()
         drawPiece(randomiser());
     } else {
         [heldpiece.piece, currentPiece] = [currentPiece, heldpiece.piece]
-        clearTimeout(timeouts['lockdelay']);
-        timeouts['lockdelay'] = 0;
+        clearTimeout(timeouts['lockdelay']); timeouts['lockdelay'] = 0;
         lockcount = 0;
         isTspin = false; isMini = false;
+        endDasArr()
         drawPiece(currentPiece);
     }
     const DOMheldpiece = document.getElementById('hold');
@@ -394,7 +392,7 @@ function holdPiece() {
     renderPieceFromCoords(DOMheldpiece, pieceToCoords(heldpiece.piece, 'shape1'),
         1, ((heldpiece.piece.name == 'o') ? 2 : 1), heldpiece.piece)
     changeColour('hold', heldpiece.piece.colour)
-    if (!infiniteHold) heldpiece.occured = true;
+    if (!gameSettings.infiniteHold) heldpiece.occured = true;
 }
 
 // screen rendering
@@ -405,7 +403,7 @@ function drawGrid() {
             let mino = document.createElement('div');
             mino.style.gridArea = `${col + 1} / ${row + 1} /span 1/span 1`
             mino.style.border = '1px solid white'
-            mino.style.opacity = `${gridopacity}%`;
+            mino.style.opacity = `${displaySettings.gridopacity}%`;
             mino.classList.add('gridLine');
             if (col < 2) mino.classList.add('dangerZone')
             DOMboard.appendChild(mino);
@@ -430,9 +428,8 @@ function renderPieceFromCoords(parentDiv, coords, heightadjust = 0, rowadjust = 
 
 function renderPieceMovement(direction, minos) {
     for (let mino of minos) {
-        let gridarea = mino.style.gridArea.split('/');
-        let x = Number(gridarea[1]);
-        let y = Number(gridarea[0]);
+        const gridarea = mino.style.gridArea.split('/');
+        let x = Number(gridarea[1]), y = Number(gridarea[0]);
         switch (direction) {
             case "RIGHT": x += 1; break;
             case "LEFT": x -= 1; break;
@@ -443,18 +440,19 @@ function renderPieceMovement(direction, minos) {
 }
 
 function renderActionText(linecount, remainingMinos) {
-    const isBTB = ((isTspin || isMini || linecount == 4) && linecount > 0);
+    const isBTB = ((isTspin || isMini || linecount == 4) && linecount > 0);     // increment stats
     const isPC = remainingMinos.length == 0;
     const damagetype = (isTspin ? 'Tspin ' : '') + (isMini ? 'mini ' : '') + cleartypes[linecount];
-    BTBcount = isBTB ? BTBcount + 1 :
-        (linecount != 0) ? - 1 : BTBcount; // increment stats
+    BTBcount = isBTB ? BTBcount + 1 : (linecount != 0) ? - 1 : BTBcount;
     combonumber = linecount == 0 ? -1 : combonumber + 1
-    totalAttack += calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, BTBcount, isBTB);
+    const damageDealt = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, BTBcount, isBTB)
+    totalAttack += damageDealt;
 
-    if (damagetype != '') setText('cleartext', damagetype, 2000);
+    if (damagetype != '') setText('cleartext', damagetype, 2000);               // render action text
     if (combonumber > 0) setText('combotext', `Combo ${combonumber}`, 2000);
-    if (isBTB && BTBcount > 0) setText('btbtext', `BTB ${BTBcount} `, 2000); // render action text
+    if (isBTB && BTBcount > 0) setText('btbtext', `BTB ${BTBcount} `, 2000);
     if (isPC) setText('pctext', "Perfect Clear", 2000);
+    if (damageDealt > 0) setText('linessent', `+${damageDealt}`, 1000)
 }
 
 function setText(id, text, duration) {
@@ -465,13 +463,13 @@ function setText(id, text, duration) {
 }
 
 function renderStyles() {
-    document.getElementById('body').style.backgroundColor = bgcolour;
-    document.getElementById('board').style.backgroundColor = boardcolour;
-    document.getElementById('hold').style.backgroundColor = boardcolour;
-    document.getElementById('next').style.backgroundColor = boardcolour;
-    document.getElementById('board').style.height = `${BoardHeightPercent}vh`;
+    document.getElementById('body').style.backgroundColor = displaySettings.bgcolour;
+    document.getElementById('board').style.backgroundColor = displaySettings.boardcolour;
+    document.getElementById('hold').style.backgroundColor = displaySettings.boardcolour;
+    document.getElementById('next').style.backgroundColor = displaySettings.boardcolour;
+    document.getElementById('board').style.height = `${displaySettings.BoardHeightPercent}vh`;
     changeColour('hold', 'white')
-    if (grid) drawGrid();
+    if (displaySettings.showGrid) drawGrid();
 }
 
 function renderStats() {
@@ -483,7 +481,7 @@ function renderStats() {
 }
 
 function changeColour(id, colour) {
-    if (colouredQueues) { document.getElementById(id).style.border = `2px solid ${colour}`; }
+    if (displaySettings.colouredQueues) { document.getElementById(id).style.border = `2px solid ${colour}`; }
 }
 
 // misc functions
@@ -525,22 +523,25 @@ function getKickData(piece, rotationType, shapeNo) {
 
 function resetStats() {
     if (timeouts['stats'] != 0) { clearInterval(timeouts['stats']) }
-    totalTimeSeconds = -0.1;
-    totalAttack = 0;
-    totalPieceCount = 0;
-    firstMovement = false;
+    totalTimeSeconds = -0.1; totalAttack = 0; totalPieceCount = 0; firstMove = false;
 }
 
-function calcDamage(combonumber, damagetype, isPC, btb, isBTB) {
-    let calccombo = combonumber > 20 ? 20 : combonumber < 0 ? 0 : combonumber;
-    let damage = 0;
-    damage += attackValues[damagetype][calccombo]
-    if (isPC) damage += attackValues['ALL_CLEAR'];
+function calcDamage(combonumber, type, isPC, btb, isBTB) {
+    let combo = combonumber > 20 ? 20 : combonumber < 0 ? 0 : combonumber;
+    let damage = attackValues[type][combo] + (isPC?attackValues['ALL_CLEAR']:0);
     if (btb > 0 && isBTB) {
-        const x = Math.log1p((BTBcount) * 0.8)
+        const x = Math.log1p((BTBcount) * 0.8);
         damage += ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3)
     }
     return damage;
+}
+
+function startGravity() {
+    if (gameSettings.gravitySpeed == 0) return;
+    const DOMminostopped = document.querySelectorAll('.stopped');
+    const coords = minoToCoords(document.querySelectorAll('.active'));
+    if (checkCollision(coords, DOMminostopped, 'DOWN')) incrementLock();
+    timeouts['gravity'] = setInterval(() => { movePieceDown(false, false) }, gameSettings.gravitySpeed);
 }
 
 // data
@@ -729,7 +730,7 @@ const KickData180 = [[
 
 const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]]
 const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' }
-
+const rmap = { "CW": 1, "CCW": -1, "180": 2 };
 const attackValues = {
     '': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     'TSPIN': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
