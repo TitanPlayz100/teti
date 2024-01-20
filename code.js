@@ -1,23 +1,24 @@
 let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, BTBcount, isTspin, isMini, firstMove;
 let timeouts = { 'btbtext': 0, 'tspintext': 0, 'cleartext': 0, 'combotext': 0, 'pctext': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'arr': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
+const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ']
 
 const displaySettings = {
-    bgcolour: 'rgb(25, 25, 25)',
-    boardcolour: 'black',
+    bgcolour: '#151515',
+    boardcolour: '#000000',
     gridopacity: 10,
     shadowOpacity: 20,
     BoardHeightPercent: 70,
     showGrid: true,
-    colouredShadow: true,
+    colouredShadow: false,
     colouredQueues: true
 }
 
 const gameSettings = {
-    arr: 0,
-    das: 75,
-    sdarr: 0,
-    gravitySpeed: 1000,
+    arr: 33,
+    das: 160,
+    sdarr: 100,
+    gravitySpeed: 950,
     lockDelay: 600,
     maxLockMovements: 15,
     nextPieces: 5,
@@ -34,8 +35,8 @@ const keybinds = {
     hdKey: ' ',
     sdKey: 'ArrowDown',
     holdKey: 'c',
-    resetKey: 'd',
-    rotate180Key: 'x'
+    resetKey: 'r',
+    rotate180Key: 'a'
 }
 
 function StartGame() {
@@ -43,14 +44,14 @@ function StartGame() {
     renderStyles();
     resetStats();
     renderStats();
-
     drawPiece(randomiser());
 }
 
 this.addEventListener('keydown', event => {
-    if (!firstMove) firstMovement();
-    if (gameEnd) return;
     if (event.repeat) return;
+    if (!isDialogOpen && disabledKeys.some((key) => event.key == key)) event.preventDefault();
+    if (gameEnd || isDialogOpen) return;
+    if (!firstMove) firstMovement();
     if (event.key == keybinds.resetKey) StartGame();
     if (event.key == keybinds.cwKey) rotate("CW");
     if (event.key == keybinds.ccwKey) rotate("CCW");
@@ -111,8 +112,9 @@ function endDasArr(direction = 'all') {
     }
     directionState[direction] = false;
     if (direction == 'RIGHT' || direction == 'LEFT') {
-        if (directionState[direction == 'RIGHT' ? 'LEFT' : 'RIGHT'] == 'das') return;
-        if (directionState[direction] == 'arr') { startArr(direction); return }
+        const oppositeDirection = direction == 'RIGHT' ? 'LEFT' : 'RIGHT'
+        if (directionState[oppositeDirection] == 'das') return;
+        if (directionState[oppositeDirection] == 'arr') { startArr(oppositeDirection); return }
         clearTimeout(timeouts['das']); timeouts['das'] = 0;
         clearInterval(timeouts['arr']); timeouts['arr'] = 0;
     }
@@ -182,6 +184,7 @@ function rotate(type) {
     rotationState = newRotation;
     incrementLock();
     displayShadow();
+    if (gameSettings.gravitySpeed == 0) startGravity();
     startArr('current');
     if (directionState['DOWN'] == 'arr') startArrSD();
 }
@@ -198,6 +201,7 @@ function movePieceSide(direction, instant) {
         clearInterval(timeouts['arr']);
         timeouts['arr'] = 0
         if (directionState['DOWN'] == 'arr') startArrSD();
+        if (gameSettings.gravitySpeed == 0) startGravity();
         return;
     };
     renderPieceMovement(direction, DOMminos);
@@ -205,11 +209,13 @@ function movePieceSide(direction, instant) {
     displayShadow();
     incrementLock();
     isTspin = false; isMini = false;
+    if (gameSettings.gravitySpeed == 0) startGravity();
     if (instant) { movePieceSide(direction, true); return; }
 
 }
 
 function movePieceDown(harddrop, softdrop) {
+    if (gameEnd) return;
     const DOMminos = document.querySelectorAll('.active');
     const stopped = document.querySelectorAll('.stopped');
     if (timeouts['lockdelay'] != 0) { // if piece is locking and used harddrop
@@ -252,8 +258,11 @@ function incrementLock() {
 }
 
 function scheduleLock(harddrop) {
-    if (lockcount > gameSettings.maxLockMovements || harddrop) { lockPiece(); }
-    else { timeouts['lockdelay'] = setTimeout(() => { lockPiece(); }, gameSettings.lockDelay); }
+    if (gameSettings.maxLockMovements == 0) return;
+    if (lockcount > gameSettings.maxLockMovements || harddrop) { lockPiece(); return; }
+    if (gameSettings.lockDelay != 0) timeouts['lockdelay'] = setTimeout(() => {
+        lockPiece();
+    }, gameSettings.lockDelay);
 }
 
 function lockPiece() {
@@ -344,7 +353,7 @@ function displayShadow() {
     const DOMboard = document.getElementById('playingfield');
     const DOMminostopped = document.querySelectorAll('.stopped');
     const coords = pieceToCoords(currentPiece, 'shape' + rotationState, undefined, true);
-    const colour = displaySettings.colouredShadow ? currentPiece.colour : "#1a1a1a";
+    const colour = displaySettings.colouredShadow ? currentPiece.colour : "#ffffff";
     const dx = currentLoc[0], dy = currentLoc[1]
     renderPieceFromCoords(DOMboard, coords, dy, dx, currentPiece, 'shadow', colour, displaySettings.shadowOpacity + "%");
     while (true) {
@@ -469,6 +478,7 @@ function renderStyles() {
     document.getElementById('next').style.backgroundColor = displaySettings.boardcolour;
     document.getElementById('board').style.height = `${displaySettings.BoardHeightPercent}vh`;
     changeColour('hold', 'white')
+    removeElements(['#grid'])
     if (displaySettings.showGrid) drawGrid();
 }
 
@@ -528,7 +538,7 @@ function resetStats() {
 
 function calcDamage(combonumber, type, isPC, btb, isBTB) {
     let combo = combonumber > 20 ? 20 : combonumber < 0 ? 0 : combonumber;
-    let damage = attackValues[type][combo] + (isPC?attackValues['ALL_CLEAR']:0);
+    let damage = attackValues[type][combo] + (isPC ? attackValues['ALL_CLEAR'] : 0);
     if (btb > 0 && isBTB) {
         const x = Math.log1p((BTBcount) * 0.8);
         damage += ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3)
@@ -537,12 +547,58 @@ function calcDamage(combonumber, type, isPC, btb, isBTB) {
 }
 
 function startGravity() {
-    if (gameSettings.gravitySpeed == 0) return;
+    if (gameSettings.gravitySpeed > 1000) return;
     const DOMminostopped = document.querySelectorAll('.stopped');
     const coords = minoToCoords(document.querySelectorAll('.active'));
     if (checkCollision(coords, DOMminostopped, 'DOWN')) incrementLock();
+    console.log(gameSettings.gravitySpeed)
+    if (gameSettings.gravitySpeed == 0) { movePieceDown(false, true); return; }
     timeouts['gravity'] = setInterval(() => { movePieceDown(false, false) }, gameSettings.gravitySpeed);
 }
+
+// interactivity in settings
+let isDialogOpen = false
+function openModal(id) {
+    const dialog = document.getElementById(id);
+    [...document.getElementsByClassName('option')]
+        .filter((item) => item.parentElement.parentElement.id == id)
+        .forEach((setting) => {
+            let newValue = eval(id.replace('Dialog', ''))[setting.id]
+            if (setting.classList[2] == 'exp') newValue = Math.round(toLogValue(newValue));
+            if (setting.classList[1] == 'check') setting.checked = (newValue);
+            setting.value = newValue
+            if (setting.classList[1] == 'range') sliderChange(setting);
+        })
+    dialog.showModal();
+    isDialogOpen = true;
+}
+
+function closeModal(id) {
+    const dialog = document.getElementById(id);
+    [...document.getElementsByClassName('option')]
+        .filter((item) => item.parentElement.parentElement.id == id)
+        .forEach((setting) => {
+            const settingid = setting.id
+            eval(id.replace('Dialog', ''))[settingid] =
+                setting.classList[1] == 'check' ? setting.checked :
+                    setting.classList[2] == 'exp' ? Math.round(toExpValue(setting.value)) :
+                        setting.value;
+        })
+    dialog.close();
+    isDialogOpen = false;
+    if (id == 'displaySettingsDialog') renderStyles();
+}
+
+function sliderChange(e) {
+    let text = e.parentElement.children[0].textContent.split(':')[0];
+    let value = e.value;
+    if (e.classList[2] == 'exp') value = Math.round(toExpValue(value));
+    if (e.classList[2] == 'exp' && value > 1000) value = "None";
+    e.parentElement.children[0].textContent = `${text}: ${value}`
+}
+
+function toExpValue(x) { return Math.pow(2, 0.1 * x) - 1 }
+function toLogValue(y) { return Math.log2(y + 1) * 10 }
 
 // data
 const pieces = [
