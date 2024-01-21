@@ -77,6 +77,22 @@ body {
     border-radius: 1.5vh 0 0 1.5vh;
 }
 
+.actiontext {
+    position: fixed;
+    font-size: 3.5vh;
+    margin: 0;
+    text-align: right;
+    width: 200%;
+    user-select: none;
+}
+
+.text {
+    position: fixed;
+    font-size: 3.5vh;
+    margin: 0;
+    user-select: none;
+}
+
 .settings {
     position: fixed;
     left: 126%;
@@ -105,6 +121,7 @@ body {
     color: rgb(225, 225, 225);
     border: 4px solid rgb(26, 26, 26);
     border-radius: 2vh;
+    user-select: none;
 }
 
 .dialog:focus {
@@ -199,30 +216,4 @@ body {
     border-radius: 1vh;
     font-size: 1.3em;
     color: white;
-}
-
-.actiontext {
-    position: fixed;
-    font-size: 3.5vh;
-    margin: 0;
-    text-align: right;
-    width: 200%;
-}
-
-.text {
-    position: fixed;
-    font-size: 3.5vh;
-    margin: 0;
-}
-
-label,
-.text,
-.actiontext,
-.unselectable {
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
 }
