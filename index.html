@@ -11,54 +11,6 @@
 
 <body id="body">
     <div id="board">
-        <dialog id="displaySettingsDialog" class="dialog">
-            <h1>Display Settings</h1>
-            <div class="settingLayout"><label>Background colour</label> <input class="option color" type="color"
-                    id="bgcolour" /></div>
-            <div class="settingLayout"><label>Board Colour</label> <input class="option color" type="color"
-                    id="boardcolour" /></div>
-            <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range"
-                    id="BoardHeightPercent" min="0" max="100" step="1" /></div>
-            <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox"
-                    id="showGrid" /></div>
-            <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="sliderChange(this)" type="range"
-                    id="gridopacity" min="0" max="100" step="2" /></div>
-            <div class="settingLayout"><label>Shadow opacity</label> <input class="option range" oninput="sliderChange(this)" type="range"
-                    id="shadowOpacity" min="0" max="100" step="5" /></div>
-            <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox"
-                    id="colouredShadow" /></div>
-            <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox"
-                    id="colouredQueues" /></div>
-            <button class="closeDialog unselectable" onclick="closeModal('displaySettingsDialog')">Save and
-                close</button>
-        </dialog>
-
-        <dialog id="gameSettingsDialog" class="dialog">
-            <h1>Game Settings</h1>
-            <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="sliderChange(this)" type="range" id="das" min="0"
-                    max="250" step="1" /></div>
-            <div class="settingLayout"><label>ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="arr" min="0"
-                    max="50" step="2" /></div>
-            <div class="settingLayout"><label>Softdrop ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="sddas"
-                    min="0" max="200" step="5" /></div>
-            <div class="settingLayout"><label>Gravity</label> <input class="option range exp" oninput="sliderChange(this)" type="range" id="gravitySpeed"
-                    min="0" max="100" step="1" /></div>
-            <div class="settingLayout"><label>Lock delay</label> <input class="option range" oninput="sliderChange(this)" type="range" id="lockDelay"
-                    min="0" max="1000" step="10" /></div>
-            <div class="settingLayout"><label>Lock Movements</label><input class="option range" oninput="sliderChange(this)" type="range"
-                    id="maxLockMovements" min="0" max="30" step="1" /></div>
-            <div class="settingLayout"><label>Next Pieces</label> <input class="option range" oninput="sliderChange(this)" type="range"
-                    id="nextPieces" min="0" max="5" step="1" /></div>
-            <div class="settingLayout"><label>Allow Lockout</label> <input class="option check" type="checkbox"
-                    id="allowLockout" /></div>
-            <div class="settingLayout"><label>Preserve DAS</label> <input class="option check" type="checkbox"
-                    id="preserveARR" /></div>
-            <div class="settingLayout"><label>Infinite Hold</label> <input class="option check" type="checkbox"
-                    id="infiniteHold" /></div>
-            <button class="closeDialog unselectable" onclick="closeModal('gameSettingsDialog')">Save and close</button>
-        </dialog>
-
-
         <button id="displaySettings" class="settings" style="top: 5%;" onclick="openModal('displaySettingsDialog')">
             <img src="./icons/display.svg" alt="display" height="70%" width="auto" style="transform: translateY(10%);">
         </button>
@@ -87,6 +39,61 @@
             <p class="text" id="objective" style="left: 110%; bottom: 10%;"></p>
         </div>
     </div>
+
+
+    <dialog id="displaySettingsDialog" class="dialog">
+        <h1>Display Settings</h1>
+        <div class="settingLayout"><label>Background colour</label> <input class="option color" type="color" id="bgcolour" /></div>
+        <div class="settingLayout"><label>Board Colour</label> <input class="option color" type="color" id="boardcolour" /></div>
+        <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range" id="BoardHeightPercent" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox" id="showGrid" /></div>
+        <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
+        <div class="settingLayout"><label>Shadow opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
+        <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
+        <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
+        <p class="smalltext">Press Esc to close without saving</p>
+        <button class="closeDialog" onclick="closeModal('displaySettingsDialog')">Save and close</button>
+    </dialog>
+
+    <dialog id="gameSettingsDialog" class="dialog">
+        <h1>Game Settings</h1>
+        <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
+        <div class="settingLayout"><label>ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="arr" min="0" max="50" step="2" /></div>
+        <div class="settingLayout"><label>Softdrop ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="sdarr" min="0" max="200" step="5" /></div>
+        <div class="settingLayout"><label>Gravity</label> <input class="option range exp" oninput="sliderChange(this)" type="range" id="gravitySpeed" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>Lock delay</label> <input class="option range" oninput="sliderChange(this)" type="range" id="lockDelay" min="0" max="1000" step="10" /></div>
+        <div class="settingLayout"><label>Lock Movements</label><input class="option range" oninput="sliderChange(this)" type="range" id="maxLockMovements" min="0" max="30" step="1" /></div>
+        <div class="settingLayout"><label>Next Pieces</label> <input class="option range" oninput="sliderChange(this)" type="range" id="nextPieces" min="0" max="5" step="1" /></div>
+        <div class="settingLayout"><label>Lockout Deaths</label> <input class="option check" type="checkbox" id="allowLockout" /></div>
+        <div class="settingLayout"><label>Preserve DAS</label> <input class="option check" type="checkbox" id="preserveARR" /></div>
+        <div class="settingLayout"><label>Infinite Hold</label> <input class="option check" type="checkbox" id="infiniteHold" /></div>
+        <p class="smalltext">Press Esc to close without saving</p>
+        <button class="closeDialog" onclick="closeModal('gameSettingsDialog')">Save and close</button>
+    </dialog>
+
+    <dialog id="controlSettingsDialog" class="dialog">
+        <h1>Keybinds</h1>
+        <div class="settingLayout"><label>Move Right</label> <button class="option keybind" onclick="buttonInput(this)" id="rightKey"></button></div>
+        <div class="settingLayout"><label>Move Left</label> <button class="option keybind" onclick="buttonInput(this)" id="leftKey"></button></div>
+        <div class="settingLayout"><label>Rotate Clockwise</label> <button class="option keybind" onclick="buttonInput(this)" id="cwKey"></button></div>
+        <div class="settingLayout"><label>Rotate Anticlockwise</label> <button class="option keybind" onclick="buttonInput(this)" id="ccwKey"></button></div>
+        <div class="settingLayout"><label>Rotate 180</label> <button class="option keybind" onclick="buttonInput(this)" id="rotate180Key"></button></div>
+        <div class="settingLayout"><label>Softdrop</label> <button class="option keybind" onclick="buttonInput(this)" id="sdKey"></button></div>
+        <div class="settingLayout"><label>Harddrop</label> <button class="option keybind" onclick="buttonInput(this)" id="hdKey"></button></div>
+        <div class="settingLayout"><label>Hold Piece</label> <button class="option keybind" onclick="buttonInput(this)" id="holdKey"></button></div>
+        <div class="settingLayout"><label>Reset Game</label> <button class="option keybind" onclick="buttonInput(this)" id="resetKey"></button></div>
+        <p class="smalltext">Press Esc to close without saving</p>
+        <button class="closeDialog" onclick="closeModal('controlSettingsDialog')">Save and close</button>
+    </dialog>
+
+    <dialog id="frontdrop" onkeydown="setKeybind(event.key)">
+        <div class="selectkeydiv" onclick="setKeybind('None')">
+            <p style="transform: translateY(-8vh);">PRESS ANY KEY</p>
+            <p class="selectkeytext">Click to remove keybind</p>
+        </div>
+    </dialog>
+
+
 </body>
 
 </html>

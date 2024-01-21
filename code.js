@@ -2,45 +2,15 @@ let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, 
 let timeouts = { 'btbtext': 0, 'tspintext': 0, 'cleartext': 0, 'combotext': 0, 'pctext': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'arr': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 let isDialogOpen = false
-const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ']
+const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter']
 
-const displaySettings = {
-    bgcolour: '#151515',
-    boardcolour: '#000000',
-    gridopacity: 10,
-    shadowOpacity: 20,
-    BoardHeightPercent: 70,
-    showGrid: true,
-    colouredShadow: false,
-    colouredQueues: true
-}
-
-const gameSettings = {
-    arr: 33,
-    das: 160,
-    sdarr: 100,
-    gravitySpeed: 950,
-    lockDelay: 600,
-    maxLockMovements: 15,
-    nextPieces: 5,
-    allowLockout: false,
-    preserveARR: true,
-    infiniteHold: false
-}
-
-const keybinds = {
-    rightKey: 'ArrowRight',
-    leftKey: 'ArrowLeft',
-    cwKey: 'ArrowUp',
-    ccwKey: 'z',
-    hdKey: ' ',
-    sdKey: 'ArrowDown',
-    holdKey: 'c',
-    resetKey: 'r',
-    rotate180Key: 'a'
-}
+// default settings
+let displaySettings = { bgcolour: '#151515', boardcolour: '#000000', gridopacity: 10, shadowOpacity: 20, BoardHeightPercent: 70, showGrid: true, colouredShadow: false, colouredQueues: true }
+let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false }
+let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
 function StartGame() {
+    loadSettings();
     resetState();
     renderStyles();
     clearInterval(timeouts['stats']);
@@ -50,29 +20,30 @@ function StartGame() {
 }
 
 this.addEventListener('keydown', event => {
-    if (event.repeat) return;
-    if (!isDialogOpen && disabledKeys.some((key) => event.key == key)) event.preventDefault();
-    if (gameEnd || isDialogOpen) return;
-    if (!firstMove) firstMovement();
-    if (event.key == keybinds.resetKey) StartGame();
-    if (event.key == keybinds.cwKey) rotate("CW");
-    if (event.key == keybinds.ccwKey) rotate("CCW");
-    if (event.key == keybinds.rotate180Key) rotate("180");
-    if (event.key == keybinds.hdKey) movePieceDown(true, false);
-    if (event.key == keybinds.holdKey) holdPiece();
-    if (event.key == keybinds.rightKey) startDas("RIGHT");
-    if (event.key == keybinds.leftKey) startDas("LEFT");
-    if (event.key == keybinds.sdKey) startArrSD(true);
+    if (event.key == 'Escape') isDialogOpen = false;
+    if (event.repeat || isDialogOpen) return;
+    if (disabledKeys.some((key) => event.key == key)) event.preventDefault();
+    if (firstMove) firstMovement();
+    if (event.key == controlSettings.resetKey) StartGame();
+    if (gameEnd) return;
+    if (event.key == controlSettings.cwKey) rotate("CW");
+    if (event.key == controlSettings.ccwKey) rotate("CCW");
+    if (event.key == controlSettings.rotate180Key) rotate("180");
+    if (event.key == controlSettings.hdKey) movePieceDown(true, false);
+    if (event.key == controlSettings.holdKey) holdPiece();
+    if (event.key == controlSettings.rightKey) startDas("RIGHT");
+    if (event.key == controlSettings.leftKey) startDas("LEFT");
+    if (event.key == controlSettings.sdKey) startArrSD(true);
 });
 
 this.addEventListener('keyup', event => {
-    if (event.key == keybinds.rightKey) endDasArr('RIGHT');
-    if (event.key == keybinds.leftKey) endDasArr('LEFT');
-    if (event.key == keybinds.sdKey) endDasArr('DOWN');
+    if (event.key == controlSettings.rightKey) endDasArr('RIGHT');
+    if (event.key == controlSettings.leftKey) endDasArr('LEFT');
+    if (event.key == controlSettings.sdKey) endDasArr('DOWN');
 });
 
 function firstMovement() { // stats clock at 100ms
-    timeouts['stats'] = setInterval(() => renderStats(), 100); firstMove = false; startGravity();
+    startGravity(); timeouts['stats'] = setInterval(() => renderStats(), 100); firstMove = false;
 }
 
 function startDas(direction) {
@@ -352,7 +323,7 @@ function updateNext() {
             1 + (3 * i), ((piece.name == 'o') ? 2 : 1), piece, 'nextmino');
     }
     const pieceColour = pieces.filter((element) => { return element.name == first5[0] })[0].colour
-    changeColour('next', pieceColour)
+    changeBorderColour('next', pieceColour)
 }
 
 function displayShadow() {
@@ -386,7 +357,7 @@ function holdPiece() {
     DOMheldpiece.replaceChildren();
     renderPieceFromCoords(DOMheldpiece, pieceToCoords(heldpiece.piece, 'shape1'),
         1, ((heldpiece.piece.name == 'o') ? 2 : 1), heldpiece.piece)
-    changeColour('hold', heldpiece.piece.colour)
+    changeBorderColour('hold', heldpiece.piece.colour)
     if (!gameSettings.infiniteHold) heldpiece.occured = true;
 }
 
@@ -462,7 +433,7 @@ function renderStyles() {
     document.getElementById('hold').style.backgroundColor = displaySettings.boardcolour;
     document.getElementById('next').style.backgroundColor = displaySettings.boardcolour;
     document.getElementById('board').style.height = `${displaySettings.BoardHeightPercent}vh`;
-    changeColour('hold', 'white')
+    changeBorderColour('hold', 'white')
     removeElements(['#grid'])
     if (displaySettings.showGrid) drawGrid();
 }
@@ -484,8 +455,9 @@ function toLogValue(y) { return Math.round(Math.log2(y + 1) * 10) }
 function removeElements(names) {
     names.forEach((name) => { document.querySelectorAll(name)[0].replaceChildren(); })
 }
-function changeColour(id, colour) {
-    if (displaySettings.colouredQueues) { document.getElementById(id).style.border = `2px solid ${colour}`; }
+function changeBorderColour(id, colour) {
+    if (!displaySettings.colouredQueues) colour = 'white';
+    document.getElementById(id).style.border = `2px solid ${colour}`;
 }
 
 function minoToCoords(minos) {
@@ -519,10 +491,10 @@ function calcDamage(combonumber, type, isPC, btb, isBTB) {
 }
 
 function startGravity() {
-    if (gameSettings.gravitySpeed > 1000) return;
     const DOMminostopped = document.querySelectorAll('.stopped');
     const coords = minoToCoords(document.querySelectorAll('.active'));
     if (checkCollision(coords, DOMminostopped, 'DOWN')) incrementLock();
+    if (gameSettings.gravitySpeed > 1000) return;
     if (gameSettings.gravitySpeed == 0) { movePieceDown(false, true); return; }
     timeouts['gravity'] = setInterval(() => { movePieceDown(false, false) }, gameSettings.gravitySpeed);
 }
@@ -534,8 +506,9 @@ function openModal(id) {
         .forEach((setting) => {
             let newValue = eval(id.replace('Dialog', ''))[setting.id]
             if (setting.classList[2] == 'exp') newValue = toLogValue(newValue);
-            if (setting.classList[1] == 'check') setting.checked = (newValue);
             setting.value = newValue
+            if (setting.classList[1] == 'keybind') setting.textContent = newValue;
+            if (setting.classList[1] == 'check') setting.checked = (newValue);
             if (setting.classList[1] == 'range') sliderChange(setting);
         })
     document.getElementById(id).showModal();
@@ -549,21 +522,47 @@ function closeModal(id) {
             const settingid = setting.id
             eval(id.replace('Dialog', ''))[settingid] =
                 setting.classList[1] == 'check' ? setting.checked :
-                    setting.classList[2] == 'exp' ? toExpValue(setting.value) :
-                        setting.value;
+                    setting.classList[1] == 'keybind' ? setting.textContent :
+                        setting.classList[2] == 'exp' ? toExpValue(setting.value) :
+                            setting.value;
         })
     document.getElementById(id).close();
     isDialogOpen = false;
+    saveSettings();
     if (id == 'displaySettingsDialog') renderStyles();
     if (id == 'gameSettingsDialog') StartGame();
 }
 
-function sliderChange(e) {
-    const text = e.parentElement.children[0].textContent.split(':')[0];
-    let value = e.value;
-    if (e.classList[2] == 'exp') value = toExpValue(value);
-    if (e.classList[2] == 'exp' && value > 1000) value = "None";
-    e.parentElement.children[0].textContent = `${text}: ${value}`
+function sliderChange(el) {
+    const text = el.parentElement.children[0].textContent.split(':')[0];
+    let value = el.value;
+    if (el.classList[2] == 'exp') value = toExpValue(value);
+    if (el.classList[2] == 'exp' && value > 1000) value = "None";
+    el.parentElement.children[0].textContent = `${text}: ${value}`
+}
+
+let currentKey = null;
+function buttonInput(el) { document.getElementById('frontdrop').showModal(); currentKey = el.id; }
+
+function setKeybind(key) {
+    document.getElementById(currentKey).textContent = key;
+    for (let i in controlSettings) { // duplicate keys prevention
+        if (i == currentKey) continue;
+        const otherKeys = document.getElementById(i);
+        if (otherKeys.textContent == key) otherKeys.textContent = 'None';
+    }
+    document.getElementById('frontdrop').close();
+    currentKey = null;
+}
+
+function saveSettings() {
+    const data = [displaySettings, gameSettings, controlSettings];
+    localStorage.setItem('settings', JSON.stringify(data));
+}
+
+function loadSettings() {
+    const data = localStorage.getItem('settings');
+    if (data != null) [displaySettings, gameSettings, controlSettings] = JSON.parse(data);
 }
 
 // data

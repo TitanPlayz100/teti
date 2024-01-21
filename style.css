@@ -15,7 +15,8 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     aspect-ratio: 0.5;
-    border: 2px solid rgb(190, 190, 190);
+    border: 2px solid white;
+    box-shadow: 0 0 20px #ffffff58;
 }
 
 #playingfield {
@@ -61,7 +62,6 @@ body {
     grid-template-rows: repeat(15, 1fr);
     height: 75%;
     width: 40%;
-    border: 2px solid rgb(255, 255, 255);
     border-radius: 0 1.5vh 1.5vh 0;
 }
 
@@ -80,6 +80,7 @@ body {
 .actiontext {
     position: fixed;
     font-size: 3.5vh;
+    text-shadow: 0 0 10px #ffffffc4;
     margin: 0;
     text-align: right;
     width: 200%;
@@ -165,7 +166,7 @@ body {
     -webkit-appearance: none;
     height: 1vh;
     width: 40%;
-    right: 10%;
+    right: 3%;
     border-radius: 5px;
     background: #7d7d7d;
     outline: none;
@@ -212,8 +213,65 @@ body {
     padding: 10px;
     bottom: 3%;
     background-color: rgba(255, 255, 255, 0);
-    border: 2px solid white;
+    border: 2px solid rgb(150, 150, 150);
     border-radius: 1vh;
     font-size: 1.3em;
+    color: rgb(194, 194, 194);
+    transition: all 0.4s ease;
+}
+
+.keybind {
+    width: 30%;
+    height: 5%;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0);
+    border: 2px solid rgb(151, 151, 151);
+    border-radius: 0.5vh;
+    font-size: 1em;
+    color: rgb(194, 194, 194);
+    transition: all 0.4s ease;
+    transform: translateY(-0.5vh);
+}
+
+.closeDialog:hover,
+.keybind:hover {
     color: white;
+    border-color: white;
+}
+
+#frontdrop {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.407);
+    overflow: hidden;
+    color: white;
+    outline: none;
+    user-select: none;
+    border: none;
+}
+
+.selectkeydiv {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    font-size: 5em;
+    text-shadow: 0 0 30px #ffffff;
+}
+
+.selectkeytext {
+    position: absolute;
+    top: 46vh;
+    font-size: 0.3em;
+    text-shadow: 0 0 30px #ffffff;
+}
+
+.smalltext {
+    position: absolute;
+    bottom: 12%;
+    left: 20%;
+    font-size: 1em;
+    color: #ffffffa1;
 }
