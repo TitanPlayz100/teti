@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <script defer src="code.js"></script>
 </head>
-
 <body id="body">
     <div id="board">
         <button id="displaySettings" class="settings" style="top: 5%;" onclick="openModal('displaySettingsDialog')">
@@ -25,6 +23,8 @@
         <div id="next"></div>
         <div id="hold"></div>
         <div id="playingfield"></div>
+        <progress id="lockTimer" max="100" value="50"></progress>
+        <progress id="lockCounter" max="100" value="50"></progress>
         <div class="displaytext">
             <p class="text" style="left: 110%; bottom: 100%;">Next</p>
             <p class="text" style="right: 110%; bottom: 100%;">Hold</p>
@@ -33,9 +33,9 @@
             <p class="actiontext" id="btbtext" style="right: 105%; top: 40%;"></p>
             <p class="actiontext" id="pctext" style="right: 105%; top: 50%;"></p>
             <p class="actiontext" id="linessent" style="right: 150%; bottom: 5%;"></p>
-            <p class="actiontext" id="stats1" style="right: 105%; bottom: 5%;"></p>
-            <p class="actiontext" id="stats2" style="right: 105%; bottom: 15%;"></p>
-            <p class="actiontext" id="stats3" style="right: 105%; bottom: 25%;"></p>
+            <p class="statstext" id="stats1" style="right: 105%; bottom: 5%;"></p>
+            <p class="statstext" id="stats2" style="right: 105%; bottom: 15%;"></p>
+            <p class="statstext" id="stats3" style="right: 105%; bottom: 25%;"></p>
             <p class="text" id="objective" style="left: 110%; bottom: 10%;"></p>
         </div>
     </div>
@@ -51,6 +51,7 @@
         <div class="settingLayout"><label>Shadow opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
         <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
         <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
+        <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
         <p class="smalltext">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="closeModal('displaySettingsDialog')">Save and close</button>
     </dialog>
@@ -92,8 +93,9 @@
             <p class="selectkeytext">Click to remove keybind</p>
         </div>
     </dialog>
-
-
 </body>
-
 </html>
+
+<!-- suggestions
+- death screen
+-->

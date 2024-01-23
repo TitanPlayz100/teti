@@ -1,11 +1,11 @@
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, BTBcount, isTspin, isMini, firstMove;
-let timeouts = { 'btbtext': 0, 'tspintext': 0, 'cleartext': 0, 'combotext': 0, 'pctext': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'arr': 0 }
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, BTBcount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter;
+
+let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
-let isDialogOpen = false
 const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter']
 
 // default settings
-let displaySettings = { bgcolour: '#151515', boardcolour: '#000000', gridopacity: 10, shadowOpacity: 20, BoardHeightPercent: 70, showGrid: true, colouredShadow: false, colouredQueues: true }
+let displaySettings = { bgcolour: '#080B0C', boardcolour: '#000000', gridopacity: 10, shadowOpacity: 20, BoardHeightPercent: 70, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
 let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
@@ -22,7 +22,7 @@ function StartGame() {
 this.addEventListener('keydown', event => {
     if (event.key == 'Escape') isDialogOpen = false;
     if (event.repeat || isDialogOpen) return;
-    if (disabledKeys.some((key) => event.key == key)) event.preventDefault();
+    if (disabledKeys.includes(event.key)) event.preventDefault();
     if (firstMove) firstMovement();
     if (event.key == controlSettings.resetKey) StartGame();
     if (gameEnd) return;
@@ -33,7 +33,7 @@ this.addEventListener('keydown', event => {
     if (event.key == controlSettings.holdKey) holdPiece();
     if (event.key == controlSettings.rightKey) startDas("RIGHT");
     if (event.key == controlSettings.leftKey) startDas("LEFT");
-    if (event.key == controlSettings.sdKey) startArrSD(true);
+    if (event.key == controlSettings.sdKey) startArrSD();
 });
 
 this.addEventListener('keyup', event => {
@@ -43,14 +43,16 @@ this.addEventListener('keyup', event => {
 });
 
 function firstMovement() { // stats clock at 100ms
-    startGravity(); timeouts['stats'] = setInterval(() => renderStats(), 100); firstMove = false;
+    startGravity();
+    timeouts['stats'] = setInterval(() => renderStats(), 100);
+    firstMove = false;
 }
 
 function startDas(direction) {
     movePieceSide(direction, false);
     directionState[direction] = 'das'
     stopTimeout('das'); stopInterval('arr');
-    timeouts['das'] = setTimeout(() => { startArr(direction); }, gameSettings.das)
+    timeouts['das'] = setTimeout(() => startArr(direction), gameSettings.das);
 }
 
 function startArr(direction) {
@@ -63,22 +65,21 @@ function startArr(direction) {
     directionState[direction] = 'arr';
     stopInterval('arr')
     if (gameSettings.arr == 0) { timeouts['arr'] = -1; movePieceSide(direction, true); return; }
-    timeouts['arr'] = setInterval(() => { movePieceSide(direction, false); }, gameSettings.arr);
+    timeouts['arr'] = setInterval(() => movePieceSide(direction, false), gameSettings.arr);
 }
 
 function startArrSD() {
     directionState['DOWN'] = 'arr';
     clearInterval(timeouts['sd']);
     if (gameSettings.sdarr == 0) { timeouts['sd'] = -1; movePieceDown(false, true); return; }
-    timeouts['sd'] = setInterval(() => { movePieceDown(false, false); }, gameSettings.sdarr);
+    timeouts['sd'] = setInterval(() => movePieceDown(false, false), gameSettings.sdarr);
 }
 
-function endDasArr(direction = 'all') {
-    if (direction == 'all') {
-        if (!gameSettings.preserveARR) {
-            directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false }
-            endDasArr('RIGHT'); endDasArr('LEFT'); endDasArr('DOWN');
-        };
+function endDasArr(direction) {
+    if (direction == undefined) {
+        if (gameSettings.preserveARR) return;
+        directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false }
+        endDasArr('RIGHT'); endDasArr('LEFT'); endDasArr('DOWN');
         return;
     }
     directionState[direction] = false;
@@ -108,8 +109,8 @@ function checkCollision(coords, stoppedMinos, action) {
             switch (action) {
                 case "RIGHT": if (x + 1 == x2 && y == y2) return true; break;
                 case "LEFT": if (x - 1 == x2 && y == y2) return true; break;
-                case "ROTATE": if (x == x2 && y == y2) return true; break;
                 case "DOWN": if (x == x2 && y - 1 == y2) return true; break;
+                case "ROTATE": if (x == x2 && y == y2) return true; break;
                 case "SPAWN": if (x == x2 && y == y2) return true; break;
             }
         }
@@ -129,7 +130,7 @@ function checkTspin(rotation, location, stoppedMinos, transformation) {
     const front2 = checkCollision([frontminos[1]], stoppedMinos, "ROTATE")
     if ((front1 && front2) && (back1 || back2)) return true;
     if ((front1 || front2) && (back1 && back2)) {
-        if ((dx == 1) || (dx == -1) && dy == -2) return true;
+        if ((dx == 1 || dx == -1) && dy == -2) return true;
         isMini = true; return true;
     }
 }
@@ -165,21 +166,21 @@ function getNewRotationState(type) {
 }
 
 function getKickData(piece, rotationType, shapeNo) {
-    let indexIsI = (piece.name == 'i') ? 1 : 0; // check if i piece
-    let kickdataindex = (rotationType == "CCW") ? (shapeNo > 3) ? 0 : shapeNo : shapeNo - 1;
+    let isI = (piece.name == 'i') ? 1 : 0; // check if i piece
+    let direction = (rotationType == "CCW") ? (shapeNo > 3) ? 0 : shapeNo : shapeNo - 1;
     return {
-        "180": KickData180[indexIsI][kickdataindex],
-        "CW": KickDataCW[indexIsI][kickdataindex],
-        "CCW": KickDataCW[indexIsI][kickdataindex].map(row => row.map(element => element * -1))
+        "180": KickData180[isI][direction],
+        "CW": KickDataCW[isI][direction],
+        "CCW": KickDataCW[isI][direction].map(row => row.map(element => element * -1))
     }[rotationType]
 }
 
 function movePieceSide(direction, instant) {
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
+    if (directionState['DOWN'] == 'arr') startArrSD();
     if (checkCollision(minoToCoords(DOMminos), DOMminostopped, direction)) {
         stopInterval('arr');
-        if (directionState['DOWN'] == 'arr') startArrSD();
         if (gameSettings.gravitySpeed == 0) startGravity();
         return;
     };
@@ -209,19 +210,18 @@ function movePieceDown(harddrop, softdrop) {
     if (softdrop) movePieceDown(false, true);
 }
 
+
 // mechanics
 function clearLines() {
+    const minoX = (mino) => Number(mino.style.gridArea.split('/')[0]);
     const rows = minoToCoords(document.querySelectorAll('.stopped')).map((coord) => coord[1])
-        .reduce((prev, curr) => (prev[curr] = ++prev[curr] || 1, prev), {}) // count minos in row
-    const clearRows = Object.keys(rows).filter((key) => rows[key] >= 10).map((row) => Number(row))
-        .toReversed()
+        .reduce((prev, curr) => (prev[curr] = ++prev[curr] || 1, prev), {})         // count minos in row
+    const clearRows = Object.keys(rows).filter((key) => rows[key] >= 10)            // get rows with 10 minos
+        .map((row) => Number(row)).toReversed()                                     // convert rows to number and reverse
     for (let row of clearRows) {
         const DOMstopped = document.querySelectorAll('.stopped');
-        [...DOMstopped].filter((mino) => Number(mino.style.gridArea.split('/')[0]) == row)
-            .forEach((mino) => mino.remove()) // remove minos on row
-        const moveMinos = [...DOMstopped]
-            .filter((mino) => Number(mino.style.gridArea.split('/')[0]) > row);
-        renderPieceMovement('DOWN', moveMinos) // move other minos down
+        [...DOMstopped].filter((mino) => minoX(mino) == row).forEach((mino) => mino.remove()) // remove minos on row
+        renderPieceMovement('DOWN', [...DOMstopped].filter((mino) => minoX(mino) > row)) // move other minos down
     }
     renderActionText(clearRows.length, document.querySelectorAll('.stopped'))
 }
@@ -229,16 +229,23 @@ function clearLines() {
 function incrementLock() {
     const DOMminos = document.querySelectorAll('.active');
     const DOMminostopped = document.querySelectorAll('.stopped');
-    if (timeouts['lockdelay'] != 0) { clearLockDelay(false); lockcount++; }
+    if (timeouts['lockdelay'] != 0) {
+        clearLockDelay(false); lockcount++;
+        const amountToAdd = 100 / gameSettings.maxLockMovements;
+        if (displaySettings.lockBar) document.getElementById('lockCounter').value += amountToAdd;
+    }
     if (checkCollision(minoToCoords(DOMminos), DOMminostopped, 'DOWN')) scheduleLock(false);
 }
 
 function scheduleLock(harddrop) {
     if (gameSettings.maxLockMovements == 0) return;
-    if (lockcount > gameSettings.maxLockMovements || harddrop) { lockPiece(); return; }
-    if (gameSettings.lockDelay != 0) timeouts['lockdelay'] = setTimeout(() => {
-        lockPiece();
-    }, gameSettings.lockDelay);
+    if (lockcount >= gameSettings.maxLockMovements || harddrop) { lockPiece(); return; }
+    if (gameSettings.lockDelay == 0) { timeouts['lockdelay'] = -1; return; }
+    timeouts['lockdelay'] = setTimeout(() => lockPiece(), gameSettings.lockDelay);
+    timeouts['lockingTimer'] = setInterval(() => {
+        const amountToAdd = 1000 / gameSettings.lockDelay
+        if (displaySettings.lockBar) document.getElementById('lockTimer').value += amountToAdd;
+    }, 10);
 }
 
 function lockPiece() {
@@ -258,7 +265,13 @@ function lockPiece() {
 }
 
 function clearLockDelay(clearCount = true) {
-    stopTimeout('lockdelay'); lockcount = clearCount ? 0 : lockcount; if (clearCount) endDasArr();
+    clearInterval(timeouts['lockingTimer'])
+    document.getElementById('lockTimer').value = 0;
+    stopTimeout('lockdelay');
+    if (clearCount) {
+        document.getElementById('lockCounter').value = 0;
+        lockcount = 0; endDasArr();
+    }
 }
 
 function endGame(type) {
@@ -273,7 +286,11 @@ function resetState() {
     BTBcount = -1; combonumber = -1;
     heldpiece = { piece: null, occured: false };
     remainingpieces = [[], []];
+    spikeCounter = 0;
     clearInterval(timeouts['gravity']);
+    for (let text of ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent']) {
+        document.getElementById(text).style.opacity = 0;
+    }
     clearLockDelay();
     removeElements(["#grid", "#next", "#hold", "#playingfield"]);
 }
@@ -297,7 +314,7 @@ function shuffleRemainingPieces() {
 function drawPiece(piece) {
     const DOMboard = document.getElementById('playingfield');
     const DOMstopped = document.querySelectorAll('.stopped');
-    let offsetx = (piece.name == 'o') ? 5 : 4 // o is smaller, set different pos
+    let offsetx = (piece.name == 'o') ? 5 : 4                   // o is smaller, set different pos
     let offsety = (piece.name == 'o') ? 21 : 20
     const coords = pieceToCoords(piece, 'shape1', undefined, true);
     const coordsmapped = coords.map((coord) => [coord[0] + offsetx, coord[1] + offsety]);
@@ -314,8 +331,7 @@ function drawPiece(piece) {
 function updateNext() {
     const DOMNext = document.getElementById('next');
     removeMinos('.nextmino')
-    let first5 = remainingpieces[0]
-        .concat(remainingpieces[1])
+    let first5 = remainingpieces[0].concat(remainingpieces[1])
         .slice(0, (gameSettings.nextPieces > 5 ? 5 : gameSettings.nextPieces));
     for (let i = 0; i < first5.length; i++) {
         const piece = pieces.filter((element) => { return element.name == first5[i] })[0];
@@ -332,8 +348,8 @@ function displayShadow() {
     const DOMminostopped = document.querySelectorAll('.stopped');
     const coords = pieceToCoords(currentPiece, 'shape' + rotationState, undefined, true);
     const colour = displaySettings.colouredShadow ? currentPiece.colour : "#ffffff";
-    const dx = currentLoc[0], dy = currentLoc[1]
-    renderPieceFromCoords(DOMboard, coords, dy, dx, currentPiece, 'shadow', colour, displaySettings.shadowOpacity + "%");
+    renderPieceFromCoords(DOMboard, coords, currentLoc[1], currentLoc[0], currentPiece, 'shadow',
+        colour, displaySettings.shadowOpacity + "%");
     while (true) {
         const shadowMinos = document.querySelectorAll('.shadow');
         if (checkCollision(minoToCoords(shadowMinos), DOMminostopped, "DOWN")) break;
@@ -405,7 +421,7 @@ function renderPieceMovement(direction, minos) {
 }
 
 function renderActionText(linecount, remainingMinos) {
-    const isBTB = ((isTspin || isMini || linecount == 4) && linecount > 0);     // increment stats
+    const isBTB = ((isTspin || isMini || linecount == 4) && linecount > 0);
     const isPC = remainingMinos.length == 0;
     const damagetype = (isTspin ? 'Tspin ' : '') + (isMini ? 'mini ' : '') + cleartypes[linecount];
     BTBcount = isBTB ? BTBcount + 1 : (linecount != 0) ? - 1 : BTBcount;
@@ -413,18 +429,33 @@ function renderActionText(linecount, remainingMinos) {
     const damageDealt = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, BTBcount, isBTB)
     totalAttack += damageDealt;
 
-    if (damagetype != '') setText('cleartext', damagetype, 2000);               // render action text
+    if (damagetype != '') setText('cleartext', damagetype, 2000);
     if (combonumber > 0) setText('combotext', `Combo ${combonumber}`, 2000);
     if (isBTB && BTBcount > 0) setText('btbtext', `BTB ${BTBcount} `, 2000);
     if (isPC) setText('pctext', "Perfect Clear", 2000);
-    if (damageDealt > 0) setText('linessent', `+${damageDealt}`, 1000)
+    if (damageDealt > 0) setText('linessent', `+${spikeCounter + damageDealt}`, 1500);
+    spikeCounter += damageDealt
+}
+
+function calcDamage(combonumber, type, isPC, btb, isBTB) {
+    let combo = combonumber > 20 ? 20 : combonumber < 0 ? 0 : combonumber;
+    let damage = attackValues[type][combo] + (isPC ? attackValues['ALL_CLEAR'] : 0);
+    if (btb > 0 && isBTB) {
+        const x = Math.log1p((BTBcount) * 0.8);
+        damage += ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3)
+    }
+    return damage;
 }
 
 function setText(id, text, duration) {
-    const textbox = document.getElementById(id)
+    const textbox = document.getElementById(id);
     textbox.textContent = text;
+    textbox.style.transform = 'translateX(-2%)'; textbox.style.opacity = 1;
     if (timeouts[id] != 0) stopTimeout(id);
-    timeouts[id] = setTimeout(() => textbox.textContent = '', duration);
+    timeouts[id] = setTimeout(() => {
+        textbox.style.opacity = 0; textbox.style.transform = 'translateX(2%)';
+        spikeCounter = 0;
+    }, duration);
 }
 
 function renderStyles() {
@@ -433,7 +464,7 @@ function renderStyles() {
     document.getElementById('hold').style.backgroundColor = displaySettings.boardcolour;
     document.getElementById('next').style.backgroundColor = displaySettings.boardcolour;
     document.getElementById('board').style.height = `${displaySettings.BoardHeightPercent}vh`;
-    changeBorderColour('hold', 'white')
+    changeBorderColour('hold', '#dbeaf3')
     removeElements(['#grid'])
     if (displaySettings.showGrid) drawGrid();
 }
@@ -446,6 +477,11 @@ function renderStats() {
     document.getElementById('stats3').textContent = `${displaytime} s`
 }
 
+function changeBorderColour(id, colour) {
+    if (!displaySettings.colouredQueues) colour = '#dbeaf3';
+    document.getElementById(id).style.border = `2px solid ${colour}`;
+}
+
 // misc functions
 function removeMinos(id) { document.querySelectorAll(id).forEach((mino) => mino.remove()); }
 function stopTimeout(name) { clearTimeout(timeouts[name]); timeouts[name] = 0; }
@@ -454,10 +490,6 @@ function toExpValue(x) { return Math.round(Math.pow(2, 0.1 * x) - 1) }
 function toLogValue(y) { return Math.round(Math.log2(y + 1) * 10) }
 function removeElements(names) {
     names.forEach((name) => { document.querySelectorAll(name)[0].replaceChildren(); })
-}
-function changeBorderColour(id, colour) {
-    if (!displaySettings.colouredQueues) colour = 'white';
-    document.getElementById(id).style.border = `2px solid ${colour}`;
 }
 
 function minoToCoords(minos) {
@@ -478,16 +510,6 @@ function pieceToCoords(piece, shape, change = [0, 0], reverseY = false) {
         }
     }
     return coords;
-}
-
-function calcDamage(combonumber, type, isPC, btb, isBTB) {
-    let combo = combonumber > 20 ? 20 : combonumber < 0 ? 0 : combonumber;
-    let damage = attackValues[type][combo] + (isPC ? attackValues['ALL_CLEAR'] : 0);
-    if (btb > 0 && isBTB) {
-        const x = Math.log1p((BTBcount) * 0.8);
-        damage += ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3)
-    }
-    return damage;
 }
 
 function startGravity() {
@@ -526,11 +548,21 @@ function closeModal(id) {
                         setting.classList[2] == 'exp' ? toExpValue(setting.value) :
                             setting.value;
         })
-    document.getElementById(id).close();
+    closeDialog(document.getElementById(id));
     isDialogOpen = false;
     saveSettings();
     if (id == 'displaySettingsDialog') renderStyles();
     if (id == 'gameSettingsDialog') StartGame();
+}
+
+function closeDialog(element) {
+    const closingAnimation = () => {
+        element.removeEventListener('animationend', closingAnimation);
+        element.classList.remove('closingAnimation');
+        element.close()
+    }
+    element.classList.add('closingAnimation');
+    element.addEventListener('animationend', closingAnimation)
 }
 
 function sliderChange(el) {
@@ -551,7 +583,7 @@ function setKeybind(key) {
         const otherKeys = document.getElementById(i);
         if (otherKeys.textContent == key) otherKeys.textContent = 'None';
     }
-    document.getElementById('frontdrop').close();
+    closeDialog(document.getElementById('frontdrop'))
     currentKey = null;
 }
 
@@ -735,7 +767,7 @@ const KickDataCW = [[                           // CCW data is CW data * -1
     [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],    // 1 -> 2
     [[0, 0], [-1, 0], [2, 0], [-1, 2], [2, -1]],    // 2 -> 3
     [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]]     // 3 -> 4
-]]
+]];
 
 const KickData180 = [[
     [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 3 -> 1
@@ -749,8 +781,8 @@ const KickData180 = [[
     [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 2 -> 4
 ]];
 
-const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]]
-const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' }
+const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
+const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' };
 const rmap = { "CW": 1, "CCW": -1, "180": 2 };
 const attackValues = {
     '': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -766,6 +798,6 @@ const attackValues = {
     'TSPIN MINI SINGLE': [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
     'TSPIN MINI DOUBLE': [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6],
     'ALL_CLEAR': 10,
-}
+};
 
 StartGame();
