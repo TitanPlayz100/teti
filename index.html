@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tetris clone</title>
+    <link rel="icon" type="image/x-icon" href="icons/titanicon.ico">
+    <title>teti idk</title>
     <link rel="stylesheet" href="style.css">
     <script defer src="code.js"></script>
 </head>
@@ -17,6 +18,9 @@
         </button>
         <button id="controlSettings" class="settings" style="top: 25%;" onclick="openModal('controlSettingsDialog')">
             <img src="./icons/joystick.svg" alt="display" height="75%" width="auto" style="transform: translateY(0%);">
+        </button>
+        <button id="gamemode" class="settings" style="top: 35%;" onclick="openModal('gamemodeDialog')">
+            <img src="./icons/timer.svg" alt="display" height="90%" width="auto" style="transform: translateY(5%);">
         </button>
 
         <div id="grid"></div>
@@ -32,11 +36,17 @@
             <p class="actiontext" id="combotext" style="right: 105%; top: 35%;"></p>
             <p class="actiontext" id="btbtext" style="right: 105%; top: 40%;"></p>
             <p class="actiontext" id="pctext" style="right: 105%; top: 50%;"></p>
-            <p class="actiontext" id="linessent" style="right: 150%; bottom: 5%;"></p>
+            <p class="actiontext" id="linessent" style="right: 120%; top: 17%;"></p>
             <p class="statstext" id="stats1" style="right: 105%; bottom: 5%;"></p>
             <p class="statstext" id="stats2" style="right: 105%; bottom: 15%;"></p>
             <p class="statstext" id="stats3" style="right: 105%; bottom: 25%;"></p>
+            <p class="smalltext" id="smallStat1" style="left: -40%; bottom: 12.5%; font-size: 1.5em;"></p>
+            <p class="smalltext" id="smallStat2" style="left: -40%; bottom: 22.5%; font-size: 1.5em;">test</p>
+            <p class="smalltext" style="left: -15%; bottom: 20%;">pps</p>
+            <p class="smalltext" style="left: -17.5%; bottom: 10%;">apm</p>
+            <p class="smalltext" style="left: -14%; bottom: 0%;">sec</p>
             <p class="text" id="objective" style="left: 110%; bottom: 10%;"></p>
+            <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
         </div>
     </div>
 
@@ -45,7 +55,7 @@
         <h1>Display Settings</h1>
         <div class="settingLayout"><label>Background colour</label> <input class="option color" type="color" id="bgcolour" /></div>
         <div class="settingLayout"><label>Board Colour</label> <input class="option color" type="color" id="boardcolour" /></div>
-        <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range" id="BoardHeightPercent" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range" id="boardHeightPercent" min="0" max="100" step="1" /></div>
         <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox" id="showGrid" /></div>
         <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
         <div class="settingLayout"><label>Shadow opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
@@ -93,9 +103,23 @@
             <p class="selectkeytext">Click to remove keybind</p>
         </div>
     </dialog>
+
+    <dialog id="gamemodeDialog" class="dialog">
+        <h1>Select Gamemode</h1>
+        <button class="gamemodeSelect" onclick="setGamemode(0);closeModal('gamemodeDialog')">Zen</button>
+        <button class="gamemodeSelect" onclick="setGamemode(1);closeModal('gamemodeDialog')">Sprint</button>
+        <button class="gamemodeSelect" onclick="setGamemode(2);closeModal('gamemodeDialog')">Ultra</button>
+        <button class="gamemodeSelect" onclick="setGamemode(3);closeModal('gamemodeDialog')">Attacker</button>
+        <div class="settingLayout"><label>Required Lines (sprint)</label> <input class="option number" type="number" id="requiredLines" oninput="if(value<1) value=1" /></div>
+        <div class="settingLayout"><label>Time Limit (ultra)</label> <input class="option number" type="number" id="timeLimit" oninput="if(value<1) value=1" /></div>
+        <div class="settingLayout"><label>Required Attack (Attacker)</label> <input class="option number" type="number" id="requiredAttack" oninput="if(value<1) value=1" /></div>
+    </dialog>
+
+    <dialog id="gameEnd" class="dialog">
+        <h1><b>GAME ENDED</b></h1>
+        <p id="reason" style="font-size: 1.8em;">test</p>
+        <p id="result">test</p>
+        <button class="closeDialog" onclick="closeModal('gameEnd')" style="bottom: 10%;">Play Again</button>
+    </dialog>
 </body>
 </html>
-
-<!-- suggestions
-- death screen
--->

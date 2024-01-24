@@ -1,31 +1,31 @@
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, BTBcount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter;
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore;
 
 let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter']
 
 // default settings
-let displaySettings = { bgcolour: '#080B0C', boardcolour: '#000000', gridopacity: 10, shadowOpacity: 20, BoardHeightPercent: 70, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
-let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false }
+let displaySettings = { bgcolour: '#080B0C', boardcolour: '#000000', gridopacity: 10, shadowOpacity: 20, boardHeightPercent: 70, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
+let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40 }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
 function StartGame() {
     loadSettings();
+    setGamemode(gameSettings.gamemode)
     resetState();
     renderStyles();
     clearInterval(timeouts['stats']);
-    totalTimeSeconds = -0.1; totalAttack = 0; totalPieceCount = 0; firstMove = true;
     renderStats();
     drawPiece(randomiser());
 }
 
 this.addEventListener('keydown', event => {
     if (event.key == 'Escape') isDialogOpen = false;
-    if (event.repeat || isDialogOpen) return;
     if (disabledKeys.includes(event.key)) event.preventDefault();
+    if (event.repeat || isDialogOpen) return;
     if (firstMove) firstMovement();
     if (event.key == controlSettings.resetKey) StartGame();
-    if (gameEnd) return;
+    document.body.style.cursor = 'none';
     if (event.key == controlSettings.cwKey) rotate("CW");
     if (event.key == controlSettings.ccwKey) rotate("CCW");
     if (event.key == controlSettings.rotate180Key) rotate("180");
@@ -42,9 +42,11 @@ this.addEventListener('keyup', event => {
     if (event.key == controlSettings.sdKey) endDasArr('DOWN');
 });
 
+this.addEventListener('mousemove', () => document.body.style.cursor = 'auto')
+
 function firstMovement() { // stats clock at 100ms
     startGravity();
-    timeouts['stats'] = setInterval(() => renderStats(), 100);
+    timeouts['stats'] = setInterval(() => renderStats(), 20);
     firstMove = false;
 }
 
@@ -204,6 +206,7 @@ function movePieceDown(harddrop, softdrop) {
     renderPieceMovement('DOWN', DOMminos);
     isTspin = false; isMini = false;
     currentLoc[1] -= 1;
+    totalScore += harddrop ? 2 : 1;
     if (checkCollision(minoToCoords(DOMminos), stopped, 'DOWN')) { scheduleLock(harddrop); return; }
     startArr('current')
     if (harddrop) movePieceDown(true, false);
@@ -274,19 +277,23 @@ function clearLockDelay(clearCount = true) {
     }
 }
 
-function endGame(type) {
+function endGame(top, bottom = 'Better luck next time') {
     clearInterval(timeouts['gravity']);
     clearInterval(timeouts['stats']);
     gameEnd = true;
-    console.log('END', type);
+    openModal('gameEnd');
+    document.getElementById('reason').textContent = top;
+    document.getElementById('result').textContent = bottom;
 }
 
 function resetState() {
     gameEnd = false; currentPiece = null; currentLoc = null; isTspin = false; isMini = false;
-    BTBcount = -1; combonumber = -1;
+    btbCount = -1; combonumber = -1;
+    totalLines = 0; totalScore = 0;
     heldpiece = { piece: null, occured: false };
     remainingpieces = [[], []];
     spikeCounter = 0;
+    totalTimeSeconds = -0.02; totalAttack = 0; totalPieceCount = 0; firstMove = true;
     clearInterval(timeouts['gravity']);
     for (let text of ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent']) {
         document.getElementById(text).style.opacity = 0;
@@ -424,27 +431,49 @@ function renderActionText(linecount, remainingMinos) {
     const isBTB = ((isTspin || isMini || linecount == 4) && linecount > 0);
     const isPC = remainingMinos.length == 0;
     const damagetype = (isTspin ? 'Tspin ' : '') + (isMini ? 'mini ' : '') + cleartypes[linecount];
-    BTBcount = isBTB ? BTBcount + 1 : (linecount != 0) ? - 1 : BTBcount;
-    combonumber = linecount == 0 ? -1 : combonumber + 1
-    const damageDealt = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, BTBcount, isBTB)
-    totalAttack += damageDealt;
+    btbCount = isBTB ? btbCount + 1 : (linecount != 0) ? - 1 : btbCount;
+    combonumber = linecount == 0 ? -1 : combonumber + 1;
+    const damage = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, btbCount, isBTB);
+    totalLines += linecount;
+    totalAttack += damage;
+    totalScore += calcScore(damagetype, isPC, isBTB, combonumber);
+    spikeCounter += damage;
 
     if (damagetype != '') setText('cleartext', damagetype, 2000);
     if (combonumber > 0) setText('combotext', `Combo ${combonumber}`, 2000);
-    if (isBTB && BTBcount > 0) setText('btbtext', `BTB ${BTBcount} `, 2000);
+    if (isBTB && btbCount > 0) setText('btbtext', `BTB ${btbCount} `, 2000);
     if (isPC) setText('pctext', "Perfect Clear", 2000);
-    if (damageDealt > 0) setText('linessent', `+${spikeCounter + damageDealt}`, 1500);
-    spikeCounter += damageDealt
+    if (damage > 0) setText('linessent', `+${spikeCounter}`, 1500);
+    
+    if (spikeCounter > 0) { spikePattern('white', 1); }
+    if (spikeCounter >= 10) { spikePattern('#FF2400', 1.1) } // red
+    if (spikeCounter >= 20) { spikePattern('#ADFF2F', 1.2) } // green
+    if (spikeCounter >= 30) { spikePattern('#007FFF', 1.3) } // blue
+    if (spikeCounter >= 35) { spikePattern('#BF00FF', 1.4) } // purple
+    if (spikeCounter >= 40) { spikePattern('#FF66CC', 1.5) } // pink
 }
 
-function calcDamage(combonumber, type, isPC, btb, isBTB) {
-    let combo = combonumber > 20 ? 20 : combonumber < 0 ? 0 : combonumber;
-    let damage = attackValues[type][combo] + (isPC ? attackValues['ALL_CLEAR'] : 0);
-    if (btb > 0 && isBTB) {
-        const x = Math.log1p((BTBcount) * 0.8);
-        damage += ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3)
+function spikePattern(colour, size) {
+    document.getElementById('linessent').style.color = colour;
+    document.getElementById('linessent').style.textShadow = `0 0 10px ${colour}`;
+    document.getElementById('linessent').style.fontSize = `${3.5 * size}vh`;
+}
+
+function calcDamage(combo, type, isPC, btb, isBTB) {
+    const btbdamage = () => {
+        const x = Math.log1p(btb * 0.8);
+        return ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3);
     }
-    return damage;
+    return attackValues[type][combo > 20 ? 20 : combo < 0 ? 0 : combo]
+        + (isPC ? attackValues['ALL CLEAR'] : 0)
+        + (isBTB && btb > 0 ? btbdamage() : 0);
+}
+
+function calcScore(type, ispc, isbtb, combo) {
+    return scoringTable[type.toUpperCase().trim()]
+        + (ispc ? scoringTable['ALL CLEAR'] : 0)
+        + (combo > 0 ? 50 * combo : 0)
+        * (isbtb ? 1.5 : 1);
 }
 
 function setText(id, text, duration) {
@@ -463,18 +492,45 @@ function renderStyles() {
     document.getElementById('board').style.backgroundColor = displaySettings.boardcolour;
     document.getElementById('hold').style.backgroundColor = displaySettings.boardcolour;
     document.getElementById('next').style.backgroundColor = displaySettings.boardcolour;
-    document.getElementById('board').style.height = `${displaySettings.BoardHeightPercent}vh`;
+    document.getElementById('board').style.height = `${displaySettings.boardHeightPercent}vh`;
     changeBorderColour('hold', '#dbeaf3')
     removeElements(['#grid'])
     if (displaySettings.showGrid) drawGrid();
 }
 
 function renderStats() {
-    totalTimeSeconds += 0.1;
+    totalTimeSeconds += 0.02
     let displaytime = (Math.round(totalTimeSeconds * 10) / 10).toFixed(1)
-    document.getElementById('stats1').textContent = `${totalAttack} sent`
-    document.getElementById('stats2').textContent = `${totalPieceCount} pieces`
-    document.getElementById('stats3').textContent = `${displaytime} s`
+    let pps = 0.00;
+    let apm = 0.0;
+    if (totalTimeSeconds != 0) pps = Math.round(totalPieceCount * 100 / totalTimeSeconds) / 100;
+    if (totalTimeSeconds != 0) apm = Math.round(totalAttack * 10 / (totalTimeSeconds / 60)) / 10;
+    document.getElementById('stats1').textContent = `${displaytime}`
+    document.getElementById('stats2').textContent = `${apm.toFixed(1)}`
+    document.getElementById('stats3').textContent = `${pps.toFixed(2)}`
+    document.getElementById('smallStat1').textContent = `${totalAttack}`
+    document.getElementById('smallStat2').textContent = `${totalPieceCount}`
+    renderObjective();
+}
+
+function renderObjective() {
+    const display = {
+        0: '',
+        1: `${totalLines}/${gameSettings.requiredLines}`,
+        2: `${totalScore}`,
+        3: `${totalAttack}/${gameSettings.requiredAttack}`
+    }
+    document.getElementById('objective').textContent = display[gameSettings.gamemode];
+    const displayTime = (Math.round(totalTimeSeconds * 100) / 100).toFixed(2)
+    if (gameSettings.gamemode == 1 && totalLines >= gameSettings.requiredLines) {
+        endGame(`${displayTime}s`, `Cleared ${totalLines} lines in ${displayTime} seconds`);
+    }
+    if (gameSettings.gamemode == 2 && totalTimeSeconds >= Number(gameSettings.timeLimit)) {
+        endGame(`${totalScore} points`, `Scored ${totalScore} points in ${displayTime} seconds`);
+    }
+    if (gameSettings.gamemode == 3 && totalAttack >= gameSettings.requiredAttack) {
+        endGame(`${displayTime}s`, `Sent ${totalAttack} damage in ${displayTime} seconds`);
+    }
 }
 
 function changeBorderColour(id, colour) {
@@ -523,10 +579,12 @@ function startGravity() {
 
 // interactivity in settings
 function openModal(id) {
+    let settingGroup = id.replace('Dialog', '');
+    if (id == 'gamemodeDialog') settingGroup = 'gameSettings';
     [...document.getElementsByClassName('option')]
         .filter((item) => item.parentElement.parentElement.id == id)
         .forEach((setting) => {
-            let newValue = eval(id.replace('Dialog', ''))[setting.id]
+            let newValue = eval(settingGroup)[setting.id];
             if (setting.classList[2] == 'exp') newValue = toLogValue(newValue);
             setting.value = newValue
             if (setting.classList[1] == 'keybind') setting.textContent = newValue;
@@ -538,11 +596,13 @@ function openModal(id) {
 }
 
 function closeModal(id) {
+    let settingGroup = id.replace('Dialog', '');
+    if (id == 'gamemodeDialog') settingGroup = 'gameSettings';
     [...document.getElementsByClassName('option')]
         .filter((item) => item.parentElement.parentElement.id == id)
         .forEach((setting) => {
             const settingid = setting.id
-            eval(id.replace('Dialog', ''))[settingid] =
+            eval(settingGroup)[settingid] =
                 setting.classList[1] == 'check' ? setting.checked :
                     setting.classList[1] == 'keybind' ? setting.textContent :
                         setting.classList[2] == 'exp' ? toExpValue(setting.value) :
@@ -552,7 +612,7 @@ function closeModal(id) {
     isDialogOpen = false;
     saveSettings();
     if (id == 'displaySettingsDialog') renderStyles();
-    if (id == 'gameSettingsDialog') StartGame();
+    if (id == 'gameSettingsDialog' || id == 'gamemodeDialog' || id == 'gameEnd') StartGame();
 }
 
 function closeDialog(element) {
@@ -594,7 +654,25 @@ function saveSettings() {
 
 function loadSettings() {
     const data = localStorage.getItem('settings');
-    if (data != null) [displaySettings, gameSettings, controlSettings] = JSON.parse(data);
+    const [tempDisplay, tempGame, tempControls] = JSON.parse(data);
+    for (let s in tempDisplay) {
+        if (tempDisplay[s] === undefined || tempDisplay[s] === "") continue;
+        displaySettings[s] = tempDisplay[s]
+    };
+    for (let s in tempGame) {
+        if (tempGame[s] === undefined || tempGame[s] === "") continue;
+        gameSettings[s] = tempGame[s]
+    };
+    for (let s in tempControls) {
+        if (tempControls[s] === undefined || tempControls[s] === "") continue;
+        controlSettings[s] = tempControls[s]
+    };
+}
+
+function setGamemode(modeNum) {
+    gameSettings.gamemode = modeNum;
+    const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage' }
+    document.getElementById('objectiveText').textContent = modesText[gameSettings.gamemode];
 }
 
 // data
@@ -797,7 +875,23 @@ const attackValues = {
     'TSPIN TRIPLE': [6, 7, 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25, 27, 28, 30, 31, 33, 34, 36],
     'TSPIN MINI SINGLE': [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
     'TSPIN MINI DOUBLE': [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6],
-    'ALL_CLEAR': 10,
+    'ALL CLEAR': 10,
 };
+
+const scoringTable = {
+    '': 0,
+    'TSPIN': 400,
+    'TSPIN MINI': 100,
+    'SINGLE': 100,
+    'DOUBLE': 300,
+    'TRIPLE': 500,
+    'QUAD': 800,
+    'TSPIN SINGLE': 800,
+    'TSPIN DOUBLE': 1200,
+    'TSPIN TRIPLE': 1600,
+    'TSPIN MINI SINGLE': 200,
+    'TSPIN MINI DOUBLE': 400,
+    'ALL CLEAR': 3500,
+}
 
 StartGame();
