@@ -13,7 +13,7 @@ body {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    background-color: var(--night);
+    background: var(--night);
 }
 
 #board {
@@ -24,6 +24,7 @@ body {
     aspect-ratio: 0.5;
     border: 2px solid var(--cl-blue);
     box-shadow: 0 0 20px #ffffff58;
+    background-color: rgba(0, 0, 0, 0.988);
 }
 
 #playingfield {
@@ -70,6 +71,7 @@ body {
     height: 75%;
     width: 40%;
     border-radius: 0 1.5vh 1.5vh 0;
+    background-color: rgba(0, 0, 0, 0.988);
 }
 
 #hold {
@@ -82,6 +84,7 @@ body {
     height: 15%;
     width: 40%;
     border-radius: 1.5vh 0 0 1.5vh;
+    background-color: rgba(0, 0, 0, 0.988);
 }
 
 #lockTimer,
@@ -303,6 +306,19 @@ body {
     margin: 0;
 }
 
+.textInput {
+    width: 50%;
+    height: 2.4vh;
+    right: 1%;
+    padding: 0.5%;
+    transform: translateY(-0.6vh);
+    background-color: var(--e-black);
+    border: 1px solid var(--c-blue);
+    border-radius: 0.3vh;
+    color: var(--cl-blue);
+    font-size: 0.9em;
+}
+
 .closeDialog {
     position: absolute;
     right: 30%;
@@ -402,6 +418,26 @@ body {
     left: 20%;
     font-size: 1em;
     color: #ffffffa1;
+}
+
+.resetIcon {
+    position: absolute;
+    padding-top: 0.8vh;
+    right: 5%;
+    bottom: 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 5%;
+    aspect-ratio: 1/1;
+    border: 2px solid rgba(255, 255, 255, 0.432);
+    border-radius: 1vh;
+    background-color: rgba(255, 255, 255, 0);
+    transition: all 0.4s ease;
+}
+
+.resetIcon:hover {
+    border: 2px solid rgb(255, 255, 255);
 }
 
 @keyframes fadein {

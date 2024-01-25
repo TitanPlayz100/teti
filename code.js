@@ -5,7 +5,7 @@ let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter']
 
 // default settings
-let displaySettings = { bgcolour: '#080B0C', boardcolour: '#000000', gridopacity: 10, shadowOpacity: 20, boardHeightPercent: 70, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
+let displaySettings = { background: '#080B0C', boardOpacity: '99', gridopacity: 10, shadowOpacity: 20, boardHeightPercent: 70, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
 let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40 }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
@@ -444,7 +444,7 @@ function renderActionText(linecount, remainingMinos) {
     if (isBTB && btbCount > 0) setText('btbtext', `BTB ${btbCount} `, 2000);
     if (isPC) setText('pctext', "Perfect Clear", 2000);
     if (damage > 0) setText('linessent', `+${spikeCounter}`, 1500);
-    
+
     if (spikeCounter > 0) { spikePattern('white', 1); }
     if (spikeCounter >= 10) { spikePattern('#FF2400', 1.1) } // red
     if (spikeCounter >= 20) { spikePattern('#ADFF2F', 1.2) } // green
@@ -488,10 +488,12 @@ function setText(id, text, duration) {
 }
 
 function renderStyles() {
-    document.getElementById('body').style.backgroundColor = displaySettings.bgcolour;
-    document.getElementById('board').style.backgroundColor = displaySettings.boardcolour;
-    document.getElementById('hold').style.backgroundColor = displaySettings.boardcolour;
-    document.getElementById('next').style.backgroundColor = displaySettings.boardcolour;
+    document.getElementById('body').style.background = displaySettings.background[0] == '#'
+        ? `${displaySettings.background} no-repeat fixed center`
+        : `url("${displaySettings.background}") no-repeat fixed center`;
+    document.getElementById('board').style.backgroundColor = `rgba(0, 0, 0, 0.${displaySettings.boardOpacity})`;
+    document.getElementById('hold').style.backgroundColor = `rgba(0, 0, 0, 0.${displaySettings.boardOpacity})`;
+    document.getElementById('next').style.backgroundColor = `rgba(0, 0, 0, 0.${displaySettings.boardOpacity})`;
     document.getElementById('board').style.height = `${displaySettings.boardHeightPercent}vh`;
     changeBorderColour('hold', '#dbeaf3')
     removeElements(['#grid'])
@@ -673,6 +675,14 @@ function setGamemode(modeNum) {
     gameSettings.gamemode = modeNum;
     const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage' }
     document.getElementById('objectiveText').textContent = modesText[gameSettings.gamemode];
+}
+
+function resetSettings(settingGroup) {
+    for (let setting in eval(settingGroup)) {
+        eval(settingGroup)[setting] = "";
+    }
+    saveSettings()
+    location.reload()
 }
 
 // data

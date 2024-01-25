@@ -14,13 +14,13 @@
             <img src="./icons/display.svg" alt="display" height="70%" width="auto" style="transform: translateY(10%);">
         </button>
         <button id="gameSettings" class="settings" style="top: 15%;" onclick="openModal('gameSettingsDialog')">
-            <img src="./icons/settings.svg" alt="display" height="90%" width="auto" style="transform: translateY(10%);">
+            <img src="./icons/settings.svg" alt="settings" height="90%" width="auto" style="transform: translateY(10%);">
         </button>
         <button id="controlSettings" class="settings" style="top: 25%;" onclick="openModal('controlSettingsDialog')">
-            <img src="./icons/joystick.svg" alt="display" height="75%" width="auto" style="transform: translateY(0%);">
+            <img src="./icons/joystick.svg" alt="controls" height="75%" width="auto" style="transform: translateY(0%);">
         </button>
         <button id="gamemode" class="settings" style="top: 35%;" onclick="openModal('gamemodeDialog')">
-            <img src="./icons/timer.svg" alt="display" height="90%" width="auto" style="transform: translateY(5%);">
+            <img src="./icons/timer.svg" alt="gamemode" height="90%" width="auto" style="transform: translateY(5%);">
         </button>
 
         <div id="grid"></div>
@@ -53,8 +53,11 @@
 
     <dialog id="displaySettingsDialog" class="dialog">
         <h1>Display Settings</h1>
-        <div class="settingLayout"><label>Background colour</label> <input class="option color" type="color" id="bgcolour" /></div>
-        <div class="settingLayout"><label>Board Colour</label> <input class="option color" type="color" id="boardcolour" /></div>
+        <button class="resetIcon" onclick="resetSettings('displaySettings')">
+            <img src="./icons/reset.svg" alt="reset" height="100%" width="auto">
+        </button>
+        <div class="settingLayout"><label>BG hex/url</label> <input class="option textInput" type="text" id="background" /></div>
+        <div class="settingLayout"><label>Board Opacity</label> <input class="option range" type="range" id="boardOpacity" oninput="sliderChange(this)" min="0" max="99" step="1"/></div>
         <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range" id="boardHeightPercent" min="0" max="100" step="1" /></div>
         <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox" id="showGrid" /></div>
         <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
@@ -68,6 +71,9 @@
 
     <dialog id="gameSettingsDialog" class="dialog">
         <h1>Game Settings</h1>
+        <button class="resetIcon" onclick="resetSettings('gameSettings')">
+            <img src="./icons/reset.svg" alt="reset" height="100%" width="auto">
+        </button>
         <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
         <div class="settingLayout"><label>ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="arr" min="0" max="50" step="2" /></div>
         <div class="settingLayout"><label>Softdrop ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="sdarr" min="0" max="200" step="5" /></div>
@@ -84,6 +90,9 @@
 
     <dialog id="controlSettingsDialog" class="dialog">
         <h1>Keybinds</h1>
+        <button class="resetIcon" onclick="resetSettings('controlSettings')">
+            <img src="./icons/reset.svg" alt="reset" height="100%" width="auto">
+        </button>
         <div class="settingLayout"><label>Move Right</label> <button class="option keybind" onclick="buttonInput(this)" id="rightKey"></button></div>
         <div class="settingLayout"><label>Move Left</label> <button class="option keybind" onclick="buttonInput(this)" id="leftKey"></button></div>
         <div class="settingLayout"><label>Rotate Clockwise</label> <button class="option keybind" onclick="buttonInput(this)" id="cwKey"></button></div>
