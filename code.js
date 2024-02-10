@@ -395,7 +395,7 @@ function drawGrid() {
         for (let row = 0; row < 10; row++) {
             let mino = document.createElement('div');
             mino.style.gridArea = `${col + 1} / ${row + 1} /span 1/span 1`
-            mino.style.border = '1px solid white'
+            mino.style.outline = '0.1vh solid white'
             mino.style.opacity = `${displaySettings.gridopacity}%`;
             mino.classList.add('gridLine');
             DOMboard.appendChild(mino);
@@ -411,7 +411,7 @@ function renderPieceFromCoords(parentDiv, coords, heightadjust = 0, rowadjust = 
         let newcol = coord[1] + heightadjust;
         mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`; // render new minos
         mino.style.backgroundColor = colour;
-        mino.style.border = `2px solid ${colour}`
+        mino.style.border = `0.3vh solid ${colour}`
         mino.style.opacity = opacity;
         if (classname != null) mino.classList.add(classname)
         parentDiv.appendChild(mino);
@@ -459,7 +459,7 @@ function renderActionText(linecount, remainingMinos) {
 
 function spikePattern(colour, size) {
     document.getElementById('linessent').style.color = colour;
-    document.getElementById('linessent').style.textShadow = `0 0 10px ${colour}`;
+    document.getElementById('linessent').style.textShadow = `0 0 1vh ${colour}`;
     document.getElementById('linessent').style.fontSize = `${3.5 * size}vh`;
 }
 
@@ -541,7 +541,7 @@ function renderObjective() {
 
 function changeBorderColour(id, colour) {
     if (!displaySettings.colouredQueues) colour = '#dbeaf3';
-    document.getElementById(id).style.border = `2px solid ${colour}`;
+    document.getElementById(id).style.outline = `0.2vh solid ${colour}`;
 }
 
 // misc functions

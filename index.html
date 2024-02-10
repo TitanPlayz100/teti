@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="icons/titanicon.ico">
-    <title>teti idk</title>
+    <title>teti</title>
     <link rel="stylesheet" href="style.css">
     <script defer src="code.js"></script>
 </head>
 <body id="body">
     <div id="board">
-        <button id="displaySettings" class="settings" style="top: 5%;" onclick="openModal('displaySettingsDialog')">
+        <button id="displaySettings" class="settings" style="top: 5%;" onclick="openModal('displaySettingsDialog')" title="Display Settings">
             <img src="./icons/display.svg" alt="display" height="70%" width="auto" style="transform: translateY(10%);">
         </button>
-        <button id="gameSettings" class="settings" style="top: 15%;" onclick="openModal('gameSettingsDialog')">
+        <button id="gameSettings" class="settings" style="top: 15%;" onclick="openModal('gameSettingsDialog')" title="Game Settings">
             <img src="./icons/settings.svg" alt="settings" height="90%" width="auto" style="transform: translateY(10%);">
         </button>
-        <button id="controlSettings" class="settings" style="top: 25%;" onclick="openModal('controlSettingsDialog')">
+        <button id="controlSettings" class="settings" style="top: 25%;" onclick="openModal('controlSettingsDialog')" title="Control Settings">
             <img src="./icons/joystick.svg" alt="controls" height="75%" width="auto" style="transform: translateY(0%);">
         </button>
-        <button id="gamemode" class="settings" style="top: 35%;" onclick="openModal('gamemodeDialog')">
+        <button id="gamemode" class="settings" style="top: 35%;" onclick="openModal('gamemodeDialog')" title="Change Gamemode">
             <img src="./icons/timer.svg" alt="gamemode" height="90%" width="auto" style="transform: translateY(5%);">
         </button>
 
@@ -40,8 +40,8 @@
             <p class="statstext" id="stats1" style="right: 105%; bottom: 5%;"></p>
             <p class="statstext" id="stats2" style="right: 105%; bottom: 15%;"></p>
             <p class="statstext" id="stats3" style="right: 105%; bottom: 25%;"></p>
-            <p class="smalltext" id="smallStat1" style="left: -40%; bottom: 12.5%; font-size: 1.5em;"></p>
-            <p class="smalltext" id="smallStat2" style="left: -40%; bottom: 22.5%; font-size: 1.5em;">test</p>
+            <p class="smalltext" id="smallStat1" style="left: -45%; bottom: 11%; font-size: 3vh;"></p>
+            <p class="smalltext" id="smallStat2" style="left: -45%; bottom: 21%; font-size: 3vh;"></p>
             <p class="smalltext" style="left: -15%; bottom: 20%;">pps</p>
             <p class="smalltext" style="left: -17.5%; bottom: 10%;">apm</p>
             <p class="smalltext" style="left: -14%; bottom: 0%;">sec</p>
@@ -52,9 +52,9 @@
 
 
     <dialog id="displaySettingsDialog" class="dialog">
-        <h1>Display Settings</h1>
-        <button class="resetIcon" onclick="resetSettings('displaySettings')">
-            <img src="./icons/reset.svg" alt="reset" height="100%" width="auto">
+        <h1 style="text-align: center;">Display Settings</h1>
+        <button title="Reset these settings" class="resetIcon" onclick="resetSettings('displaySettings')">
+            <img src="./icons/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>BG hex/url</label> <input class="option textInput" type="text" id="background" /></div>
         <div class="settingLayout"><label>Board Opacity</label> <input class="option range" type="range" id="boardOpacity" oninput="sliderChange(this)" min="0" max="99" step="1"/></div>
@@ -65,14 +65,14 @@
         <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
         <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
         <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
-        <p class="smalltext">Press Esc to close without saving</p>
+        <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="closeModal('displaySettingsDialog')">Save and close</button>
     </dialog>
 
     <dialog id="gameSettingsDialog" class="dialog">
-        <h1>Game Settings</h1>
-        <button class="resetIcon" onclick="resetSettings('gameSettings')">
-            <img src="./icons/reset.svg" alt="reset" height="100%" width="auto">
+        <h1 style="text-align: center;">Game Settings</h1>
+        <button title="Reset these settings" class="resetIcon" onclick="resetSettings('gameSettings')">
+            <img src="./icons/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
         <div class="settingLayout"><label>ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="arr" min="0" max="50" step="2" /></div>
@@ -84,14 +84,14 @@
         <div class="settingLayout"><label>Lockout Deaths</label> <input class="option check" type="checkbox" id="allowLockout" /></div>
         <div class="settingLayout"><label>Preserve DAS</label> <input class="option check" type="checkbox" id="preserveARR" /></div>
         <div class="settingLayout"><label>Infinite Hold</label> <input class="option check" type="checkbox" id="infiniteHold" /></div>
-        <p class="smalltext">Press Esc to close without saving</p>
+        <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="closeModal('gameSettingsDialog')">Save and close</button>
     </dialog>
 
     <dialog id="controlSettingsDialog" class="dialog">
-        <h1>Keybinds</h1>
-        <button class="resetIcon" onclick="resetSettings('controlSettings')">
-            <img src="./icons/reset.svg" alt="reset" height="100%" width="auto">
+        <h1 style="text-align: center;">Keybinds</h1>
+        <button title="Reset these settings" class="resetIcon" onclick="resetSettings('controlSettings')">
+            <img src="./icons/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>Move Right</label> <button class="option keybind" onclick="buttonInput(this)" id="rightKey"></button></div>
         <div class="settingLayout"><label>Move Left</label> <button class="option keybind" onclick="buttonInput(this)" id="leftKey"></button></div>
@@ -102,7 +102,7 @@
         <div class="settingLayout"><label>Harddrop</label> <button class="option keybind" onclick="buttonInput(this)" id="hdKey"></button></div>
         <div class="settingLayout"><label>Hold Piece</label> <button class="option keybind" onclick="buttonInput(this)" id="holdKey"></button></div>
         <div class="settingLayout"><label>Reset Game</label> <button class="option keybind" onclick="buttonInput(this)" id="resetKey"></button></div>
-        <p class="smalltext">Press Esc to close without saving</p>
+        <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="closeModal('controlSettingsDialog')">Save and close</button>
     </dialog>
 
@@ -126,7 +126,7 @@
 
     <dialog id="gameEnd" class="dialog">
         <h1><b>GAME ENDED</b></h1>
-        <p id="reason" style="font-size: 1.8em;">test</p>
+        <p id="reason" style="font-size: 3.6vh;">test</p>
         <p id="result">test</p>
         <button class="closeDialog" onclick="closeModal('gameEnd')" style="bottom: 10%;">Play Again</button>
     </dialog>

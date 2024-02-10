@@ -22,8 +22,8 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     aspect-ratio: 0.5;
-    border: 2px solid var(--cl-blue);
-    box-shadow: 0 0 20px #ffffff58;
+    outline: 0.2vh solid var(--cl-blue);
+    box-shadow: 0 0 5vh #ffffff58;
     background-color: rgba(0, 0, 0, 0.988);
 }
 
@@ -33,7 +33,7 @@ body {
     height: 200%;
     top: -100%;
     display: grid;
-    grid-gap: -1px;
+    gap: -0.1vh;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(40, 1fr);
     direction: rtl;
@@ -63,8 +63,7 @@ body {
 
 #next {
     position: fixed;
-    top: -0.3%;
-    left: 100.3%;
+    left: 101%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(15, 1fr);
@@ -76,13 +75,12 @@ body {
 
 #hold {
     position: fixed;
-    top: -0.3%;
-    left: -40.9%;
+    left: -40%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(3, 1fr);
     height: 15%;
-    width: 40%;
+    width: 39.5%;
     border-radius: 1.5vh 0 0 1.5vh;
     background-color: rgba(0, 0, 0, 0.988);
 }
@@ -93,7 +91,7 @@ body {
     bottom: -0.8vh;
     width: 100%;
     height: 0.8vh;
-    border-radius: 5px;
+    border-radius: 0.5vh;
 }
 
 #lockCounter {
@@ -108,19 +106,19 @@ body {
 
 #lockTimer::-webkit-progress-value {
     background-color: var(--cl-blue);
-    border-radius: 7px;
+    border-radius: 0.7vh;
 }
 
 #lockCounter::-webkit-progress-value {
     background-color: var(--c-blue);
-    border-radius: 7px;
+    border-radius: 0.7vh;
 }
 
 .actiontext,
 .statstext {
     position: fixed;
     font-size: 3.5vh;
-    text-shadow: 0 0 10px #ffffffc4;
+    text-shadow: 0 0 3vh #ffffffc4;
     margin: 0;
     text-align: right;
     width: 200%;
@@ -148,7 +146,7 @@ body {
     align-items: center;
     height: 8%;
     width: 24%;
-    border: 2px solid rgba(255, 255, 255, 0.288);
+    border: 0.2vh solid rgba(255, 255, 255, 0.288);
     border-radius: 0 1.5vh 1.5vh 0;
     transition: all 0.3s ease-out;
     background-color: rgba(255, 255, 255, 0);
@@ -156,64 +154,62 @@ body {
 
 .settings:hover {
     left: 133%;
-    border: 2px solid var(--cl-blue);
+    border: 0.2vh solid var(--cl-blue);
 }
 
 .dialog {
     height: 75vh;
-    width: 28vw;
-    min-width: 380px;
+    aspect-ratio: 1/1.4;
     background-color: var(--e-black);
-    padding-left: 2%;
-    padding-right: 2%;
+    padding: 1%;
     color: var(--cl-blue);
     border: none;
     border-radius: 2vh;
     user-select: none;
-    animation: zoomin 0.4s forwards ease;
+    animation: zoomin 0.3s forwards ease;
     outline: none;
     overflow: hidden;
+    font-size: 1.8vh;
 }
 
 #gamemodeDialog {
     height: 50vh;
-    width: 25vw;
+    aspect-ratio: 1/1;
 }
 
 #gameEnd {
     text-align: center;
     height: 30vh;
-    width: 25vw;
+    aspect-ratio: 1.5/1;
 }
 
 .dialog.closingAnimation {
-    animation: zoomout 0.4s forwards ease;
+    animation: zoomout 0.3s forwards ease;
 }
 
 .dialog::backdrop {
     background-color: #000000bb;
-    backdrop-filter: blur(3px);
-    animation: fadein 0.2s forwards ease;
+    backdrop-filter: blur(5px);
+    animation: fadein 0.4s forwards ease;
 }
 
 .dialog.closingAnimation::backdrop {
-    animation: fadeout 0.2s forwards ease;
+    animation: fadeout 0.4s forwards ease;
 }
 
 .settingLayout {
     width: 100%;
     padding: 1vh;
-    padding-right: 0;
-    transition: all 0.4s ease;
-    border: 2px solid #00000000;
+    transition: all 0.3s ease;
+    border: 0.2vh solid #00000000;
     margin: 0.4vh;
 }
 
 .settingLayout:hover {
-    border-top: 2px solid var(--c-blue);
-    border-bottom: 2px solid var(--c-blue);
+    border-top: 0.2vh solid var(--c-blue);
+    border-bottom: 0.2vh solid var(--c-blue);
     animation: pulse 2s infinite ease;
-    animation-delay: 1s;
+    animation-delay: 0.5s;
 }
 
 .option {
@@ -309,7 +305,7 @@ body {
 .textInput {
     width: 50%;
     height: 2.4vh;
-    right: 1%;
+    right: 5%;
     padding: 0.5%;
     transform: translateY(-0.6vh);
     background-color: var(--e-black);
@@ -324,10 +320,10 @@ body {
     right: 30%;
     width: 40%;
     height: auto;
-    padding: 10px;
-    bottom: 3%;
+    padding: 1vh;
+    bottom: 2%;
     background-color: #00000000;
-    border: 2px solid rgb(150, 150, 150);
+    border: 0.2vh solid rgb(150, 150, 150);
     border-radius: 1vh;
     font-size: 1.3em;
     color: var(--cl-blue);
@@ -338,7 +334,7 @@ body {
     width: 100%;
     padding: 1vh;
     background-color: #00000000;
-    border: 2px solid rgb(150, 150, 150);
+    border: 0.2vh solid rgb(150, 150, 150);
     border-radius: 1vh;
     font-size: 1.3em;
     color: var(--cl-blue);
@@ -349,9 +345,9 @@ body {
 .keybind {
     width: 30%;
     height: 5%;
-    padding: 5px;
+    padding: 0.5vh;
     background-color: #00000000;
-    border: 2px solid rgb(150, 150, 150);
+    border: 0.2vh solid rgb(150, 150, 150);
     border-radius: 0.5vh;
     font-size: 1em;
     color: var(--c-blue);
@@ -369,13 +365,13 @@ body {
 .closeDialog,
 .keybind,
 .gamemodeSelect:disabled {
-    border: 2px solid rgba(255, 255, 255, 0.138);
+    border: 0.2vh solid rgba(255, 255, 255, 0.138);
 }
 
 .closeDialog:disabled:hover,
 .keybind:disabled:hover,
 .gamemodeSelect:disabled:hover {
-    border: 2px solid rgba(255, 255, 255, 0.138);
+    border: 0.2vh solid rgba(255, 255, 255, 0.138);
 }
 
 #frontdrop {
@@ -402,42 +398,47 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 5em;
-    text-shadow: 0 0 30px #ffffff;
+    text-shadow: 0 0 3vh #ffffff;
 }
 
 .selectkeytext {
     position: absolute;
     top: 46vh;
     font-size: 0.3em;
-    text-shadow: 0 0 30px #ffffff;
+    text-shadow: 0 0 3vh #ffffff;
 }
 
-.smalltext {
+.smalltext, .smalltextdialog {
     position: absolute;
-    bottom: 10%;
-    left: 20%;
-    font-size: 1em;
+    font-size: 1.6vh;
     color: #ffffffa1;
+}
+
+.smalltextdialog {
+    text-align: center;
+    left: 0;
+    width: 100%;
+    bottom: 10%;
 }
 
 .resetIcon {
     position: absolute;
     padding-top: 0.8vh;
     right: 5%;
-    bottom: 2%;
+    bottom: 2.5%;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 5%;
     aspect-ratio: 1/1;
-    border: 2px solid rgba(255, 255, 255, 0.432);
+    border: 0.2vh solid rgba(255, 255, 255, 0.432);
     border-radius: 1vh;
     background-color: rgba(255, 255, 255, 0);
     transition: all 0.4s ease;
 }
 
 .resetIcon:hover {
-    border: 2px solid rgb(255, 255, 255);
+    border: 0.2vh solid rgb(255, 255, 255);
 }
 
 @keyframes fadein {
