@@ -170,11 +170,13 @@ function getNewRotationState(type) {
 function getKickData(piece, rotationType, shapeNo) {
     let isI = (piece.name == 'i') ? 1 : 0; // check if i piece
     let direction = (rotationType == "CCW") ? (shapeNo > 3) ? 0 : shapeNo : shapeNo - 1;
-    return {
+    let data = {
         "180": KickData180[isI][direction],
-        "CW": KickDataCW[isI][direction],
-        "CCW": KickDataCW[isI][direction].map(row => row.map(element => element * -1))
+        "CW": KickData[isI][direction],
+        "CCW": KickData[isI][direction].map(row => row.map(element => element * -1))
     }[rotationType]
+    console.log(data)
+    return data;
 }
 
 function movePieceSide(direction, instant) {
@@ -234,15 +236,17 @@ function incrementLock() {
     const DOMminostopped = document.querySelectorAll('.stopped');
     if (timeouts['lockdelay'] != 0) {
         clearLockDelay(false); lockcount++;
-        const amountToAdd = 100 / gameSettings.maxLockMovements;
-        if (displaySettings.lockBar) document.getElementById('lockCounter').value += amountToAdd;
+        if (gameSettings.maxLockMovements != 0 && displaySettings.lockBar) {
+            const amountToAdd = 100 / gameSettings.maxLockMovements;
+            document.getElementById('lockCounter').value += amountToAdd;
+        }
     }
     if (checkCollision(minoToCoords(DOMminos), DOMminostopped, 'DOWN')) scheduleLock(false);
 }
 
 function scheduleLock(harddrop) {
-    if (gameSettings.maxLockMovements == 0) return;
-    if (lockcount >= gameSettings.maxLockMovements || harddrop) { lockPiece(); return; }
+    let LockMoves = gameSettings.maxLockMovements == 0 ? 99999 : gameSettings.maxLockMovements;
+    if (lockcount >= LockMoves || harddrop) { lockPiece(); return; }
     if (gameSettings.lockDelay == 0) { timeouts['lockdelay'] = -1; return; }
     timeouts['lockdelay'] = setTimeout(() => lockPiece(), gameSettings.lockDelay);
     timeouts['lockingTimer'] = setInterval(() => {
@@ -322,7 +326,7 @@ function drawPiece(piece) {
     const DOMboard = document.getElementById('playingfield');
     const DOMstopped = document.querySelectorAll('.stopped');
     let offsetx = (piece.name == 'o') ? 5 : 4                   // o is smaller, set different pos
-    let offsety = (piece.name == 'o') ? 21 : 20
+    let offsety = (piece.name == 'o') ? 22 : (piece.name == 'i') ? 20 : 21
     const coords = pieceToCoords(piece, 'shape1', undefined, true);
     const coordsmapped = coords.map((coord) => [coord[0] + offsetx, coord[1] + offsety]);
     if (checkCollision(coordsmapped, DOMstopped, 'SPAWN') == true) { endGame('blockout'); return; }
@@ -576,6 +580,7 @@ function startGravity() {
     if (checkCollision(coords, DOMminostopped, 'DOWN')) incrementLock();
     if (gameSettings.gravitySpeed > 1000) return;
     if (gameSettings.gravitySpeed == 0) { movePieceDown(false, true); return; }
+    movePieceDown(false, false);
     timeouts['gravity'] = setInterval(() => { movePieceDown(false, false) }, gameSettings.gravitySpeed);
 }
 
@@ -656,6 +661,7 @@ function saveSettings() {
 
 function loadSettings() {
     const data = localStorage.getItem('settings');
+    if (data == null) return;
     const [tempDisplay, tempGame, tempControls] = JSON.parse(data);
     for (let s in tempDisplay) {
         if (tempDisplay[s] === undefined || tempDisplay[s] === "") continue;
@@ -845,11 +851,12 @@ const pieces = [
     }
 ];
 
-const KickDataCW = [[                           // CCW data is CW data * -1
-    [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],   // 4 -> 1 -> 4
-    [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],  // 1 -> 2 -> 1
-    [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],      // 2 -> 3 -> 2
-    [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]]      // 3 -> 4 -> 3
+// srs+
+const KickData = [[
+    [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],   // 4 -> 1, 1 is north, ccw is 1 -> 4, ccw is * -1
+    [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],  // 1 -> 2
+    [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],      // 2 -> 3 
+    [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]]      // 3 -> 4
 ], [                                            // I piece kicks
     [[0, 0], [1, 0], [-2, 0], [1, -2], [-2, 1]],    // 4 -> 1      
     [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],    // 1 -> 2
@@ -858,15 +865,15 @@ const KickDataCW = [[                           // CCW data is CW data * -1
 ]];
 
 const KickData180 = [[
-    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 3 -> 1
-    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],    // 4 -> 2
-    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],    // 1 -> 3
-    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 2 -> 4
-], [                                            // I piece kicks
-    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 3 -> 1      
-    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],    // 4 -> 2
-    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]],    // 1 -> 3
-    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 2 -> 4
+    [[0, 0], [0, -1], [-1, -1], [1, -1], [-1, 0], [1, 0]], // 3 -> 1
+    [[0, 0], [-1, 0], [-1, 2], [-1, 1], [0, 2], [0, 1]],   // 4 -> 2
+    [[0, 0], [0, 1], [1, 1], [-1, 1], [1, 0], [-1, 0]],    // 1 -> 3
+    [[0, 0], [1, 0], [1, 2], [1, 1], [0, 2], [0, 1]]       // 2 -> 4
+], [        // I piece kicks
+    [[0, 0], [0, -1]],   // 3 -> 1
+    [[0, 0], [-1, 0]],  // 4 -> 2
+    [[0, 0], [0, 1]],  // 1 -> 3
+    [[0, 0], [1, 0]],   // 2 -> 4
 ]];
 
 const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
