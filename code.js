@@ -1,4 +1,4 @@
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore;
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbageRemaining;
 
 let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
@@ -16,6 +16,7 @@ function StartGame() {
     renderStyles();
     clearInterval(timeouts['stats']);
     renderStats();
+    addGarbage(gameSettings.gamemode == 4);
     drawPiece(randomiser());
 }
 
@@ -24,8 +25,8 @@ this.addEventListener('keydown', event => {
     if (disabledKeys.includes(event.key)) event.preventDefault();
     if (event.repeat || isDialogOpen) return;
     if (firstMove) firstMovement();
-    if (event.key == controlSettings.resetKey) StartGame();
     document.body.style.cursor = 'none';
+    if (event.key == controlSettings.resetKey) StartGame();
     if (event.key == controlSettings.cwKey) rotate("CW");
     if (event.key == controlSettings.ccwKey) rotate("CCW");
     if (event.key == controlSettings.rotate180Key) rotate("180");
@@ -170,13 +171,11 @@ function getNewRotationState(type) {
 function getKickData(piece, rotationType, shapeNo) {
     let isI = (piece.name == 'i') ? 1 : 0; // check if i piece
     let direction = (rotationType == "CCW") ? (shapeNo > 3) ? 0 : shapeNo : shapeNo - 1;
-    let data = {
+    return {
         "180": KickData180[isI][direction],
         "CW": KickData[isI][direction],
         "CCW": KickData[isI][direction].map(row => row.map(element => element * -1))
     }[rotationType]
-    console.log(data)
-    return data;
 }
 
 function movePieceSide(direction, instant) {
@@ -219,14 +218,18 @@ function movePieceDown(harddrop, softdrop) {
 // mechanics
 function clearLines() {
     const minoX = (mino) => Number(mino.style.gridArea.split('/')[0]);
-    const rows = minoToCoords(document.querySelectorAll('.stopped')).map((coord) => coord[1])
+    const rows = minoToCoords(document.querySelectorAll('.stopped')).map(coord => coord[1])
         .reduce((prev, curr) => (prev[curr] = ++prev[curr] || 1, prev), {})         // count minos in row
     const clearRows = Object.keys(rows).filter((key) => rows[key] >= 10)            // get rows with 10 minos
         .map((row) => Number(row)).toReversed()                                     // convert rows to number and reverse
+
     for (let row of clearRows) {
         const DOMstopped = document.querySelectorAll('.stopped');
-        [...DOMstopped].filter((mino) => minoX(mino) == row).forEach((mino) => mino.remove()) // remove minos on row
-        renderPieceMovement('DOWN', [...DOMstopped].filter((mino) => minoX(mino) > row)) // move other minos down
+        let garbageClear = [...DOMstopped].filter((mino) => minoX(mino) == row)
+            .some(mino => mino.classList.contains('garbage'));
+        if (garbageClear) garbageRemaining -= 1;
+        [...DOMstopped].filter((mino) => minoX(mino) == row).forEach(mino => mino.remove()) // remove minos on row
+        renderPieceMovement('DOWN', [...DOMstopped].filter(mino => minoX(mino) > row)) // move other minos down
     }
     renderActionText(clearRows.length, document.querySelectorAll('.stopped'))
 }
@@ -293,7 +296,7 @@ function endGame(top, bottom = 'Better luck next time') {
 function resetState() {
     gameEnd = false; currentPiece = null; currentLoc = null; isTspin = false; isMini = false;
     btbCount = -1; combonumber = -1;
-    totalLines = 0; totalScore = 0;
+    totalLines = 0; totalScore = 0, garbageRemaining = 10;
     heldpiece = { piece: null, occured: false };
     remainingpieces = [[], []];
     spikeCounter = 0;
@@ -388,6 +391,28 @@ function holdPiece() {
     if (!gameSettings.infiniteHold) heldpiece.occured = true;
 }
 
+function startGravity() {
+    const DOMminostopped = document.querySelectorAll('.stopped');
+    const coords = minoToCoords(document.querySelectorAll('.active'));
+    if (checkCollision(coords, DOMminostopped, 'DOWN')) incrementLock();
+    if (gameSettings.gravitySpeed > 1000) return;
+    if (gameSettings.gravitySpeed == 0) { movePieceDown(false, true); return; }
+    movePieceDown(false, false);
+    timeouts['gravity'] = setInterval(() => movePieceDown(false, false), gameSettings.gravitySpeed);
+}
+
+function addGarbage(isRightGamemode) {
+    if (!isRightGamemode) return;
+    const DOMboard = document.getElementById('playingfield');
+    for (let row = 1; row < 11; row++) {
+        const colRemoved = Math.floor(Math.random() * 10) + 1;
+        for (let col = 1; col < 11; col++) {
+            if (col == colRemoved) continue;
+            renderPieceFromCoords(DOMboard, [[col, row]], 0, 0, undefined, 'garbage', 'gray');
+        }
+    }
+}
+
 // screen rendering
 function drawGrid() {
     const DOMboard = document.getElementById('grid');
@@ -414,6 +439,7 @@ function renderPieceFromCoords(parentDiv, coords, heightadjust = 0, rowadjust = 
         mino.style.border = `0.3vh solid ${colour}`
         mino.style.opacity = opacity;
         if (classname != null) mino.classList.add(classname)
+        if (classname == 'garbage') mino.classList.add('stopped')
         parentDiv.appendChild(mino);
     })
 }
@@ -422,12 +448,11 @@ function renderPieceMovement(direction, minos) {
     for (let mino of minos) {
         const gridarea = mino.style.gridArea.split('/');
         let x = Number(gridarea[1]), y = Number(gridarea[0]);
-        switch (direction) {
-            case "RIGHT": x += 1; break;
-            case "LEFT": x -= 1; break;
-            case "DOWN": y -= 1; break;
-        }
-        mino.style.gridArea = `${y} / ${x} / span 1 / span 1`; // render moved minos
+        mino.style.gridArea = {
+            "RIGHT": `${y} / ${x + 1} / span 1 / span 1`,
+            "LEFT": `${y} / ${x - 1} / span 1 / span 1`,
+            "DOWN": `${y - 1} / ${x} / span 1 / span 1`,
+        }[direction] // render moved minos
     }
 }
 
@@ -438,9 +463,9 @@ function renderActionText(linecount, remainingMinos) {
     btbCount = isBTB ? btbCount + 1 : (linecount != 0) ? - 1 : btbCount;
     combonumber = linecount == 0 ? -1 : combonumber + 1;
     const damage = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, btbCount, isBTB);
+    totalScore += calcScore(damagetype, isPC, isBTB, combonumber);
     totalLines += linecount;
     totalAttack += damage;
-    totalScore += calcScore(damagetype, isPC, isBTB, combonumber);
     spikeCounter += damage;
 
     if (damagetype != '') setText('cleartext', damagetype, 2000);
@@ -495,10 +520,8 @@ function renderStyles() {
     document.getElementById('body').style.background = displaySettings.background[0] == '#'
         ? `${displaySettings.background} no-repeat fixed center`
         : `url("${displaySettings.background}") no-repeat fixed center`;
-    document.getElementById('board').style.backgroundColor = `rgba(0, 0, 0, 0.${displaySettings.boardOpacity})`;
-    document.getElementById('hold').style.backgroundColor = `rgba(0, 0, 0, 0.${displaySettings.boardOpacity})`;
-    document.getElementById('next').style.backgroundColor = `rgba(0, 0, 0, 0.${displaySettings.boardOpacity})`;
     document.getElementById('board').style.height = `${displaySettings.boardHeightPercent}vh`;
+    SetBG(['board', 'hold', 'next'], `rgba(0, 0, 0, 0.${displaySettings.boardOpacity})`);
     changeBorderColour('hold', '#dbeaf3')
     removeElements(['#grid'])
     if (displaySettings.showGrid) drawGrid();
@@ -520,22 +543,22 @@ function renderStats() {
 }
 
 function renderObjective() {
-    const display = {
+    const displayTime = (Math.round(totalTimeSeconds * 100) / 100).toFixed(2)
+    document.getElementById('objective').textContent = {
         0: '',
         1: `${totalLines}/${gameSettings.requiredLines}`,
         2: `${totalScore}`,
-        3: `${totalAttack}/${gameSettings.requiredAttack}`
-    }
-    document.getElementById('objective').textContent = display[gameSettings.gamemode];
-    const displayTime = (Math.round(totalTimeSeconds * 100) / 100).toFixed(2)
+        3: `${totalAttack}/${gameSettings.requiredAttack}`,
+        4: `${garbageRemaining}`
+    }[gameSettings.gamemode]
     if (gameSettings.gamemode == 1 && totalLines >= gameSettings.requiredLines) {
         endGame(`${displayTime}s`, `Cleared ${totalLines} lines in ${displayTime} seconds`);
-    }
-    if (gameSettings.gamemode == 2 && totalTimeSeconds >= Number(gameSettings.timeLimit)) {
+    } else if (gameSettings.gamemode == 2 && totalTimeSeconds >= Number(gameSettings.timeLimit)) {
         endGame(`${totalScore} points`, `Scored ${totalScore} points in ${displayTime} seconds`);
-    }
-    if (gameSettings.gamemode == 3 && totalAttack >= gameSettings.requiredAttack) {
+    } else if (gameSettings.gamemode == 3 && totalAttack >= gameSettings.requiredAttack) {
         endGame(`${displayTime}s`, `Sent ${totalAttack} damage in ${displayTime} seconds`);
+    } else if (gameSettings.gamemode == 4 && garbageRemaining < 1) {
+        endGame(`${displayTime}s`, `Dug 10 lines in ${displayTime} seconds`);
     }
 }
 
@@ -550,9 +573,9 @@ function stopTimeout(name) { clearTimeout(timeouts[name]); timeouts[name] = 0; }
 function stopInterval(name) { clearInterval(timeouts[name]); timeouts[name] = 0; }
 function toExpValue(x) { return Math.round(Math.pow(2, 0.1 * x) - 1) }
 function toLogValue(y) { return Math.round(Math.log2(y + 1) * 10) }
-function removeElements(names) {
-    names.forEach((name) => { document.querySelectorAll(name)[0].replaceChildren(); })
-}
+function newGame(k, d) { if (k == controlSettings.resetKey) { closeModal(d); StartGame(); } }
+function removeElements(ns) { ns.forEach(n => document.querySelectorAll(n)[0].replaceChildren()) }
+function SetBG(ids, c) { ids.forEach(id => document.getElementById(id).style.backgroundColor = c) }
 
 function minoToCoords(minos) {
     return [...minos].map((mino) => {
@@ -572,16 +595,6 @@ function pieceToCoords(piece, shape, change = [0, 0], reverseY = false) {
         }
     }
     return coords;
-}
-
-function startGravity() {
-    const DOMminostopped = document.querySelectorAll('.stopped');
-    const coords = minoToCoords(document.querySelectorAll('.active'));
-    if (checkCollision(coords, DOMminostopped, 'DOWN')) incrementLock();
-    if (gameSettings.gravitySpeed > 1000) return;
-    if (gameSettings.gravitySpeed == 0) { movePieceDown(false, true); return; }
-    movePieceDown(false, false);
-    timeouts['gravity'] = setInterval(() => { movePieceDown(false, false) }, gameSettings.gravitySpeed);
 }
 
 // interactivity in settings
@@ -679,7 +692,7 @@ function loadSettings() {
 
 function setGamemode(modeNum) {
     gameSettings.gamemode = modeNum;
-    const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage' }
+    const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining' }
     document.getElementById('objectiveText').textContent = modesText[gameSettings.gamemode];
 }
 
@@ -859,9 +872,9 @@ const KickData = [[
     [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]]      // 3 -> 4
 ], [                                            // I piece kicks
     [[0, 0], [1, 0], [-2, 0], [1, -2], [-2, 1]],    // 4 -> 1      
-    [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],    // 1 -> 2
+    [[0, 0], [1, 0], [-2, 0], [1, 2], [-2, -1]],    // 1 -> 2
     [[0, 0], [-1, 0], [2, 0], [-1, 2], [2, -1]],    // 2 -> 3
-    [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]]     // 3 -> 4
+    [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]]     // 3 -> 4
 ]];
 
 const KickData180 = [[
@@ -869,11 +882,11 @@ const KickData180 = [[
     [[0, 0], [-1, 0], [-1, 2], [-1, 1], [0, 2], [0, 1]],   // 4 -> 2
     [[0, 0], [0, 1], [1, 1], [-1, 1], [1, 0], [-1, 0]],    // 1 -> 3
     [[0, 0], [1, 0], [1, 2], [1, 1], [0, 2], [0, 1]]       // 2 -> 4
-], [        // I piece kicks
-    [[0, 0], [0, -1]],   // 3 -> 1
-    [[0, 0], [-1, 0]],  // 4 -> 2
-    [[0, 0], [0, 1]],  // 1 -> 3
-    [[0, 0], [1, 0]],   // 2 -> 4
+], [                                                   // I piece kicks
+    [[0, 0], [0, -1]],                                     // 3 -> 1
+    [[0, 0], [-1, 0]],                                     // 4 -> 2
+    [[0, 0], [0, 1]],                                      // 1 -> 3
+    [[0, 0], [1, 0]],                                      // 2 -> 4
 ]];
 
 const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
