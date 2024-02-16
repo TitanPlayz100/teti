@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
 
 :root {
     --night: #080B0C;
@@ -9,7 +10,7 @@
 
 body {
     color: var(--cl-blue);
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Major Mono Display", monospace;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
@@ -117,7 +118,7 @@ body {
 .actiontext,
 .statstext {
     position: fixed;
-    font-size: 3.5vh;
+    font-size: 3.0vh;
     text-shadow: 0 0 3vh #ffffffc4;
     margin: 0;
     text-align: right;
@@ -132,7 +133,7 @@ body {
 
 .text {
     position: fixed;
-    font-size: 3.5vh;
+    font-size: 3.0vh;
     margin: 0;
     user-select: none;
 }
@@ -158,6 +159,7 @@ body {
 }
 
 .dialog {
+    font-family: 'Montserrat', sans-serif;
     height: 75vh;
     aspect-ratio: 1/1.4;
     background-color: var(--e-black);
@@ -174,7 +176,7 @@ body {
 
 #gamemodeDialog {
     height: 60vh;
-    aspect-ratio: 2/3;
+    aspect-ratio: 1/1.3;
 }
 
 #gameEnd {
@@ -200,9 +202,9 @@ body {
 .settingLayout {
     width: 100%;
     padding: 1vh;
-    transition: all 0.3s ease;
+    transition: all 0.7s ease;
     border: 0.2vh solid #00000000;
-    margin: 0.4vh;
+    /* margin: 0.4vh; */
 }
 
 .settingLayout:hover {
@@ -210,6 +212,7 @@ body {
     border-bottom: 0.2vh solid var(--c-blue);
     animation: pulse 2s infinite ease;
     animation-delay: 0.5s;
+    transition: all 0.1s ease;
 }
 
 .option {
@@ -266,8 +269,8 @@ body {
 }
 
 .check {
-    width: 3.5vh;
-    height: 3.5vh;
+    width: 3.0vh;
+    height: 3.0vh;
     right: 19%;
     transform: translateY(-1vh);
     appearance: none;
@@ -355,11 +358,34 @@ body {
     transform: translateY(-1vh);
 }
 
+.resetIcon {
+    position: absolute;
+    padding-top: 0.8vh;
+    right: 5%;
+    bottom: 2.5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 5%;
+    aspect-ratio: 1/1;
+    border: 0.2vh solid rgba(255, 255, 255, 0.432);
+    border-radius: 1vh;
+    background-color: rgba(255, 255, 255, 0);
+    transition: all 0.4s ease;
+}
+
 .closeDialog:hover,
 .keybind:hover,
-.gamemodeSelect:hover {
+.gamemodeSelect:hover,
+.resetIcon:hover {
     color: white;
     border-color: white;
+}
+
+.keybind:hover,
+.gamemodeSelect:hover {
+    transition: all 0.1s ease;
+
 }
 
 .closeDialog,
@@ -408,9 +434,10 @@ body {
     text-shadow: 0 0 3vh #ffffff;
 }
 
-.smalltext, .smalltextdialog {
+.smalltext,
+.smalltextdialog {
     position: absolute;
-    font-size: 1.6vh;
+    font-size: 1.4vh;
     color: #ffffffa1;
 }
 
@@ -419,26 +446,6 @@ body {
     left: 0;
     width: 100%;
     bottom: 10%;
-}
-
-.resetIcon {
-    position: absolute;
-    padding-top: 0.8vh;
-    right: 5%;
-    bottom: 2.5%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 5%;
-    aspect-ratio: 1/1;
-    border: 0.2vh solid rgba(255, 255, 255, 0.432);
-    border-radius: 1vh;
-    background-color: rgba(255, 255, 255, 0);
-    transition: all 0.4s ease;
-}
-
-.resetIcon:hover {
-    border: 0.2vh solid rgb(255, 255, 255);
 }
 
 @keyframes fadein {

@@ -1,11 +1,12 @@
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbageRemaining;
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, heldpiece, gameEnd, remainingpieces, lockcount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbageRemaining, sfx = {};
 
 let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
-const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter']
+const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Escape']
+const audioLevel = 10;
 
 // default settings
-let displaySettings = { background: '#080B0C', boardOpacity: '99', gridopacity: 10, shadowOpacity: 20, boardHeightPercent: 70, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
+let displaySettings = { background: '#080B0C', boardOpacity: '99', gridopacity: 10, shadowOpacity: 20, boardHeightPercent: 61, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
 let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40 }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
@@ -16,12 +17,12 @@ function StartGame() {
     renderStyles();
     clearInterval(timeouts['stats']);
     renderStats();
-    addGarbage(gameSettings.gamemode == 4);
+    if (gameSettings.gamemode == 4) addGarbage(10);
     drawPiece(randomiser());
 }
 
 this.addEventListener('keydown', event => {
-    if (event.key == 'Escape') isDialogOpen = false;
+    if (event.key == 'Escape') toggleDialog();
     if (disabledKeys.includes(event.key)) event.preventDefault();
     if (event.repeat || isDialogOpen) return;
     if (firstMove) firstMovement();
@@ -125,6 +126,7 @@ function checkTspin(rotation, location, stoppedMinos, transformation) {
     const [x, y] = location;
     const [dx, dy] = transformation;
     isMini = false;
+    const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
     const backminos = spinChecks[(rotation + 1) % 4].map((coord) => [coord[0] + x, coord[1] + y]);
     const frontminos = spinChecks[rotation - 1].map((coord) => [coord[0] + x, coord[1] + y]);
     const back1 = checkCollision([backminos[0]], stoppedMinos, "ROTATE")
@@ -155,16 +157,18 @@ function rotate(type) {
         posChange[0], currentPiece, 'active');
     currentLoc = [currentLoc[0] + posChange[0], currentLoc[1] + posChange[1]]
     isTspin = checkTspin(newRotation, currentLoc, DOMstopped, posChange);
+    if (isTspin) playSound('spin')
     rotationState = newRotation;
     incrementLock();
     displayShadow();
+    playSound('rotate')
     if (gameSettings.gravitySpeed == 0) startGravity();
     startArr('current');
     if (directionState['DOWN'] == 'arr') startArrSD();
 }
 
 function getNewRotationState(type) {
-    let newState = (rotationState + rmap[type] || 0) % 4;
+    let newState = (rotationState + { "CW": 1, "CCW": -1, "180": 2 }[type] || 0) % 4;
     return newState == 0 ? 4 : newState;
 }
 
@@ -192,6 +196,7 @@ function movePieceSide(direction, instant) {
     displayShadow();
     incrementLock();
     isTspin = false; isMini = false;
+    playSound('move');
     if (gameSettings.gravitySpeed == 0) startGravity();
     if (instant) movePieceSide(direction, true);
 }
@@ -210,10 +215,10 @@ function movePieceDown(harddrop, softdrop) {
     totalScore += harddrop ? 2 : 1;
     if (checkCollision(minoToCoords(DOMminos), stopped, 'DOWN')) { scheduleLock(harddrop); return; }
     startArr('current')
+    playSound('move');
     if (harddrop) movePieceDown(true, false);
     if (softdrop) movePieceDown(false, true);
 }
-
 
 // mechanics
 function clearLines() {
@@ -222,12 +227,11 @@ function clearLines() {
         .reduce((prev, curr) => (prev[curr] = ++prev[curr] || 1, prev), {})         // count minos in row
     const clearRows = Object.keys(rows).filter((key) => rows[key] >= 10)            // get rows with 10 minos
         .map((row) => Number(row)).toReversed()                                     // convert rows to number and reverse
-
     for (let row of clearRows) {
         const DOMstopped = document.querySelectorAll('.stopped');
         let garbageClear = [...DOMstopped].filter((mino) => minoX(mino) == row)
             .some(mino => mino.classList.contains('garbage'));
-        if (garbageClear) garbageRemaining -= 1;
+        if (garbageClear) garbageRemaining -= 1;                                    // count garbage lines cleared
         [...DOMstopped].filter((mino) => minoX(mino) == row).forEach(mino => mino.remove()) // remove minos on row
         renderPieceMovement('DOWN', [...DOMstopped].filter(mino => minoX(mino) > row)) // move other minos down
     }
@@ -249,7 +253,7 @@ function incrementLock() {
 
 function scheduleLock(harddrop) {
     let LockMoves = gameSettings.maxLockMovements == 0 ? 99999 : gameSettings.maxLockMovements;
-    if (lockcount >= LockMoves || harddrop) { lockPiece(); return; }
+    if (lockcount >= LockMoves || harddrop) { lockPiece(); playSound('harddrop'); return; }
     if (gameSettings.lockDelay == 0) { timeouts['lockdelay'] = -1; return; }
     timeouts['lockdelay'] = setTimeout(() => lockPiece(), gameSettings.lockDelay);
     timeouts['lockingTimer'] = setInterval(() => {
@@ -285,6 +289,8 @@ function clearLockDelay(clearCount = true) {
 }
 
 function endGame(top, bottom = 'Better luck next time') {
+    if (top == 'lockout' || top == 'blockout') { playSound('failure'); playSound('topout') }
+    else { playSound('finish') }
     clearInterval(timeouts['gravity']);
     clearInterval(timeouts['stats']);
     gameEnd = true;
@@ -295,12 +301,11 @@ function endGame(top, bottom = 'Better luck next time') {
 
 function resetState() {
     gameEnd = false; currentPiece = null; currentLoc = null; isTspin = false; isMini = false;
-    btbCount = -1; combonumber = -1;
-    totalLines = 0; totalScore = 0, garbageRemaining = 10;
     heldpiece = { piece: null, occured: false };
     remainingpieces = [[], []];
-    spikeCounter = 0;
-    totalTimeSeconds = -0.02; totalAttack = 0; totalPieceCount = 0; firstMove = true;
+    totalLines = 0; totalScore = 0, garbageRemaining = 10; spikeCounter = 0; btbCount = -1;
+    combonumber = -1; totalTimeSeconds = -0.02; totalAttack = 0; totalPieceCount = 0;
+    firstMove = true;
     clearInterval(timeouts['gravity']);
     for (let text of ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent']) {
         document.getElementById(text).style.opacity = 0;
@@ -353,7 +358,7 @@ function updateNext() {
             1 + (3 * i), ((piece.name == 'o') ? 2 : 1), piece, 'nextmino');
     }
     const pieceColour = pieces.filter((element) => { return element.name == first5[0] })[0].colour
-    changeBorderColour('next', pieceColour)
+    changeOutlineColour('next', pieceColour)
 }
 
 function displayShadow() {
@@ -383,11 +388,12 @@ function holdPiece() {
         [heldpiece.piece, currentPiece] = [currentPiece, heldpiece.piece]
         drawPiece(currentPiece);
     }
+    playSound('hold');
     const DOMheldpiece = document.getElementById('hold');
     DOMheldpiece.replaceChildren();
     renderPieceFromCoords(DOMheldpiece, pieceToCoords(heldpiece.piece, 'shape1'),
         1, ((heldpiece.piece.name == 'o') ? 2 : 1), heldpiece.piece)
-    changeBorderColour('hold', heldpiece.piece.colour)
+    changeOutlineColour('hold', heldpiece.piece.colour)
     if (!gameSettings.infiniteHold) heldpiece.occured = true;
 }
 
@@ -401,13 +407,12 @@ function startGravity() {
     timeouts['gravity'] = setInterval(() => movePieceDown(false, false), gameSettings.gravitySpeed);
 }
 
-function addGarbage(isRightGamemode) {
-    if (!isRightGamemode) return;
+function addGarbage(lines) {
     const DOMboard = document.getElementById('playingfield');
-    for (let row = 1; row < 11; row++) {
-        const colRemoved = Math.floor(Math.random() * 10) + 1;
+    for (let row = 1; row < (lines + 1); row++) {
+        const randCol = Math.floor(Math.random() * 10) + 1;
         for (let col = 1; col < 11; col++) {
-            if (col == colRemoved) continue;
+            if (col == randCol) continue;
             renderPieceFromCoords(DOMboard, [[col, row]], 0, 0, undefined, 'garbage', 'gray');
         }
     }
@@ -434,12 +439,12 @@ function renderPieceFromCoords(parentDiv, coords, heightadjust = 0, rowadjust = 
         let mino = document.createElement('div');
         let newrow = coord[0] + rowadjust;
         let newcol = coord[1] + heightadjust;
-        mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`; // render new minos
+        mino.style.gridArea = `${newcol} / ${newrow} /span 1/span 1`;
         mino.style.backgroundColor = colour;
-        mino.style.border = `0.3vh solid ${colour}`
+        mino.style.border = classname != 'shadow' ? `0.3vh solid ${colour}` : 'none';
         mino.style.opacity = opacity;
-        if (classname != null) mino.classList.add(classname)
-        if (classname == 'garbage') mino.classList.add('stopped')
+        if (classname != null) mino.classList.add(classname);
+        if (classname == 'garbage') mino.classList.add('stopped');
         parentDiv.appendChild(mino);
     })
 }
@@ -480,6 +485,14 @@ function renderActionText(linecount, remainingMinos) {
     if (spikeCounter >= 30) { spikePattern('#007FFF', 1.3) } // blue
     if (spikeCounter >= 35) { spikePattern('#BF00FF', 1.4) } // purple
     if (spikeCounter >= 40) { spikePattern('#FF66CC', 1.5) } // pink
+
+    if (isPC) playSound('allclear')
+    if (btbCount == 2 && isBTB) playSound('btb_1')
+    if (linecount == 4 && btbCount > 0) { playSound('clearbtb') }
+    else if (linecount == 4) { playSound('clearquad') }
+    else if (linecount > 0 && isTspin) { playSound('clearspin') }
+    else if (linecount > 0) { playSound('clearline') }
+    if (spikeCounter >= 15) playSound('thunder');
 }
 
 function spikePattern(colour, size) {
@@ -522,7 +535,7 @@ function renderStyles() {
         : `url("${displaySettings.background}") no-repeat fixed center`;
     document.getElementById('board').style.height = `${displaySettings.boardHeightPercent}vh`;
     SetBG(['board', 'hold', 'next'], `rgba(0, 0, 0, 0.${displaySettings.boardOpacity})`);
-    changeBorderColour('hold', '#dbeaf3')
+    changeOutlineColour('hold', '#dbeaf3')
     removeElements(['#grid'])
     if (displaySettings.showGrid) drawGrid();
 }
@@ -543,28 +556,35 @@ function renderStats() {
 }
 
 function renderObjective() {
-    const displayTime = (Math.round(totalTimeSeconds * 100) / 100).toFixed(2)
+    const time = (Math.round(totalTimeSeconds * 100) / 100).toFixed(2), gs = gameSettings.gamemode;
     document.getElementById('objective').textContent = {
         0: '',
         1: `${totalLines}/${gameSettings.requiredLines}`,
         2: `${totalScore}`,
         3: `${totalAttack}/${gameSettings.requiredAttack}`,
         4: `${garbageRemaining}`
-    }[gameSettings.gamemode]
-    if (gameSettings.gamemode == 1 && totalLines >= gameSettings.requiredLines) {
-        endGame(`${displayTime}s`, `Cleared ${totalLines} lines in ${displayTime} seconds`);
-    } else if (gameSettings.gamemode == 2 && totalTimeSeconds >= Number(gameSettings.timeLimit)) {
-        endGame(`${totalScore} points`, `Scored ${totalScore} points in ${displayTime} seconds`);
-    } else if (gameSettings.gamemode == 3 && totalAttack >= gameSettings.requiredAttack) {
-        endGame(`${displayTime}s`, `Sent ${totalAttack} damage in ${displayTime} seconds`);
-    } else if (gameSettings.gamemode == 4 && garbageRemaining < 1) {
-        endGame(`${displayTime}s`, `Dug 10 lines in ${displayTime} seconds`);
+    }[gs]
+    if (gs == 1 && totalLines >= gameSettings.requiredLines) {
+        endGame(`${time}s`, `Cleared ${totalLines} lines in ${time} seconds`);
+    } else if (gs == 2 && totalTimeSeconds >= Number(gameSettings.timeLimit)) {
+        endGame(`${totalScore} points`, `Scored ${totalScore} points in ${time} seconds`);
+    } else if (gs == 3 && totalAttack >= gameSettings.requiredAttack) {
+        endGame(`${time}s`, `Sent ${totalAttack} damage in ${time} seconds`);
+    } else if (gs == 4 && garbageRemaining < 1) {
+        endGame(`${time}s`, `Dug 10 lines in ${time} seconds`);
     }
 }
 
-function changeBorderColour(id, colour) {
+function changeOutlineColour(id, colour) {
     if (!displaySettings.colouredQueues) colour = '#dbeaf3';
     document.getElementById(id).style.outline = `0.2vh solid ${colour}`;
+}
+
+function playSound(audioName) {
+    if (sfx[audioName] == undefined) sfx[audioName] = new Audio(`assets/sfx/${audioName}.mp3`);
+    sfx[audioName].currentTime = 0;
+    sfx[audioName].volume = audioLevel / 100;
+    sfx[audioName].play();
 }
 
 // misc functions
@@ -577,11 +597,8 @@ function newGame(k, d) { if (k == controlSettings.resetKey) { closeModal(d); Sta
 function removeElements(ns) { ns.forEach(n => document.querySelectorAll(n)[0].replaceChildren()) }
 function SetBG(ids, c) { ids.forEach(id => document.getElementById(id).style.backgroundColor = c) }
 
-function minoToCoords(minos) {
-    return [...minos].map((mino) => {
-        const gridarea = mino.style.gridArea.split('/');
-        return [Number(gridarea[1]), Number(gridarea[0])];
-    })
+function minoToCoords(minos) { // get each mino gridarea, get y and x as numbers, flip to x and y
+    return [...minos].map(m => m.style.gridArea.split('/').map(e => Number(e))).map(c => [c[1], c[0]]);
 }
 
 function pieceToCoords(piece, shape, change = [0, 0], reverseY = false) {
@@ -629,7 +646,6 @@ function closeModal(id) {
                             setting.value;
         })
     closeDialog(document.getElementById(id));
-    isDialogOpen = false;
     saveSettings();
     if (id == 'displaySettingsDialog') renderStyles();
     if (id == 'gameSettingsDialog' || id == 'gamemodeDialog' || id == 'gameEnd') StartGame();
@@ -641,6 +657,7 @@ function closeDialog(element) {
         element.classList.remove('closingAnimation');
         element.close()
     }
+    isDialogOpen = false;
     element.classList.add('closingAnimation');
     element.addEventListener('animationend', closingAnimation)
 }
@@ -697,11 +714,14 @@ function setGamemode(modeNum) {
 }
 
 function resetSettings(settingGroup) {
-    for (let setting in eval(settingGroup)) {
-        eval(settingGroup)[setting] = "";
-    }
+    for (let setting in eval(settingGroup)) eval(settingGroup)[setting] = "";
     saveSettings()
     location.reload()
+}
+
+function toggleDialog() {
+    if (isDialogOpen) { closeDialog(document.querySelectorAll("dialog[open]")[0]) }
+    else { openModal('gamemodeDialog') }
 }
 
 // data
@@ -728,7 +748,7 @@ const pieces = [
             [1, 1, 0],
             [1, 0, 0]
         ],
-        colour: "red"
+        colour: "#D83A28"
     },
     {
         name: "s",
@@ -752,7 +772,7 @@ const pieces = [
             [1, 1, 0],
             [0, 1, 0]
         ],
-        colour: "LawnGreen"
+        colour: "#7ACD44"
     },
     {
         name: "o",
@@ -760,7 +780,7 @@ const pieces = [
             [1, 1],
             [1, 1]
         ],
-        colour: "yellow"
+        colour: "#F2D74C"
     },
     {
         name: "t",
@@ -784,7 +804,7 @@ const pieces = [
             [1, 1, 0],
             [0, 1, 0]
         ],
-        colour: "DarkMagenta"
+        colour: "#C132D0"
     },
     {
         name: "j",
@@ -808,7 +828,7 @@ const pieces = [
             [0, 1, 0],
             [1, 1, 0]
         ],
-        colour: "blue"
+        colour: "#3358DD"
     },
     {
         name: "l",
@@ -832,7 +852,7 @@ const pieces = [
             [0, 1, 0],
             [0, 1, 0]
         ],
-        colour: "darkorange"
+        colour: "#EDA93F"
     },
     {
         name: "i",
@@ -860,12 +880,11 @@ const pieces = [
             [0, 1, 0, 0],
             [0, 1, 0, 0]
         ],
-        colour: "aqua"
+        colour: "#65DBC8"
     }
 ];
 
-// srs+
-const KickData = [[
+const KickData = [[ // srs+ (tetrio)
     [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],   // 4 -> 1, 1 is north, ccw is 1 -> 4, ccw is * -1
     [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],  // 1 -> 2
     [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],      // 2 -> 3 
@@ -889,9 +908,6 @@ const KickData180 = [[
     [[0, 0], [1, 0]],                                      // 2 -> 4
 ]];
 
-const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
-const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' };
-const rmap = { "CW": 1, "CCW": -1, "180": 2 };
 const attackValues = {
     '': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     'TSPIN': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -907,21 +923,7 @@ const attackValues = {
     'TSPIN MINI DOUBLE': [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6],
     'ALL CLEAR': 10,
 };
-
-const scoringTable = {
-    '': 0,
-    'TSPIN': 400,
-    'TSPIN MINI': 100,
-    'SINGLE': 100,
-    'DOUBLE': 300,
-    'TRIPLE': 500,
-    'QUAD': 800,
-    'TSPIN SINGLE': 800,
-    'TSPIN DOUBLE': 1200,
-    'TSPIN TRIPLE': 1600,
-    'TSPIN MINI SINGLE': 200,
-    'TSPIN MINI DOUBLE': 400,
-    'ALL CLEAR': 3500,
-}
+const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' };
+const scoringTable = { '': 0, 'TSPIN': 400, 'TSPIN MINI': 100, 'SINGLE': 100, 'DOUBLE': 300, 'TRIPLE': 500, 'QUAD': 800, 'TSPIN SINGLE': 800, 'TSPIN DOUBLE': 1200, 'TSPIN TRIPLE': 1600, 'TSPIN MINI SINGLE': 200, 'TSPIN MINI DOUBLE': 400, 'ALL CLEAR': 3500 }
 
 StartGame();
