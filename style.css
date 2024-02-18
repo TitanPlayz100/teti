@@ -26,6 +26,21 @@ body {
     outline: 0.2vh solid var(--cl-blue);
     box-shadow: 0 0 5vh #ffffff58;
     background-color: rgba(0, 0, 0, 0.988);
+    transition: all 0.5s ease;
+}
+
+#board.boardDanger {
+    outline-color: red !important;
+    transition: all 0.2s ease;
+}
+
+.dangerOverlay {
+    position: absolute;
+    background-color: rgba(255, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
 }
 
 #playingfield {
@@ -34,7 +49,6 @@ body {
     height: 200%;
     top: -100%;
     display: grid;
-    gap: -0.1vh;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(40, 1fr);
     direction: rtl;
@@ -46,6 +60,11 @@ body {
 
 .shadow {
     z-index: -1;
+}
+
+.nextSpawn {
+    z-index: -1;
+    opacity: 0;
 }
 
 #playingfield,
@@ -125,6 +144,7 @@ body {
     width: 200%;
     user-select: none;
     transition: all 0.2s ease;
+    right: 105%;
 }
 
 .actiontext {
@@ -138,7 +158,7 @@ body {
     user-select: none;
 }
 
-.settings {
+.settingsButton {
     position: fixed;
     left: 126%;
     display: flex;
@@ -149,29 +169,35 @@ body {
     width: 24%;
     border: 0.2vh solid rgba(255, 255, 255, 0.288);
     border-radius: 0 1.5vh 1.5vh 0;
-    transition: all 0.3s ease-out;
+    transition: all 0.5s ease-out;
     background-color: rgba(255, 255, 255, 0);
 }
 
-.settings:hover {
+.settingsButton:hover {
     left: 133%;
     border: 0.2vh solid var(--cl-blue);
+    transition: all 0.2s ease;
 }
 
 .dialog {
     font-family: 'Montserrat', sans-serif;
     height: 75vh;
     aspect-ratio: 1/1.4;
-    background-color: var(--e-black);
+    background-color: #00000024;
     padding: 1%;
     color: var(--cl-blue);
-    border: none;
     border-radius: 2vh;
     user-select: none;
     animation: zoomin 0.3s forwards ease;
     outline: none;
     overflow: hidden;
     font-size: 1.8vh;
+    text-shadow: 0 0 5vh #ffffffc4;
+    border: 0.vh solid #ffffffc4;
+}
+
+.dialog h1 {
+    text-align: center;
 }
 
 #gamemodeDialog {
@@ -190,7 +216,7 @@ body {
 }
 
 .dialog::backdrop {
-    background-color: #000000bb;
+    background-color: #000000cf;
     backdrop-filter: blur(5px);
     animation: fadein 0.4s forwards ease;
 }
@@ -334,6 +360,7 @@ body {
 }
 
 .gamemodeSelect {
+    outline: none;
     width: 100%;
     padding: 1vh;
     background-color: #00000000;
@@ -343,6 +370,18 @@ body {
     color: var(--cl-blue);
     transition: all 0.4s ease;
     margin: 0.5vh;
+}
+
+.gamemodeSelect.selected {
+    border: 0.3vh solid rgb(80, 150, 90);
+}
+
+.gamemodeSelect.selected:hover {
+    border: 0.3vh solid rgb(137, 234, 137);
+}
+
+.gamemodeSelect.selected:focus {
+    border: 0.3vh solid rgb(137, 234, 137);
 }
 
 .keybind {
@@ -385,7 +424,6 @@ body {
 .keybind:hover,
 .gamemodeSelect:hover {
     transition: all 0.1s ease;
-
 }
 
 .closeDialog,
@@ -411,6 +449,7 @@ body {
     user-select: none;
     border: none;
     animation: fadein 0.4s forwards ease;
+    font-family: 'Montserrat', sans-serif;
 }
 
 #frontdrop.closingAnimation {
@@ -446,6 +485,21 @@ body {
     left: 0;
     width: 100%;
     bottom: 10%;
+}
+
+#smallStat1,
+#smallStat2 {
+    right: 150%;
+    font-size: 2.1vh;
+    text-align: right;
+}
+
+#fps-counter {
+    position: absolute;
+    top: 2vh;
+    left: 1vw;
+    font-size: 14px;
+    color: white;
 }
 
 @keyframes fadein {
