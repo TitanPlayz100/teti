@@ -26,7 +26,8 @@ body {
     outline: 0.2vh solid var(--cl-blue);
     box-shadow: 0 0 5vh #ffffff58;
     background-color: rgba(0, 0, 0, 0.988);
-    transition: all 0.5s ease;
+    transition: outline 0.5s ease;
+    height: 60vh;
 }
 
 #board.boardDanger {
@@ -36,7 +37,7 @@ body {
 
 .dangerOverlay {
     position: absolute;
-    background-color: rgba(255, 0, 0, 0.05);
+    background-color: rgb(255, 0, 0);
     transition: all 0.2s ease;
     width: 100%;
     height: 100%;
@@ -48,14 +49,6 @@ body {
     width: 100%;
     height: 200%;
     top: -100%;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(40, 1fr);
-    direction: rtl;
-}
-
-#playingfield>div {
-    direction: ltr
 }
 
 .shadow {
@@ -65,20 +58,6 @@ body {
 .nextSpawn {
     z-index: -1;
     opacity: 0;
-}
-
-#playingfield,
-#playingfield>div {
-    transform: rotate(180deg);
-}
-
-#grid {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(20, 1fr);
 }
 
 #next {
@@ -492,14 +471,6 @@ body {
     right: 150%;
     font-size: 2.1vh;
     text-align: right;
-}
-
-#fps-counter {
-    position: absolute;
-    top: 2vh;
-    left: 1vw;
-    font-size: 14px;
-    color: white;
 }
 
 @keyframes fadein {

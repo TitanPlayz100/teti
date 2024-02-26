@@ -24,11 +24,11 @@
         <button id="gamemode" class="settingsButton" style="top: 35%;" onclick="openModal('gamemodeDialog')" title="Change Gamemode">
             <img src="./assets/timer.svg" style="transform: translateY(5%); height: 90%;">
         </button>
-        <div id="grid"></div>
-        <div id="next"></div>
-        <div id="hold"></div>
+        
+        <canvas id="next"></canvas>
+        <canvas id="hold"></canvas>
+        <canvas id="playingfield"></canvas>
 
-        <div id="playingfield"></div>
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
         <div class="displaytext">
@@ -58,7 +58,7 @@
             <img src="./assets/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>BG hex/url</label> <input class="option textInput" type="text" id="background" /></div>
-        <div class="settingLayout"><label>Board Opacity</label> <input class="option range" type="range" id="boardOpacity" oninput="sliderChange(this)" min="0" max="99" step="1"/></div>
+        <div class="settingLayout"><label>Board Opacity</label> <input class="option range" type="range" id="boardOpacity" oninput="sliderChange(this)" min="0" max="100" step="1"/></div>
         <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range" id="boardHeightPercent" min="0" max="100" step="1" /></div>
         <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox" id="showGrid" /></div>
         <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
@@ -120,10 +120,11 @@
         <button id="gamemode1" class="gamemodeSelect" onclick="setGamemode(1);closeModal('gamemodeDialog')">Sprint</button>
         <button id="gamemode2" class="gamemodeSelect" onclick="setGamemode(2);closeModal('gamemodeDialog')">Ultra</button>
         <button id="gamemode3" class="gamemodeSelect" onclick="setGamemode(3);closeModal('gamemodeDialog')">Attacker</button>
-        <button id="gamemode4" class="gamemodeSelect" onclick="setGamemode(4);closeModal('gamemodeDialog')">10L Dig</button>
+        <button id="gamemode4" class="gamemodeSelect" onclick="setGamemode(4);closeModal('gamemodeDialog')">Digger</button>
         <div class="settingLayout"><label>Required Lines (sprint)</label> <input class="option number" type="number" id="requiredLines" oninput="if(value<1) value=1" /></div>
         <div class="settingLayout"><label>Time Limit (ultra)</label> <input class="option number" type="number" id="timeLimit" oninput="if(value<1) value=1" /></div>
         <div class="settingLayout"><label>Required Attack (Attacker)</label> <input class="option number" type="number" id="requiredAttack" oninput="if(value<1) value=1" /></div>
+        <div class="settingLayout"><label>Garbage Rows (digger)</label> <input class="option number" type="number" id="requiredGarbage" oninput="if(value<1) value=1" /></div>
     </dialog>
 
     <dialog id="gameEnd" class="dialog" onkeydown="newGame(event.key, 'gameEnd')">
@@ -132,7 +133,5 @@
         <p id="result">test</p>
         <button class="closeDialog" onclick="closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
     </dialog>
-
-    <div id="fps-counter"></div>
 </body>
 </html>
