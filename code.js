@@ -343,7 +343,7 @@ function spawnPiece(piece, start = false) {
     currentLoc = [dx, dy]; rotationState = 1; currentPiece = piece;
     spawnOverlay(); updateNext(); displayShadow(); topoutSound();
     const rows = gameSettings.requiredGarbage < 10 ? gameSettings.requiredGarbage : 10
-    if (garbRowsLeft > 0 && start) addGarbage(rows);
+    if (garbRowsLeft > 0 && start && gameSettings.gamemode == '4') addGarbage(rows);
     if (gameSettings.preserveARR) startArr('current');
 }
 
