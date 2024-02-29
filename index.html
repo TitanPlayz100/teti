@@ -11,18 +11,8 @@
 <body id="body">
     <div id="board">
         <div class="dangerOverlay"></div>
-
-        <button id="displaySettings" class="settingsButton" style="top: 5%;" onclick="openModal('displaySettingsDialog')" title="Display Settings">
-            <img src="./assets/display.svg" style="transform: translateY(10%); height: 70%;">
-        </button>
-        <button id="gameSettings" class="settingsButton" style="top: 15%;" onclick="openModal('gameSettingsDialog')" title="Game Settings">
+        <button id="test" class="settingsButton" style="top: 5%;" onclick="openModal('settingsPanel')">
             <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%;">
-        </button>
-        <button id="controlSettings" class="settingsButton" style="top: 25%;" onclick="openModal('controlSettingsDialog')" title="Control Settings">
-            <img src="./assets/joystick.svg" style="transform: translateY(0%); height: 75%;">
-        </button>
-        <button id="gamemode" class="settingsButton" style="top: 35%;" onclick="openModal('gamemodeDialog')" title="Change Gamemode">
-            <img src="./assets/timer.svg" style="transform: translateY(5%); height: 90%;">
         </button>
         
         <canvas id="next"></canvas>
@@ -59,7 +49,7 @@
         </button>
         <div class="settingLayout"><label>BG hex/url</label> <input class="option textInput" type="text" id="background" /></div>
         <div class="settingLayout"><label>Board Opacity</label> <input class="option range" type="range" id="boardOpacity" oninput="sliderChange(this)" min="0" max="100" step="1"/></div>
-        <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range" id="boardHeightPercent" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range" id="boardHeight" min="0" max="100" step="1" /></div>
         <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox" id="showGrid" /></div>
         <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
         <div class="settingLayout"><label>Shadow opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
@@ -132,6 +122,29 @@
         <p id="reason" style="font-size: 3.6vh;">test</p>
         <p id="result">test</p>
         <button class="closeDialog" onclick="closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
+    </dialog>
+
+    <dialog id="settingsPanel" class="dialog">
+        <p id='explanationText'>Hover for more info</p>
+        <button id="displaySettings" class="settingPanelButton" onclick="openModal('displaySettingsDialog')" title="Display Settings - graphics of the board and background"> 
+            <img src="./assets/display.svg" style="transform: translateY(10%); height: 70%;">
+        </button>
+        <button id="gameSettings" class="settingPanelButton" onclick="openModal('gameSettingsDialog')" title="Game Settings - gameplay features or mechanics such as tuning or gravity">
+            <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <button id="controlSettings" class="settingPanelButton" onclick="openModal('controlSettingsDialog')" title="Controls - keybinds for different actions">
+            <img src="./assets/joystick.svg" style="transform: translateY(0%); height: 75%;">
+        </button>
+        <button id="gamemode" class="settingPanelButton" onclick="openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
+            <img src="./assets/timer.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <button id="downloadloadSettings" class="settingPanelButton smallPanelButton" onclick="downloadSettings()" style=" flex: 0 0 2%;" title="Download / Export Settings">
+            <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <span id="uploadSettings" class="settingPanelButton smallPanelButton" style=" flex: 0 0 2%; height: 4.5vh;" onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
+            <input type="file" id="fileUpload" onchange="uploadSettings(this)" hidden accept=".teti">
+            <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
+        </span>
     </dialog>
 </body>
 </html>

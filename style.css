@@ -21,13 +21,14 @@ body {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform-origin: 0 0;
+    transform: scale(1.1) translate(-50%, -50%);
+    height: 60vh;
     aspect-ratio: 0.5;
     outline: 0.2vh solid var(--cl-blue);
     box-shadow: 0 0 5vh #ffffff58;
     background-color: rgba(0, 0, 0, 0.988);
     transition: outline 0.5s ease;
-    height: 60vh;
 }
 
 #board.boardDanger {
@@ -150,12 +151,52 @@ body {
     border-radius: 0 1.5vh 1.5vh 0;
     transition: all 0.5s ease-out;
     background-color: rgba(255, 255, 255, 0);
+    outline: none;
 }
 
 .settingsButton:hover {
     left: 133%;
     border: 0.2vh solid var(--cl-blue);
     transition: all 0.2s ease;
+}
+
+#settingsPanel[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    height: 31vh;
+    aspect-ratio: 3/1;
+    border: none;
+}
+
+.settingPanelButton {
+    margin: 2%;
+    height: 18vh;
+    aspect-ratio: 1/1;
+    border: 0.3vh solid rgba(255, 255, 255, 0.421);
+    border-radius: 1.5vh;
+    transition: all 0.5s ease-out;
+    background-color: rgba(255, 255, 255, 0);
+    padding: 0.5vh;
+    outline: none;
+}
+
+.smallPanelButton {
+    height: 6vh;
+    aspect-ratio: 1/1;
+    border-radius: 1vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.settingPanelButton:hover {
+    border: 0.3vh solid var(--cl-blue);
+    transition: all 0.1s ease;
 }
 
 .dialog {
@@ -172,7 +213,7 @@ body {
     overflow: hidden;
     font-size: 1.8vh;
     text-shadow: 0 0 5vh #ffffffc4;
-    border: 0.vh solid #ffffffc4;
+    border: 0.3vh solid #ffffffc4;
 }
 
 .dialog h1 {
@@ -209,7 +250,6 @@ body {
     padding: 1vh;
     transition: all 0.7s ease;
     border: 0.2vh solid #00000000;
-    /* margin: 0.4vh; */
 }
 
 .settingLayout:hover {
@@ -217,7 +257,7 @@ body {
     border-bottom: 0.2vh solid var(--c-blue);
     animation: pulse 2s infinite ease;
     animation-delay: 0.5s;
-    transition: all 0.1s ease;
+    transition: all 0s ease;
 }
 
 .option {
@@ -356,11 +396,11 @@ body {
 }
 
 .gamemodeSelect.selected:hover {
-    border: 0.3vh solid rgb(137, 234, 137);
+    border: 0.3vh solid rgb(53, 238, 53);
 }
 
 .gamemodeSelect.selected:focus {
-    border: 0.3vh solid rgb(137, 234, 137);
+    border: 0.3vh solid rgb(53, 238, 53);
 }
 
 .keybind {
@@ -390,6 +430,7 @@ body {
     border-radius: 1vh;
     background-color: rgba(255, 255, 255, 0);
     transition: all 0.4s ease;
+    outline: none;
 }
 
 .closeDialog:hover,
@@ -471,6 +512,13 @@ body {
     right: 150%;
     font-size: 2.1vh;
     text-align: right;
+}
+
+#explanationText {
+    position: absolute;
+    text-align: center;
+    top: 30vh;
+    opacity: 0.4;
 }
 
 @keyframes fadein {

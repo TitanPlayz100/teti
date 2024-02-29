@@ -2,7 +2,7 @@ let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, 
 let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 
-let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 10, shadowOpacity: 20, boardHeightPercent: 61, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
+let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 20, shadowOpacity: 20, boardHeight: 80, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
 let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10 }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
@@ -100,12 +100,6 @@ function startArrSD() {
 }
 
 function endDasArr(direction) {
-    if (direction == undefined) {
-        if (gameSettings.preserveARR) return;
-        directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false }
-        endDasArr('RIGHT'); endDasArr('LEFT'); endDasArr('DOWN');
-        return;
-    }
     directionState[direction] = false;
     if (direction == 'RIGHT' || direction == 'LEFT') {
         const oppDirection = direction == 'RIGHT' ? 'LEFT' : 'RIGHT'
@@ -121,15 +115,11 @@ function checkCollision(coords, action, collider = getMinos('S')) {
         if ((action == "RIGHT" && x > 8) || (action == "LEFT" && x < 1) ||
             (action == "DOWN" && y < 1) || (action == "ROTATE" && x < 0 || x > 9 || y < 0) ||
             (action == "PLACE" && y > 19)) return true;
-        for (let [x2, y2] of collider) {
-            switch (action) {
-                case "RIGHT": if (x + 1 == x2 && y == y2) return true; break;
-                case "LEFT": if (x - 1 == x2 && y == y2) return true; break;
-                case "DOWN": if (x == x2 && y - 1 == y2) return true; break;
-                case "ROTATE": if (x == x2 && y == y2) return true; break;
-                case "SPAWN": if (x == x2 && y == y2) return true; break;
-            }
-        }
+        if (collider.some(([x2, y2]) => {
+            const col = (dx, dy) => x + dx == x2 && y + dy == y2;
+            return ((action == "RIGHT" && col(1, 0)) || (action == "LEFT" && col(-1, 0)) ||
+                (action == "DOWN" && col(0, -1)) || ((action == "ROTATE" || action == "SPAWN") && col(0, 0)))
+        })) return true;
     }
 }
 
@@ -137,14 +127,10 @@ function checkTspin(rotation, [x, y], [dx, dy]) {
     if (currentPiece.name != 't') return false;
     isMini = false;
     const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
-    const backminos = spinChecks[(rotation + 1) % 4].map(([ddx, ddy]) => [ddx + x, ddy + y]);
-    const frontminos = spinChecks[rotation - 1].map(([ddx, ddy]) => [ddx + x, ddy + y]);
-    const back1 = checkCollision([backminos[0]], "ROTATE")
-    const back2 = checkCollision([backminos[1]], "ROTATE")
-    const front1 = checkCollision([frontminos[0]], "ROTATE")
-    const front2 = checkCollision([frontminos[1]], "ROTATE")
-    if ((front1 && front2) && (back1 || back2)) return true;
-    if ((front1 || front2) && (back1 && back2)) {
+    const minos = spinChecks[(rotation + 1) % 4].concat(spinChecks[rotation - 1])
+        .map(([ddx, ddy]) => checkCollision([[ddx + x, ddy + y]], 'ROTATE'))
+    if ((minos[2] && minos[3]) && (minos[0] || minos[1])) return true;
+    if ((minos[2] || minos[3]) && (minos[0] && minos[1])) {
         if ((dx == 1 || dx == -1) && dy == -2) return true;
         isMini = true; return true;
     }
@@ -230,7 +216,7 @@ function clearLines() {
         stopped.filter(c => c[1] == row).forEach(c => replaceMino(c, ""))
         moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1)
     }
-    if (garbRowsLeft > 10) addGarbage(removedGarbage); 
+    if (garbRowsLeft > 10) addGarbage(removedGarbage);
     garbRowsLeft -= removedGarbage;
     renderActionText(clearRows.length, getMinos('S'))
 }
@@ -286,7 +272,10 @@ function clearLockDelay(clearCount = true) {
     divLockTimer.value = 0;
     if (!clearCount) return;
     divLockCounter.value = 0;
-    lockCount = 0; endDasArr();
+    lockCount = 0;
+    if (gameSettings.preserveARR) return;
+    directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false }
+    endDasArr('RIGHT'); endDasArr('LEFT'); endDasArr('DOWN');
 }
 
 function endGame(top, bottom = 'Better luck next time') {
@@ -309,7 +298,7 @@ function resetState() {
     gameEnd = false; currentPiece = null; currentLoc = []; isTspin = false; isMini = false;
     holdPiece = { piece: null, occured: false };
     nextPieces = [[], []];
-    totalLines = 0; totalScore = 0, garbRowsLeft = gameSettings.requiredGarbage; spikeCounter = 0; 
+    totalLines = 0; totalScore = 0, garbRowsLeft = gameSettings.requiredGarbage; spikeCounter = 0;
     btbCount = -1; combonumber = -1; totalTimeSeconds = -0.02; totalAttack = 0; totalPieceCount = 0;
     firstMove = true; toppingOut = false; rotationState = 1; inDanger = false;
     clearInterval(timeouts['gravity']);
@@ -343,7 +332,7 @@ function spawnPiece(piece, start = false) {
     currentLoc = [dx, dy]; rotationState = 1; currentPiece = piece;
     spawnOverlay(); updateNext(); displayShadow(); topoutSound();
     const rows = gameSettings.requiredGarbage < 10 ? gameSettings.requiredGarbage : 10
-    if (garbRowsLeft > 0 && start && gameSettings.gamemode == '4') addGarbage(rows);
+    if (garbRowsLeft > 0 && start && gameSettings.gamemode == 4) addGarbage(rows);
     if (gameSettings.preserveARR) startArr('current');
 }
 
@@ -388,7 +377,7 @@ function addGarbage(lines) {
 function updateNext() {
     nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ''))
     const first5 = nextPieces[0].concat(nextPieces[1])
-        .slice(0, (gameSettings.nextPieces > 5 ? 5 : gameSettings.nextPieces));
+        .slice(0, gameSettings.nextPieces);
     first5.forEach((name, idx) => {
         const piece = pieces.filter(e => e.name == name)[0], nm = piece.name;
         let dx = 0, dy = 3 * (4 - idx);
@@ -507,7 +496,7 @@ function renderStyles() {
     document.body.style.background = displaySettings.background[0] == '#'
         ? `${displaySettings.background} no-repeat fixed center`
         : `url("${displaySettings.background}") no-repeat fixed center`;
-    divBoard.style.height = `${displaySettings.boardHeightPercent}vh`;
+    divBoard.style.transform = `scale(${Number(displaySettings.boardHeight) + 10}%) translate(-50%, -50%)`;
     canvasHold.style.outline = `0.2vh solid #dbeaf3`;
     const background = `rgba(0, 0, 0, ${Number(displaySettings.boardOpacity) / 100})`
     divBoard.style.backgroundColor = background;
@@ -579,11 +568,10 @@ function getCoords(array, filter, [dx, dy]) {
     return coords.map(([x, y]) => [x + dx, y + dy]);
 }
 
-function moveMinos(coords, dir, amount, value = false) {
+function moveMinos(coords, dir, size, value = false) {
     const getChange = ([x, y]) => {
-        return { 'RIGHT': [x + amount, y], 'LEFT': [x - amount, y], 'DOWN': [x, y - amount], 'UP': [x, y + amount] }
+        return { 'RIGHT': [x + size, y], 'LEFT': [x - size, y], 'DOWN': [x, y - size], 'UP': [x, y + size] }
     }
-
     const newcoords = coords.map((c) => getChange(c)[dir]);
     const valTable = coords.map(([x, y]) => value ? value : boardState[y][x])
     coords.forEach((c, idx) => removeValue(c, valTable[idx]))
@@ -604,8 +592,10 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
             const cell = col.split(' ')
             cntx.lineWidth = 1;
             if (cell.includes('A') || cell.includes('S')) {
-                cntx.fillStyle = cell.includes('G') ? 'gray' : pieces.filter(p => p.name == cell[1])[0].colour;
-                cntx.fillRect(posX, posY, minoSize, minoSize)
+                cntx.fillStyle = cell.includes('G')
+                    ? 'gray'
+                    : pieces.filter(p => p.name == cell[1])[0].colour;
+                cntx.fillRect(posX + dx, posY + dy, minoSize, minoSize)
             } else if (cell.includes('NP') && inDanger) {
                 cntx.fillStyle = '#ff000020';
                 cntx.fillRect(posX, posY, minoSize, minoSize)
@@ -615,7 +605,9 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
                 cntx.fillRect(posX, posY, minoSize, minoSize)
             } else if (y < 20 && displaySettings.showGrid && cntx == ctx) {
                 cntx.strokeStyle = '#ffffff' + toHex(displaySettings.gridopacity);
-                cntx.strokeRect(posX + dx, posY + dy, minoSize, minoSize);
+                cntx.beginPath()
+                cntx.roundRect(posX, posY, minoSize - 1, minoSize - 1, minoSize / 4);
+                cntx.stroke()
             }
         })
     })
@@ -641,6 +633,8 @@ function openModal(id) {
         if (setting.id == "gamemode" + gameSettings.gamemode) setting.classList.add('selected');
     })
     document.getElementById(id).showModal();
+    const settingPanel = document.getElementById('settingsPanel');
+    if (id != 'settingsPanel' && settingPanel.open) closeDialog(settingPanel);
     isDialogOpen = true;
 }
 
@@ -719,6 +713,21 @@ function loadSettings() {
     };
 }
 
+function downloadSettings() {
+    saveSettings();
+    let el = document.createElement('a');
+    const text = localStorage.getItem('settings');
+    el.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    el.setAttribute('download', 'settings.teti');
+    document.body.appendChild(el); el.click(); document.body.removeChild(el);
+}
+
+function uploadSettings(el) {
+    const reader = new FileReader();
+    reader.readAsText(el.files[0]);
+    reader.onload = () => { localStorage.setItem('settings', reader.result); loadSettings() }
+}
+
 function setGamemode(modeNum) {
     gameSettings.gamemode = modeNum;
     const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining' }
@@ -733,7 +742,7 @@ function resetSettings(settingGroup) {
 
 function toggleDialog() {
     if (isDialogOpen) { closeDialog(document.querySelectorAll("dialog[open]")[0]) }
-    else { openModal('gamemodeDialog'); StartGame() }
+    else { openModal('settingsPanel'); StartGame() }
 }
 
 let menuSFX = (e, sfx) => document.querySelectorAll(e)
@@ -747,7 +756,6 @@ function stopInterval(name) { clearInterval(timeouts[name]); timeouts[name] = 0;
 function toExpValue(x) { return Math.round(Math.pow(2, 0.1 * x) - 1) }
 function toLogValue(y) { return Math.round(Math.log2(y + 1) * 10) }
 function newGame(k, d) { if (k == controlSettings.resetKey) { closeModal(d); StartGame(); } }
-
 function toHex(num) {
     const hex = Math.round(((Number(num) / 100) * 255)).toString(16);
     return hex.length > 1 ? hex : 0 + hex;
