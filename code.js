@@ -47,8 +47,9 @@ this.addEventListener('keydown', event => {
     if (event.key == 'Escape' && bindingKey == undefined) toggleDialog();
     if (event.repeat || isDialogOpen) return;
     if (firstMove && event.key != 'Escape') firstMovement();
-    document.body.style.cursor = 'none';
     if (event.key == controlSettings.resetKey) { playSound('retry'); StartGame(); }
+    document.body.style.cursor = 'none';
+    if (gameEnd) return;
     if (event.key == controlSettings.cwKey) rotate("CW");
     if (event.key == controlSettings.ccwKey) rotate("CCW");
     if (event.key == controlSettings.rotate180Key) rotate("180");
@@ -73,7 +74,7 @@ function firstMovement() { // stats clock at 20ms
 }
 
 function startDas(direction) {
-    movePieceSide(direction, false);
+    movePieceSide(direction);
     directionState[direction] = 'das'
     stopTimeout('das'); stopInterval('arr');
     timeouts['das'] = setTimeout(() => startArr(direction), gameSettings.das);
@@ -88,8 +89,9 @@ function startArr(direction) {
     }
     directionState[direction] = 'arr';
     stopInterval('arr')
-    if (gameSettings.arr == 0) { timeouts['arr'] = -1; movePieceSide(direction, true); return; }
-    timeouts['arr'] = setInterval(() => movePieceSide(direction, false), gameSettings.arr);
+    if (gameSettings.arr == 0) { timeouts['arr'] = -1; movePieceSide(direction, Infinity); return; }
+    movePieceSide(direction);
+    timeouts['arr'] = setInterval(() => movePieceSide(direction), gameSettings.arr);
 }
 
 function startArrSD() {
@@ -171,23 +173,20 @@ function getKickData(piece, rotationType, shapeNo) {
     }[rotationType]
 }
 
-function movePieceSide(direction, instant) {
-    if (directionState['DOWN'] == 'arr') startArrSD();
-    if (checkCollision(getMinos('A'), direction)) {
-        stopInterval('arr');
-        if (gameSettings.gravitySpeed == 0) startGravity();
-        return;
-    };
-    moveMinos(getMinos('A'), direction, 1);
-    currentLoc[0] = direction == 'RIGHT' ? currentLoc[0] + 1 : currentLoc[0] - 1;
-    incrementLock(); playSound('move'); displayShadow(); topoutSound();
-    isTspin = false; isMini = false;
+function movePieceSide(direction, max = 1) {
+    const minos = getMinos('A');
+    let amount = 0;
+    const check = dx => !checkCollision(minos.map(([x, y]) => [x + dx, y]), direction);
+    while (check(amount) && Math.abs(amount) < max) direction == 'RIGHT' ? amount++ : amount--;
+    if (amount == 0) return;
+    moveMinos(minos, direction, Math.abs(amount));
+    currentLoc[0] += amount; isTspin = false; isMini = false;
+    incrementLock(); playSound('move'); displayShadow(); topoutSound(); stopInterval('arr');
     if (gameSettings.gravitySpeed == 0) startGravity();
-    if (instant) movePieceSide(direction, true);
+    if (directionState['DOWN'] == 'arr') startArrSD();
 }
 
 function movePieceDown(harddrop, softdrop) {
-    if (gameEnd) return;
     if (timeouts['lockdelay'] != 0) {
         if (harddrop) scheduleLock(true);
         return;
@@ -346,12 +345,13 @@ function spawnOverlay() {
 
 function displayShadow() {
     MinoToNone('Sh')
-    const coords = pieceToCoords(currentPiece['shape' + rotationState]);
-    const [dx, dy] = currentLoc
-    coords.forEach(([x, y]) => addValue([x + dx, y + dy], 'Sh'))
+    const coords = getMinos('A');
+    if (coords.length == 0) return;
+    coords.forEach(([x, y]) => addValue([x, y], 'Sh'))
     let count = 0;
-    while (!checkCollision(getMinos('Sh').map(c => [c[0], c[1] - count]), "DOWN")) count++;
-    moveMinos(getMinos('Sh'), "DOWN", count, 'Sh');
+    const shadow = getMinos('Sh')
+    while (!checkCollision(shadow.map(c => [c[0], c[1] - count]), "DOWN")) count++;
+    moveMinos(shadow, "DOWN", count, 'Sh');
 }
 
 function startGravity() {
@@ -579,11 +579,6 @@ function moveMinos(coords, dir, size, value = false) {
     spawnOverlay()
 }
 
-function renderingLoop() {
-    renderToCanvas(ctx, canvasField, boardState, 39)
-    requestAnimationFrame(renderingLoop)
-}
-
 function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
     cntx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
     grid.forEach((row, y) => {
@@ -611,6 +606,11 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
             }
         })
     })
+}
+
+function renderingLoop() {
+    renderToCanvas(ctx, canvasField, boardState, 39)
+    requestAnimationFrame(renderingLoop)
 }
 
 // interactivity in settings
