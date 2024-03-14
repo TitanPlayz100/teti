@@ -53,7 +53,7 @@ this.addEventListener('keydown', event => {
     if (event.key == controlSettings.cwKey) rotate("CW");
     if (event.key == controlSettings.ccwKey) rotate("CCW");
     if (event.key == controlSettings.rotate180Key) rotate("180");
-    if (event.key == controlSettings.hdKey) movePieceDown(true, false);
+    if (event.key == controlSettings.hdKey) harddrop();
     if (event.key == controlSettings.holdKey) updateHold();
     if (event.key == controlSettings.rightKey) startDas("RIGHT");
     if (event.key == controlSettings.leftKey) startDas("LEFT");
@@ -90,15 +90,14 @@ function startArr(direction) {
     directionState[direction] = 'arr';
     stopInterval('arr')
     if (gameSettings.arr == 0) { timeouts['arr'] = -1; movePieceSide(direction, Infinity); return; }
-    movePieceSide(direction);
     timeouts['arr'] = setInterval(() => movePieceSide(direction), gameSettings.arr);
 }
 
 function startArrSD() {
     directionState['DOWN'] = 'arr';
     clearInterval(timeouts['sd']);
-    if (gameSettings.sdarr == 0) { timeouts['sd'] = -1; movePieceDown(false, true); return; }
-    timeouts['sd'] = setInterval(() => movePieceDown(false, false), gameSettings.sdarr);
+    if (gameSettings.sdarr == 0) { timeouts['sd'] = -1; movePieceDown(true); return; }
+    timeouts['sd'] = setInterval(() => movePieceDown(false), gameSettings.sdarr);
 }
 
 function endDasArr(direction) {
@@ -169,37 +168,43 @@ function getKickData(piece, rotationType, shapeNo) {
     return {
         "180": KickData180[isI][direction],
         "CW": KickData[isI][direction],
-        "CCW": KickData[isI][direction].map(row => row.map(element => element * -1))
+        "CCW": KickData[isI][direction].map(row => row.map(el => el * -1))
     }[rotationType]
 }
 
 function movePieceSide(direction, max = 1) {
+    if (directionState['DOWN'] == 'arr') startArrSD();
     const minos = getMinos('A');
     let amount = 0;
     const check = dx => !checkCollision(minos.map(([x, y]) => [x + dx, y]), direction);
     while (check(amount) && Math.abs(amount) < max) direction == 'RIGHT' ? amount++ : amount--;
-    if (amount == 0) return;
-    moveMinos(minos, direction, Math.abs(amount));
-    currentLoc[0] += amount; isTspin = false; isMini = false;
-    incrementLock(); playSound('move'); displayShadow(); topoutSound(); stopInterval('arr');
     if (gameSettings.gravitySpeed == 0) startGravity();
+    if (amount == 0) { stopInterval('arr'); return; }
+    moveMinos(minos, 'RIGHT', amount);
+    currentLoc[0] += amount; isTspin = false; isMini = false;
+    incrementLock(); playSound('move'); displayShadow(); topoutSound();
     if (directionState['DOWN'] == 'arr') startArrSD();
 }
 
-function movePieceDown(harddrop, softdrop) {
-    if (timeouts['lockdelay'] != 0) {
-        if (harddrop) scheduleLock(true);
-        return;
-    };
-    moveMinos(getMinos('A'), 'DOWN', 1);
-    isTspin = false; isMini = false;
-    currentLoc[1] -= 1;
-    totalScore += harddrop ? 2 : 1;
-    if (checkCollision(getMinos('A'), 'DOWN')) { scheduleLock(harddrop); return; }
-    startArr('current')
-    if (softdrop) playSound('move');
-    if (harddrop) movePieceDown(true, false);
-    if (softdrop) movePieceDown(false, true);
+function movePieceDown(sonic) {
+    const minos = getMinos('A');
+    if (checkCollision(minos, 'DOWN')) return;
+    moveMinos(minos, 'DOWN', 1);
+    isTspin = false; isMini = false; currentLoc[1] -= 1; totalScore += 1;
+    if (checkCollision(getMinos('A'), 'DOWN')) scheduleLock();
+    startArr('current');
+    if (sonic) movePieceDown(true);
+}
+
+function harddrop() {
+    const minos = getMinos('A');
+    let amount = 0;
+    while (!checkCollision(minos.map(([x, y]) => [x, y - amount]), 'DOWN')) amount++;
+    if (amount > 0) { isTspin = false; isMini = false; }
+    moveMinos(minos, 'DOWN', amount);
+    currentLoc[1] -= amount; totalScore += 2;
+    playSound('harddrop');
+    lockPiece();
 }
 
 // mechanics
@@ -212,7 +217,7 @@ function clearLines() {
     for (let row of clearRows) {
         const stopped = getMinos('S');
         if (stopped.filter(c => c[1] == row).some(c => checkMino(c, 'G'))) removedGarbage++;
-        stopped.filter(c => c[1] == row).forEach(c => replaceMino(c, ""))
+        stopped.filter(c => c[1] == row).forEach(([x, y]) => boardState[y][x] = "")
         moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1)
     }
     if (garbRowsLeft > 10) addGarbage(removedGarbage);
@@ -228,12 +233,12 @@ function incrementLock() {
             divLockCounter.value += amountToAdd;
         }
     }
-    if (checkCollision(getMinos('A'), 'DOWN')) scheduleLock(false);
+    if (checkCollision(getMinos('A'), 'DOWN')) scheduleLock();
 }
 
-function scheduleLock(harddrop) {
+function scheduleLock() {
     let LockMoves = gameSettings.maxLockMovements == 0 ? 99999 : gameSettings.maxLockMovements;
-    if (lockCount >= LockMoves || harddrop) { lockPiece(); playSound('harddrop'); return; }
+    if (lockCount >= LockMoves) { lockPiece(); return; }
     if (gameSettings.lockDelay == 0) { timeouts['lockdelay'] = -1; return; }
     timeouts['lockdelay'] = setTimeout(() => lockPiece(), gameSettings.lockDelay);
     timeouts['lockingTimer'] = setInterval(() => {
@@ -357,9 +362,9 @@ function displayShadow() {
 function startGravity() {
     if (checkCollision(getMinos('A'), 'DOWN')) incrementLock();
     if (gameSettings.gravitySpeed > 1000) return;
-    if (gameSettings.gravitySpeed == 0) { movePieceDown(false, true); return; }
-    movePieceDown(false, false);
-    timeouts['gravity'] = setInterval(() => movePieceDown(false, false), gameSettings.gravitySpeed);
+    if (gameSettings.gravitySpeed == 0) { movePieceDown(true); return; }
+    movePieceDown(false);
+    timeouts['gravity'] = setInterval(() => movePieceDown(false), gameSettings.gravitySpeed);
 }
 
 function addGarbage(lines) {
@@ -551,7 +556,6 @@ function playSound(audioName) {
 
 // Board manipulations and rendering
 function checkMino([x, y], val) { return boardState[y][x].split(' ').includes(val) }
-function replaceMino([x, y], val) { boardState[y][x] = val }
 function MinoToNone(val) { getMinos(val).forEach(c => removeValue(c, val)) }
 function resetBoard() { boardState = [...Array(40)].map(() => [...Array(10)].map(() => "")); }
 function addMinos(val, c, [dx, dy]) { c.forEach(([x, y]) => setValue([x + dx, y + dy], val)) }
@@ -586,19 +590,19 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
             const [posX, posY] = [x * minoSize, (yPosChange - y) * minoSize]
             const cell = col.split(' ')
             cntx.lineWidth = 1;
-            if (cell.includes('A') || cell.includes('S')) {
-                cntx.fillStyle = cell.includes('G')
+            if (cell.includes('A') || cell.includes('S')) { // active piece or stopped piece
+                cntx.fillStyle = cell.includes('G') // garbage piece
                     ? 'gray'
                     : pieces.filter(p => p.name == cell[1])[0].colour;
                 cntx.fillRect(posX + dx, posY + dy, minoSize, minoSize)
-            } else if (cell.includes('NP') && inDanger) {
+            } else if (cell.includes('NP') && inDanger) { // next piece overlay
                 cntx.fillStyle = '#ff000020';
                 cntx.fillRect(posX, posY, minoSize, minoSize)
-            } else if (cell.includes('Sh')) {
+            } else if (cell.includes('Sh')) { // shadow piece
                 const colour = displaySettings.colouredShadow ? currentPiece.colour : '#ffffff'
                 cntx.fillStyle = colour + toHex(displaySettings.shadowOpacity);
                 cntx.fillRect(posX, posY, minoSize, minoSize)
-            } else if (y < 20 && displaySettings.showGrid && cntx == ctx) {
+            } else if (y < 20 && displaySettings.showGrid && cntx == ctx) { // grid
                 cntx.strokeStyle = '#ffffff' + toHex(displaySettings.gridopacity);
                 cntx.beginPath()
                 cntx.roundRect(posX, posY, minoSize - 1, minoSize - 1, minoSize / 4);
@@ -610,7 +614,7 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
 
 function renderingLoop() {
     renderToCanvas(ctx, canvasField, boardState, 39)
-    requestAnimationFrame(renderingLoop)
+    setTimeout(() => requestAnimationFrame(renderingLoop), 1);
 }
 
 // interactivity in settings
