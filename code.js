@@ -1,9 +1,9 @@
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, holdPiece, gameEnd, nextPieces, lockCount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbRowsLeft, sfx = {}, toppingOut, bindingKey, boardState = [], nextQueueGrid = [], holdQueueGrid = [], inDanger;
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, holdPiece, gameEnd, nextPieces, lockCount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbRowsLeft, sfx = {}, toppingOut, bindingKey, boardState = [], nextQueueGrid = [], holdQueueGrid = [], inDanger, totalSentLines, garbageQueue, maxCombo;
 let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 
 let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 20, shadowOpacity: 20, boardHeight: 80, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
-let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10 }
+let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10, survivalRate: 60, backfireMulti: 1 }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
 const canvasField = document.getElementById('playingfield');
@@ -12,6 +12,7 @@ const canvasHold = document.getElementById('hold');
 const divBoard = document.getElementById('board');
 const divLockTimer = document.getElementById('lockTimer');
 const divLockCounter = document.getElementById('lockCounter');
+const progressDamage = document.getElementById('garbageQueue');
 const divDanger = document.getElementsByClassName('dangerOverlay');
 const divLinesSent = document.getElementById('linessent');
 const divObjectiveText = document.getElementById('objectiveText');
@@ -71,6 +72,8 @@ this.addEventListener('mousemove', () => document.body.style.cursor = 'auto')
 function firstMovement() { // stats clock at 20ms
     startGravity(); firstMove = false;
     timeouts['stats'] = setInterval(() => renderStats(), 20);
+    const time = 60 / gameSettings.survivalRate * 1000
+    if (gameSettings.gamemode == 5) timeouts['survival'] = setInterval(() => addGarbage(1), time);
 }
 
 function startDas(direction) {
@@ -220,7 +223,7 @@ function clearLines() {
         stopped.filter(c => c[1] == row).forEach(([x, y]) => boardState[y][x] = "")
         moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1)
     }
-    if (garbRowsLeft > 10) addGarbage(removedGarbage);
+    if (garbRowsLeft > 10 && gameSettings.gamemode == 4) addGarbage(removedGarbage);
     garbRowsLeft -= removedGarbage;
     renderActionText(clearRows.length, getMinos('S'))
 }
@@ -283,6 +286,9 @@ function clearLockDelay(clearCount = true) {
 }
 
 function endGame(top, bottom = 'Better luck next time') {
+    if (gameSettings.gamemode == 5 && (top == 'Lockout' || top == 'Topout' || top == 'Blockout')) {
+        gameEnd = true; return;
+    };
     switch (top) {
         case undefined: return; break;
         case 'Lockout':
@@ -290,9 +296,11 @@ function endGame(top, bottom = 'Better luck next time') {
         case 'Blockout': playSound('failure'); playSound('topout'); break;
         default: playSound('finish'); break;
     }
+    gameEnd = true;
     clearInterval(timeouts['gravity']);
     clearInterval(timeouts['stats']);
-    gameEnd = true;
+    clearInterval(timeouts['survival']);
+
     openModal('gameEnd');
     document.getElementById('reason').textContent = top;
     document.getElementById('result').textContent = bottom;
@@ -302,10 +310,13 @@ function resetState() {
     gameEnd = false; currentPiece = null; currentLoc = []; isTspin = false; isMini = false;
     holdPiece = { piece: null, occured: false };
     nextPieces = [[], []];
-    totalLines = 0; totalScore = 0, garbRowsLeft = gameSettings.requiredGarbage; spikeCounter = 0;
+    totalLines = 0; totalScore = 0; garbRowsLeft = gameSettings.requiredGarbage; spikeCounter = 0;
     btbCount = -1; combonumber = -1; totalTimeSeconds = -0.02; totalAttack = 0; totalPieceCount = 0;
-    firstMove = true; toppingOut = false; rotationState = 1; inDanger = false;
+    firstMove = true; toppingOut = false; rotationState = 1; inDanger = false; totalSentLines = 0;
+    garbageQueue = 0; maxCombo = 0;
     clearInterval(timeouts['gravity']);
+    clearInterval(timeouts['survival']);
+    progressDamage.value = 0;
     ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
         document.getElementById(id).style.opacity = 0;
     })
@@ -337,6 +348,7 @@ function spawnPiece(piece, start = false) {
     spawnOverlay(); updateNext(); displayShadow(); topoutSound();
     const rows = gameSettings.requiredGarbage < 10 ? gameSettings.requiredGarbage : 10
     if (garbRowsLeft > 0 && start && gameSettings.gamemode == 4) addGarbage(rows);
+    if (gameSettings.gamemode == 7) setComboBoard(start);
     if (gameSettings.preserveARR) startArr('current');
 }
 
@@ -367,16 +379,22 @@ function startGravity() {
     timeouts['gravity'] = setInterval(() => movePieceDown(false), gameSettings.gravitySpeed);
 }
 
-function addGarbage(lines) {
+function addGarbage(lines, messiness = 100) {
+    let randCol = Math.floor(Math.random() * 10);
     for (let i = 0; i < lines; i++) {
-        if (checkCollision(getMinos('A'), 'DOWN')) moveMinos(getMinos('A'), 'UP', 1);
+        if (checkCollision(getMinos('A'), 'DOWN')) {
+            if (timeouts['lockdelay'] == 0) incrementLock();
+            moveMinos(getMinos('A'), 'UP', 1);
+        };
         moveMinos(getMinos('S'), 'UP', 1)
-        const randCol = Math.floor(Math.random() * 10);
+        const mustchange = Math.floor(Math.random() * 100);
+        if (mustchange < messiness) randCol = Math.floor(Math.random() * 10);
         for (let col = 0; col < 10; col++) {
             if (col != randCol) addMinos('S G', [[col, 0]], [0, 0]);
         }
     }
     displayShadow();
+    totalSentLines += lines;
 }
 
 function updateNext() {
@@ -426,7 +444,7 @@ function updateHold() {
 
 // GUI rendering
 function renderDanger() {
-    const condition = getMinos('S').some(c => c[1] > 16);
+    const condition = getMinos('S').some(c => c[1] > 16) && gameSettings.gamemode != 7;
     inDanger = condition ? true : false;
     divDanger[0].style.opacity = condition ? 0.1 : 0;
     if (condition && !inDanger) playSound('damage_alert');
@@ -437,10 +455,18 @@ function renderActionText(linecount, remainingMinos) {
     const isPC = remainingMinos.length == 0;
     const damagetype = (isTspin ? 'Tspin ' : '') + (isMini ? 'mini ' : '') + cleartypes[linecount];
     btbCount = isBTB ? btbCount + 1 : (linecount != 0) ? - 1 : btbCount;
+    if (linecount == 0) maxCombo = combonumber;
     combonumber = linecount == 0 ? -1 : combonumber + 1;
     const damage = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, btbCount, isBTB);
     totalScore += calcScore(damagetype, isPC, isBTB, combonumber);
     totalLines += linecount; totalAttack += damage; spikeCounter += damage;
+    garbageQueue = garbageQueue == 0 ? damage : garbageQueue - damage;
+    garbageQueue *= gameSettings.backfireMulti;
+    if (garbageQueue < 0) garbageQueue = 0
+    if (gameSettings.gamemode == 6 && combonumber == -1 && garbageQueue > 0) {
+        addGarbage(garbageQueue, 0); garbageQueue = 0; progressDamage.value = 0;
+    }
+    if (damage > 0 && gameSettings.gamemode == 6) progressDamage.value = garbageQueue;
 
     if (damagetype != '') setText('cleartext', damagetype, 2000);
     if (combonumber > 0) setText('combotext', `Combo ${combonumber}`, 2000);
@@ -461,7 +487,7 @@ function renderActionText(linecount, remainingMinos) {
     else if (linecount == 4) { playSound('clearquad') }
     else if (linecount > 0 && isTspin) { playSound('clearspin') }
     else if (linecount > 0) { playSound('clearline') }
-    if (spikeCounter >= 15) playSound('thunder');
+    if (spikeCounter >= 15) playSound('thunder', false);
 }
 
 function spikePattern(colour, size) {
@@ -530,26 +556,45 @@ function objectives() {
         1: `${totalLines}/${gameSettings.requiredLines}`,
         2: `${totalScore}`,
         3: `${totalAttack}/${gameSettings.requiredAttack}`,
-        4: `${garbRowsLeft}`
+        4: `${garbRowsLeft}`,
+        5: `${totalSentLines}`,
+        6: `${totalAttack}/${gameSettings.requiredAttack}`,
+        7: `${combonumber}`
     }[gs]
-    if (gs == 1 && totalLines >= gameSettings.requiredLines) {
-        endGame(`${time}s`, `Cleared ${totalLines} lines in ${time} seconds`);
-    } else if (gs == 2 && totalTimeSeconds >= Number(gameSettings.timeLimit)) {
-        endGame(`${totalScore} points`, `Scored ${totalScore} points in ${time} seconds`);
-    } else if (gs == 3 && totalAttack >= gameSettings.requiredAttack) {
-        endGame(`${time}s`, `Sent ${totalAttack} damage in ${time} seconds`);
-    } else if (gs == 4 && garbRowsLeft < 1) {
-        endGame(`${time}s`, `Dug ${gameSettings.requiredGarbage} lines in ${time} seconds`);
+
+    switch (gs) {
+        case 1: if (totalLines >= gameSettings.requiredLines) {
+            endGame(`${time}s`, `Cleared ${totalLines} lines in ${time} seconds`);
+        } break;
+        case 2: if (totalTimeSeconds >= Number(gameSettings.timeLimit)) {
+            endGame(`${totalScore} points`, `Scored ${totalScore} points in ${time} seconds`);
+        } break;
+        case 3: if (totalAttack >= gameSettings.requiredAttack) {
+            endGame(`${time}s`, `Sent ${totalAttack} damage in ${time} seconds`);
+        } break;
+        case 4: if (garbRowsLeft < 1) {
+            endGame(`${time}s`, `Dug ${gameSettings.requiredGarbage} lines in ${time} seconds`);
+        } break;
+        case 5: if (gameEnd) {
+            endGame(`${time}s`, `Survived ${totalSentLines} lines in ${time} seconds`);
+        } break;
+        case 6: if (totalAttack >= gameSettings.requiredAttack) {
+            endGame(`${time}s`, `Sent ${totalAttack} damage in ${time} seconds`);
+        } break;
+        case 7: if (combonumber == -1 && totalLines >= 1) {
+            endGame(`${time}s`, `Got a ${maxCombo} combo in ${time} seconds`);
+        } break;
     }
 }
 
 const audioLevel = 10;
-function playSound(audioName) {
+function playSound(audioName, replace = true) {
     if (sfx[audioName] == undefined) {
         sfx[audioName] = new Audio(`assets/sfx/${audioName}.mp3`)
         sfx[audioName].volume = audioLevel / 1000;
     };
     if (firstMove == true) return;
+    if (!replace && !sfx[audioName].ended && sfx[audioName].currentTime != 0) return;
     sfx[audioName].currentTime = 0;
     sfx[audioName].play();
 }
@@ -577,10 +622,18 @@ function moveMinos(coords, dir, size, value = false) {
         return { 'RIGHT': [x + size, y], 'LEFT': [x - size, y], 'DOWN': [x, y - size], 'UP': [x, y + size] }
     }
     const newcoords = coords.map((c) => getChange(c)[dir]);
+    if (newcoords.some(([x, y]) => y > 39)) { endGame('Topout'); return; } // vanishing zone
     const valTable = coords.map(([x, y]) => value ? value : boardState[y][x])
     coords.forEach((c, idx) => removeValue(c, valTable[idx]))
     newcoords.forEach((c, idx) => value ? addValue(c, valTable[idx]) : setValue(c, valTable[idx]))
     spawnOverlay()
+}
+
+function setComboBoard(start) {
+    boardState.forEach((row, y) => row.forEach((col, x) => {
+        if (x < 3 || x > 6) addMinos('S G', [[x, y]], [0, 0])
+    }))
+    if (start) { addMinos('S G', [[3, 0], [3, 1], [4, 1]], [0, 0]); displayShadow() }
 }
 
 function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
@@ -734,7 +787,7 @@ function uploadSettings(el) {
 
 function setGamemode(modeNum) {
     gameSettings.gamemode = modeNum;
-    const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining' }
+    const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining', 5: 'Lines Survived', 6: 'Sent', 7: 'Combo' }
     divObjectiveText.textContent = modesText[gameSettings.gamemode];
 }
 
