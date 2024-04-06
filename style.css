@@ -188,6 +188,10 @@ body {
     border: none;
 }
 
+button > img {
+    -webkit-user-drag: none;
+}
+
 .settingPanelButton {
     margin: 2%;
     height: 18vh;
@@ -222,6 +226,7 @@ body {
     aspect-ratio: 1/1.4;
     background-color: #00000024;
     padding: 1%;
+    padding-left: 0;
     color: var(--cl-blue);
     border-radius: 2vh;
     user-select: none;
@@ -264,9 +269,15 @@ body {
     animation: fadeout 0.4s forwards ease;
 }
 
+#queueModify {
+    height: 28vh;
+    aspect-ratio: 1.6/1;
+}
+
 .settingLayout {
     width: 100%;
     padding: 1vh;
+    padding-left: 2vh;
     transition: all 0.7s ease;
     border: 0.2vh solid #00000000;
 }

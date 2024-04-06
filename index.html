@@ -12,11 +12,11 @@
     <div id="board">
         <div class="dangerOverlay"></div>
         <button id="test" class="settingsButton" style="top: 5%;" onclick="openModal('settingsPanel')">
-            <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%;">
+            <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%; user-select: none;">
         </button>
         
-        <canvas id="next"></canvas>
-        <canvas id="hold"></canvas>
+        <canvas id="next" onclick="openModal('queueModify')"></canvas>
+        <canvas id="hold" onclick="openModal('queueModify')"></canvas>
         <canvas id="playingfield"></canvas>
         <progress id="garbageQueue" max="40" value="0"></progress>
         
@@ -76,6 +76,7 @@
         <div class="settingLayout"><label>Lockout Deaths</label> <input class="option check" type="checkbox" id="allowLockout" /></div>
         <div class="settingLayout"><label>Preserve DAS</label> <input class="option check" type="checkbox" id="preserveARR" /></div>
         <div class="settingLayout"><label>Infinite Hold</label> <input class="option check" type="checkbox" id="infiniteHold" /></div>
+        <div class="settingLayout"><label>Allow Queue Modification</label> <input class="option check" type="checkbox" id="allowQueueModify" /></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="closeModal('gameSettingsDialog')">Save and close</button>
     </dialog>
@@ -125,8 +126,8 @@
 
     <dialog id="gameEnd" class="dialog" onkeydown="newGame(event.key, 'gameEnd')">
         <h1><b>GAME ENDED</b></h1>
-        <p id="reason" style="font-size: 3.6vh;">test</p>
-        <p id="result">test</p>
+        <p id="reason" style="font-size: 3.6vh;"></p>
+        <p id="result"></p>
         <button class="closeDialog" onclick="closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
     </dialog>
 
@@ -151,6 +152,13 @@
             <input type="file" id="fileUpload" onchange="uploadSettings(this)" hidden accept=".teti">
             <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
         </span>
+    </dialog>
+
+    <dialog id="queueModify" class="dialog">
+        <h1><b>Change Queues</b></h1>
+        <div class="settingLayout"><label>Next</label> <input class="option textInput next" type="text" id="nextQueue" /></div>
+        <div class="settingLayout"><label>Hold</label> <input class="option textInput hold" type="text" id="holdQueue" /></div>
+        <button class="closeDialog" onclick="closeModal('queueModify')" style="bottom: 10%;" >Save</button>
     </dialog>
 </body>
 </html>

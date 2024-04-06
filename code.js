@@ -3,7 +3,7 @@ let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'sta
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 
 let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 20, shadowOpacity: 20, boardHeight: 80, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
-let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10, survivalRate: 60, backfireMulti: 1 }
+let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10, survivalRate: 60, backfireMulti: 1, allowQueueModify: true }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
 const canvasField = document.getElementById('playingfield');
@@ -44,9 +44,10 @@ function StartGame() {
 
 this.addEventListener('keydown', event => {
     const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Escape']
-    if (disabledKeys.includes(event.key)) event.preventDefault();
+    if (event.key == 'Escape') event.preventDefault();
     if (event.key == 'Escape' && bindingKey == undefined) toggleDialog();
     if (event.repeat || isDialogOpen) return;
+    if (disabledKeys.includes(event.key)) event.preventDefault();
     if (firstMove && event.key != 'Escape') firstMovement();
     if (event.key == controlSettings.resetKey) { playSound('retry'); StartGame(); }
     document.body.style.cursor = 'none';
@@ -55,7 +56,7 @@ this.addEventListener('keydown', event => {
     if (event.key == controlSettings.ccwKey) rotate("CCW");
     if (event.key == controlSettings.rotate180Key) rotate("180");
     if (event.key == controlSettings.hdKey) harddrop();
-    if (event.key == controlSettings.holdKey) updateHold();
+    if (event.key == controlSettings.holdKey) switchHold();
     if (event.key == controlSettings.rightKey) startDas("RIGHT");
     if (event.key == controlSettings.leftKey) startDas("LEFT");
     if (event.key == controlSettings.sdKey) startArrSD();
@@ -402,10 +403,10 @@ function updateNext() {
     const first5 = nextPieces[0].concat(nextPieces[1])
         .slice(0, gameSettings.nextPieces);
     first5.forEach((name, idx) => {
-        const piece = pieces.filter(e => e.name == name)[0], nm = piece.name;
+        const piece = getPiece(name), pn = piece.name;
         let dx = 0, dy = 3 * (4 - idx);
-        if (nm == 'o') [dx, dy] = [dx + 1, dy + 1]
-        pieceToCoords(piece.shape1).forEach(([x, y]) => nextQueueGrid[y + dy][x + dx] = 'A ' + nm)
+        if (pn == 'o') [dx, dy] = [dx + 1, dy + 1]
+        pieceToCoords(piece.shape1).forEach(([x, y]) => nextQueueGrid[y + dy][x + dx] = 'A ' + pn)
     });
     const colour = displaySettings.colouredQueues
         ? pieces.filter(e => e.name == first5[0])[0].colour
@@ -418,7 +419,9 @@ function resetHoldGrid() {
     holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ''));
     ctxH.clearRect(0, 0, canvasHold.offsetWidth + 10, canvasHold.offsetHeight)
 }
-function updateHold() {
+
+function switchHold() {
+    console.log('test')
     if (holdPiece.occured) return;
     clearLockDelay(); MinoToNone('A'); isTspin = false; isMini = false;
     if (holdPiece.piece == null) { // first time holding
@@ -428,18 +431,25 @@ function updateHold() {
         [holdPiece.piece, currentPiece] = [currentPiece, holdPiece.piece]
         spawnPiece(currentPiece);
     }
-    const name = holdPiece.piece.name; isO = name == 'o', isI = name == 'i';
-    const dx = isO ? 1 : 0, dy = isO ? 1 : isI ? -1 : 0;
-    resetHoldGrid()
-    const coords = pieceToCoords(holdPiece.piece.shape1);
-    coords.forEach(([x, y]) => holdQueueGrid[y + dy][x + dx] = 'A ' + name)
     if (checkDeath(getMinos('A'), getMinos('S')) == 'blockout') { endGame('blockout'); return }
-    playSound('hold'); renderDanger(); clearInterval(timeouts['gravity']); startGravity();
     if (!gameSettings.infiniteHold) holdPiece.occured = true;
-    const len = Math.round(minoSize / 2), shiftX = isO || isI ? 0 : len, shiftY = isI ? 0 : len;
-    renderToCanvas(ctxH, canvasHold, holdQueueGrid, 2, [shiftX, shiftY])
+    playSound('hold'); renderDanger(); clearInterval(timeouts['gravity']); startGravity();
+    updateHold();
+}
+
+function updateHold() {
+    resetHoldGrid();
+    if (holdPiece.piece == undefined) return;
     const colour = displaySettings.colouredQueues ? holdPiece.piece.colour : '#dbeaf3';
     canvasHold.style.outline = `0.2vh solid ${colour}`
+    const name = holdPiece.piece.name;
+    const isO = name == 'o', isI = name == 'i';
+    const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
+    const coords = pieceToCoords(holdPiece.piece.shape1);
+    coords.forEach(([x, y]) => holdQueueGrid[y + dy][x + dx] = 'A ' + name)
+    const len = Math.round(minoSize / 2);
+    const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
+    renderToCanvas(ctxH, canvasHold, holdQueueGrid, 2, [shiftX, shiftY])
 }
 
 // GUI rendering
@@ -460,9 +470,9 @@ function renderActionText(linecount, remainingMinos) {
     const damage = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, btbCount, isBTB);
     totalScore += calcScore(damagetype, isPC, isBTB, combonumber);
     totalLines += linecount; totalAttack += damage; spikeCounter += damage;
-    garbageQueue = garbageQueue == 0 ? damage : garbageQueue - damage;
-    garbageQueue *= gameSettings.backfireMulti;
-    if (garbageQueue < 0) garbageQueue = 0
+    garbageQueue = garbageQueue == 0 ? damage * gameSettings.backfireMulti
+        : garbageQueue - damage * gameSettings.backfireMulti;
+    if (garbageQueue < 0) garbageQueue = 0;
     if (gameSettings.gamemode == 6 && combonumber == -1 && garbageQueue > 0) {
         addGarbage(garbageQueue, 0); garbageQueue = 0; progressDamage.value = 0;
     }
@@ -674,11 +684,14 @@ function renderingLoop() {
 function openModal(id) {
     let settingGroup = id.replace('Dialog', '');
     if (id == 'gamemodeDialog') settingGroup = 'gameSettings';
+    if (id == 'queueModify' && !gameSettings.allowQueueModify) return;
     const options = [...document.getElementsByClassName('option')]
     options.filter((item) => item.parentElement.parentElement.id == id)
         .forEach((setting) => {
             let newValue = eval(settingGroup)[setting.id];
             if (setting.classList[2] == 'exp') newValue = toLogValue(newValue);
+            if (setting.id == 'nextQueue') newValue = nextPieces[0].concat(nextPieces[1]).splice(0, 7).join(' ');
+            if (setting.id == 'holdQueue') newValue = holdPiece.piece ? holdPiece.piece.name : '';
             setting.value = newValue
             if (setting.classList[1] == 'keybind') setting.textContent = newValue;
             if (setting.classList[1] == 'check') setting.checked = (newValue);
@@ -707,6 +720,15 @@ function closeModal(id) {
                     setting.classList[1] == 'keybind' ? setting.textContent :
                         setting.classList[2] == 'exp' ? toExpValue(setting.value) :
                             setting.value;
+            if (setting.id == 'nextQueue') {
+                nextPieces[0] = setting.value.split(' ').filter((p) => ['s', 'z', 'i', 'j', 'l', 'o', 't'].includes(p))
+                shuffleRemainingPieces(); updateNext();
+            }
+            if (setting.id == 'holdQueue') {
+                const filtp = [setting.value].filter((p) => ['s', 'z', 'i', 'j', 'l', 'o', 't'].includes(p))
+                holdPiece = { piece: getPiece(filtp), occured: false }; updateHold();
+            }
+
         })
     closeDialog(document.getElementById(id));
     saveSettings();
@@ -813,6 +835,7 @@ function stopInterval(name) { clearInterval(timeouts[name]); timeouts[name] = 0;
 function toExpValue(x) { return Math.round(Math.pow(2, 0.1 * x) - 1) }
 function toLogValue(y) { return Math.round(Math.log2(y + 1) * 10) }
 function newGame(k, d) { if (k == controlSettings.resetKey) { closeModal(d); StartGame(); } }
+function getPiece(name) { return pieces.filter(p => p.name == name)[0] }
 function toHex(num) {
     const hex = Math.round(((Number(num) / 100) * 255)).toString(16);
     return hex.length > 1 ? hex : 0 + hex;
