@@ -1,9 +1,10 @@
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, holdPiece, gameEnd, nextPieces, lockCount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbRowsLeft, sfx = {}, toppingOut, bindingKey, boardState = [], nextQueueGrid = [], holdQueueGrid = [], inDanger, totalSentLines, garbageQueue, maxCombo;
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, holdPiece, gameEnd, nextPieces, lockCount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbRowsLeft, sfx = {}, toppingOut, bindingKey, boardState = [], nextQueueGrid = [], holdQueueGrid = [], inDanger, totalSentLines, garbageQueue, maxCombo, movedPieceFirst, boardAlpha, boardAlphaChange;
 let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
+let totalfps = 0, frames = 0, time = 0, prevTime = 0, fpsnow = 0;
 
-let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 20, shadowOpacity: 20, boardHeight: 80, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
-let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10, survivalRate: 60, backfireMulti: 1, allowQueueModify: true }
+let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 20, shadowOpacity: 20, boardHeight: 80, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true, showFPS: false }
+let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10, survivalRate: 60, backfireMulti: 1, allowQueueModify: true, lookAheadPieces: 3 }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
 const canvasField = document.getElementById('playingfield');
@@ -16,6 +17,14 @@ const progressDamage = document.getElementById('garbageQueue');
 const divDanger = document.getElementsByClassName('dangerOverlay');
 const divLinesSent = document.getElementById('linessent');
 const divObjectiveText = document.getElementById('objectiveText');
+const elementStats1 = document.getElementById('stats1')
+const elementStats2 = document.getElementById('stats2')
+const elementStats3 = document.getElementById('stats3')
+const elementSmallStat1 = document.getElementById('smallStat1')
+const elementSmallStat2 = document.getElementById('smallStat2')
+const elementObjective = document.getElementById('objective')
+const fpsmeter = document.getElementById('fps');
+const fpsavgmeter = document.getElementById('fpsavg');
 
 canvasField.width = Math.round(canvasField.offsetWidth / 10) * 10;
 canvasField.height = Math.round(canvasField.offsetHeight / 40) * 40;
@@ -73,7 +82,7 @@ this.addEventListener('mousemove', () => document.body.style.cursor = 'auto')
 function firstMovement() { // stats clock at 20ms
     startGravity(); firstMove = false;
     timeouts['stats'] = setInterval(() => renderStats(), 20);
-    const time = 60 / gameSettings.survivalRate * 1000
+    const time = 60 * 1000 / gameSettings.survivalRate
     if (gameSettings.gamemode == 5) timeouts['survival'] = setInterval(() => addGarbage(1), time);
 }
 
@@ -122,8 +131,9 @@ function checkCollision(coords, action, collider = getMinos('S')) {
             (action == "PLACE" && y > 19)) return true;
         if (collider.some(([x2, y2]) => {
             const col = (dx, dy) => x + dx == x2 && y + dy == y2;
-            return ((action == "RIGHT" && col(1, 0)) || (action == "LEFT" && col(-1, 0)) ||
-                (action == "DOWN" && col(0, -1)) || ((action == "ROTATE" || action == "SPAWN") && col(0, 0)))
+            return ((action == "RIGHT" && col(1, 0)) ||
+                (action == "LEFT" && col(-1, 0)) || (action == "DOWN" && col(0, -1)) ||
+                ((action == "ROTATE" || action == "SPAWN") && col(0, 0)))
         })) return true;
     }
 }
@@ -153,7 +163,7 @@ function rotate(type) {
     addMinos("A " + currentPiece.name, rotatingCoords, change)
     currentLoc = [currentLoc[0] + change[0], currentLoc[1] + change[1]]
     isTspin = checkTspin(newRotation, currentLoc, change);
-    rotationState = newRotation;
+    rotationState = newRotation; movedPieceFirst = true;
     incrementLock(); playSound('rotate'); displayShadow(); topoutSound();
     if (isTspin) playSound('spin')
     if (gameSettings.gravitySpeed == 0) startGravity();
@@ -185,7 +195,7 @@ function movePieceSide(direction, max = 1) {
     if (gameSettings.gravitySpeed == 0) startGravity();
     if (amount == 0) { stopInterval('arr'); return; }
     moveMinos(minos, 'RIGHT', amount);
-    currentLoc[0] += amount; isTspin = false; isMini = false;
+    currentLoc[0] += amount; isTspin = false; isMini = false; movedPieceFirst = true;
     incrementLock(); playSound('move'); displayShadow(); topoutSound();
     if (directionState['DOWN'] == 'arr') startArrSD();
 }
@@ -194,7 +204,7 @@ function movePieceDown(sonic) {
     const minos = getMinos('A');
     if (checkCollision(minos, 'DOWN')) return;
     moveMinos(minos, 'DOWN', 1);
-    isTspin = false; isMini = false; currentLoc[1] -= 1; totalScore += 1;
+    isTspin = false; isMini = false; currentLoc[1] -= 1; totalScore += 1; movedPieceFirst = true;
     if (checkCollision(getMinos('A'), 'DOWN')) scheduleLock();
     startArr('current');
     if (sonic) movePieceDown(true);
@@ -216,7 +226,7 @@ function clearLines() {
     const rows = getMinos('S').map(coord => coord[1])
         .reduce((prev, curr) => (prev[curr] = ++prev[curr] || 1, prev), {});
     const clearRows = Object.keys(rows).filter((key) => rows[key] >= 10)
-        .map((row) => Number(row)).toReversed();
+        .map(row => +row).toReversed();
     let removedGarbage = 0;
     for (let row of clearRows) {
         const stopped = getMinos('S');
@@ -225,8 +235,26 @@ function clearLines() {
         moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1)
     }
     if (garbRowsLeft > 10 && gameSettings.gamemode == 4) addGarbage(removedGarbage);
+
     garbRowsLeft -= removedGarbage;
-    renderActionText(clearRows.length, getMinos('S'))
+    const linecount = clearRows.length;
+    const isBTB = ((isTspin || isMini || linecount == 4) && linecount > 0);
+    const isPC = getMinos('S').length == 0;
+    const damagetype = (isTspin ? 'Tspin ' : '') + (isMini ? 'mini ' : '') + cleartypes[linecount];
+    btbCount = isBTB ? btbCount + 1 : (linecount != 0) ? - 1 : btbCount;
+    if (linecount == 0) maxCombo = combonumber;
+    combonumber = linecount == 0 ? -1 : combonumber + 1;
+    const damage = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, btbCount, isBTB);
+    totalScore += calcScore(damagetype, isPC, isBTB, combonumber);
+    totalLines += linecount; totalAttack += damage; spikeCounter += damage;
+    garbageQueue = garbageQueue == 0 ? damage * gameSettings.backfireMulti
+        : garbageQueue - damage * gameSettings.backfireMulti;
+    if (garbageQueue < 0) garbageQueue = 0;
+    if (gameSettings.gamemode == 6 && combonumber == -1 && garbageQueue > 0) {
+        addGarbage(garbageQueue, 0); garbageQueue = 0; progressDamage.value = 0;
+    }
+    if (damage > 0 && gameSettings.gamemode == 6) progressDamage.value = garbageQueue;
+    renderActionText(damagetype, isBTB, isPC, damage, linecount)
 }
 
 function incrementLock() {
@@ -251,6 +279,26 @@ function scheduleLock() {
     }, 10);
 }
 
+function lockPiece() {
+    getMinos('A').forEach(c => { rmValue(c, 'A'); addValFront(c, 'S') });
+    endGame(checkDeath(getMinos('S'), getMinos('NP')));
+    clearLockDelay(); clearInterval(timeouts['gravity']); clearLines();
+    totalPieceCount++;
+    holdPiece.occured = false; isTspin = false; isMini = false; movedPieceFirst = false;
+    spawnPiece(randomiser()); startGravity(); renderDanger();
+}
+
+function clearLockDelay(clearCount = true) {
+    clearInterval(timeouts['lockingTimer']); stopTimeout('lockdelay');
+    divLockTimer.value = 0;
+    if (!clearCount) return;
+    divLockCounter.value = 0;
+    lockCount = 0;
+    if (gameSettings.preserveARR) return;
+    directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false }
+    endDasArr('RIGHT'); endDasArr('LEFT'); endDasArr('DOWN');
+}
+
 function topoutSound() {
     const check = checkDeath(getMinos('Sh'), getMinos('NP')) && !toppingOut;
     if (check) { playSound('hyperalert'); toppingOut = true; return }
@@ -264,26 +312,6 @@ function checkDeath(coords, collider) {
     if (collision && gameSettings.allowLockout) return 'Lockout';
     if (collision2 && isGarbage) return 'Topout';
     if (collision2) return 'Blockout';
-}
-
-function lockPiece() {
-    getMinos('A').forEach(c => { removeValue(c, 'A'); addValFront(c, 'S') });
-    endGame(checkDeath(getMinos('S'), getMinos('NP')));
-    clearLockDelay(); clearInterval(timeouts['gravity']); clearLines();
-    totalPieceCount++;
-    holdPiece.occured = false; isTspin = false; isMini = false;
-    spawnPiece(randomiser()); startGravity(); renderDanger();
-}
-
-function clearLockDelay(clearCount = true) {
-    clearInterval(timeouts['lockingTimer']); stopTimeout('lockdelay');
-    divLockTimer.value = 0;
-    if (!clearCount) return;
-    divLockCounter.value = 0;
-    lockCount = 0;
-    if (gameSettings.preserveARR) return;
-    directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false }
-    endDasArr('RIGHT'); endDasArr('LEFT'); endDasArr('DOWN');
 }
 
 function endGame(top, bottom = 'Better luck next time') {
@@ -314,7 +342,7 @@ function resetState() {
     totalLines = 0; totalScore = 0; garbRowsLeft = gameSettings.requiredGarbage; spikeCounter = 0;
     btbCount = -1; combonumber = -1; totalTimeSeconds = -0.02; totalAttack = 0; totalPieceCount = 0;
     firstMove = true; toppingOut = false; rotationState = 1; inDanger = false; totalSentLines = 0;
-    garbageQueue = 0; maxCombo = 0;
+    garbageQueue = 0; maxCombo = 0; movedPieceFirst = false; boardAlpha = 1; boardAlphaChange = 0;
     clearInterval(timeouts['gravity']);
     clearInterval(timeouts['survival']);
     progressDamage.value = 0;
@@ -346,7 +374,7 @@ function spawnPiece(piece, start = false) {
     const dy = (piece.name == 'o') ? 21 : (piece.name == 'i') ? 19 : 20
     addMinos('A ' + piece.name, pieceToCoords(piece.shape1), [dx, dy])
     currentLoc = [dx, dy]; rotationState = 1; currentPiece = piece;
-    spawnOverlay(); updateNext(); displayShadow(); topoutSound();
+    spawnOverlay(); updateNext(); updateHold(); displayShadow(); topoutSound();
     const rows = gameSettings.requiredGarbage < 10 ? gameSettings.requiredGarbage : 10
     if (garbRowsLeft > 0 && start && gameSettings.gamemode == 4) addGarbage(rows);
     if (gameSettings.gamemode == 7) setComboBoard(start);
@@ -408,11 +436,9 @@ function updateNext() {
         if (pn == 'o') [dx, dy] = [dx + 1, dy + 1]
         pieceToCoords(piece.shape1).forEach(([x, y]) => nextQueueGrid[y + dy][x + dx] = 'A ' + pn)
     });
-    const colour = displaySettings.colouredQueues
-        ? pieces.filter(e => e.name == first5[0])[0].colour
-        : '#dbeaf3';
-    canvasNext.style.outline = `0.2vh solid ${colour}`
     renderToCanvas(ctxN, canvasNext, nextQueueGrid, 15)
+    if (gameSettings.gamemode == 8 || !displaySettings.colouredQueues) return;
+    canvasNext.style.outlineColor = pieces.filter(e => e.name == first5[0])[0].colour
 }
 
 function resetHoldGrid() {
@@ -421,7 +447,6 @@ function resetHoldGrid() {
 }
 
 function switchHold() {
-    console.log('test')
     if (holdPiece.occured) return;
     clearLockDelay(); MinoToNone('A'); isTspin = false; isMini = false;
     if (holdPiece.piece == null) { // first time holding
@@ -440,8 +465,6 @@ function switchHold() {
 function updateHold() {
     resetHoldGrid();
     if (holdPiece.piece == undefined) return;
-    const colour = displaySettings.colouredQueues ? holdPiece.piece.colour : '#dbeaf3';
-    canvasHold.style.outline = `0.2vh solid ${colour}`
     const name = holdPiece.piece.name;
     const isO = name == 'o', isI = name == 'i';
     const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
@@ -450,6 +473,8 @@ function updateHold() {
     const len = Math.round(minoSize / 2);
     const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
     renderToCanvas(ctxH, canvasHold, holdQueueGrid, 2, [shiftX, shiftY])
+    if (gameSettings.gamemode == 8 || !displaySettings.colouredQueues) return;
+    canvasHold.style.outline = `0.2vh solid ${holdPiece.piece.colour}`
 }
 
 // GUI rendering
@@ -460,23 +485,7 @@ function renderDanger() {
     if (condition && !inDanger) playSound('damage_alert');
 }
 
-function renderActionText(linecount, remainingMinos) {
-    const isBTB = ((isTspin || isMini || linecount == 4) && linecount > 0);
-    const isPC = remainingMinos.length == 0;
-    const damagetype = (isTspin ? 'Tspin ' : '') + (isMini ? 'mini ' : '') + cleartypes[linecount];
-    btbCount = isBTB ? btbCount + 1 : (linecount != 0) ? - 1 : btbCount;
-    if (linecount == 0) maxCombo = combonumber;
-    combonumber = linecount == 0 ? -1 : combonumber + 1;
-    const damage = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, btbCount, isBTB);
-    totalScore += calcScore(damagetype, isPC, isBTB, combonumber);
-    totalLines += linecount; totalAttack += damage; spikeCounter += damage;
-    garbageQueue = garbageQueue == 0 ? damage * gameSettings.backfireMulti
-        : garbageQueue - damage * gameSettings.backfireMulti;
-    if (garbageQueue < 0) garbageQueue = 0;
-    if (gameSettings.gamemode == 6 && combonumber == -1 && garbageQueue > 0) {
-        addGarbage(garbageQueue, 0); garbageQueue = 0; progressDamage.value = 0;
-    }
-    if (damage > 0 && gameSettings.gamemode == 6) progressDamage.value = garbageQueue;
+function renderActionText(damagetype, isBTB, isPC, damage, linecount) {
 
     if (damagetype != '') setText('cleartext', damagetype, 2000);
     if (combonumber > 0) setText('combotext', `Combo ${combonumber}`, 2000);
@@ -498,6 +507,7 @@ function renderActionText(linecount, remainingMinos) {
     else if (linecount > 0 && isTspin) { playSound('clearspin') }
     else if (linecount > 0) { playSound('clearline') }
     if (spikeCounter >= 15) playSound('thunder', false);
+    if (combonumber > 0) playSound(`combo/combo_${combonumber > 16 ? 16 : combonumber}`);
 }
 
 function spikePattern(colour, size) {
@@ -537,7 +547,8 @@ function renderStyles() {
     document.body.style.background = displaySettings.background[0] == '#'
         ? `${displaySettings.background} no-repeat fixed center`
         : `url("${displaySettings.background}") no-repeat fixed center`;
-    divBoard.style.transform = `scale(${Number(displaySettings.boardHeight) + 10}%) translate(-50%, -50%)`;
+    const height = Number(displaySettings.boardHeight) + 10
+    divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
     canvasHold.style.outline = `0.2vh solid #dbeaf3`;
     const background = `rgba(0, 0, 0, ${Number(displaySettings.boardOpacity) / 100})`
     divBoard.style.backgroundColor = background;
@@ -545,23 +556,25 @@ function renderStyles() {
     canvasNext.style.backgroundColor = background;
 }
 
+
 function renderStats() {
     totalTimeSeconds += 0.02
     let displaytime = (Math.round(totalTimeSeconds * 10) / 10).toFixed(1)
     let pps = 0.00, apm = 0.0;
     if (totalTimeSeconds != 0) pps = Math.round(totalPieceCount * 100 / totalTimeSeconds) / 100;
     if (totalTimeSeconds != 0) apm = Math.round(totalAttack * 10 / (totalTimeSeconds / 60)) / 10;
-    document.getElementById('stats1').textContent = `${displaytime}`
-    document.getElementById('stats2').textContent = `${apm.toFixed(1)}`
-    document.getElementById('stats3').textContent = `${pps.toFixed(2)}`
-    document.getElementById('smallStat1').textContent = `${totalAttack}`
-    document.getElementById('smallStat2').textContent = `${totalPieceCount}`
+    elementStats1.textContent = `${displaytime}`
+    elementStats2.textContent = `${apm.toFixed(1)}`
+    elementStats3.textContent = `${pps.toFixed(2)}`
+    elementSmallStat1.textContent = `${totalAttack}`
+    elementSmallStat2.textContent = `${totalPieceCount}`
     objectives();
 }
 
 function objectives() {
     const time = (Math.round(totalTimeSeconds * 100) / 100).toFixed(2), gs = gameSettings.gamemode;
-    document.getElementById('objective').textContent = {
+    const pieces = gameSettings.lookAheadPieces;
+    elementObjective.textContent = {
         0: '',
         1: `${totalLines}/${gameSettings.requiredLines}`,
         2: `${totalScore}`,
@@ -569,7 +582,8 @@ function objectives() {
         4: `${garbRowsLeft}`,
         5: `${totalSentLines}`,
         6: `${totalAttack}/${gameSettings.requiredAttack}`,
-        7: `${combonumber}`
+        7: `${combonumber}`,
+        8: `${totalLines}/${gameSettings.requiredLines}`
     }[gs]
 
     switch (gs) {
@@ -594,6 +608,9 @@ function objectives() {
         case 7: if (combonumber == -1 && totalLines >= 1) {
             endGame(`${time}s`, `Got a ${maxCombo} combo in ${time} seconds`);
         } break;
+        case 8: if (totalLines >= gameSettings.requiredLines) {
+            endGame(`${time}s`, `Cleared ${totalLines} lines using ${pieces} lookahead`);
+        } break;
     }
 }
 
@@ -611,13 +628,13 @@ function playSound(audioName, replace = true) {
 
 // Board manipulations and rendering
 function checkMino([x, y], val) { return boardState[y][x].split(' ').includes(val) }
-function MinoToNone(val) { getMinos(val).forEach(c => removeValue(c, val)) }
+function MinoToNone(val) { getMinos(val).forEach(c => rmValue(c, val)) }
 function resetBoard() { boardState = [...Array(40)].map(() => [...Array(10)].map(() => "")); }
 function addMinos(val, c, [dx, dy]) { c.forEach(([x, y]) => setValue([x + dx, y + dy], val)) }
 function addValFront([x, y], val) { boardState[y][x] = `${val} ${boardState[y][x]}` }
 function addValue([x, y], val) { boardState[y][x] = (boardState[y][x] + ' ' + val).trim() }
 function setValue([x, y], val) { boardState[y][x] = val }
-function removeValue([x, y], val) { boardState[y][x] = boardState[y][x].replace(val, '').trim().replace('  ', ' ') }
+function rmValue([x, y], val) { boardState[y][x] = boardState[y][x].replace(val, '').trim().replace('  ', ' ') }
 function getMinos(name) { return getCoords(boardState, c => c.split(' ').includes(name), [0, 0]) }
 function pieceToCoords(arr, cd = [0, 0]) { return getCoords(arr.toReversed(), c => c == 1, cd) }
 
@@ -628,13 +645,13 @@ function getCoords(array, filter, [dx, dy]) {
 }
 
 function moveMinos(coords, dir, size, value = false) {
-    const getChange = ([x, y]) => {
-        return { 'RIGHT': [x + size, y], 'LEFT': [x - size, y], 'DOWN': [x, y - size], 'UP': [x, y + size] }
+    const getChange = ([x, y], a) => {
+        return { 'RIGHT': [x + a, y], 'LEFT': [x - a, y], 'DOWN': [x, y - a], 'UP': [x, y + a] }
     }
-    const newcoords = coords.map((c) => getChange(c)[dir]);
+    const newcoords = coords.map((c) => getChange(c, size)[dir]);
     if (newcoords.some(([x, y]) => y > 39)) { endGame('Topout'); return; } // vanishing zone
     const valTable = coords.map(([x, y]) => value ? value : boardState[y][x])
-    coords.forEach((c, idx) => removeValue(c, valTable[idx]))
+    coords.forEach((c, idx) => rmValue(c, valTable[idx]))
     newcoords.forEach((c, idx) => value ? addValue(c, valTable[idx]) : setValue(c, valTable[idx]))
     spawnOverlay()
 }
@@ -646,7 +663,18 @@ function setComboBoard(start) {
     if (start) { addMinos('S G', [[3, 0], [3, 1], [4, 1]], [0, 0]); displayShadow() }
 }
 
+
 function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
+    if (gameSettings.gamemode == 8) {
+        if (totalPieceCount % gameSettings.lookAheadPieces == 0 && !movedPieceFirst) {
+            if (boardAlpha <= 0) { boardAlphaChange = 0; boardAlpha = 1; }
+        } else {
+            if (boardAlpha >= 1) boardAlphaChange = -0.05;
+            if (boardAlpha <= 0) boardAlphaChange = 0;
+        }
+    }
+    if (boardAlphaChange != 0) boardAlpha += boardAlphaChange;
+    cntx.globalAlpha = boardAlpha.toFixed(2)
     cntx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
     grid.forEach((row, y) => {
         row.forEach((col, x) => {
@@ -658,6 +686,7 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
                     ? 'gray'
                     : pieces.filter(p => p.name == cell[1])[0].colour;
                 cntx.fillRect(posX + dx, posY + dy, minoSize, minoSize)
+                cntx.globalAlpha = boardAlpha.toFixed(2);
             } else if (cell.includes('NP') && inDanger) { // next piece overlay
                 cntx.fillStyle = '#ff000020';
                 cntx.fillRect(posX, posY, minoSize, minoSize)
@@ -676,7 +705,10 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
 }
 
 function renderingLoop() {
+    const now = performance.now(); frames++; fpsnow = 1000 / (now - prevTime); totalfps += fpsnow;
+    prevTime = performance.now();
     renderToCanvas(ctx, canvasField, boardState, 39)
+    if (boardAlphaChange != 0) { updateNext(); updateHold(); }
     setTimeout(() => requestAnimationFrame(renderingLoop), 1);
 }
 
@@ -809,7 +841,6 @@ function uploadSettings(el) {
 
 function setGamemode(modeNum) {
     gameSettings.gamemode = modeNum;
-    const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining', 5: 'Lines Survived', 6: 'Sent', 7: 'Combo' }
     divObjectiveText.textContent = modesText[gameSettings.gamemode];
 }
 
@@ -821,7 +852,7 @@ function resetSettings(settingGroup) {
 
 function toggleDialog() {
     if (isDialogOpen) { closeDialog(document.querySelectorAll("dialog[open]")[0]) }
-    else { openModal('settingsPanel'); StartGame() }
+    else { openModal('settingsPanel'); }
 }
 
 let menuSFX = (e, sfx) => document.querySelectorAll(e)
@@ -837,7 +868,7 @@ function toLogValue(y) { return Math.round(Math.log2(y + 1) * 10) }
 function newGame(k, d) { if (k == controlSettings.resetKey) { closeModal(d); StartGame(); } }
 function getPiece(name) { return pieces.filter(p => p.name == name)[0] }
 function toHex(num) {
-    const hex = Math.round(((Number(num) / 100) * 255)).toString(16);
+    const hex = Math.round((+num * 255 / 100)).toString(16);
     return hex.length > 1 ? hex : 0 + hex;
 }
 
@@ -931,6 +962,12 @@ const attackValues = {
 };
 const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' };
 const scoringTable = { '': 0, 'TSPIN': 400, 'TSPIN MINI': 100, 'SINGLE': 100, 'DOUBLE': 300, 'TRIPLE': 500, 'QUAD': 800, 'TSPIN SINGLE': 800, 'TSPIN DOUBLE': 1200, 'TSPIN TRIPLE': 1600, 'TSPIN MINI SINGLE': 200, 'TSPIN MINI DOUBLE': 400, 'ALL CLEAR': 3500 }
+const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining', 5: 'Lines Survived', 6: 'Sent', 7: 'Combo', 8: 'Lines' }
 
 StartGame();
-renderingLoop()
+renderingLoop();
+
+if (displaySettings.showFPS) {
+    setInterval(() => fpsmeter.textContent = `${fpsnow.toFixed(1)} fps`, 200);
+    setInterval(() => fpsavgmeter.textContent = `${(totalfps / frames).toFixed(1)} avg`, 1000);
+}

@@ -9,6 +9,8 @@
     <script defer src="code.js"></script>
 </head>
 <body id="body">
+    <p id="fps" style="color: white; right: 93vw; position: absolute; font-size: 0.8em;"></p>
+    <p id="fpsavg" style="color: white; right: 93vw; top: 3vh; position: absolute; font-size: 0.8em;"></p>
     <div id="board">
         <div class="dangerOverlay"></div>
         <button id="test" class="settingsButton" style="top: 5%;" onclick="openModal('settingsPanel')">
@@ -57,6 +59,7 @@
         <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
         <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
         <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
+        <div class="settingLayout"><label>Show FPS</label> <input class="option check" type="checkbox" id="showFPS" /></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="closeModal('displaySettingsDialog')">Save and close</button>
     </dialog>
@@ -116,18 +119,21 @@
         <button id="gamemode5" class="gamemodeSelect" onclick="setGamemode(5);closeModal('gamemodeDialog')">Survival</button>
         <button id="gamemode6" class="gamemodeSelect" onclick="setGamemode(6);closeModal('gamemodeDialog')">Backfire</button>
         <button id="gamemode7" class="gamemodeSelect" onclick="setGamemode(7);closeModal('gamemodeDialog')">4w</button>
-        <div class="settingLayout"><label>Required Lines (sprint)</label> <input class="option number" type="number" id="requiredLines" oninput="if(value<1) value=1" /></div>
+        <button id="gamemode8" class="gamemodeSelect" onclick="setGamemode(8);closeModal('gamemodeDialog')">Lookahead</button>
+        <div class="settingLayout"><label>Required Lines (sprint, lookahead)</label> <input class="option number" type="number" id="requiredLines" oninput="if(value<1) value=1" /></div>
         <div class="settingLayout"><label>Time Limit (ultra, survival)</label> <input class="option number" type="number" id="timeLimit" oninput="if(value<1) value=1" /></div>
         <div class="settingLayout"><label>Attack (attacker, backfire)</label> <input class="option number" type="number" id="requiredAttack" oninput="if(value<1) value=1" /></div>
         <div class="settingLayout"><label>Garbage Rows (digger)</label> <input class="option number" type="number" id="requiredGarbage" oninput="if(value<1) value=1" /></div>
         <div class="settingLayout"><label>APM (survival)</label> <input class="option number" type="number" id="survivalRate" oninput="if(value<1) value=1" /></div>
         <div class="settingLayout"><label>Multiplier (backfire)</label> <input class="option number" type="number" id="backfireMulti" oninput="if(value<0.1) value=0.1" /></div>
+        <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces" oninput="if(value<1) value=1" /></div>
     </dialog>
 
     <dialog id="gameEnd" class="dialog" onkeydown="newGame(event.key, 'gameEnd')">
         <h1><b>GAME ENDED</b></h1>
         <p id="reason" style="font-size: 3.6vh;"></p>
         <p id="result"></p>
+        <button style="opacity: 0;" autofocus></button>
         <button class="closeDialog" onclick="closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
     </dialog>
 
