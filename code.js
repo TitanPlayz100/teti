@@ -1,4 +1,4 @@
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, holdPiece, gameEnd, nextPieces, lockCount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbRowsLeft, sfx = {}, toppingOut, bindingKey, boardState = [], nextQueueGrid = [], holdQueueGrid = [], inDanger, totalSentLines, garbageQueue, maxCombo, movedPieceFirst, boardAlpha, boardAlphaChange;
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, holdPiece, gameEnd, nextPieces, lockCount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbRowsLeft, sfx = {}, bindingKey, boardState = [], nextQueueGrid = [], holdQueueGrid = [], inDanger, totalSentLines, garbageQueue, maxCombo, movedPieceFirst, boardAlpha, boardAlphaChange, minoSize;
 let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 let totalfps = 0, frames = 0, time = 0, prevTime = 0, fpsnow = 0;
@@ -7,59 +7,59 @@ let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 2
 let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10, survivalRate: 60, backfireMulti: 1, allowQueueModify: true, lookAheadPieces: 3 }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
-const canvasField = document.getElementById('playingfield');
-const canvasNext = document.getElementById('next');
-const canvasHold = document.getElementById('hold');
-const divBoard = document.getElementById('board');
-const divLockTimer = document.getElementById('lockTimer');
-const divLockCounter = document.getElementById('lockCounter');
-const progressDamage = document.getElementById('garbageQueue');
-const divDanger = document.getElementsByClassName('dangerOverlay');
-const divLinesSent = document.getElementById('linessent');
-const divObjectiveText = document.getElementById('objectiveText');
-const elementStats1 = document.getElementById('stats1')
-const elementStats2 = document.getElementById('stats2')
-const elementStats3 = document.getElementById('stats3')
-const elementSmallStat1 = document.getElementById('smallStat1')
-const elementSmallStat2 = document.getElementById('smallStat2')
-const elementObjective = document.getElementById('objective')
-const fpsmeter = document.getElementById('fps');
-const fpsavgmeter = document.getElementById('fpsavg');
+const canvasField = document.getElementById('playingfield'),
+    canvasNext = document.getElementById('next'),
+    canvasHold = document.getElementById('hold'),
+    divBoard = document.getElementById('board'),
+    divLockTimer = document.getElementById('lockTimer'),
+    divLockCounter = document.getElementById('lockCounter'),
+    progressDamage = document.getElementById('garbageQueue'),
+    divDanger = document.getElementsByClassName('dangerOverlay'),
+    divLinesSent = document.getElementById('linessent'),
+    divObjectiveText = document.getElementById('objectiveText'),
+    elementStats1 = document.getElementById('stats1'),
+    elementStats2 = document.getElementById('stats2'),
+    elementStats3 = document.getElementById('stats3'),
+    elementSmallStat1 = document.getElementById('smallStat1'),
+    elementSmallStat2 = document.getElementById('smallStat2'),
+    elementObjective = document.getElementById('objective'),
+    fpsmeter = document.getElementById('fps'),
+    fpsavgmeter = document.getElementById('fpsavg'),
+    ctx = canvasField.getContext('2d'),
+    ctxN = canvasNext.getContext('2d'),
+    ctxH = canvasHold.getContext('2d');
 
-canvasField.width = Math.round(canvasField.offsetWidth / 10) * 10;
-canvasField.height = Math.round(canvasField.offsetHeight / 40) * 40;
-canvasNext.width = Math.round(canvasNext.offsetWidth / 10) * 10;
-canvasNext.height = Math.round(canvasNext.offsetHeight / 40) * 40;
-canvasHold.width = Math.round(canvasHold.offsetWidth / 10) * 10;
-canvasHold.height = Math.round(canvasHold.offsetHeight / 40) * 40;
+function init() {
+    [canvasField, canvasNext, canvasHold].forEach(c => {
+        c.width = Math.round(c.offsetWidth / 10) * 10;
+        c.height = Math.round(c.offsetHeight / 40) * 40;
+    });
+    divBoard.style.width = `${canvasField.width}px`
+    divBoard.style.height = `${canvasField.height / 2}px`
+    minoSize = canvasField.width / 10;
+    let menuSFX = (e, sfx) =>
+        document.querySelectorAll(e).forEach(el => el.onmouseenter = () => playSound(sfx));
+    menuSFX('.settingLayout', 'menutap'); menuSFX('.gamemodeSelect', 'menutap');
+    if (displaySettings.showFPS) {
+        setInterval(() => fpsmeter.textContent = `${fpsnow.toFixed(1)} fps`, 200);
+        setInterval(() => fpsavgmeter.textContent = `${(totalfps / frames).toFixed(1)} avg`, 1000);
+    }
+}
 
-divBoard.style.width = `${canvasField.width}px`
-divBoard.style.height = `${canvasField.height / 2}px`
-
-const ctx = canvasField.getContext('2d');
-const ctxN = canvasNext.getContext('2d');
-const ctxH = canvasHold.getContext('2d');
-const minoSize = canvasField.width / 10;
-
-function StartGame() {
+function startGame() {
     loadSettings();
-    setGamemode(gameSettings.gamemode)
     resetState();
     renderStyles();
-    clearInterval(timeouts['stats']);
-    renderStats();
     spawnPiece(randomiser(), true);
 }
 
 this.addEventListener('keydown', event => {
-    const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Escape']
     if (event.key == 'Escape') event.preventDefault();
     if (event.key == 'Escape' && bindingKey == undefined) toggleDialog();
     if (event.repeat || isDialogOpen) return;
     if (disabledKeys.includes(event.key)) event.preventDefault();
     if (firstMove && event.key != 'Escape') firstMovement();
-    if (event.key == controlSettings.resetKey) { playSound('retry'); StartGame(); }
-    document.body.style.cursor = 'none';
+    if (event.key == controlSettings.resetKey) { playSound('retry'); startGame(); }
     if (gameEnd) return;
     if (event.key == controlSettings.cwKey) rotate("CW");
     if (event.key == controlSettings.ccwKey) rotate("CCW");
@@ -76,8 +76,6 @@ this.addEventListener('keyup', event => {
     if (event.key == controlSettings.leftKey) endDasArr('LEFT');
     if (event.key == controlSettings.sdKey) endDasArr('DOWN');
 });
-
-this.addEventListener('mousemove', () => document.body.style.cursor = 'auto')
 
 function firstMovement() { // stats clock at 20ms
     startGravity(); firstMove = false;
@@ -102,8 +100,8 @@ function startArr(direction) {
     }
     directionState[direction] = 'arr';
     stopInterval('arr')
-    if (gameSettings.arr == 0) { timeouts['arr'] = -1; movePieceSide(direction, Infinity); return; }
-    timeouts['arr'] = setInterval(() => movePieceSide(direction), gameSettings.arr);
+    if (gameSettings.arr == 0) { timeouts['arr'] = -1; movePieceSide(direction, Infinity); }
+    else { timeouts['arr'] = setInterval(() => movePieceSide(direction), gameSettings.arr); }
 }
 
 function startArrSD() {
@@ -129,19 +127,18 @@ function checkCollision(coords, action, collider = getMinos('S')) {
         if ((action == "RIGHT" && x > 8) || (action == "LEFT" && x < 1) ||
             (action == "DOWN" && y < 1) || (action == "ROTATE" && x < 0 || x > 9 || y < 0) ||
             (action == "PLACE" && y > 19)) return true;
-        if (collider.some(([x2, y2]) => {
+        for (let [x2, y2] of collider) {
             const col = (dx, dy) => x + dx == x2 && y + dy == y2;
-            return ((action == "RIGHT" && col(1, 0)) ||
-                (action == "LEFT" && col(-1, 0)) || (action == "DOWN" && col(0, -1)) ||
-                ((action == "ROTATE" || action == "SPAWN") && col(0, 0)))
-        })) return true;
+            if ((action == "RIGHT" && col(1, 0)) || (action == "LEFT" && col(-1, 0)) ||
+                (action == "DOWN" && col(0, -1)) ||
+                ((action == "ROTATE" || action == "SPAWN") && col(0, 0))) return true;
+        }
     }
 }
 
 function checkTspin(rotation, [x, y], [dx, dy]) {
     if (currentPiece.name != 't') return false;
     isMini = false;
-    const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
     const minos = spinChecks[(rotation + 1) % 4].concat(spinChecks[rotation - 1])
         .map(([ddx, ddy]) => checkCollision([[ddx + x, ddy + y]], 'ROTATE'))
     if ((minos[2] && minos[3]) && (minos[0] || minos[1])) return true;
@@ -164,7 +161,7 @@ function rotate(type) {
     currentLoc = [currentLoc[0] + change[0], currentLoc[1] + change[1]]
     isTspin = checkTspin(newRotation, currentLoc, change);
     rotationState = newRotation; movedPieceFirst = true;
-    incrementLock(); playSound('rotate'); displayShadow(); topoutSound();
+    incrementLock(); playSound('rotate'); displayShadow();
     if (isTspin) playSound('spin')
     if (gameSettings.gravitySpeed == 0) startGravity();
     startArr('current');
@@ -172,7 +169,7 @@ function rotate(type) {
 }
 
 function newRotateState(type, state) {
-    let newState = (state + { "CW": 1, "CCW": -1, "180": 2 }[type] || 0) % 4;
+    let newState = (state + { "CW": 1, "CCW": -1, "180": 2 }[type]) % 4;
     return newState == 0 ? 4 : newState;
 }
 
@@ -182,7 +179,7 @@ function getKickData(piece, rotationType, shapeNo) {
     return {
         "180": KickData180[isI][direction],
         "CW": KickData[isI][direction],
-        "CCW": KickData[isI][direction].map(row => row.map(el => el * -1))
+        "CCW": KickData[isI][direction].map(row => row.map(x => x * -1))
     }[rotationType]
 }
 
@@ -196,7 +193,7 @@ function movePieceSide(direction, max = 1) {
     if (amount == 0) { stopInterval('arr'); return; }
     moveMinos(minos, 'RIGHT', amount);
     currentLoc[0] += amount; isTspin = false; isMini = false; movedPieceFirst = true;
-    incrementLock(); playSound('move'); displayShadow(); topoutSound();
+    incrementLock(); playSound('move'); displayShadow();
     if (directionState['DOWN'] == 'arr') startArrSD();
 }
 
@@ -247,9 +244,8 @@ function clearLines() {
     const damage = calcDamage(combonumber, damagetype.toUpperCase().trim(), isPC, btbCount, isBTB);
     totalScore += calcScore(damagetype, isPC, isBTB, combonumber);
     totalLines += linecount; totalAttack += damage; spikeCounter += damage;
-    garbageQueue = garbageQueue == 0 ? damage * gameSettings.backfireMulti
-        : garbageQueue - damage * gameSettings.backfireMulti;
-    if (garbageQueue < 0) garbageQueue = 0;
+    const garb = damage * gameSettings.backfireMulti;
+    garbageQueue = garbageQueue == 0 ? garb : garbageQueue > garb ? garbageQueue - garb : 0;
     if (gameSettings.gamemode == 6 && combonumber == -1 && garbageQueue > 0) {
         addGarbage(garbageQueue, 0); garbageQueue = 0; progressDamage.value = 0;
     }
@@ -299,12 +295,6 @@ function clearLockDelay(clearCount = true) {
     endDasArr('RIGHT'); endDasArr('LEFT'); endDasArr('DOWN');
 }
 
-function topoutSound() {
-    const check = checkDeath(getMinos('Sh'), getMinos('NP')) && !toppingOut;
-    if (check) { playSound('hyperalert'); toppingOut = true; return }
-    toppingOut = false;
-}
-
 function checkDeath(coords, collider) {
     const collision = coords.every(c => checkCollision([c], 'PLACE', []));
     const collision2 = checkCollision(coords, 'SPAWN', collider)
@@ -319,17 +309,16 @@ function endGame(top, bottom = 'Better luck next time') {
         gameEnd = true; return;
     };
     switch (top) {
-        case undefined: return; break;
         case 'Lockout':
         case 'Topout':
         case 'Blockout': playSound('failure'); playSound('topout'); break;
+        case undefined: return; break;
         default: playSound('finish'); break;
     }
     gameEnd = true;
     clearInterval(timeouts['gravity']);
     clearInterval(timeouts['stats']);
     clearInterval(timeouts['survival']);
-
     openModal('gameEnd');
     document.getElementById('reason').textContent = top;
     document.getElementById('result').textContent = bottom;
@@ -337,11 +326,10 @@ function endGame(top, bottom = 'Better luck next time') {
 
 function resetState() {
     gameEnd = false; currentPiece = null; currentLoc = []; isTspin = false; isMini = false;
-    holdPiece = { piece: null, occured: false };
-    nextPieces = [[], []];
+    holdPiece = { piece: null, occured: false }; nextPieces = [[], []];
     totalLines = 0; totalScore = 0; garbRowsLeft = gameSettings.requiredGarbage; spikeCounter = 0;
     btbCount = -1; combonumber = -1; totalTimeSeconds = -0.02; totalAttack = 0; totalPieceCount = 0;
-    firstMove = true; toppingOut = false; rotationState = 1; inDanger = false; totalSentLines = 0;
+    firstMove = true; rotationState = 1; inDanger = false; totalSentLines = 0;
     garbageQueue = 0; maxCombo = 0; movedPieceFirst = false; boardAlpha = 1; boardAlphaChange = 0;
     clearInterval(timeouts['gravity']);
     clearInterval(timeouts['survival']);
@@ -349,7 +337,9 @@ function resetState() {
     ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
         document.getElementById(id).style.opacity = 0;
     })
-    clearLockDelay(); resetBoard(); renderDanger(); resetHoldGrid();
+    boardState = [...Array(40)].map(() => [...Array(10)].map(() => ""));
+    clearLockDelay(); renderDanger(); clearInterval(timeouts['stats']); renderStats();
+    ctxH.clearRect(0, 0, canvasHold.offsetWidth + 10, canvasHold.offsetHeight)
 }
 
 function randomiser() {
@@ -374,7 +364,7 @@ function spawnPiece(piece, start = false) {
     const dy = (piece.name == 'o') ? 21 : (piece.name == 'i') ? 19 : 20
     addMinos('A ' + piece.name, pieceToCoords(piece.shape1), [dx, dy])
     currentLoc = [dx, dy]; rotationState = 1; currentPiece = piece;
-    spawnOverlay(); updateNext(); updateHold(); displayShadow(); topoutSound();
+    spawnOverlay(); updateNext(); updateHold(); displayShadow();
     const rows = gameSettings.requiredGarbage < 10 ? gameSettings.requiredGarbage : 10
     if (garbRowsLeft > 0 && start && gameSettings.gamemode == 4) addGarbage(rows);
     if (gameSettings.gamemode == 7) setComboBoard(start);
@@ -441,11 +431,6 @@ function updateNext() {
     canvasNext.style.outlineColor = pieces.filter(e => e.name == first5[0])[0].colour
 }
 
-function resetHoldGrid() {
-    holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ''));
-    ctxH.clearRect(0, 0, canvasHold.offsetWidth + 10, canvasHold.offsetHeight)
-}
-
 function switchHold() {
     if (holdPiece.occured) return;
     clearLockDelay(); MinoToNone('A'); isTspin = false; isMini = false;
@@ -463,7 +448,8 @@ function switchHold() {
 }
 
 function updateHold() {
-    resetHoldGrid();
+    holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ''));
+    ctxH.clearRect(0, 0, canvasHold.offsetWidth + 10, canvasHold.offsetHeight)
     if (holdPiece.piece == undefined) return;
     const name = holdPiece.piece.name;
     const isO = name == 'o', isI = name == 'i';
@@ -486,19 +472,15 @@ function renderDanger() {
 }
 
 function renderActionText(damagetype, isBTB, isPC, damage, linecount) {
-
     if (damagetype != '') setText('cleartext', damagetype, 2000);
     if (combonumber > 0) setText('combotext', `Combo ${combonumber}`, 2000);
     if (isBTB && btbCount > 0) setText('btbtext', `BTB ${btbCount} `, 2000);
     if (isPC) setText('pctext', "Perfect Clear", 2000);
     if (damage > 0) setText('linessent', `${spikeCounter}`, 1500);
 
-    if (spikeCounter > 0) { spikePattern('white', 1); }
-    if (spikeCounter >= 10) { spikePattern('#FF2400', 1.1) } // red
-    if (spikeCounter >= 20) { spikePattern('#ADFF2F', 1.2) } // green
-    if (spikeCounter >= 30) { spikePattern('#007FFF', 1.3) } // blue
-    if (spikeCounter >= 35) { spikePattern('#BF00FF', 1.4) } // purple
-    if (spikeCounter >= 40) { spikePattern('#FF66CC', 1.5) } // pink
+    if (spikeCounter > 0) spikePattern('white', 1);
+    if (spikeCounter >= 10) spikePattern('#FF2400', 1.1)  // red
+    if (spikeCounter >= 20) spikePattern('#ADFF2F', 1.2)  // green
 
     if (isPC) playSound('allclear')
     if (btbCount == 2 && isBTB) playSound('btb_1')
@@ -544,9 +526,7 @@ function calcScore(type, ispc, isbtb, combo) {
 }
 
 function renderStyles() {
-    document.body.style.background = displaySettings.background[0] == '#'
-        ? `${displaySettings.background} no-repeat fixed center`
-        : `url("${displaySettings.background}") no-repeat fixed center`;
+    document.body.style.background = `${displaySettings.background} no-repeat fixed center`
     const height = Number(displaySettings.boardHeight) + 10
     divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
     canvasHold.style.outline = `0.2vh solid #dbeaf3`;
@@ -555,7 +535,6 @@ function renderStyles() {
     canvasHold.style.backgroundColor = background;
     canvasNext.style.backgroundColor = background;
 }
-
 
 function renderStats() {
     totalTimeSeconds += 0.02
@@ -629,17 +608,16 @@ function playSound(audioName, replace = true) {
 // Board manipulations and rendering
 function checkMino([x, y], val) { return boardState[y][x].split(' ').includes(val) }
 function MinoToNone(val) { getMinos(val).forEach(c => rmValue(c, val)) }
-function resetBoard() { boardState = [...Array(40)].map(() => [...Array(10)].map(() => "")); }
 function addMinos(val, c, [dx, dy]) { c.forEach(([x, y]) => setValue([x + dx, y + dy], val)) }
 function addValFront([x, y], val) { boardState[y][x] = `${val} ${boardState[y][x]}` }
 function addValue([x, y], val) { boardState[y][x] = (boardState[y][x] + ' ' + val).trim() }
 function setValue([x, y], val) { boardState[y][x] = val }
-function rmValue([x, y], val) { boardState[y][x] = boardState[y][x].replace(val, '').trim().replace('  ', ' ') }
+function rmValue([x, y], val) { boardState[y][x] = boardState[y][x].replace(val, '').trim() }
 function getMinos(name) { return getCoords(boardState, c => c.split(' ').includes(name), [0, 0]) }
 function pieceToCoords(arr, cd = [0, 0]) { return getCoords(arr.toReversed(), c => c == 1, cd) }
 
 function getCoords(array, filter, [dx, dy]) {
-    let coords = [];
+    const coords = [];
     array.forEach((row, y) => row.forEach((col, x) => { if (filter(col)) coords.push([x, y]) }))
     return coords.map(([x, y]) => [x + dx, y + dy]);
 }
@@ -662,7 +640,6 @@ function setComboBoard(start) {
     }))
     if (start) { addMinos('S G', [[3, 0], [3, 1], [4, 1]], [0, 0]); displayShadow() }
 }
-
 
 function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
     if (gameSettings.gamemode == 8) {
@@ -722,7 +699,8 @@ function openModal(id) {
         .forEach((setting) => {
             let newValue = eval(settingGroup)[setting.id];
             if (setting.classList[2] == 'exp') newValue = toLogValue(newValue);
-            if (setting.id == 'nextQueue') newValue = nextPieces[0].concat(nextPieces[1]).splice(0, 7).join(' ');
+            if (setting.id == 'nextQueue')
+                newValue = nextPieces[0].concat(nextPieces[1]).splice(0, 7).join(' ');
             if (setting.id == 'holdQueue') newValue = holdPiece.piece ? holdPiece.piece.name : '';
             setting.value = newValue
             if (setting.classList[1] == 'keybind') setting.textContent = newValue;
@@ -753,11 +731,11 @@ function closeModal(id) {
                         setting.classList[2] == 'exp' ? toExpValue(setting.value) :
                             setting.value;
             if (setting.id == 'nextQueue') {
-                nextPieces[0] = setting.value.split(' ').filter((p) => ['s', 'z', 'i', 'j', 'l', 'o', 't'].includes(p))
+                nextPieces[0] = setting.value.split(' ').filter((p) => pieceNames.includes(p))
                 shuffleRemainingPieces(); updateNext();
             }
             if (setting.id == 'holdQueue') {
-                const filtp = [setting.value].filter((p) => ['s', 'z', 'i', 'j', 'l', 'o', 't'].includes(p))
+                const filtp = [setting.value].filter((p) => piecesNames.includes(p))
                 holdPiece = { piece: getPiece(filtp), occured: false }; updateHold();
             }
 
@@ -765,7 +743,7 @@ function closeModal(id) {
     closeDialog(document.getElementById(id));
     saveSettings();
     if (id == 'displaySettingsDialog') renderStyles();
-    if (id == 'gameSettingsDialog' || id == 'gamemodeDialog' || id == 'gameEnd') StartGame();
+    if (id == 'gameSettingsDialog' || id == 'gamemodeDialog' || id == 'gameEnd') startGame();
 }
 
 function closeDialog(element) {
@@ -822,6 +800,7 @@ function loadSettings() {
         if (tempControls[s] === undefined || tempControls[s] === "") continue;
         controlSettings[s] = tempControls[s]
     };
+    divObjectiveText.textContent = modesText[gameSettings.gamemode];
 }
 
 function downloadSettings() {
@@ -839,11 +818,6 @@ function uploadSettings(el) {
     reader.onload = () => { localStorage.setItem('settings', reader.result); loadSettings() }
 }
 
-function setGamemode(modeNum) {
-    gameSettings.gamemode = modeNum;
-    divObjectiveText.textContent = modesText[gameSettings.gamemode];
-}
-
 function resetSettings(settingGroup) {
     for (let setting in eval(settingGroup)) eval(settingGroup)[setting] = "";
     saveSettings();
@@ -855,17 +829,12 @@ function toggleDialog() {
     else { openModal('settingsPanel'); }
 }
 
-let menuSFX = (e, sfx) => document.querySelectorAll(e)
-    .forEach(el => el.onmouseenter = () => playSound(sfx));
-menuSFX('.settingsButton', 'menuhover'); menuSFX('.settingLayout', 'menutap');
-menuSFX('.closeDialog', 'menutap'); menuSFX('.gamemodeSelect', 'menutap')
-
 // misc functions
 function stopTimeout(name) { clearTimeout(timeouts[name]); timeouts[name] = 0; }
 function stopInterval(name) { clearInterval(timeouts[name]); timeouts[name] = 0; }
 function toExpValue(x) { return Math.round(Math.pow(2, 0.1 * x) - 1) }
 function toLogValue(y) { return Math.round(Math.log2(y + 1) * 10) }
-function newGame(k, d) { if (k == controlSettings.resetKey) { closeModal(d); StartGame(); } }
+function newGame(k, d) { if (k == controlSettings.resetKey) { closeModal(d); startGame(); } }
 function getPiece(name) { return pieces.filter(p => p.name == name)[0] }
 function toHex(num) {
     const hex = Math.round((+num * 255 / 100)).toString(16);
@@ -963,11 +932,10 @@ const attackValues = {
 const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' };
 const scoringTable = { '': 0, 'TSPIN': 400, 'TSPIN MINI': 100, 'SINGLE': 100, 'DOUBLE': 300, 'TRIPLE': 500, 'QUAD': 800, 'TSPIN SINGLE': 800, 'TSPIN DOUBLE': 1200, 'TSPIN TRIPLE': 1600, 'TSPIN MINI SINGLE': 200, 'TSPIN MINI DOUBLE': 400, 'ALL CLEAR': 3500 }
 const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining', 5: 'Lines Survived', 6: 'Sent', 7: 'Combo', 8: 'Lines' }
+const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Escape'];
+const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
+const pieceNames = ['s', 'z', 'i', 'j', 'l', 'o', 't'];
 
-StartGame();
+init();
+startGame();
 renderingLoop();
-
-if (displaySettings.showFPS) {
-    setInterval(() => fpsmeter.textContent = `${fpsnow.toFixed(1)} fps`, 200);
-    setInterval(() => fpsavgmeter.textContent = `${(totalfps / frames).toFixed(1)} avg`, 1000);
-}
