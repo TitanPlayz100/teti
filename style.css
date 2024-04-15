@@ -6,6 +6,14 @@
     --e-black: #1B1E22;
     --c-blue: #ACCBE1;
     --cl-blue: #dbeaf3;
+    --l-gray: #ffffff50;
+    --vl-gray: #ffffffc4;
+    --invis: #00000000;
+    --almost-invis: #00000024;
+    --slight-invis:#000000cf;
+    --p-green: #53b565;
+    --green: #30f24d;
+    --gray:#808080;
 }
 
 body {
@@ -26,8 +34,8 @@ body {
     height: 60vh;
     aspect-ratio: 0.5;
     outline: 0.2vh solid var(--cl-blue);
-    box-shadow: 0 0 5vh #ffffff58;
-    background-color: rgba(0, 0, 0, 0.988);
+    box-shadow: 0 0 5vh var(--l-gray);
+    background-color: black;
     transition: outline 0.5s ease;
 }
 
@@ -36,7 +44,7 @@ body {
     transition: all 0.2s ease;
 }
 
-.dangerOverlay {
+#dangerOverlay {
     position: absolute;
     background-color: rgb(255, 0, 0);
     transition: all 0.2s ease;
@@ -67,8 +75,8 @@ body {
     height: 75%;
     width: 40%;
     border-radius: 0 1.5vh 1.5vh 0;
-    outline: 0.2vh solid #dbeaf3;
-    background-color: rgba(0, 0, 0, 0.988);
+    outline: 0.2vh solid var(--cl-blue);
+    background-color: black;
 }
 
 #hold {
@@ -80,7 +88,7 @@ body {
     height: 15%;
     width: 39.5%;
     border-radius: 1.5vh 0 0 1.5vh;
-    background-color: rgba(0, 0, 0, 0.988);
+    background-color: black;
 }
 
 #lockTimer,
@@ -100,16 +108,12 @@ body {
 #lockTimer::-webkit-progress-bar,
 #lockCounter::-webkit-progress-bar,
 #garbageQueue::-webkit-progress-bar {
-    background-color: #00000000;
+    background-color: var(--invis);
 }
 
-#lockTimer::-webkit-progress-value {
-    background-color: var(--cl-blue);
-    border-radius: 0.7vh;
-}
-
+#lockTimer::-webkit-progress-value,
 #lockCounter::-webkit-progress-value {
-    background-color: var(--c-blue);
+    background-color: var(--cl-blue);
     border-radius: 0.7vh;
 }
 
@@ -125,7 +129,7 @@ body {
 }
 
 #garbageQueue::-webkit-progress-value {
-    background-color: rgb(219, 35, 35);
+    background-color: red;
     border-radius: 0.7vh;
 }
 
@@ -133,7 +137,7 @@ body {
 .statstext {
     position: fixed;
     font-size: 3.0vh;
-    text-shadow: 0 0 3vh #ffffffc4;
+    text-shadow: 0 0 3vh var(--vl-gray);
     margin: 0;
     text-align: right;
     width: 200%;
@@ -153,7 +157,23 @@ body {
     user-select: none;
 }
 
-.settingsButton {
+.nextText {
+    left: 110%;
+    bottom: 100%;
+}
+
+.holdText {
+    right: 110%;
+    bottom: 100%;
+}
+
+.objectiveText {
+    left: 110%;
+    bottom: 10%;
+}
+
+#openSettingsButton {
+    top: 5%;
     position: fixed;
     left: 126%;
     display: flex;
@@ -162,17 +182,23 @@ body {
     align-items: center;
     height: 8%;
     width: 24%;
-    border: 0.2vh solid rgba(255, 255, 255, 0.288);
+    border: 0.2vh solid var(--l-gray);
     border-radius: 0 1.5vh 1.5vh 0;
     transition: all 0.5s ease-out;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: var(--invis);
     outline: none;
 }
 
-.settingsButton:hover {
+#openSettingsButton:hover {
     left: 133%;
     border: 0.2vh solid var(--cl-blue);
     transition: all 0.2s ease;
+}
+
+#openSettingsButton>img {
+    transform: translateY(10%);
+    height: 90%;
+    user-select: none;
 }
 
 #settingsPanel[open] {
@@ -186,7 +212,7 @@ body {
     border: none;
 }
 
-button > img {
+button>img {
     -webkit-user-drag: none;
 }
 
@@ -194,10 +220,10 @@ button > img {
     margin: 2%;
     height: 18vh;
     aspect-ratio: 1/1;
-    border: 0.3vh solid rgba(255, 255, 255, 0.421);
+    border: 0.3vh solid var(--l-gray);
     border-radius: 1.5vh;
     transition: all 0.5s ease-out;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: var(--invis);
     padding: 0.5vh;
     outline: none;
 }
@@ -222,7 +248,7 @@ button > img {
     font-family: 'Montserrat', sans-serif;
     height: 75vh;
     aspect-ratio: 1/1.4;
-    background-color: #00000024;
+    background-color: var(--almost-invis);
     padding: 1%;
     padding-left: 0;
     color: var(--cl-blue);
@@ -232,8 +258,8 @@ button > img {
     outline: none;
     overflow: hidden;
     font-size: 1.8vh;
-    text-shadow: 0 0 5vh #ffffffc4;
-    border: 0.3vh solid #ffffffc4;
+    text-shadow: 0 0 5vh var(--vl-gray);
+    border: 0.3vh solid var(--vl-gray);
 }
 
 .dialog h1 {
@@ -258,7 +284,7 @@ button > img {
 }
 
 .dialog::backdrop {
-    background-color: #000000cf;
+    background-color: #000000b5;
     backdrop-filter: blur(5px);
     animation: fadein 0.4s forwards ease;
 }
@@ -277,7 +303,7 @@ button > img {
     padding: 1vh;
     padding-left: 2vh;
     transition: all 0.7s ease;
-    border: 0.2vh solid #00000000;
+    border: 0.2vh solid var(--invis);
 }
 
 .settingLayout:hover {
@@ -305,11 +331,6 @@ button > img {
     transition: all 0.4s ease;
 }
 
-.color::-webkit-color-swatch {
-    border-radius: 0.5vh;
-    border: 1px solid var(--e-black);
-}
-
 .range {
     appearance: none;
     -webkit-appearance: none;
@@ -323,22 +344,6 @@ button > img {
     -webkit-transition: .2s;
     transition: opacity .2s;
     transform: translateY(0.5vh);
-}
-
-.range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 2vh;
-    height: 2vh;
-    border-radius: 50%;
-    background: var(--cl-blue);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.range::-webkit-slider-thumb:hover {
-    width: 2.7vh;
-    height: 2.7vh;
 }
 
 .check {
@@ -355,7 +360,7 @@ button > img {
 }
 
 .check:checked {
-    background-color: #53b565;
+    background-color: var(--p-green);
     border: none;
 }
 
@@ -370,12 +375,6 @@ button > img {
     border-radius: 0.3vh;
     color: var(--cl-blue);
     font-size: 1.2em;
-}
-
-.number::-webkit-outer-spin-button,
-.number::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
 }
 
 .textInput {
@@ -398,8 +397,8 @@ button > img {
     height: auto;
     padding: 1vh;
     bottom: 2%;
-    background-color: #00000000;
-    border: 0.2vh solid rgb(150, 150, 150);
+    background-color: var(--invis);
+    border: 0.2vh solid var(--almost-invis);
     border-radius: 1vh;
     font-size: 1.3em;
     color: var(--cl-blue);
@@ -410,8 +409,8 @@ button > img {
     outline: none;
     width: 100%;
     padding: 1vh;
-    background-color: #00000000;
-    border: 0.2vh solid rgb(150, 150, 150);
+    background-color: var(--invis);
+    border: 0.2vh solid var(--gray);
     border-radius: 1vh;
     font-size: 1.3em;
     color: var(--cl-blue);
@@ -420,23 +419,20 @@ button > img {
 }
 
 .gamemodeSelect.selected {
-    border: 0.3vh solid rgb(80, 150, 90);
+    border: 0.3vh solid var(--p-green);
 }
 
-.gamemodeSelect.selected:hover {
-    border: 0.3vh solid rgb(53, 238, 53);
-}
-
+.gamemodeSelect.selected:hover,
 .gamemodeSelect.selected:focus {
-    border: 0.3vh solid rgb(53, 238, 53);
+    border: 0.3vh solid var(--green);
 }
 
 .keybind {
     width: 30%;
     height: 5%;
     padding: 0.5vh;
-    background-color: #00000000;
-    border: 0.2vh solid rgb(150, 150, 150);
+    background-color: var(--invis);
+    border: 0.2vh solid var(--almost-invis);
     border-radius: 0.5vh;
     font-size: 1em;
     color: var(--c-blue);
@@ -454,9 +450,9 @@ button > img {
     align-items: center;
     height: 5%;
     aspect-ratio: 1/1;
-    border: 0.2vh solid rgba(255, 255, 255, 0.432);
+    border: 0.2vh solid var(--gray);
     border-radius: 1vh;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: var(--invis);
     transition: all 0.4s ease;
     outline: none;
 }
@@ -467,30 +463,14 @@ button > img {
 .resetIcon:hover {
     color: white;
     border-color: white;
-}
-
-.keybind:hover,
-.gamemodeSelect:hover {
     transition: all 0.1s ease;
-}
-
-.closeDialog,
-.keybind,
-.gamemodeSelect:disabled {
-    border: 0.2vh solid rgba(255, 255, 255, 0.138);
-}
-
-.closeDialog:disabled:hover,
-.keybind:disabled:hover,
-.gamemodeSelect:disabled:hover {
-    border: 0.2vh solid rgba(255, 255, 255, 0.138);
 }
 
 #frontdrop {
     width: 100%;
     height: 100%;
     position: fixed;
-    background-color: #000000bb;
+    background-color: var(--slight-invis);
     overflow: hidden;
     color: var(--cl-blue);
     outline: none;
@@ -504,28 +484,32 @@ button > img {
     animation: fadeout 0.2s forwards ease;
 }
 
-.selectkeydiv {
+#selectkeydiv {
     display: flex;
     width: 100%;
     height: 100%;
     justify-content: center;
     align-items: center;
     font-size: 5em;
-    text-shadow: 0 0 3vh #ffffff;
+    text-shadow: 0 0 3vh white;
 }
 
-.selectkeytext {
+#selectkeybigtext {
+    transform: translateY(-8vh);
+}
+
+#selectkeytext {
     position: absolute;
     top: 46vh;
     font-size: 0.3em;
-    text-shadow: 0 0 3vh #ffffff;
+    text-shadow: 0 0 3vh white;
 }
 
 .smalltext,
 .smalltextdialog {
     position: absolute;
     font-size: 1.4vh;
-    color: #ffffffa1;
+    color: var(--l-gray);
 }
 
 .smalltextdialog {
@@ -549,24 +533,51 @@ button > img {
     opacity: 0.4;
 }
 
+.color::-webkit-color-swatch {
+    border-radius: 0.5vh;
+    border: 1px solid var(--e-black);
+}
+
+.range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 2vh;
+    height: 2vh;
+    border-radius: 50%;
+    background: var(--cl-blue);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.range::-webkit-slider-thumb:hover {
+    width: 2.7vh;
+    height: 2.7vh;
+}
+
+.number::-webkit-outer-spin-button,
+.number::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 ::-webkit-scrollbar {
     width: 0.3vw;
 }
 
 ::-webkit-scrollbar-track {
     border-radius: 1vh;
-    background: #00000000;
+    background: var(--invis);
     margin-top: 1vh;
     margin-bottom: 1vh;
 }
 
 ::-webkit-scrollbar-thumb {
     border-radius: 1vh;
-    background: #ffffffde;
+    background: var(--vl-gray);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #ffffff;
+    background: white;
     transition: all 0.2s ease;
 }
 

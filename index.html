@@ -9,24 +9,22 @@
     <script defer src="code.js"></script>
 </head>
 <body id="body">
-    <p id="fps" style="color: white; right: 93vw; position: absolute; font-size: 0.8em;"></p>
-    <p id="fpsavg" style="color: white; right: 93vw; top: 3vh; position: absolute; font-size: 0.8em;"></p>
     <div id="board">
-        <div class="dangerOverlay"></div>
-        <button id="test" class="settingsButton" style="top: 5%;" onclick="openModal('settingsPanel')">
-            <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%; user-select: none;">
+        <div id="dangerOverlay"></div>
+        <button id="openSettingsButton" onclick="openModal('settingsPanel')">
+            <img src="./assets/settings.svg">
         </button>
         
         <canvas id="next" onclick="openModal('queueModify')"></canvas>
         <canvas id="hold" onclick="openModal('queueModify')"></canvas>
         <canvas id="playingfield"></canvas>
         <progress id="garbageQueue" max="40" value="0"></progress>
-        
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
-        <div class="displaytext">
-            <p class="text" style="left: 110%; bottom: 100%;">Next</p>
-            <p class="text" style="right: 110%; bottom: 100%;">Hold</p>
+        
+        <div>
+            <p class="text nextText">Next</p>
+            <p class="text holdText">Hold</p>
             <p class="actiontext" id="cleartext" style="top: 25%;"></p>
             <p class="actiontext" id="combotext" style="top: 35%;"></p>
             <p class="actiontext" id="btbtext" style="top: 40%;"></p>
@@ -40,7 +38,7 @@
             <p class="smalltext" style="left: -15%; bottom: 20%;">pps</p>
             <p class="smalltext" style="left: -15%; bottom: 10%;">apm</p>
             <p class="smalltext" style="left: -15%; bottom: 0%;">sec</p>
-            <p class="text" id="objective" style="left: 110%; bottom: 10%;"></p>
+            <p class="text objectiveText" id="objective"></p>
             <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
         </div>
     </div>
@@ -59,7 +57,6 @@
         <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
         <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
         <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
-        <div class="settingLayout"><label>Show FPS</label> <input class="option check" type="checkbox" id="showFPS" /></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="closeModal('displaySettingsDialog')">Save and close</button>
     </dialog>
@@ -103,9 +100,9 @@
     </dialog>
 
     <dialog id="frontdrop" onkeydown="setKeybind(event.key)">
-        <div class="selectkeydiv" onclick="setKeybind('None')">
-            <p style="transform: translateY(-8vh);">PRESS ANY KEY</p>
-            <p class="selectkeytext">Click to remove keybind</p>
+        <div id="selectkeydiv" onclick="setKeybind('None')">
+            <p id="selectkeybigtext">PRESS ANY KEY</p>
+            <p id="selectkeytext">Click to remove keybind</p>
         </div>
     </dialog>
 
