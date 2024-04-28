@@ -398,7 +398,7 @@ button>img {
     padding: 1vh;
     bottom: 2%;
     background-color: var(--invis);
-    border: 0.2vh solid var(--almost-invis);
+    border: 0.2vh solid var(--gray);
     border-radius: 1vh;
     font-size: 1.3em;
     color: var(--cl-blue);

@@ -807,6 +807,11 @@ function loadSettings() {
     divObjectiveText.textContent = modesText[gameSettings.gamemode];
 }
 
+function setGamemode(modeNum) {
+    gameSettings.gamemode = modeNum;
+    divObjectiveText.textContent = modesText[gameSettings.gamemode];
+}
+
 function downloadSettings() {
     saveSettings();
     let el = document.createElement('a');
