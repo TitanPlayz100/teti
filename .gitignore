@@ -1,0 +1,16 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+node_modules/
+dist/
+out/
+target/
+gen/schemas
+
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/

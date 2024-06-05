@@ -26,7 +26,7 @@ const canvasField = document.getElementById('playingfield'),
     ctxN = canvasNext.getContext('2d'),
     ctxH = canvasHold.getContext('2d');
 
-    window.onresize = function () { location.reload(); }
+window.onresize = function () { location.reload(); }
 
 function init() {
     [canvasField, canvasNext, canvasHold].forEach(c => {
@@ -595,7 +595,7 @@ function objectives() {
 
 function playSound(audioName, replace = true) {
     if (sfx[audioName] == undefined) {
-        sfx[audioName] = new Audio(`assets/sfx/${audioName}.mp3`)
+        sfx[audioName] = new Audio(`assets/soundfx/${audioName}.mp3`)
         sfx[audioName].volume = audioLevel / 1000;
     };
     if (firstMove == true) return;
