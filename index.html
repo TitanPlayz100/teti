@@ -1,12 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="./src/assets/titanicon.ico">
-        <title>teti</title>
-    </head>
-<body style="margin: 0; overflow: hidden;">
-    <iframe src="./src/index.html" style="width: 100vw; height: 100vh; border: none; " onload="this.contentWindow.focus()"></iframe>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./assets/titanicon.ico">
+    <title>teti</title>
+    <link rel="stylesheet" href="./style.css">
+    <script defer src="./code.js"></script>
+</head>
+<body id="body">
+    <div id="board">
+        <div id="dangerOverlay"></div>
+        <button id="openSettingsButton" onclick="openModal('settingsPanel')">
+            <img src="./assets/settings.svg">
+        </button>
+        
+        <canvas id="next" onclick="openModal('queueModify')"></canvas>
+        <canvas id="hold" onclick="openModal('queueModify')"></canvas>
+        <canvas id="playingfield"></canvas>
+        <progress id="garbageQueue" max="40" value="0"></progress>
+        <progress id="lockTimer" max="100" value="50"></progress>
+        <progress id="lockCounter" max="100" value="50"></progress>
+        
+        <div>
+            <p class="text nextText">Next</p>
+            <p class="text holdText">Hold</p>
+            <p class="actiontext" id="cleartext" style="top: 25%;"></p>
+            <p class="actiontext" id="combotext" style="top: 35%;"></p>
+            <p class="actiontext" id="btbtext" style="top: 40%;"></p>
+            <p class="actiontext" id="pctext" style="top: 50%;"></p>
+            <p class="actiontext" id="linessent" style="right: 120%; top: 17%;"></p>
+            <p class="statstext" id="stats1" style="bottom: 5%;"></p>
+            <p class="statstext" id="stats2" style="bottom: 15%;"></p>
+            <p class="statstext" id="stats3" style="bottom: 25%;"></p>
+            <p class="smalltext" id="smallStat1" style="bottom: 12.5%"></p>
+            <p class="smalltext" id="smallStat2" style="bottom: 22.5%"></p>
+            <p class="smalltext" style="left: -15%; bottom: 20%;">pps</p>
+            <p class="smalltext" style="left: -15%; bottom: 10%;">apm</p>
+            <p class="smalltext" style="left: -15%; bottom: 0%;">sec</p>
+            <p class="text objectiveText" id="objective"></p>
+            <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
+        </div>
+    </div>
+
+    <dialog id="displaySettingsDialog" class="dialog">
+        <h1>Display Settings</h1>
+        <button title="Reset settings in this section" class="resetIcon" onclick="resetSettings('displaySettings')">
+            <img src="./assets/reset.svg" alt="reset" height="100%">
+        </button>
+        <div class="settingLayout"><label>BG hex</label> <input class="option textInput" type="text" id="background" /></div>
+        <div class="settingLayout"><label>Board Opacity</label> <input class="option range" type="range" id="boardOpacity" oninput="sliderChange(this)" min="0" max="100" step="1"/></div>
+        <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="sliderChange(this)" type="range" id="boardHeight" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox" id="showGrid" /></div>
+        <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
+        <div class="settingLayout"><label>Shadow opacity</label> <input class="option range" oninput="sliderChange(this)" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
+        <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
+        <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
+        <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
+        <p class="smalltextdialog">Press Esc to close without saving</p>
+        <button class="closeDialog" onclick="closeModal('displaySettingsDialog')">Save and close</button>
+    </dialog>
+
+    <dialog id="gameSettingsDialog" class="dialog">
+        <h1>Game Settings</h1>
+        <button title="Reset settings in this section" class="resetIcon" onclick="resetSettings('gameSettings')">
+            <img src="./assets/reset.svg" alt="reset" height="100%">
+        </button>
+        <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
+        <div class="settingLayout"><label>ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="arr" min="0" max="50" step="2" /></div>
+        <div class="settingLayout"><label>Softdrop ARR</label> <input class="option range" oninput="sliderChange(this)" type="range" id="sdarr" min="0" max="200" step="5" /></div>
+        <div class="settingLayout"><label>Gravity</label> <input class="option range exp" oninput="sliderChange(this)" type="range" id="gravitySpeed" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>Lock delay</label> <input class="option range" oninput="sliderChange(this)" type="range" id="lockDelay" min="0" max="1000" step="10" /></div>
+        <div class="settingLayout"><label>Lock Movements</label><input class="option range" oninput="sliderChange(this)" type="range" id="maxLockMovements" min="0" max="30" step="1" /></div>
+        <div class="settingLayout"><label>Next Pieces</label> <input class="option range" oninput="sliderChange(this)" type="range" id="nextPieces" min="0" max="5" step="1" /></div>
+        <div class="settingLayout"><label>Lockout Deaths</label> <input class="option check" type="checkbox" id="allowLockout" /></div>
+        <div class="settingLayout"><label>Preserve DAS</label> <input class="option check" type="checkbox" id="preserveARR" /></div>
+        <div class="settingLayout"><label>Infinite Hold</label> <input class="option check" type="checkbox" id="infiniteHold" /></div>
+        <div class="settingLayout"><label>Allow Queue Modification</label> <input class="option check" type="checkbox" id="allowQueueModify" /></div>
+        <p class="smalltextdialog">Press Esc to close without saving</p>
+        <button class="closeDialog" onclick="closeModal('gameSettingsDialog')">Save and close</button>
+    </dialog>
+
+    <dialog id="controlSettingsDialog" class="dialog">
+        <h1>Keybinds</h1>
+        <button title="Reset settings in this section" class="resetIcon" onclick="resetSettings('controlSettings')">
+            <img src="./assets/reset.svg" alt="reset" height="100%">
+        </button>
+        <div class="settingLayout"><label>Move Right</label> <button class="option keybind" onclick="buttonInput(this)" id="rightKey"></button></div>
+        <div class="settingLayout"><label>Move Left</label> <button class="option keybind" onclick="buttonInput(this)" id="leftKey"></button></div>
+        <div class="settingLayout"><label>Rotate Clockwise</label> <button class="option keybind" onclick="buttonInput(this)" id="cwKey"></button></div>
+        <div class="settingLayout"><label>Rotate Anticlockwise</label> <button class="option keybind" onclick="buttonInput(this)" id="ccwKey"></button></div>
+        <div class="settingLayout"><label>Rotate 180</label> <button class="option keybind" onclick="buttonInput(this)" id="rotate180Key"></button></div>
+        <div class="settingLayout"><label>Softdrop</label> <button class="option keybind" onclick="buttonInput(this)" id="sdKey"></button></div>
+        <div class="settingLayout"><label>Harddrop</label> <button class="option keybind" onclick="buttonInput(this)" id="hdKey"></button></div>
+        <div class="settingLayout"><label>Hold Piece</label> <button class="option keybind" onclick="buttonInput(this)" id="holdKey"></button></div>
+        <div class="settingLayout"><label>Reset Game</label> <button class="option keybind" onclick="buttonInput(this)" id="resetKey"></button></div>
+        <p class="smalltextdialog">Press Esc to close without saving</p>
+        <button class="closeDialog" onclick="closeModal('controlSettingsDialog')">Save and close</button>
+    </dialog>
+
+    <dialog id="frontdrop" onkeydown="setKeybind(event.key)">
+        <div id="selectkeydiv" onclick="setKeybind('None')">
+            <p id="selectkeybigtext">PRESS ANY KEY</p>
+            <p id="selectkeytext">Click to remove keybind</p>
+        </div>
+    </dialog>
+
+    <dialog id="gamemodeDialog" class="dialog">
+        <h1>Select Gamemode</h1>
+        <button id="gamemode0" class="gamemodeSelect" onclick="setGamemode(0);closeModal('gamemodeDialog')">Zen</button>
+        <button id="gamemode1" class="gamemodeSelect" onclick="setGamemode(1);closeModal('gamemodeDialog')">Sprint</button>
+        <button id="gamemode2" class="gamemodeSelect" onclick="setGamemode(2);closeModal('gamemodeDialog')">Ultra</button>
+        <button id="gamemode3" class="gamemodeSelect" onclick="setGamemode(3);closeModal('gamemodeDialog')">Attacker</button>
+        <button id="gamemode4" class="gamemodeSelect" onclick="setGamemode(4);closeModal('gamemodeDialog')">Digger</button>
+        <button id="gamemode5" class="gamemodeSelect" onclick="setGamemode(5);closeModal('gamemodeDialog')">Survival</button>
+        <button id="gamemode6" class="gamemodeSelect" onclick="setGamemode(6);closeModal('gamemodeDialog')">Backfire</button>
+        <button id="gamemode7" class="gamemodeSelect" onclick="setGamemode(7);closeModal('gamemodeDialog')">4w</button>
+        <button id="gamemode8" class="gamemodeSelect" onclick="setGamemode(8);closeModal('gamemodeDialog')">Lookahead</button>
+        <div class="settingLayout"><label>Required Lines (sprint, lookahead)</label> <input class="option number" type="number" id="requiredLines" oninput="if(value<1) value=1" /></div>
+        <div class="settingLayout"><label>Time Limit (ultra, survival)</label> <input class="option number" type="number" id="timeLimit" oninput="if(value<1) value=1" /></div>
+        <div class="settingLayout"><label>Attack (attacker, backfire)</label> <input class="option number" type="number" id="requiredAttack" oninput="if(value<1) value=1" /></div>
+        <div class="settingLayout"><label>Garbage Rows (digger)</label> <input class="option number" type="number" id="requiredGarbage" oninput="if(value<1) value=1" /></div>
+        <div class="settingLayout"><label>APM (survival)</label> <input class="option number" type="number" id="survivalRate" oninput="if(value<1) value=1" /></div>
+        <div class="settingLayout"><label>Multiplier (backfire)</label> <input class="option number" type="number" id="backfireMulti" oninput="if(value<0.1) value=0.1" /></div>
+        <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces" oninput="if(value<1) value=1" /></div>
+    </dialog>
+
+    <dialog id="gameEnd" class="dialog" onkeydown="newGame(event.key, 'gameEnd')">
+        <h1><b>GAME ENDED</b></h1>
+        <p id="reason" style="font-size: 3.6vh;"></p>
+        <p id="result"></p>
+        <button style="opacity: 0;" autofocus></button>
+        <button class="closeDialog" onclick="closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
+    </dialog>
+
+    <dialog id="settingsPanel" class="dialog">
+        <p id='explanationText'>Hover for more info</p>
+        <button id="displaySettings" class="settingPanelButton" onclick="openModal('displaySettingsDialog')" title="Display Settings - graphics of the board and background"> 
+            <img src="./assets/display.svg" style="transform: translateY(10%); height: 70%;">
+        </button>
+        <button id="gameSettings" class="settingPanelButton" onclick="openModal('gameSettingsDialog')" title="Game Settings - gameplay features or mechanics such as tuning or gravity">
+            <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <button id="controlSettings" class="settingPanelButton" onclick="openModal('controlSettingsDialog')" title="Controls - keybinds for different actions">
+            <img src="./assets/joystick.svg" style="transform: translateY(0%); height: 75%;">
+        </button>
+        <button id="gamemode" class="settingPanelButton" onclick="openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
+            <img src="./assets/timer.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <button id="downloadloadSettings" class="settingPanelButton smallPanelButton" onclick="downloadSettings()" style=" flex: 0 0 2%;" title="Download / Export Settings">
+            <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <span id="uploadSettings" class="settingPanelButton smallPanelButton" style=" flex: 0 0 2%; height: 4.5vh;" onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
+            <input type="file" id="fileUpload" onchange="uploadSettings(this)" hidden accept=".teti">
+            <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
+        </span>
+    </dialog>
+
+    <dialog id="queueModify" class="dialog">
+        <h1><b>Change Queues</b></h1>
+        <div class="settingLayout"><label>Next</label> <input class="option textInput next" type="text" id="nextQueue" /></div>
+        <div class="settingLayout"><label>Hold</label> <input class="option textInput hold" type="text" id="holdQueue" /></div>
+        <button class="closeDialog" onclick="closeModal('queueModify')" style="bottom: 10%;" >Save</button>
+    </dialog>
+
+    <dialog id="changeRangeValue" class="dialog">
+        <h1>Enter Value</h1>
+        <input class="option number" type="number" id="rangeValue" oninput="checkValue(this)" />
+    </dialog>
 </body>
 </html>

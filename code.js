@@ -683,7 +683,7 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
 function renderingLoop() {
     renderToCanvas(ctx, canvasField, boardState, 39)
     if (boardAlphaChange != 0) { updateNext(); updateHold(); }
-    setTimeout(() => requestAnimationFrame(renderingLoop), 1);
+    requestAnimationFrame(renderingLoop);
 }
 
 //#region Menus
