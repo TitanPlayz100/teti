@@ -9,7 +9,8 @@ There are several builds within this project, which you can build yourself or do
 ### Electron
 
 To build
-- cd into electronTest directory
+- copy files from /src into /Electron
+- cd into /Electron directory
 - `npm install`
 
 If you want to build a portable
@@ -24,7 +25,7 @@ If you want to build an installer
 > https://tauri.app/v1/guides/building/
 
 To build
-- cd into tauriTest/teti directory
+- cd into Tauri/teti directory
 - `npm install`
 - `npm run tauri build`
 
