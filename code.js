@@ -683,7 +683,7 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
 function renderingLoop() {
     renderToCanvas(ctx, canvasField, boardState, 39)
     if (boardAlphaChange != 0) { updateNext(); updateHold(); }
-    requestAnimationFrame(renderingLoop);
+    setTimeout(()=>requestAnimationFrame(renderingLoop), 1);
 }
 
 //#region Menus
@@ -702,7 +702,7 @@ function openModal(id) {
             setting.value = newValue
             if (setting.classList[1] == 'keybind') setting.textContent = newValue;
             if (setting.classList[1] == 'check') setting.checked = (newValue);
-            if (setting.classList[1] == 'range') sliderChange(setting);
+            if (setting.classList[1] == 'range') {sliderChange(setting); rangeClickListener(setting)};
         });
     const gamemodeSelect = [...document.getElementsByClassName('gamemodeSelect')]
     gamemodeSelect.forEach((setting) => {
@@ -721,27 +721,32 @@ function closeModal(id) {
     [...document.getElementsByClassName('option')]
         .filter((item) => item.parentElement.parentElement.id == id)
         .forEach((setting) => {
-            const settingid = setting.id
+            const settingid = setting.id, type = setting.classList[1];
+            if (type == 'number' && setting.value == '') setting.value = currentRangeOption.min;
             eval(settingGroup)[settingid] =
-                setting.classList[1] == 'check' ? setting.checked :
-                    setting.classList[1] == 'keybind' ? setting.textContent :
+                type == 'check' ? setting.checked :
+                    type == 'keybind' ? setting.textContent :
                         setting.classList[2] == 'exp' ? toExpValue(setting.value) :
                             setting.value;
-            if (setting.id == 'nextQueue') {
+            if (settingid == 'nextQueue') {
                 nextPieces[0] = setting.value.split(' ').filter((p) => pieceNames.includes(p))
                 shuffleRemainingPieces();
                 updateNext();
             }
-            if (setting.id == 'holdQueue') {
+            if (settingid == 'holdQueue') {
                 const filtp = [setting.value].filter((p) => pieceNames.includes(p))
                 holdPiece = { piece: getPiece(filtp), occured: false }; updateHold();
             }
-
+            if (id == 'changeRangeValue') {
+                currentRangeOption.value = document.getElementById('rangeValue').value;
+                sliderChange(currentRangeOption);
+            }
         })
     closeDialog(document.getElementById(id));
     saveSettings();
     if (id == 'displaySettingsDialog') renderStyles();
     if (id == 'gameSettingsDialog' || id == 'gamemodeDialog' || id == 'gameEnd') startGame();
+    if (id == 'changeRangeValue') isDialogOpen = true;
 }
 
 function closeDialog(element) {
@@ -761,6 +766,14 @@ function sliderChange(el) {
     if (el.classList[2] == 'exp') value = toExpValue(value);
     if (el.classList[2] == 'exp' && value > 1000) value = "None";
     el.parentElement.children[0].textContent = `${text}: ${value}`
+}
+
+function rangeClickListener(el) {
+    el.parentElement.children[0].addEventListener('click', () => {
+        currentRangeOption = el;
+        openModal('changeRangeValue')
+        document.getElementById('rangeValue').value = el.value;
+    })
 }
 
 function buttonInput(el) { document.getElementById('frontdrop').showModal(); bindingKey = el.id; }
@@ -830,13 +843,15 @@ function resetSettings(settingGroup) {
 }
 
 function toggleDialog() {
-    if (isDialogOpen) { closeDialog(document.querySelectorAll("dialog[open]")[0]) }
+    if (isDialogOpen) { document.querySelectorAll("dialog[open]").forEach(e=>closeDialog(e)) }
     else { openModal('settingsPanel'); }
 }
 
-function checkValue(el) {
-    if (el.value < currentRangeOption.min) el.value = currentRangeOption.min;
-    if (el.value > currentRangeOption.max) el.value = currentRangeOption.max;
+function checkValue(el, el2 = currentRangeOption) {
+    currentRangeOption = el2;
+    if (el.value == '') return;
+    if (el.value < Number(el2.min)) el.value = Number(el2.min);
+    if (el.value > Number(el2.max)) el.value = Number(el2.max);
 }
 
 // misc functions

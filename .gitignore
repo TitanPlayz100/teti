@@ -1,18 +1,3 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-
 src-temp/
-
 node_modules/
-dist/
-out/
 target/
-gen/schemas
-
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/

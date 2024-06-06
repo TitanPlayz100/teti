@@ -117,13 +117,15 @@
         <button id="gamemode6" class="gamemodeSelect" onclick="setGamemode(6);closeModal('gamemodeDialog')">Backfire</button>
         <button id="gamemode7" class="gamemodeSelect" onclick="setGamemode(7);closeModal('gamemodeDialog')">4w</button>
         <button id="gamemode8" class="gamemodeSelect" onclick="setGamemode(8);closeModal('gamemodeDialog')">Lookahead</button>
-        <div class="settingLayout"><label>Required Lines (sprint, lookahead)</label> <input class="option number" type="number" id="requiredLines" oninput="if(value<1) value=1" /></div>
-        <div class="settingLayout"><label>Time Limit (ultra, survival)</label> <input class="option number" type="number" id="timeLimit" oninput="if(value<1) value=1" /></div>
-        <div class="settingLayout"><label>Attack (attacker, backfire)</label> <input class="option number" type="number" id="requiredAttack" oninput="if(value<1) value=1" /></div>
-        <div class="settingLayout"><label>Garbage Rows (digger)</label> <input class="option number" type="number" id="requiredGarbage" oninput="if(value<1) value=1" /></div>
-        <div class="settingLayout"><label>APM (survival)</label> <input class="option number" type="number" id="survivalRate" oninput="if(value<1) value=1" /></div>
-        <div class="settingLayout"><label>Multiplier (backfire)</label> <input class="option number" type="number" id="backfireMulti" oninput="if(value<0.1) value=0.1" /></div>
-        <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces" oninput="if(value<1) value=1" /></div>
+        <input id="limiter" type="range" min="1" max="9999" style="display: none;"/>
+        <input id="limiter2" type="range" min="0.1" max="9999" style="display: none;"/>
+        <div class="settingLayout"><label>Required Lines (sprint, lookahead)</label> <input class="option number" type="number" id="requiredLines" oninput="checkValue(this, document.getElementById('limiter'))"/></div>
+        <div class="settingLayout"><label>Time Limit (ultra, survival)</label> <input class="option number" type="number" id="timeLimit" oninput="checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Attack (attacker, backfire)</label> <input class="option number" type="number" id="requiredAttack" oninput="checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Garbage Rows (digger)</label> <input class="option number" type="number" id="requiredGarbage" oninput="checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>APM (survival)</label> <input class="option number" type="number" id="survivalRate" oninput="checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Multiplier (backfire)</label> <input class="option number" type="number" id="backfireMulti" oninput="checkValue(this, document.getElementById('limiter2'))" /></div>
+        <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces"oninput="checkValue(this, document.getElementById('limiter'))" /></div>
     </dialog>
 
     <dialog id="gameEnd" class="dialog" onkeydown="newGame(event.key, 'gameEnd')">
@@ -148,10 +150,10 @@
         <button id="gamemode" class="settingPanelButton" onclick="openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
             <img src="./assets/timer.svg" style="transform: translateY(10%); height: 90%;">
         </button>
-        <button id="downloadloadSettings" class="settingPanelButton smallPanelButton" onclick="downloadSettings()" style=" flex: 0 0 2%;" title="Download / Export Settings">
+        <button id="downloadloadSettings" class="settingPanelButton smallPanelButton" onclick="downloadSettings()" title="Download / Export Settings">
             <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
         </button>
-        <span id="uploadSettings" class="settingPanelButton smallPanelButton" style=" flex: 0 0 2%; height: 4.5vh;" onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
+        <span id="uploadSettings" class="settingPanelButton smallPanelButton" style="height: 4.5vh; " onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
             <input type="file" id="fileUpload" onchange="uploadSettings(this)" hidden accept=".teti">
             <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
         </span>
@@ -166,7 +168,8 @@
 
     <dialog id="changeRangeValue" class="dialog">
         <h1>Enter Value</h1>
-        <input class="option number" type="number" id="rangeValue" oninput="checkValue(this)" />
+        <div class="settingLayout"><input class="option number" type="number" id="rangeValue" oninput="checkValue(this)" /></div>
+        <button class="closeDialog" onclick="closeModal('changeRangeValue')" style="bottom: 10%;" >Save</button>
     </dialog>
 </body>
 </html>
