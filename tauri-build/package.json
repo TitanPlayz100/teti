@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "tauri": "tauri",
-    "build": "build.bat"
+    "build": "build.bat",
+    "dev": "dev.bat"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1"

@@ -535,7 +535,7 @@ function setText(id, text, duration) {
 }
 
 function renderStyles() {
-    document.body.style.background = `${displaySettings.background} no-repeat fixed center`
+    document.body.style.background = displaySettings.background;
     const height = Number(displaySettings.boardHeight) + 10
     divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
     canvasHold.style.outline = `0.2vh solid #dbeaf3`;

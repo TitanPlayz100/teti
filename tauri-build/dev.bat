@@ -8,6 +8,6 @@ copy /y index.html src-temp\index.html
 copy /y code.js src-temp\code.js
 copy /y style.css src-temp\style.css
 
-echo Starting build
+echo Starting dev
 cd tauri-build
-call tauri build
+call tauri dev
