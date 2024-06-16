@@ -1,0 +1,72 @@
+{
+  "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
+  "applicationId": "js.neutralino.sample",
+  "version": "1.0.0",
+  "defaultMode": "window",
+  "port": 0,
+  "documentRoot": "/resources/",
+  "url": "/",
+  "enableServer": true,
+  "enableNativeAPI": true,
+  "tokenSecurity": "one-time",
+  "logging": {
+    "enabled": true,
+    "writeToLogFile": true
+  },
+  "nativeAllowList": [
+    "app.*",
+    "os.*",
+    "filesystem.*",
+    "storage.*",
+    "debug.log"
+  ],
+  "globalVariables": {},
+  "modes": {
+    "window": {
+      "title": "Teti",
+      "width": 800,
+      "height": 500,
+      "minWidth": 0,
+      "minHeight": 0,
+      "center": true,
+      "fullScreen": false,
+      "alwaysOnTop": false,
+      "icon": "/resources/assets/icon.png",
+      "enableInspector": true,
+      "borderless": false,
+      "maximize": true,
+      "hidden": false,
+      "resizable": true,
+      "exitProcessOnClose": false
+    },
+    "browser": {
+      "globalVariables": {},
+      "nativeBlockList": [
+        "filesystem.*"
+      ]
+    },
+    "cloud": {
+      "url": "/resources/#cloud",
+      "nativeAllowList": [
+        "app.*"
+      ]
+    },
+    "chrome": {
+      "width": 800,
+      "height": 500,
+      "args": "--user-agent=\"Neutralinojs chrome mode\"",
+      "nativeBlockList": [
+        "filesystem.*",
+        "os.*"
+      ]
+    }
+  },
+  "cli": {
+    "binaryName": "myapp",
+    "resourcesPath": "/resources/",
+    "extensionsPath": "/extensions/",
+    "clientLibrary": "/resources/js/neutralino.js",
+    "binaryVersion": "5.2.0",
+    "clientVersion": "5.2.0"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "build": {
-    "devPath": "../../src-temp",
-    "distDir": "../../src-temp",
+    "devPath": "../src",
+    "distDir": "../src",
     "withGlobalTauri": true
   },
   "package": {
