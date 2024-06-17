@@ -9,3 +9,5 @@ neutralino.js
 neutralino.d.ts
 .storage
 *.log
+_app_scaffolds/
+_VERSION

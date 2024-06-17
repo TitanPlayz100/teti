@@ -32,7 +32,7 @@
       "fullScreen": false,
       "alwaysOnTop": false,
       "icon": "/resources/assets/icon.png",
-      "enableInspector": true,
+      "enableInspector": false,
       "borderless": false,
       "maximize": true,
       "hidden": false,
@@ -68,5 +68,27 @@
     "clientLibrary": "/resources/js/neutralino.js",
     "binaryVersion": "5.2.0",
     "clientVersion": "5.2.0"
+  },
+  "buildScript": {
+    "mac": {
+      "architecture": ["x64", "arm64", "universal"],
+      "minimumOS": "10.13.0",
+      "appName": "ExtBunDemo",
+      "appBundleName": "ExtBunDemo",
+      "appIdentifier": "com.marketmix.ext.bun.demo",
+      "appIcon":  "icon.icns"
+    },
+    "win": {
+      "architecture": ["x64"],
+      "appName": "Teti",
+      "appIcon": "icon.ico"
+    },
+    "linux": {
+      "architecture": ["x64", "arm64", "armhf"],
+      "appName": "ExtBunDemo",
+      "appIcon": "icon.png",
+      "appPath":  "/usr/share/ExtBunDemo",
+      "appIconLocation": "/usr/share/ExtBunDemo/icon.png"
+    }
   }
 }
