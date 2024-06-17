@@ -14,7 +14,7 @@ Build this yourself or download the installer from the latest release
 - `npm run build` or run build.bat to build
 - `npm run dev` to run as dev
 
-Creates exe at **/target/release/teti.exe**  
+Creates an exe at **/target/release/teti.exe**  
 
 ## Build With Neutralino
 
@@ -22,4 +22,16 @@ Creates exe at **/target/release/teti.exe**
 - `neu build` to build
 - `neu run` to run as dev
 
-Creates exe at **/dist/myapp-win-x64.exe**
+Creates an exe and related files at **/dist/myapp/myapp-win_x64 and resources.neu**
+
+To create exe with icon use build-win.sh and follow instructions for installation
+
+## Build With Electron
+
+- open electron folder
+- `npm run dist`
+- `npm run start` for dev
+
+Creates an installer in **dist/teti Setup 1.0.0.exe**
+
+Installer will create app and desktop shortcut
