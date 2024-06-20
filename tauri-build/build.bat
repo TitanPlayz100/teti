@@ -10,4 +10,4 @@ copy /y style.css src-temp\style.css
 
 echo Starting build
 cd tauri-build
-call tauri build
+call npm run tauri build

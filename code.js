@@ -1,8 +1,8 @@
-let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, holdPiece, gameEnd, nextPieces, lockCount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbRowsLeft, sfx = {}, bindingKey, boardState = [], nextQueueGrid = [], holdQueueGrid = [], inDanger, totalSentLines, garbageQueue, maxCombo, movedPieceFirst, boardAlpha, boardAlphaChange, minoSize, audioLevel, currentRangeOption;
+let currentPiece, currentLoc, rotationState, totalTimeSeconds, totalPieceCount, totalAttack, holdPiece, gameEnd, nextPieces, lockCount, combonumber, btbCount, isTspin, isMini, firstMove, isDialogOpen, spikeCounter, totalLines, totalScore, garbRowsLeft, sfx = {}, bindingKey, boardState = [], nextQueueGrid = [], holdQueueGrid = [], inDanger, totalSentLines, garbageQueue, maxCombo, movedPieceFirst, boardAlpha, boardAlphaChange, minoSize, currentRangeOption, curSongIdx = 0, boardWidth, boardHeight, nextWidth, nextHeight, holdWidth, holdHeight;
 let timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 }
 let directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
 
-let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 20, shadowOpacity: 20, boardHeight: 80, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true }
+let displaySettings = { background: '#080B0C', boardOpacity: 100, gridopacity: 20, shadowOpacity: 20, boardHeight: 80, showGrid: true, colouredShadow: false, colouredQueues: true, lockBar: true, audioLevel: 15, sfxLevel: 10 }
 let gameSettings = { arr: 33, das: 160, sdarr: 100, gravitySpeed: 950, lockDelay: 600, maxLockMovements: 15, nextPieces: 5, allowLockout: false, preserveARR: true, infiniteHold: false, gamemode: 1, requiredLines: 40, timeLimit: 120, requiredAttack: 40, requiredGarbage: 10, survivalRate: 60, backfireMulti: 1, allowQueueModify: true, lookAheadPieces: 3 }
 let controlSettings = { rightKey: 'ArrowRight', leftKey: 'ArrowLeft', cwKey: 'ArrowUp', ccwKey: 'z', hdKey: ' ', sdKey: 'ArrowDown', holdKey: 'c', resetKey: 'r', rotate180Key: 'a' }
 
@@ -22,13 +22,28 @@ const canvasField = document.getElementById('playingfield'),
     elementSmallStat1 = document.getElementById('smallStat1'),
     elementSmallStat2 = document.getElementById('smallStat2'),
     elementObjective = document.getElementById('objective'),
+    elSongProgress = document.getElementById('songProgress'),
     ctx = canvasField.getContext('2d'),
     ctxN = canvasNext.getContext('2d'),
     ctxH = canvasHold.getContext('2d');
 
-window.onresize = function () { location.reload(); }
-
 function init() {
+    sizeCanvas();
+    window.onresize = () => { sizeCanvas(); updateNext(); updateHold(); }
+    let menuSFX = (e, sfx) =>
+        document.querySelectorAll(e).forEach(el => el.onmouseenter = () => playSound(sfx));
+    menuSFX('.settingLayout', 'menutap');
+    menuSFX('.gamemodeSelect', 'menutap');
+    setInterval(() => {
+        elSongProgress.value = songs[curSongIdx].currentTime * 100 / songs[curSongIdx].duration;
+    }, 2000);
+    startGame();
+    renderingLoop();
+}
+
+function sizeCanvas() {
+    divBoard.setAttribute('style', ''); renderStyles();
+    canvasField.offsetWidth = divBoard.width;
     [canvasField, canvasNext, canvasHold].forEach(c => {
         c.width = Math.round(c.offsetWidth / 10) * 10;
         c.height = Math.round(c.offsetHeight / 40) * 40;
@@ -36,13 +51,9 @@ function init() {
     divBoard.style.width = `${canvasField.width}px`
     divBoard.style.height = `${canvasField.height / 2}px`
     minoSize = canvasField.width / 10;
-    audioLevel = 10;
-    let menuSFX = (e, sfx) =>
-        document.querySelectorAll(e).forEach(el => el.onmouseenter = () => playSound(sfx));
-    menuSFX('.settingLayout', 'menutap');
-    menuSFX('.gamemodeSelect', 'menutap');
-    startGame();
-    renderingLoop();
+    boardWidth = canvasField.offsetWidth, boardHeight = canvasField.offsetHeight;
+    nextWidth = canvasNext.offsetWidth, nextHeight = canvasNext.offsetHeight;
+    holdWidth = canvasHold.offsetWidth, holdHeight = canvasHold.offsetHeight;
 }
 
 function startGame() {
@@ -451,7 +462,7 @@ function updateNext() {
         if (pn == 'o') [dx, dy] = [dx + 1, dy + 1]
         pieceToCoords(piece.shape1).forEach(([x, y]) => nextQueueGrid[y + dy][x + dx] = 'A ' + pn)
     });
-    renderToCanvas(ctxN, canvasNext, nextQueueGrid, 15)
+    renderToCanvas(ctxN, nextQueueGrid, 15, [0, 0], nextWidth, nextHeight);
     if (gameSettings.gamemode == 8 || !displaySettings.colouredQueues) return;
     canvasNext.style.outlineColor = pieces.filter(e => e.name == first5[0])[0].colour
 }
@@ -484,7 +495,7 @@ function updateHold() {
     coords.forEach(([x, y]) => holdQueueGrid[y + dy][x + dx] = 'A ' + name)
     const len = Math.round(minoSize / 2);
     const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
-    renderToCanvas(ctxH, canvasHold, holdQueueGrid, 2, [shiftX, shiftY])
+    renderToCanvas(ctxH, holdQueueGrid, 2, [shiftX, shiftY], holdWidth, holdHeight)
     if (gameSettings.gamemode == 8 || !displaySettings.colouredQueues) return;
     canvasHold.style.outline = `0.2vh solid ${holdPiece.piece.colour}`
 }
@@ -593,15 +604,35 @@ function objectives() {
     }
 }
 
+// Audio
 function playSound(audioName, replace = true) {
     if (sfx[audioName] == undefined) {
         sfx[audioName] = new Audio(`assets/sfx/${audioName}.mp3`)
-        sfx[audioName].volume = audioLevel / 1000;
     };
+    sfx[audioName].volume = displaySettings.sfxLevel / 1000;
     if (firstMove == true) return;
     if (!replace && !sfx[audioName].ended && sfx[audioName].currentTime != 0) return;
     sfx[audioName].currentTime = 0;
     sfx[audioName].play();
+}
+
+function startSong() {
+    document.getElementById('songText').textContent = `Now Playing ${songNames[curSongIdx]}`;
+    songs[curSongIdx].onended = () => { endSong(); startSong(); };
+    songs[curSongIdx].volume = displaySettings.audioLevel / 1000;
+    songs[curSongIdx].play();
+}
+
+function endSong() {
+    songs[curSongIdx].pause();
+    songs[curSongIdx].currentTime = 0;
+    songs[curSongIdx].onended = undefined;
+    curSongIdx = (curSongIdx + 1) % songs.length;
+}
+
+function pauseSong() {
+    if (songs[curSongIdx].paused) { songs[curSongIdx].play() }
+    else { songs[curSongIdx].pause() }
 }
 
 //#region Rendering
@@ -640,7 +671,7 @@ function setComboBoard(start) {
     if (start) { addMinos('S G', [[3, 0], [3, 1], [4, 1]], [0, 0]); displayShadow() }
 }
 
-function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
+function renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
     if (gameSettings.gamemode == 8) {
         if (totalPieceCount % gameSettings.lookAheadPieces == 0 && !movedPieceFirst) {
             if (boardAlpha <= 0) { boardAlphaChange = 0; boardAlpha = 1; }
@@ -651,7 +682,7 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
     }
     if (boardAlphaChange != 0) boardAlpha += boardAlphaChange;
     cntx.globalAlpha = boardAlpha.toFixed(2)
-    cntx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
+    cntx.clearRect(0, 0, width, height)
     grid.forEach((row, y) => {
         row.forEach((col, x) => {
             const [posX, posY] = [x * minoSize, (yPosChange - y) * minoSize]
@@ -681,9 +712,9 @@ function renderToCanvas(cntx, canvas, grid, yPosChange, [dx, dy] = [0, 0]) {
 }
 
 function renderingLoop() {
-    renderToCanvas(ctx, canvasField, boardState, 39)
+    renderToCanvas(ctx, boardState, 39, [0, 0], boardWidth, boardHeight);
     if (boardAlphaChange != 0) { updateNext(); updateHold(); }
-    setTimeout(()=>requestAnimationFrame(renderingLoop), 1);
+    setTimeout(() => requestAnimationFrame(renderingLoop), 0);
 }
 
 //#region Menus
@@ -702,7 +733,7 @@ function openModal(id) {
             setting.value = newValue
             if (setting.classList[1] == 'keybind') setting.textContent = newValue;
             if (setting.classList[1] == 'check') setting.checked = (newValue);
-            if (setting.classList[1] == 'range') {sliderChange(setting); rangeClickListener(setting)};
+            if (setting.classList[1] == 'range') { sliderChange(setting); rangeClickListener(setting) };
         });
     const gamemodeSelect = [...document.getElementsByClassName('gamemodeSelect')]
     gamemodeSelect.forEach((setting) => {
@@ -740,6 +771,9 @@ function closeModal(id) {
             if (id == 'changeRangeValue') {
                 currentRangeOption.value = document.getElementById('rangeValue').value;
                 sliderChange(currentRangeOption);
+            }
+            if (settingid == 'audioLevel') {
+                songs[curSongIdx].volume = Number(displaySettings.audioLevel) / 1000;
             }
         })
     closeDialog(document.getElementById(id));
@@ -843,7 +877,7 @@ function resetSettings(settingGroup) {
 }
 
 function toggleDialog() {
-    if (isDialogOpen) { document.querySelectorAll("dialog[open]").forEach(e=>closeDialog(e)) }
+    if (isDialogOpen) { document.querySelectorAll("dialog[open]").forEach(e => closeDialog(e)) }
     else { openModal('settingsPanel'); }
 }
 
@@ -957,8 +991,10 @@ const attackValues = {
 const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' };
 const scoringTable = { '': 0, 'TSPIN': 400, 'TSPIN MINI': 100, 'SINGLE': 100, 'DOUBLE': 300, 'TRIPLE': 500, 'QUAD': 800, 'TSPIN SINGLE': 800, 'TSPIN DOUBLE': 1200, 'TSPIN TRIPLE': 1600, 'TSPIN MINI SINGLE': 200, 'TSPIN MINI DOUBLE': 400, 'ALL CLEAR': 3500 }
 const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining', 5: 'Lines Survived', 6: 'Sent', 7: 'Combo', 8: 'Lines' }
-const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Escape'];
+const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Escape', 'Tab'];
 const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
 const pieceNames = ['s', 'z', 'i', 'j', 'l', 'o', 't'];
+const songs = [new Audio('assets/songs/patc.mp3'), new Audio('assets/songs/sato.mp3'), new Audio('assets/songs/flan.mp3')];
+const songNames = ["Cafe de Touhou 3 - The Girl's Secret Room", "ShibayanRecords - Acoustic Image", "ShibayanRecords - Close to your Mind"];
 
 init();

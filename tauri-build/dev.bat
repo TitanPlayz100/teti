@@ -1,4 +1,4 @@
-echo Starting install
+echo Starting dev
 call npm install
 
 cd ..
@@ -10,4 +10,4 @@ copy /y style.css src-temp\style.css
 
 echo Starting dev
 cd tauri-build
-call tauri dev
+call npm run tauri dev

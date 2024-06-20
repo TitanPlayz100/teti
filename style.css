@@ -1,19 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap");
 
 :root {
-    --night: #080B0C;
-    --e-black: #1B1E22;
-    --c-blue: #ACCBE1;
+    --night: #080b0c;
+    --e-black: #1b1e22;
+    --c-blue: #accbe1;
     --cl-blue: #dbeaf3;
     --l-gray: #ffffff50;
     --vl-gray: #ffffffc4;
     --invis: #00000000;
     --almost-invis: #00000024;
-    --slight-invis:#000000cf;
+    --slight-invis: #000000cf;
     --p-green: #53b565;
     --green: #30f24d;
-    --gray:#808080;
+    --gray: #808080;
 }
 
 body {
@@ -136,7 +136,7 @@ body {
 .actiontext,
 .statstext {
     position: fixed;
-    font-size: 3.0vh;
+    font-size: 3vh;
     text-shadow: 0 0 3vh var(--vl-gray);
     margin: 0;
     text-align: right;
@@ -152,7 +152,7 @@ body {
 
 .text {
     position: fixed;
-    font-size: 3.0vh;
+    font-size: 3vh;
     margin: 0;
     user-select: none;
 }
@@ -195,7 +195,7 @@ body {
     transition: all 0.2s ease;
 }
 
-#openSettingsButton>img {
+#openSettingsButton > img {
     transform: translateY(10%);
     height: 90%;
     user-select: none;
@@ -211,9 +211,10 @@ body {
     aspect-ratio: 3/1;
     border: none;
     background-color: var(--invis);
+    overflow: visible;
 }
 
-button>img {
+button > img {
     -webkit-user-drag: none;
 }
 
@@ -229,7 +230,8 @@ button>img {
     outline: none;
 }
 
-.smallPanelButton {
+.smallPanelButton,
+.smallerPanelButton {
     height: 6vh;
     aspect-ratio: 1/1;
     border-radius: 1vh;
@@ -240,13 +242,66 @@ button>img {
     flex-direction: row;
 }
 
+.smallerPanelButton {
+    height: 4vh;
+    border-radius: 0.7vh;
+    border-width: 0.2vh;
+}
+
 .settingPanelButton:hover {
     border: 0.3vh solid var(--cl-blue);
     transition: all 0.1s ease;
 }
 
+.smallerPanelButton:hover {
+    border-width: 0.2vh;
+}
+
+#songSelector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    align-self: center;
+    width: 40vw;
+    aspect-ratio: 3/1;
+    bottom: -30vh;
+    overflow: visible;
+    white-space: nowrap;
+    opacity: 0.4;
+    transition: all 0.5s ease;
+}
+
+#songSelector:hover {
+    opacity: 0.8;
+    transition: all 0.1s ease;
+}
+
+#songText {
+    position: absolute;
+    transform: translateY(-4vh);
+    align-self: center;
+    padding: 0;
+    margin: 0;
+}
+
+#songProgress {
+    height: 0.8vh;
+    border-radius: 5vh;
+}
+
+#songProgress::-webkit-progress-bar {
+    background-color: var(--e-black);
+    border-radius: 5vh;
+}
+
+#songProgress::-webkit-progress-value {
+    background-color: var(--cl-blue);
+    border-radius: 5vh;
+}
+
 .dialog {
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Montserrat", sans-serif;
     height: 75vh;
     aspect-ratio: 1/1.4;
     background-color: var(--almost-invis);
@@ -283,11 +338,11 @@ button>img {
     aspect-ratio: 1.3/1;
 }
 
-#changeRangeValue>div {
+#changeRangeValue > div {
     height: 1.6vh;
 }
 
-#changeRangeValue>div>input {
+#changeRangeValue > div > input {
     right: auto;
     left: 35%;
 }
@@ -354,14 +409,14 @@ button>img {
     background: var(--c-blue);
     outline: none;
     opacity: 0.7;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
+    -webkit-transition: 0.2s;
+    transition: opacity 0.2s;
     transform: translateY(0.5vh);
 }
 
 .check {
-    width: 3.0vh;
-    height: 3.0vh;
+    width: 3vh;
+    height: 3vh;
     right: 19%;
     transform: translateY(-1vh);
     appearance: none;
@@ -490,7 +545,7 @@ button>img {
     user-select: none;
     border: none;
     animation: fadein 0.4s forwards ease;
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Montserrat", sans-serif;
 }
 
 #frontdrop.closingAnimation {
