@@ -804,7 +804,7 @@ function sliderChange(el) {
 
 function rangeClkLisnr(el) {
     el.parentElement.children[0].addEventListener('click', () => {
-        currentRangeOption = el; 
+        currentRangeOption = el;
         openModal('changeRangeValue')
         document.getElementById('rangeValue').value = el.value;
     })
@@ -994,7 +994,7 @@ const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining
 const disabledKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Escape', 'Tab'];
 const spinChecks = [[[0, 2], [2, 2]], [[2, 2], [2, 0]], [[0, 0], [2, 0]], [[0, 0], [0, 2]]];
 const pieceNames = ['s', 'z', 'i', 'j', 'l', 'o', 't'];
-const songs = [new Audio('assets/songs/patc.mp3'), new Audio('assets/songs/sato.mp3'), new Audio('assets/songs/flan.mp3')];
+const songs = [new Audio('https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/patc.mp3'), new Audio('https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/sato.mp3'), new Audio('https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/flan.mp3')];
 const songNames = ["Cafe de Touhou 3 - The Girl's Secret Room", "ShibayanRecords - Acoustic Image", "ShibayanRecords - Close to your Mind"];
 
 init();
