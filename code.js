@@ -29,11 +29,10 @@ const canvasField = document.getElementById('playingfield'),
 
 function init() {
     sizeCanvas();
-    window.onresize = () => { sizeCanvas(); updateNext(); updateHold(); }
+    onresize = () => { sizeCanvas(); updateNext(); updateHold(); }
     let menuSFX = (e, sfx) =>
         document.querySelectorAll(e).forEach(el => el.onmouseenter = () => playSound(sfx));
-    menuSFX('.settingLayout', 'menutap');
-    menuSFX('.gamemodeSelect', 'menutap');
+    menuSFX('.settingLayout', 'menutap'); menuSFX('.gamemodeSelect', 'menutap');
     setInterval(() => {
         elSongProgress.value = songs[curSongIdx].currentTime * 100 / songs[curSongIdx].duration;
     }, 2000);
@@ -63,6 +62,7 @@ function startGame() {
     spawnPiece(randomiser(), true);
 }
 
+//region Movement
 this.addEventListener('keydown', event => {
     if (event.key == 'Escape') event.preventDefault();
     if (event.key == 'Escape' && bindingKey == undefined) toggleDialog();
@@ -258,6 +258,7 @@ function clearLines() {
     totalLines += linecount; totalAttack += damage; spikeCounter += damage;
     const garb = damage * gameSettings.backfireMulti;
     garbageQueue = garbageQueue == 0 ? garb : garbageQueue > garb ? garbageQueue - garb : 0;
+    if (gameSettings.gamemode == 6 && garb > 0) playSound(garb > 4 ? 'garbage_in_large' : 'garbage_in_small');
     if (gameSettings.gamemode == 6 && combonumber == -1 && garbageQueue > 0) {
         addGarbage(garbageQueue, 0);
         garbageQueue = 0;
@@ -342,7 +343,6 @@ function checkDeath(coords, collider) {
 function endGame(top, bottom = 'Better luck next time') {
     const ded = ['Lockout', 'Topout', 'Blockout'].includes(top)
     if (gameSettings.gamemode == 5 && ded) { gameEnd = true; return; };
-
     switch (top) {
         case 'Lockout':
         case 'Topout':
@@ -500,7 +500,7 @@ function updateHold() {
     canvasHold.style.outline = `0.2vh solid ${holdPiece.piece.colour}`
 }
 
-//#region GUI rendering
+//#region Text rendering
 function renderDanger() {
     const condition = getMinos('S').some(c => c[1] > 16) && gameSettings.gamemode != 7;
     if (condition && !inDanger) playSound('damage_alert');
@@ -635,7 +635,7 @@ function pauseSong() {
     else { songs[curSongIdx].pause() }
 }
 
-//#region Rendering
+//#region Board rendering
 function checkMino([x, y], val) { return boardState[y][x].split(' ').includes(val) }
 function MinoToNone(val) { getMinos(val).forEach(c => rmValue(c, val)) }
 function addMinos(val, c, [dx, dy]) { c.forEach(([x, y]) => setValue([x + dx, y + dy], val)) }
@@ -733,7 +733,7 @@ function openModal(id) {
             setting.value = newValue
             if (setting.classList[1] == 'keybind') setting.textContent = newValue;
             if (setting.classList[1] == 'check') setting.checked = (newValue);
-            if (setting.classList[1] == 'range') { sliderChange(setting); rangeClickListener(setting) };
+            if (setting.classList[1] == 'range') { sliderChange(setting); rangeClkLisnr(setting) };
         });
     const gamemodeSelect = [...document.getElementsByClassName('gamemodeSelect')]
     gamemodeSelect.forEach((setting) => {
@@ -802,9 +802,9 @@ function sliderChange(el) {
     el.parentElement.children[0].textContent = `${text}: ${value}`
 }
 
-function rangeClickListener(el) {
+function rangeClkLisnr(el) {
     el.parentElement.children[0].addEventListener('click', () => {
-        currentRangeOption = el;
+        currentRangeOption = el; 
         openModal('changeRangeValue')
         document.getElementById('rangeValue').value = el.value;
     })
