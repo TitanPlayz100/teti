@@ -1,17 +1,11 @@
 # Teti README
 
-Finally a readme  
-Hosted on github pages [here](https://titanplayz100.github.io/teti/)  
-You can literally just open up [index.html](index.html) in a browser as well to play 
+Hosted on github pages [here](https://titanplayz100.github.io/teti/)
 
-## Build With Tauri
-Build this yourself or download the installer from the latest release
+No dependancies, pure html, css, js
 
-> You need rust installed  
-> https://tauri.app/v1/guides/building/
+I invite you in attempting to comprehend the abomination of js code, cause i can't either
 
-- open **tauri-build** directory
-- `npm run build` or run build.bat
+## Tauri
 
-Creates exe at **/target/release/teti.exe**  
-You can delete **/src-temp**
+All the information is in the tauri branch
