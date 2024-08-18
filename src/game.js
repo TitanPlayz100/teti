@@ -12,7 +12,6 @@ import { Utils } from "./util.js";
 export class Game {
     // global variables to be refactored
     attackValues;
-    bindingKey;
     boardAlpha;
     boardAlphaChange;
     boardHeight;
@@ -20,9 +19,7 @@ export class Game {
     controlSettings;
     currentLoc;
     currentPiece;
-    currentRangeOption;
     curSongIdx = 0;
-    directionState = { 'RIGHT': false, 'LEFT': false, 'DOWN': false };
     displaySettings;
     firstMove;
     gameEnd;
@@ -32,7 +29,6 @@ export class Game {
     holdQueueGrid = [];
     holdWidth;
     inDanger;
-    isDialogOpen;
     minoSize;
     movedPieceFirst;
     nextHeight;
@@ -40,31 +36,30 @@ export class Game {
     nextQueueGrid = [];
     nextWidth;
     pieces;
-    rotationState;
     sfx = {};
-    timeouts = { 'arr': 0, 'das': 0, 'sd': 0, 'lockdelay': 0, 'gravity': 0, 'stats': 0, 'lockingTimer': 0 };
+    timeouts = { arr: 0, das: 0, sd: 0, lockdelay: 0, gravity: 0, stats: 0, lockingTimer: 0 };
     totalTimeSeconds;
 
-    canvasField = document.getElementById('playingfield');
-    canvasNext = document.getElementById('next');
-    canvasHold = document.getElementById('hold');
-    divBoard = document.getElementById('board');
-    divLockTimer = document.getElementById('lockTimer');
-    divLockCounter = document.getElementById('lockCounter');
-    progressDamage = document.getElementById('garbageQueue');
-    divDanger = document.getElementById('dangerOverlay');
-    divLinesSent = document.getElementById('linessent');
-    divObjectiveText = document.getElementById('objectiveText');
-    elementStats1 = document.getElementById('stats1');
-    elementStats2 = document.getElementById('stats2');
-    elementStats3 = document.getElementById('stats3');
-    elementSmallStat1 = document.getElementById('smallStat1');
-    elementSmallStat2 = document.getElementById('smallStat2');
-    elementObjective = document.getElementById('objective');
-    elSongProgress = document.getElementById('songProgress');
-    ctx = this.canvasField.getContext('2d');
-    ctxN = this.canvasNext.getContext('2d');
-    ctxH = this.canvasHold.getContext('2d');
+    canvasField = document.getElementById("playingfield");
+    canvasNext = document.getElementById("next");
+    canvasHold = document.getElementById("hold");
+    divBoard = document.getElementById("board");
+    divLockTimer = document.getElementById("lockTimer");
+    divLockCounter = document.getElementById("lockCounter");
+    progressDamage = document.getElementById("garbageQueue");
+    divDanger = document.getElementById("dangerOverlay");
+    divLinesSent = document.getElementById("linessent");
+    divObjectiveText = document.getElementById("objectiveText");
+    elementStats1 = document.getElementById("stats1");
+    elementStats2 = document.getElementById("stats2");
+    elementStats3 = document.getElementById("stats3");
+    elementSmallStat1 = document.getElementById("smallStat1");
+    elementSmallStat2 = document.getElementById("smallStat2");
+    elementObjective = document.getElementById("objective");
+    elSongProgress = document.getElementById("songProgress");
+    ctx = this.canvasField.getContext("2d");
+    ctxN = this.canvasNext.getContext("2d");
+    ctxH = this.canvasHold.getContext("2d");
 
     constructor(defaultSettings, piecesJSON, attackValuesJSON) {
         this.displaySettings = defaultSettings[0];
@@ -73,7 +68,7 @@ export class Game {
         this.pieces = piecesJSON;
         this.attackValues = attackValuesJSON;
 
-        this.main = new Main(this)
+        this.main = new Main(this);
         this.mechanics = new Mechanics(this);
         this.menus = new MenuActions(this);
         this.movement = new Movement(this);
@@ -82,8 +77,6 @@ export class Game {
         this.utils = new Utils(this);
         this.board = new Board(this);
     }
-
-
 
     resetState() {
         this.gameEnd = false;
@@ -112,47 +105,36 @@ export class Game {
         this.boardAlpha = 1;
         this.boardAlphaChange = 0;
 
-        clearInterval(this.timeouts['gravity']);
-        clearInterval(this.timeouts['survival']);
-
-        this.progressDamage.value = 0;
-
-        ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
-            document.getElementById(id).style.opacity = 0;
-        })
-
-        this.board.boardState = [...Array(40)].map(() => [...Array(10)].map(() => ""));
-
-        clearLockDelay();
-        this.rendering.renderDanger();
-        clearInterval(this.timeouts['stats']);
-        this.rendering.renderStats();
-
-        this.ctxH.clearRect(0, 0, this.canvasHold.offsetWidth + 10, this.canvasHold.offsetHeight)
+        clearInterval(this.timeouts["gravity"]);
+        clearInterval(this.timeouts["survival"]);
     }
 
-    
     objectives() {
-        const time = (Math.round(this.totalTimeSeconds * 100) / 100).toFixed(2), gs = this.gameSettings.gamemode;
+        const time = (Math.round(this.totalTimeSeconds * 100) / 100).toFixed(2),
+            gs = this.gameSettings.gamemode;
         const pieces = this.gameSettings.lookAheadPieces;
         this.elementObjective.textContent = {
-            0: '',
-            1: `${totalLines}/${this.gameSettings.requiredLines}`,
-            2: `${totalScore}`,
-            3: `${totalAttack}/${this.gameSettings.requiredAttack}`,
-            4: `${garbRowsLeft}`,
-            5: `${totalSentLines}`,
-            6: `${totalAttack}/${this.gameSettings.requiredAttack}`,
-            7: `${combonumber}`,
-            8: `${totalLines}/${this.gameSettings.requiredLines}`
-        }[gs]
+            0: "",
+            1: `${this.mechanics.totalLines}/${this.gameSettings.requiredLines}`,
+            2: `${this.mechanics.totalScore}`,
+            3: `${this.mechanics.totalAttack}/${this.gameSettings.requiredAttack}`,
+            4: `${this.mechanics.garbRowsLeft}`,
+            5: `${this.mechanics.totalSentLines}`,
+            6: `${this.mechanics.totalAttack}/${this.gameSettings.requiredAttack}`,
+            7: `${this.mechanics.combonumber}`,
+            8: `${this.mechanics.totalLines}/${this.gameSettings.requiredLines}`,
+        }[gs];
 
-        const obj1 = totalLines >= this.gameSettings.requiredLines,
+        const obj1 = this.mechanics.totalLines >= this.gameSettings.requiredLines,
             obj2 = this.totalTimeSeconds >= Number(this.gameSettings.timeLimit),
-            obj3 = totalAttack >= this.gameSettings.requiredAttack, obj4 = garbRowsLeft < 1,
-            obj5 = this.gameEnd, obj6 = combonumber == -1 && totalLines >= 1;
-        const ts = ` in ${time} seconds`, cl = `Cleared ${totalLines} lines`;
-        const total = totalScore, reqGarb = this.gameSettings.requiredGarbage;
+            obj3 = this.mechanics.totalAttack >= this.gameSettings.requiredAttack,
+            obj4 = garbRowsLeft < 1,
+            obj5 = this.gameEnd,
+            obj6 = combonumber == -1 && this.mechanics.totalLines >= 1;
+        const ts = ` in ${time} seconds`,
+            cl = `Cleared ${totalLines} lines`;
+        const total = totalScore,
+            reqGarb = this.gameSettings.requiredGarbage;
 
         switch (gs) {
             case 1: if (obj1) { this.endGame(`${time}s`, cl + ts); } break;
@@ -166,25 +148,33 @@ export class Game {
         }
     }
 
-    endGame(top, bottom = 'Better luck next time') {
-        const ded = ['Lockout', 'Topout', 'Blockout'].includes(top)
-        if (this.gameSettings.gamemode == 5 && ded) { this.gameEnd = true; return; };
+    endGame(top, bottom = "Better luck next time") {
+        const ded = ["Lockout", "Topout", "Blockout"].includes(top);
+        if (this.gameSettings.gamemode == 5 && ded) {
+            this.gameEnd = true;
+            return;
+        }
         switch (top) {
-            case 'Lockout':
-            case 'Topout':
-            case 'Blockout': playSound('failure'); playSound('topout'); break;
-            case undefined: return; break;
-            default: playSound('finish'); break;
+            case "Lockout":
+            case "Topout":
+            case "Blockout":
+                playSound("failure");
+                playSound("topout");
+                break;
+            case undefined:
+                return;
+                break;
+            default:
+                playSound("finish");
+                break;
         }
 
         this.gameEnd = true;
-        clearInterval(this.timeouts['gravity']);
-        clearInterval(this.timeouts['stats']);
-        clearInterval(this.timeouts['survival']);
-        openModal('gameEnd');
-        document.getElementById('reason').textContent = top;
-        document.getElementById('result').textContent = bottom;
+        clearInterval(this.timeouts["gravity"]);
+        clearInterval(this.timeouts["stats"]);
+        clearInterval(this.timeouts["survival"]);
+        openModal("gameEnd");
+        document.getElementById("reason").textContent = top;
+        document.getElementById("result").textContent = bottom;
     }
-
-
 }

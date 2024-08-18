@@ -1,5 +1,6 @@
 // @ts-check
 import { Game } from "./game.js";
+import { toHex } from "./util.js";
 
 export class Rendering {
     /**

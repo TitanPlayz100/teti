@@ -14,21 +14,29 @@ export class Main {
     }
 
     init() {
+        this.game.progressDamage.value = 0;
+        ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
+            document.getElementById(id).style.opacity = 0;
+        })
+        this.game.board.boardState = [...Array(40)].map(() => [...Array(10)].map(() => ""));
+        clearLockDelay();
+        this.game.rendering.renderDanger();
+        clearInterval(this.game.timeouts['stats']);
+        this.game.rendering.renderStats();
+
+        this.game.ctxH.clearRect(0, 0, this.game.canvasHold.offsetWidth + 10, this.game.canvasHold.offsetHeight)
         this.game.movement.initKeyListeners();
         this.sizeCanvas();
         document.onresize = () => {
             this.sizeCanvas();
-            this.game.mechanics.updateNext();
-            this.game.mechanics.updateHold();
+            this.game.rendering.updateNext();
+            this.game.rendering.updateHold();
         }
-
         let menuSFX = (e, sfx) => {
             document.querySelectorAll(e).forEach(el => el.onmouseenter = () => this.game.sounds.playSound(sfx))
         }
-
         menuSFX('.settingLayout', 'menutap');
         menuSFX('.gamemodeSelect', 'menutap');
-
         setInterval(() => {
             this.game.elSongProgress.value = songs[this.game.curSongIdx].currentTime * 100 / songs[this.game.curSongIdx].duration;
         }, 2000);
