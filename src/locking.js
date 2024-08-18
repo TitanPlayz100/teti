@@ -1,6 +1,15 @@
 // @ts-check
 
+import { Game } from "./game";
+
 export class LockPiece {
+    divLockTimer = document.getElementById("lockTimer");
+    divLockCounter = document.getElementById("lockCounter");
+
+
+    /**
+     * @param {Game} game
+     */
     constructor(mechanics, game) {
         this.mechanics = mechanics;
         this.game = game;
@@ -12,7 +21,7 @@ export class LockPiece {
             this.mechanics.mechanics.lockCount++;
             if (this.game.gameSettings.maxLockMovements != 0 && this.game.displaySettings.lockBar) {
                 const amountToAdd = 100 / this.game.gameSettings.maxLockMovements;
-                this.game.divLockCounter.value += amountToAdd;
+                this.divLockCounter.value += amountToAdd;
             }
         }
         if (this.game.movement.checkCollision(this.mechanics.board.getMinos("A"), "DOWN"))
@@ -38,7 +47,7 @@ export class LockPiece {
         );
         this.game.timeouts["lockingTimer"] = setInterval(() => {
             const amountToAdd = 1000 / this.game.gameSettings.lockDelay;
-            if (this.game.displaySettings.lockBar) this.game.divLockTimer.value += amountToAdd;
+            if (this.game.displaySettings.lockBar) this.divLockTimer.value += amountToAdd;
         }, 10);
     }
 
@@ -60,23 +69,20 @@ export class LockPiece {
         this.game.holdPiece.occured = false;
         this.mechanics.isTspin = false;
         this.mechanics.isMini = false;
-        movedPieceFirst = false;
+        this.game.movedPieceFirst = false;
         this.mechanics.spawnPiece(this.mechanics.randomiser());
         this.mechanics.startGravity();
-        renderDanger();
+        this.game.rendering.renderDanger();
     }
 
     clearLockDelay(clearCount = true) {
         clearInterval(this.game.timeouts["lockingTimer"]);
         this.game.utils.stopTimeout("lockdelay");
-        this.game.divLockTimer.value = 0;
+        this.divLockTimer.value = 0;
         if (!clearCount) return;
-        this.game.divLockCounter.value = 0;
+        this.divLockCounter.value = 0;
         this.mechanics.lockCount = 0;
         if (this.game.gameSettings.preserveARR) return;
-        directionState = { RIGHT: false, LEFT: false, DOWN: false };
-        endDasArr("RIGHT");
-        endDasArr("LEFT");
-        endDasArr("DOWN");
+        this.game.movement.resetMovements();
     }
 }

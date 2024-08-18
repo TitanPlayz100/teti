@@ -58,7 +58,6 @@ export const spinChecks = [
     ],
 ];
 
-export const pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
 
 export const songs = [
     new Audio("https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/patc.mp3"),
