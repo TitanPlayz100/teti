@@ -3,8 +3,8 @@
 import { Board } from "./board.js";
 import { Main } from "./main.js";
 import { Mechanics } from "./mechanics.js";
-import { MenuItems as MenuActions } from "./menuactions.js";
-import { MenuActions as Modals } from "./modals.js";
+import { MenuActions } from "./menuactions.js";
+import { ModalActions } from "./modals.js";
 import { Movement } from "./movement.js";
 import { Rendering } from "./rendering.js";
 import { Sounds } from "./sound.js";
@@ -15,7 +15,6 @@ export class Game {
     controlSettings;
     currentLoc;
     currentPiece;
-    curSongIdx = 0;
     displaySettings;
     firstMove;
     gameEnd;
@@ -24,13 +23,11 @@ export class Game {
     movedPieceFirst;
     nextPieces;
     pieces;
-    sfx = {};
     timeouts = { arr: 0, das: 0, sd: 0, lockdelay: 0, gravity: 0, stats: 0, lockingTimer: 0 };
     totalTimeSeconds;
 
     progressDamage = document.getElementById("garbageQueue");
     elementObjective = document.getElementById("objective");
-    elSongProgress = document.getElementById("songProgress");
   
 
     constructor(defaultSettings, piecesJSON, attackValuesJSON) {
@@ -41,14 +38,14 @@ export class Game {
         this.attackValues = attackValuesJSON;
 
         this.main = new Main(this);
+        this.board = new Board(this);
         this.mechanics = new Mechanics(this);
-        this.modals = new Modals(this);
+        this.menuactions = new MenuActions(this);
+        this.modals = new ModalActions(this);
         this.movement = new Movement(this);
         this.rendering = new Rendering(this);
         this.sounds = new Sounds(this);
         this.utils = new Utils(this);
-        this.board = new Board(this);
-        this.menuactions = new MenuActions(this);
     }
 
     startGame() {
@@ -76,7 +73,7 @@ export class Game {
         this.mechanics.totalAttack = 0;
         this.mechanics.totalPieceCount = 0;
         this.firstMove = true;
-        this.rotationState = 1;
+        this.movement.rotationState = 1;
         this.inDanger = false;
         this.mechanics.totalSentLines = 0;
         this.mechanics.garbageQueue = 0;
@@ -87,6 +84,17 @@ export class Game {
 
         clearInterval(this.timeouts["gravity"]);
         clearInterval(this.timeouts["survival"]);
+
+        this.progressDamage.value = 0;
+        ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
+            document.getElementById(id).style.opacity = 0;
+        })
+        this.board.boardState = [...Array(40)].map(() => [...Array(10)].map(() => ""));
+        this.mechanics.Locking.clearLockDelay();
+        this.rendering.renderDanger();
+        clearInterval(this.timeouts['stats']);
+        this.rendering.renderStats();
+        this.rendering.clearHold();
     }
 
     objectives() {
@@ -138,14 +146,14 @@ export class Game {
             case "Lockout":
             case "Topout":
             case "Blockout":
-                playSound("failure");
-                playSound("topout");
+                this.sounds.playSound("failure");
+                this.sounds.playSound("topout");
                 break;
             case undefined:
                 return;
                 break;
             default:
-                playSound("finish");
+                this.sounds.playSound("finish");
                 break;
         }
 

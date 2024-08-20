@@ -47,7 +47,7 @@ export class Rendering {
     sizeCanvas() {
         this.divBoard.setAttribute("style", "");
         this.game.rendering.renderStyles();
-        this.canvasField.offsetWidth = this.divBoard.width;
+        // this.canvasField.offsetWidth = this.divBoard.width;
         [this.canvasField, this.canvasNext, this.canvasHold].forEach(c => {
             c.width = Math.round(c.offsetWidth / 10) * 10;
             c.height = Math.round(c.offsetHeight / 40) * 40;
@@ -67,7 +67,7 @@ export class Rendering {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
         const first5 = this.game.nextPieces[0]
             .concat(this.game.nextPieces[1])
-            .slice(0, this.game.gameSettings.this.game.nextPieces);
+            .slice(0, this.game.gameSettings.nextPieces);
         first5.forEach((name, idx) => {
             const piece = this.game.utils.getPiece(name),
                 pn = piece.name;
@@ -120,7 +120,7 @@ export class Rendering {
 
     renderDanger() {
         const condition = this.game.board.getMinos("S").some(c => c[1] > 16) && this.game.gameSettings.gamemode != 7;
-        if (condition && !this.inDanger) playSound("damage_alert");
+        if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
         this.inDanger = condition;
         this.divDanger.style.opacity = condition ? 0.1 : 0;
     }
@@ -136,19 +136,19 @@ export class Rendering {
         if (this.game.mechanics.spikeCounter >= 10) this.spikePattern("red", 1.1);
         if (this.game.mechanics.spikeCounter >= 20) this.spikePattern("lime", 1.2);
 
-        if (isPC) playSound("allclear");
-        if (this.game.mechanics.btbCount == 2 && isBTB) playSound("btb_1");
+        if (isPC) this.game.sounds.playSound("allclear");
+        if (this.game.mechanics.btbCount == 2 && isBTB) this.game.sounds.playSound("btb_1");
         if (linecount == 4 && this.game.mechanics.btbCount > 0) {
-            playSound("clearbtb");
+            this.game.sounds.playSound("clearbtb");
         } else if (linecount == 4) {
-            playSound("clearquad");
-        } else if (linecount > 0 && isTspin) {
-            playSound("clearspin");
+            this.game.sounds.playSound("clearquad");
+        } else if (linecount > 0 && this.game.mechanics.isTspin) {
+            this.game.sounds.playSound("clearspin");
         } else if (linecount > 0) {
-            playSound("clearline");
+            this.game.sounds.playSound("clearline");
         }
-        if (this.game.mechanics.spikeCounter >= 15) playSound("thunder", false);
-        if (this.game.mechanics.combonumber > 0) playSound(`combo/combo_${this.game.mechanics.combonumber > 16 ? 16 : this.game.mechanics.combonumber}`);
+        if (this.game.mechanics.spikeCounter >= 15) this.game.sounds.playSound("thunder", false);
+        if (this.game.mechanics.combonumber > 0) this.game.sounds.playSound(`combo/combo_${this.game.mechanics.combonumber > 16 ? 16 : this.game.mechanics.combonumber}`);
     }
 
     spikePattern(colour, size) {
@@ -162,46 +162,46 @@ export class Rendering {
         textbox.textContent = text;
         textbox.style.transform = "translateX(-2%)";
         textbox.style.opacity = 1;
-        if (timeouts[id] != 0) stopTimeout(id);
-        timeouts[id] = setTimeout(() => {
+        if (this.game.timeouts[id] != 0) this.game.utils.stopTimeout(id);
+        this.game.timeouts[id] = setTimeout(() => {
             textbox.style.opacity = 0;
             textbox.style.transform = "translateX(2%)";
-            spikeCounter = 0;
+            this.game.mechanics.spikeCounter = 0;
         }, duration);
     }
 
     renderStyles() {
-        document.body.style.background = displaySettings.background;
-        const height = Number(displaySettings.boardHeight) + 10;
+        document.body.style.background = this.game.displaySettings.background;
+        const height = Number(this.game.displaySettings.boardHeight) + 10;
         this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
-        this.game.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
-        const background = `rgba(0, 0, 0, ${Number(displaySettings.boardOpacity) / 100})`;
+        this.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
+        const background = `rgba(0, 0, 0, ${Number(this.game.displaySettings.boardOpacity) / 100})`;
         this.divBoard.style.backgroundColor = background;
-        this.game.canvasHold.style.backgroundColor = background;
+        this.canvasHold.style.backgroundColor = background;
         this.canvasNext.style.backgroundColor = background;
     }
 
     renderStats() {
-        totalTimeSeconds += 0.02;
-        const displaytime = (Math.round(totalTimeSeconds * 10) / 10).toFixed(1);
+        this.game.totalTimeSeconds += 0.02;
+        const displaytime = (Math.round(this.game.totalTimeSeconds * 10) / 10).toFixed(1);
         let pps = 0.0,
             apm = 0.0;
-        if (totalTimeSeconds != 0)
-            pps = Math.round((totalPieceCount * 100) / totalTimeSeconds) / 100;
-        if (totalTimeSeconds != 0)
-            apm = Math.round((totalAttack * 10) / (totalTimeSeconds / 60)) / 10;
+        if (this.game.totalTimeSeconds != 0)
+            pps = Math.round((this.game.mechanics.totalPieceCount * 100) / this.game.totalTimeSeconds) / 100;
+        if (this.game.totalTimeSeconds != 0)
+            apm = Math.round((this.game.mechanics.totalAttack * 10) / (this.game.totalTimeSeconds / 60)) / 10;
         this.elementStats1.textContent = `${displaytime}`;
         this.elementStats2.textContent = `${apm.toFixed(1)}`;
         this.elementStats3.textContent = `${pps.toFixed(2)}`;
-        this.elementSmallStat1.textContent = `${totalAttack}`;
-        this.elementSmallStat2.textContent = `${totalPieceCount}`;
-        objectives();
+        this.elementSmallStat1.textContent = `${this.game.mechanics.totalAttack}`;
+        this.elementSmallStat2.textContent = `${this.game.mechanics.totalPieceCount}`;
+        this.game.objectives();
     }
 
     // board rendering
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
-        if (gameSettings.gamemode == 8) {
-            if (totalPieceCount % gameSettings.lookAheadPieces == 0 && !movedPieceFirst) {
+        if (this.game.gameSettings.gamemode == 8) {
+            if (this.game.mechanics.totalPieceCount % this.game.gameSettings.lookAheadPieces == 0 && !this.game.movedPieceFirst) {
                 if (this.boardAlpha <= 0) {
                     this.boardAlphaChange = 0;
                     this.boardAlpha = 1;
@@ -223,7 +223,7 @@ export class Rendering {
                     // active piece or stopped piece
                     cntx.fillStyle = cell.includes("G") // garbage piece
                         ? "gray"
-                        : pieces.filter(p => p.name == cell[1])[0].colour;
+                        : this.game.pieces.filter(p => p.name == cell[1])[0].colour;
                     cntx.fillRect(posX + dx, posY + dy, this.minoSize, this.minoSize);
                     cntx.globalAlpha = this.boardAlpha.toFixed(2);
                 } else if (cell.includes("NP") && this.inDanger) {
@@ -232,12 +232,12 @@ export class Rendering {
                     cntx.fillRect(posX, posY, this.minoSize, this.minoSize);
                 } else if (cell.includes("Sh")) {
                     // shadow piece
-                    const colour = displaySettings.colouredShadow ? currentPiece.colour : "#ffffff";
-                    cntx.fillStyle = colour + toHex(displaySettings.shadowOpacity);
+                    const colour = this.game.displaySettings.colouredShadow ? this.game.currentPiece.colour : "#ffffff";
+                    cntx.fillStyle = colour + toHex(this.game.displaySettings.shadowOpacity);
                     cntx.fillRect(posX, posY, this.minoSize, this.minoSize);
-                } else if (y < 20 && displaySettings.showGrid && cntx == this.ctx) {
+                } else if (y < 20 && this.game.displaySettings.showGrid && cntx == this.ctx) {
                     // grid
-                    cntx.strokeStyle = "#ffffff" + toHex(displaySettings.gridopacity);
+                    cntx.strokeStyle = "#ffffff" + toHex(this.game.displaySettings.gridopacity);
                     cntx.beginPath();
                     cntx.roundRect(posX, posY, this.minoSize - 1, this.minoSize - 1, this.minoSize / 4);
                     cntx.stroke();
@@ -247,11 +247,11 @@ export class Rendering {
     }
 
     renderingLoop() {
-        this.renderToCanvas(this.ctx, boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
+        this.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
         if (this.boardAlphaChange != 0) {
             this.updateNext();
             this.updateHold();
         }
-        setTimeout(() => requestAnimationFrame(this.renderingLoop), 0);
+        setTimeout(() => requestAnimationFrame(this.renderingLoop.bind(this)), 0);
     }
 }

@@ -1,20 +1,20 @@
 // @ts-check
 
+import { modesText } from "./data.js";
 import { Game } from "./game.js";
 import { toExpValue } from "./util.js";
 
 
-export class MenuItems {
+export class MenuActions {
     bindingKey;
     divObjectiveText = document.getElementById("objectiveText");
-
+    menus;
 
     /**
      * @param {Game} game
      */
     constructor(game) {
         this.game = game;
-        this.menus = game.modals;
     }
 
     sliderChange(el) {
@@ -46,7 +46,7 @@ export class MenuItems {
             if (otherKeys.textContent == key) otherKeys.textContent = "None";
         }
         this.menus.closeDialog(document.getElementById("frontdrop"));
-        this.isDialogOpen = true;
+        this.game.modals.isDialogOpen = true;
         this.bindingKey = undefined;
     }
 
@@ -71,12 +71,12 @@ export class MenuItems {
             if (tempControls[s] === undefined || tempControls[s] === "") continue;
             this.game.controlSettings[s] = tempControls[s];
         }
-        this.game.divObjectiveText.textContent = modesText[this.game.gameSettings.gamemode];
+        this.divObjectiveText.textContent = modesText[this.game.gameSettings.gamemode];
     }
 
     setGamemode(modeNum) {
         this.game.gameSettings.gamemode = modeNum;
-        this.game.divObjectiveText.textContent = modesText[this.game.gameSettings.gamemode];
+        this.divObjectiveText.textContent = modesText[this.game.gameSettings.gamemode];
     }
 
     downloadSettings() {
@@ -100,13 +100,14 @@ export class MenuItems {
     }
 
     resetSettings(settingGroup) {
+        settingGroup = "this.game."+settingGroup;
         for (let setting in eval(settingGroup)) eval(settingGroup)[setting] = "";
         this.saveSettings();
         location.reload();
     }
 
     toggleDialog() {
-        if (this.isDialogOpen) {
+        if (this.game.modals.isDialogOpen) {
             document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
         } else {
             this.menus.openModal("settingsPanel");
@@ -126,4 +127,5 @@ export class MenuItems {
             this.game.startGame();
         }
     }
+    
 }

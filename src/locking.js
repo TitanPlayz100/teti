@@ -1,6 +1,7 @@
 // @ts-check
 
-import { Game } from "./game";
+import { Game } from "./game.js";
+import { Mechanics } from "./mechanics.js";
 
 export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
@@ -9,6 +10,7 @@ export class LockPiece {
 
     /**
      * @param {Game} game
+     * @param {Mechanics} mechanics
      */
     constructor(mechanics, game) {
         this.mechanics = mechanics;
@@ -17,15 +19,15 @@ export class LockPiece {
 
     incrementLock() {
         if (this.game.timeouts["lockdelay"] != 0) {
-            this.mechanics.clearLockDelay(false);
-            this.mechanics.mechanics.lockCount++;
+            this.mechanics.Locking.clearLockDelay(false);
+            this.mechanics.lockCount++;
             if (this.game.gameSettings.maxLockMovements != 0 && this.game.displaySettings.lockBar) {
                 const amountToAdd = 100 / this.game.gameSettings.maxLockMovements;
                 this.divLockCounter.value += amountToAdd;
             }
         }
         if (this.game.movement.checkCollision(this.mechanics.board.getMinos("A"), "DOWN"))
-            this.mechanics.scheduleLock();
+            this.mechanics.Locking.scheduleLock();
     }
 
     scheduleLock() {
@@ -34,7 +36,7 @@ export class LockPiece {
                 ? 99999
                 : this.game.gameSettings.maxLockMovements;
         if (this.mechanics.lockCount >= LockMoves) {
-            this.mechanics.lockPiece();
+            this.mechanics.Locking.lockPiece();
             return;
         }
         if (this.game.gameSettings.lockDelay == 0) {
@@ -42,7 +44,7 @@ export class LockPiece {
             return;
         }
         this.game.timeouts["lockdelay"] = setTimeout(
-            () => this.mechanics.lockPiece(),
+            () => this.mechanics.Locking.lockPiece(),
             this.game.gameSettings.lockDelay
         );
         this.game.timeouts["lockingTimer"] = setInterval(() => {
@@ -56,13 +58,13 @@ export class LockPiece {
             this.mechanics.board.rmValue(c, "A");
             this.mechanics.board.addValFront(c, "S");
         });
-        endGame(
+        this.game.endGame(
             this.mechanics.checkDeath(
                 this.mechanics.board.getMinos("S"),
                 this.mechanics.board.getMinos("NP")
             )
         );
-        this.mechanics.clearLockDelay();
+        this.mechanics.Locking.clearLockDelay();
         clearInterval(this.game.timeouts["gravity"]);
         this.mechanics.clear.clearLines();
         this.mechanics.totalPieceCount++;

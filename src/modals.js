@@ -3,7 +3,7 @@ import { songs } from "./data.js";
 import { Game } from "./game.js";
 import { toExpValue, toLogValue } from "./util.js";
 
-export class MenuActions {
+export class ModalActions {
     isDialogOpen;
     currentRangeOption;
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
@@ -13,11 +13,12 @@ export class MenuActions {
      */
     constructor(game) {
         this.game = game;
-        this.items = this.game.menuactions;
+        this.actions = this.game.menuactions;
+        game.menuactions.menus = this;
     }
 
     openModal(id) {
-        let settingGroup = id.replace("Dialog", "");
+        let settingGroup = "this.game." + id.replace("Dialog", "");
         if (id == "gamemodeDialog") settingGroup = "this.game.gameSettings";
         if (id == "queueModify" && !this.game.gameSettings.allowQueueModify) return;
         const options = [...document.getElementsByClassName("option")];
@@ -37,8 +38,8 @@ export class MenuActions {
                 if (setting.classList[1] == "keybind") setting.textContent = newValue;
                 if (setting.classList[1] == "check") setting.checked = newValue;
                 if (setting.classList[1] == "range") {
-                    this.items.sliderChange(setting);
-                    this.items.rangeClkLisnr(setting);
+                    this.actions.sliderChange(setting);
+                    this.actions.rangeClkLisnr(setting);
                 }
             });
         const gamemodeSelect = [...document.getElementsByClassName("gamemodeSelect")];
@@ -54,7 +55,7 @@ export class MenuActions {
     }
 
     closeModal(id) {
-        let settingGroup = id.replace("Dialog", "");
+        let settingGroup = "this.game."+id.replace("Dialog", "");
         if (id == "gamemodeDialog") settingGroup = "this.game.gameSettings";
         [...document.getElementsByClassName("option")]
             .filter(item => item.parentElement.parentElement.id == id)
@@ -63,6 +64,7 @@ export class MenuActions {
                     type = setting.classList[1];
                 if (type == "number" && setting.value == "")
                     setting.value = this.currentRangeOption.min;
+
                 eval(settingGroup)[settingid] =
                     type == "check"
                         ? setting.checked
@@ -88,14 +90,14 @@ export class MenuActions {
                 }
                 if (id == "changeRangeValue") {
                     this.currentRangeOption.value = document.getElementById("rangeValue").value;
-                    this.items.sliderChange(this.currentRangeOption);
+                    this.actions.sliderChange(this.currentRangeOption);
                 }
                 if (settingid == "audioLevel") {
-                    songs[curSongIdx].volume = Number(this.game.displaySettings.audioLevel) / 1000;
+                    this.game.sounds.setAudioLevel();
                 }
             });
         this.closeDialog(document.getElementById(id));
-        this.items.saveSettings();
+        this.actions.saveSettings();
         if (id == "displaySettingsDialog") this.game.rendering.renderStyles();
         if (id == "gameSettingsDialog" || id == "gamemodeDialog" || id == "gameEnd")
             this.game.startGame();

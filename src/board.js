@@ -79,7 +79,7 @@ export class Board {
         newcoords.forEach((c, idx) =>
             value ? this.addValue(c, valTable[idx]) : this.setValue(c, valTable[idx])
         );
-        spawnOverlay();
+        this.game.mechanics.spawnOverlay();
     }
 
     setComboBoard(start) {
@@ -98,7 +98,7 @@ export class Board {
                 ],
                 [0, 0]
             );
-            displayShadow();
+            this.game.mechanics.setShadow();
         }
     }
 }

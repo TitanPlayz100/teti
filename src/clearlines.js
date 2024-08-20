@@ -1,10 +1,15 @@
 // @ts-check
 
 import { cleartypes, scoringTable } from "./data.js";
+import { Mechanics } from "./mechanics.js";
 
 export class ClearLines {
-    constructor(mechanics) {
+    /**
+     * @param {Mechanics} mechanics
+     */
+    constructor(mechanics, sounds) {
         this.mechanics = mechanics;
+        this.sounds = sounds;
     }
 
     clearLines() {
@@ -33,7 +38,7 @@ export class ClearLines {
         if (this.mechanics.garbRowsLeft > 10 && this.mechanics.game.gameSettings.gamemode == 4)
             this.mechanics.addGarbage(removedGarbage);
 
-        this.mechanics.processLineClear(removedGarbage, clearRows);
+        this.processLineClear(removedGarbage, clearRows);
     }
 
     processLineClear(garbageCleared, clearRows) {
@@ -53,14 +58,14 @@ export class ClearLines {
             : this.mechanics.btbCount;
         if (linecount == 0) this.mechanics.maxCombo = this.mechanics.combonumber;
         this.mechanics.combonumber = linecount == 0 ? -1 : this.mechanics.combonumber + 1;
-        const damage = this.mechanics.calcDamage(
+        const damage = this.calcDamage(
             this.mechanics.combonumber,
             damagetype.toUpperCase().trim(),
             isPC,
             this.mechanics.btbCount,
             isBTB
         );
-        this.mechanics.totalScore += this.mechanics.calcScore(
+        this.mechanics.totalScore += this.calcScore(
             damagetype,
             isPC,
             isBTB,
@@ -70,7 +75,7 @@ export class ClearLines {
         this.mechanics.totalAttack += damage;
         this.mechanics.spikeCounter += damage;
 
-        this.mechanics.manageGarbageSent(damage);
+        this.manageGarbageSent(damage);
         this.mechanics.game.rendering.renderActionText(damagetype, isBTB, isPC, damage, linecount);
     }
 
@@ -83,7 +88,7 @@ export class ClearLines {
                 ? this.mechanics.garbageQueue - garb
                 : 0;
         if (this.mechanics.game.gameSettings.gamemode == 6 && garb > 0)
-            playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
+            this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
         if (
             this.mechanics.game.gameSettings.gamemode == 6 &&
             this.mechanics.combonumber == -1 &&

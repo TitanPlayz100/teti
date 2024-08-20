@@ -27,7 +27,7 @@ export class Mechanics {
     constructor(game) {
         this.game = game;
         this.board = game.board;
-        this.clear = new ClearLines(this);
+        this.clear = new ClearLines(this, game.sounds);
         this.Locking = new LockPiece(this, game);
     }
 
@@ -66,7 +66,7 @@ export class Mechanics {
         const dy = piece.name == "o" ? 21 : piece.name == "i" ? 19 : 20;
         this.board.addMinos("A " + piece.name, this.board.pieceToCoords(piece.shape1), [dx, dy]);
         this.game.currentLoc = [dx, dy];
-        this.game.rotationState = 1;
+        this.game.movement.rotationState = 1;
         this.game.currentPiece = piece;
         this.spawnOverlay();
         this.game.rendering.updateNext();
@@ -79,7 +79,7 @@ export class Mechanics {
         if (this.garbRowsLeft > 0 && start && this.game.gameSettings.gamemode == 4)
             this.addGarbage(rows);
         if (this.game.gameSettings.gamemode == 7) this.board.setComboBoard(start);
-        if (this.game.gameSettings.preserveARR) startArr("current");
+        if (this.game.gameSettings.preserveARR) this.game.movement.startArr("current");
     }
 
     spawnOverlay() {
@@ -159,11 +159,11 @@ export class Mechanics {
             this.spawnPiece(this.game.currentPiece);
         }
         if (this.checkDeath(this.board.getMinos("A"), this.board.getMinos("S")) == "Blockout") {
-            this.endGame("Blockout");
+            this.game.endGame("Blockout");
             return;
         }
         if (!this.game.gameSettings.infiniteHold) this.game.holdPiece.occured = true;
-        playSound("hold");
+        this.game.sounds.playSound("hold");
         this.game.rendering.renderDanger();
         clearInterval(this.game.timeouts["gravity"]);
         this.startGravity();
