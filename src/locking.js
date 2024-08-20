@@ -7,7 +7,6 @@ export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
     divLockCounter = document.getElementById("lockCounter");
 
-
     /**
      * @param {Game} game
      * @param {Mechanics} mechanics

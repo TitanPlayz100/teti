@@ -58,7 +58,6 @@ export const spinChecks = [
     ],
 ];
 
-
 export const songs = [
     new Audio("https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/patc.mp3"),
     new Audio("https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/sato.mp3"),

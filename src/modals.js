@@ -55,7 +55,7 @@ export class ModalActions {
     }
 
     closeModal(id) {
-        let settingGroup = "this.game."+id.replace("Dialog", "");
+        let settingGroup = "this.game." + id.replace("Dialog", "");
         if (id == "gamemodeDialog") settingGroup = "this.game.gameSettings";
         [...document.getElementsByClassName("option")]
             .filter(item => item.parentElement.parentElement.id == id)

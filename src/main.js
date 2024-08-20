@@ -13,8 +13,6 @@ export class Main {
     }
 
     init() {
-        
-
         this.game.movement.initKeyListeners();
         this.game.rendering.sizeCanvas();
         document.onresize = () => {

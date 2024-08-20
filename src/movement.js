@@ -252,7 +252,8 @@ export class Movement {
         this.game.currentLoc[1] -= 1;
         this.game.mechanics.totalScore += 1;
         this.game.movedPieceFirst = true;
-        if (this.checkCollision(this.game.board.getMinos("A"), "DOWN")) this.game.mechanics.Locking.scheduleLock();
+        if (this.checkCollision(this.game.board.getMinos("A"), "DOWN"))
+            this.game.mechanics.Locking.scheduleLock();
         this.startArr("current");
         if (sonic) this.movePieceDown(true);
     }

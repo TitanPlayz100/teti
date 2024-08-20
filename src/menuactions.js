@@ -4,7 +4,6 @@ import { modesText } from "./data.js";
 import { Game } from "./game.js";
 import { toExpValue } from "./util.js";
 
-
 export class MenuActions {
     bindingKey;
     divObjectiveText = document.getElementById("objectiveText");
@@ -100,7 +99,7 @@ export class MenuActions {
     }
 
     resetSettings(settingGroup) {
-        settingGroup = "this.game."+settingGroup;
+        settingGroup = "this.game." + settingGroup;
         for (let setting in eval(settingGroup)) eval(settingGroup)[setting] = "";
         this.saveSettings();
         location.reload();
@@ -127,5 +126,4 @@ export class MenuActions {
             this.game.startGame();
         }
     }
-    
 }
