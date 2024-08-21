@@ -43,9 +43,9 @@
         </div>
     </div>
 
-    <dialog id="displaySettingsDialog" class="dialog">
+    <dialog id="displayDialog" class="dialog">
         <h1>General Settings</h1>
-        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('displaySettings')">
+        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('display')">
             <img src="./assets/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>BG hex</label> <input class="option textInput" type="text" id="background" /></div>
@@ -61,12 +61,12 @@
         <div class="settingLayout"><label>SFX Volume</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="sfxLevel" min="0" max="100" step="1" /></div>
 
         <p class="smalltextdialog">Press Esc to close without saving</p>
-        <button class="closeDialog" onclick="modal.closeModal('displaySettingsDialog')">Save and close</button>
+        <button class="closeDialog" onclick="modal.closeModal('displayDialog')">Save and close</button>
     </dialog>
 
-    <dialog id="gameSettingsDialog" class="dialog">
+    <dialog id="gameDialog" class="dialog">
         <h1>Game Settings</h1>
-        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('gameSettings')">
+        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('game')">
             <img src="./assets/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
@@ -81,12 +81,12 @@
         <div class="settingLayout"><label>Infinite Hold</label> <input class="option check" type="checkbox" id="infiniteHold" /></div>
         <div class="settingLayout"><label>Allow Queue Modification</label> <input class="option check" type="checkbox" id="allowQueueModify" /></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
-        <button class="closeDialog" onclick="modal.closeModal('gameSettingsDialog')">Save and close</button>
+        <button class="closeDialog" onclick="modal.closeModal('gameDialog')">Save and close</button>
     </dialog>
 
-    <dialog id="controlSettingsDialog" class="dialog">
+    <dialog id="controlDialog" class="dialog">
         <h1>Keybinds</h1>
-        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('controlSettings')">
+        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('control')">
             <img src="./assets/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>Move Right</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="rightKey"></button></div>
@@ -99,7 +99,7 @@
         <div class="settingLayout"><label>Hold Piece</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="holdKey"></button></div>
         <div class="settingLayout"><label>Reset Game</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="resetKey"></button></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
-        <button class="closeDialog" onclick="modal.closeModal('controlSettingsDialog')">Save and close</button>
+        <button class="closeDialog" onclick="modal.closeModal('controlDialog')">Save and close</button>
     </dialog>
 
     <dialog id="frontdrop" onkeydown="menu.setKeybind(event.key)">
@@ -141,13 +141,13 @@
 
     <dialog id="settingsPanel" class="dialog">
         <p id='explanationText'>Hover for info |  Esc to close</p>
-        <button id="displaySettings" class="settingPanelButton" onclick="modal.openModal('displaySettingsDialog')" title="Display Settings - graphics of the board and background"> 
+        <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="Display Settings - graphics of the board and background"> 
             <img src="./assets/display.svg" style="transform: translateY(10%); height: 70%;">
         </button>
-        <button id="gameSettings" class="settingPanelButton" onclick="modal.openModal('gameSettingsDialog')" title="Game Settings - gameplay features or mechanics such as tuning or gravity">
+        <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - gameplay features or mechanics such as tuning or gravity">
             <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%;">
         </button>
-        <button id="controlSettings" class="settingPanelButton" onclick="modal.openModal('controlSettingsDialog')" title="Controls - keybinds for different actions">
+        <button id="control" class="settingPanelButton" onclick="modal.openModal('controlDialog')" title="Controls - keybinds for different actions">
             <img src="./assets/joystick.svg" style="transform: translateY(0%); height: 75%;">
         </button>
         <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">

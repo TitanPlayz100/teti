@@ -1,7 +1,7 @@
 // @ts-check
-import { Game } from "./game.js";
-import { toHex } from "./util.js";
-import pieces from "./data/pieces.json" with { type: "json" };
+import { Game } from "../game.js";
+import { toHex } from "../util.js";
+import pieces from "../data/pieces.json" with { type: "json" };
 
 export class Rendering {
     boardAlpha;
@@ -85,7 +85,7 @@ export class Rendering {
             this.nextWidth,
             this.nextHeight
         );
-        if (this.game.gameSettings.gamemode == 8 || !this.game.displaySettings.colouredQueues)
+        if (this.game.settings.game.gamemode == 8 || !this.game.settings.display.colouredQueues)
             return;
         this.canvasNext.style.outlineColor = pieces.filter(
             e => e.name == first5[0]
@@ -95,12 +95,12 @@ export class Rendering {
     updateHold() {
         this.holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ""));
         this.ctxH.clearRect(0, 0, this.canvasHold.offsetWidth + 10, this.canvasHold.offsetHeight);
-        if (this.game.holdPiece.piece == undefined) return;
-        const name = this.game.holdPiece.piece.name;
+        if (this.game.hold.piece == undefined) return;
+        const name = this.game.hold.piece.name;
         const isO = name == "o",
             isI = name == "i";
         const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
-        const coords = this.board.pieceToCoords(this.game.holdPiece.piece.shape1);
+        const coords = this.board.pieceToCoords(this.game.hold.piece.shape1);
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
         const len = Math.round(this.minoSize / 2);
         const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
@@ -112,9 +112,9 @@ export class Rendering {
             this.holdWidth,
             this.holdHeight
         );
-        if (this.game.gameSettings.gamemode == 8 || !this.game.displaySettings.colouredQueues)
+        if (this.game.settings.game.gamemode == 8 || !this.game.settings.display.colouredQueues)
             return;
-        this.canvasHold.style.outline = `0.2vh solid ${this.game.holdPiece.piece.colour}`;
+        this.canvasHold.style.outline = `0.2vh solid ${this.game.hold.piece.colour}`;
     }
 
     clearHold() {
@@ -124,7 +124,7 @@ export class Rendering {
     renderDanger() {
         const condition =
             this.game.board.getMinos("S").some(c => c[1] > 16) &&
-            this.game.gameSettings.gamemode != 7;
+            this.game.settings.game.gamemode != 7;
         if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
         this.inDanger = condition;
         this.divDanger.style.opacity = condition ? "0.1" : "0";
@@ -183,11 +183,11 @@ export class Rendering {
     }
 
     renderStyles() {
-        document.body.style.background = this.game.displaySettings.background;
-        const height = Number(this.game.displaySettings.boardHeight) + 10;
+        document.body.style.background = this.game.settings.display.background;
+        const height = Number(this.game.settings.display.boardHeight) + 10;
         this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
         this.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
-        const background = `rgba(0, 0, 0, ${Number(this.game.displaySettings.boardOpacity) / 100})`;
+        const background = `rgba(0, 0, 0, ${Number(this.game.settings.display.boardOpacity) / 100})`;
         this.divBoard.style.backgroundColor = background;
         this.canvasHold.style.backgroundColor = background;
         this.canvasNext.style.backgroundColor = background;
@@ -218,9 +218,9 @@ export class Rendering {
 
     // board rendering
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
-        if (this.game.gameSettings.gamemode == 8) {
+        if (this.game.settings.game.gamemode == 8) {
             if (
-                this.game.mechanics.totalPieceCount % this.game.gameSettings.lookAheadPieces == 0 &&
+                this.game.mechanics.totalPieceCount % this.game.settings.game.lookAheadPieces == 0 &&
                 !this.game.movedPieceFirst
             ) {
                 if (this.boardAlpha <= 0) {
@@ -253,14 +253,14 @@ export class Rendering {
                     cntx.fillRect(posX, posY, this.minoSize, this.minoSize);
                 } else if (cell.includes("Sh")) {
                     // shadow piece
-                    const colour = this.game.displaySettings.colouredShadow
+                    const colour = this.game.settings.display.colouredShadow
                         ? this.game.currentPiece.colour
                         : "#ffffff";
-                    cntx.fillStyle = colour + toHex(this.game.displaySettings.shadowOpacity);
+                    cntx.fillStyle = colour + toHex(this.game.settings.display.shadowOpacity);
                     cntx.fillRect(posX, posY, this.minoSize, this.minoSize);
-                } else if (y < 20 && this.game.displaySettings.showGrid && cntx == this.ctx) {
+                } else if (y < 20 && this.game.settings.display.showGrid && cntx == this.ctx) {
                     // grid
-                    cntx.strokeStyle = "#ffffff" + toHex(this.game.displaySettings.gridopacity);
+                    cntx.strokeStyle = "#ffffff" + toHex(this.game.settings.display.gridopacity);
                     cntx.beginPath();
                     cntx.roundRect(
                         posX,

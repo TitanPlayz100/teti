@@ -1,9 +1,9 @@
 // @ts-check
 
-import { Game } from "./game.js";
+import { Game } from "../game.js";
 import { ClearLines } from "./clearlines.js";
 import { LockPiece } from "./locking.js";
-import pieces from "./data/pieces.json" with { type: "json" };
+import pieces from "../data/pieces.json" with { type: "json" };
 import { Bag } from "./bag.js";
 
 export class Mechanics {
@@ -37,7 +37,7 @@ export class Mechanics {
         const collision = coords.every(c => this.game.movement.checkCollision([c], "PLACE", []));
         const collision2 = this.game.movement.checkCollision(coords, "SPAWN", collider);
         const isGarbage = collider.some(c => this.board.checkMino(c, "G"));
-        if (collision && this.game.gameSettings.allowLockout) return "Lockout";
+        if (collision && this.game.settings.game.allowLockout) return "Lockout";
         if (collision2 && isGarbage) return "Topout";
         if (collision2) return "Blockout";
     }
@@ -55,13 +55,13 @@ export class Mechanics {
         this.game.rendering.updateHold();
         this.setShadow();
         const rows =
-            this.game.gameSettings.requiredGarbage < 10
-                ? this.game.gameSettings.requiredGarbage
+            this.game.settings.game.requiredGarbage < 10
+                ? this.game.settings.game.requiredGarbage
                 : 10;
-        if (this.garbRowsLeft > 0 && start && this.game.gameSettings.gamemode == 4)
+        if (this.garbRowsLeft > 0 && start && this.game.settings.game.gamemode == 4)
             this.addGarbage(rows);
-        if (this.game.gameSettings.gamemode == 7) this.board.setComboBoard(start);
-        if (this.game.gameSettings.preserveARR) this.game.movement.startArr("current");
+        if (this.game.settings.game.gamemode == 7) this.board.setComboBoard(start);
+        if (this.game.settings.game.preserveARR) this.game.movement.startArr("current");
     }
 
     spawnOverlay() {
@@ -94,15 +94,15 @@ export class Mechanics {
     startGravity() {
         if (this.game.movement.checkCollision(this.board.getMinos("A"), "DOWN"))
             this.Locking.incrementLock();
-        if (this.game.gameSettings.gravitySpeed > 1000) return;
-        if (this.game.gameSettings.gravitySpeed == 0) {
+        if (this.game.settings.game.gravitySpeed > 1000) return;
+        if (this.game.settings.game.gravitySpeed == 0) {
             this.game.movement.movePieceDown(true);
             return;
         }
         this.game.movement.movePieceDown(false);
         this.game.timeouts["gravity"] = setInterval(
             () => this.game.movement.movePieceDown(false),
-            this.game.gameSettings.gravitySpeed
+            this.game.settings.game.gravitySpeed
         );
     }
 
@@ -125,26 +125,23 @@ export class Mechanics {
     }
 
     switchHold() {
-        if (this.game.holdPiece.occured) return;
+        if (this.game.hold.occured) return;
         this.Locking.clearLockDelay();
         this.board.MinoToNone("A");
         this.isTspin = false;
         this.isMini = false;
-        if (this.game.holdPiece.piece == null) {
-            this.game.holdPiece.piece = this.game.currentPiece;
+        if (this.game.hold.piece == null) {
+            this.game.hold.setHold();
             this.spawnPiece(this.game.bag.randomiser());
         } else {
-            [this.game.holdPiece.piece, this.game.currentPiece] = [
-                this.game.currentPiece,
-                this.game.holdPiece.piece,
-            ];
+            this.game.hold.swapHold();
             this.spawnPiece(this.game.currentPiece);
         }
         if (this.checkDeath(this.board.getMinos("A"), this.board.getMinos("S")) == "Blockout") {
             this.game.endGame("Blockout");
             return;
         }
-        if (!this.game.gameSettings.infiniteHold) this.game.holdPiece.occured = true;
+        if (!this.game.settings.game.infiniteHold) this.game.hold.occured = true;
         this.game.sounds.playSound("hold");
         this.game.rendering.renderDanger();
         clearInterval(this.game.timeouts["gravity"]);

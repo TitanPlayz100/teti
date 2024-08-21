@@ -1,6 +1,6 @@
 // @ts-check
 
-import { Game } from "./game.js";
+import { Game } from "../game.js";
 import { Mechanics } from "./mechanics.js";
 
 export class LockPiece {
@@ -20,8 +20,8 @@ export class LockPiece {
         if (this.game.timeouts["lockdelay"] != 0) {
             this.mechanics.Locking.clearLockDelay(false);
             this.mechanics.lockCount++;
-            if (this.game.gameSettings.maxLockMovements != 0 && this.game.displaySettings.lockBar) {
-                const amountToAdd = 100 / this.game.gameSettings.maxLockMovements;
+            if (this.game.settings.game.maxLockMovements != 0 && this.game.settings.display.lockBar) {
+                const amountToAdd = 100 / this.game.settings.game.maxLockMovements;
                 this.divLockCounter.value += amountToAdd;
             }
         }
@@ -31,24 +31,24 @@ export class LockPiece {
 
     scheduleLock() {
         const LockMoves =
-            this.game.gameSettings.maxLockMovements == 0
+            this.game.settings.game.maxLockMovements == 0
                 ? 99999
-                : this.game.gameSettings.maxLockMovements;
+                : this.game.settings.game.maxLockMovements;
         if (this.mechanics.lockCount >= LockMoves) {
             this.mechanics.Locking.lockPiece();
             return;
         }
-        if (this.game.gameSettings.lockDelay == 0) {
+        if (this.game.settings.game.lockDelay == 0) {
             this.game.timeouts["lockdelay"] = -1;
             return;
         }
         this.game.timeouts["lockdelay"] = setTimeout(
             () => this.mechanics.Locking.lockPiece(),
-            this.game.gameSettings.lockDelay
+            this.game.settings.game.lockDelay
         );
         this.game.timeouts["lockingTimer"] = setInterval(() => {
-            const amountToAdd = 1000 / this.game.gameSettings.lockDelay;
-            if (this.game.displaySettings.lockBar) this.divLockTimer.value += amountToAdd;
+            const amountToAdd = 1000 / this.game.settings.game.lockDelay;
+            if (this.game.settings.display.lockBar) this.divLockTimer.value += amountToAdd;
         }, 10);
     }
 
@@ -67,7 +67,7 @@ export class LockPiece {
         clearInterval(this.game.timeouts["gravity"]);
         this.mechanics.clear.clearLines();
         this.mechanics.totalPieceCount++;
-        this.game.holdPiece.occured = false;
+        this.game.hold.occured = false;
         this.mechanics.isTspin = false;
         this.mechanics.isMini = false;
         this.game.movedPieceFirst = false;
@@ -83,7 +83,7 @@ export class LockPiece {
         if (!clearCount) return;
         this.divLockCounter.value = 0;
         this.mechanics.lockCount = 0;
-        if (this.game.gameSettings.preserveARR) return;
+        if (this.game.settings.game.preserveARR) return;
         this.game.movement.resetMovements();
     }
 }

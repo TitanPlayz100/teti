@@ -1,28 +1,24 @@
 // @ts-check
 
-import { Bag } from "./bag.js";
-import { Board } from "./board.js";
-import { Controls } from "./controls.js";
-import { Main } from "./main.js";
-import { Mechanics } from "./mechanics.js";
-import { MenuActions } from "./menuactions.js";
-import { ModalActions } from "./modals.js";
-import { Movement } from "./movement.js";
-import { Rendering } from "./rendering.js";
+import { Bag } from "./mechanics/bag.js";
+import { Board } from "./mechanics/board.js";
+import { Controls } from "./movement/controls.js";
+import { Hold } from "./movement/hold.js";
+import { Mechanics } from "./mechanics/mechanics.js";
+import { MenuActions } from "./display/menuactions.js";
+import { ModalActions } from "./display/modals.js";
+import { Movement } from "./movement/movement.js";
+import { Rendering } from "./display/rendering.js";
+import { Settings } from "./settings.js";
 import { Sounds } from "./sound.js";
 import { Utils } from "./util.js";
 
 export class Game {
-    controlSettings;
-    displaySettings;
-    gameSettings;
-
     firstMove;
     gameEnd;
     
     currentLoc;
     currentPiece;
-    holdPiece;
     movedPieceFirst;
 
     timeouts = { arr: 0, das: 0, sd: 0, lockdelay: 0, gravity: 0, stats: 0, lockingTimer: 0 };
@@ -33,13 +29,10 @@ export class Game {
     elementResult = document.getElementById("result");
   
 
-    constructor(defaultSettings) {
-        this.displaySettings = defaultSettings[0];
-        this.gameSettings = defaultSettings[1];
-        this.controlSettings = defaultSettings[2];
-
+    constructor() {
+        this.settings = new Settings(this);
+        this.hold = new Hold(this);
         this.sounds = new Sounds(this);
-        this.main = new Main(this);
         this.board = new Board(this);
         this.bag = new Bag(this);
         this.mechanics = new Mechanics(this);
@@ -49,6 +42,11 @@ export class Game {
         this.rendering = new Rendering(this);
         this.utils = new Utils(this);
         this.controls = new Controls(this);
+
+        this.rendering.sizeCanvas();
+        this.sounds.initSounds();
+        this.startGame();
+        this.rendering.renderingLoop();
     }
 
     startGame() {
@@ -58,10 +56,9 @@ export class Game {
         this.mechanics.spawnPiece(this.bag.randomiser(), true);
     }
 
-    
     endGame(top, bottom = "Better luck next time") {
         const dead = ["Lockout", "Topout", "Blockout"].includes(top);
-        if (this.gameSettings.gamemode == 5 && dead) {
+        if (this.settings.game.gamemode == 5 && dead) {
             this.gameEnd = true;
             return;
         }
@@ -95,11 +92,12 @@ export class Game {
         this.currentLoc = [];
         this.mechanics.isTspin = false;
         this.mechanics.isMini = false;
-        this.holdPiece = { piece: null, occured: false };
+        this.hold.piece = null;
+        this.hold.occured = false;
         this.bag.nextPieces = [[], []];
         this.mechanics.totalLines = 0;
         this.mechanics.totalScore = 0;
-        this.mechanics.garbRowsLeft = this.gameSettings.requiredGarbage;
+        this.mechanics.garbRowsLeft = this.settings.game.requiredGarbage;
         this.mechanics.spikeCounter = 0;
         this.mechanics.btbCount = -1;
         this.mechanics.combonumber = -1;
@@ -124,7 +122,7 @@ export class Game {
         ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
             document.getElementById(id).style.opacity = "0";
         })
-        this.board.boardState = [...Array(40)].map(() => [...Array(10)].map(() => ""));
+        this.board.resetBoard();
         this.mechanics.Locking.clearLockDelay();
         this.rendering.renderDanger();
         this.rendering.renderStats();
@@ -133,30 +131,30 @@ export class Game {
 
     checkObjectives() {
         const time = (Math.round(this.totalTimeSeconds * 100) / 100).toFixed(2),
-            gs = this.gameSettings.gamemode;
-        const pieces = this.gameSettings.lookAheadPieces;
+            gs = this.settings.game.gamemode;
+        const pieces = this.settings.game.lookAheadPieces;
         this.elementObjective.textContent = {
             0: "",
-            1: `${this.mechanics.totalLines}/${this.gameSettings.requiredLines}`,
+            1: `${this.mechanics.totalLines}/${this.settings.game.requiredLines}`,
             2: `${this.mechanics.totalScore}`,
-            3: `${this.mechanics.totalAttack}/${this.gameSettings.requiredAttack}`,
+            3: `${this.mechanics.totalAttack}/${this.settings.game.requiredAttack}`,
             4: `${this.mechanics.garbRowsLeft}`,
             5: `${this.mechanics.totalSentLines}`,
-            6: `${this.mechanics.totalAttack}/${this.gameSettings.requiredAttack}`,
+            6: `${this.mechanics.totalAttack}/${this.settings.game.requiredAttack}`,
             7: `${this.mechanics.combonumber}`,
-            8: `${this.mechanics.totalLines}/${this.gameSettings.requiredLines}`,
+            8: `${this.mechanics.totalLines}/${this.settings.game.requiredLines}`,
         }[gs];
 
-        const obj1 = this.mechanics.totalLines >= this.gameSettings.requiredLines,
-            obj2 = this.totalTimeSeconds >= Number(this.gameSettings.timeLimit),
-            obj3 = this.mechanics.totalAttack >= this.gameSettings.requiredAttack,
+        const obj1 = this.mechanics.totalLines >= this.settings.game.requiredLines,
+            obj2 = this.totalTimeSeconds >= Number(this.settings.game.timeLimit),
+            obj3 = this.mechanics.totalAttack >= this.settings.game.requiredAttack,
             obj4 = this.mechanics.garbRowsLeft < 1,
             obj5 = this.gameEnd,
             obj6 = this.mechanics.combonumber == -1 && this.mechanics.totalLines >= 1;
         const ts = ` in ${time} seconds`,
             cl = `Cleared ${this.mechanics.totalLines} lines`;
         const total = this.mechanics.totalScore,
-            reqGarb = this.gameSettings.requiredGarbage;
+            reqGarb = this.settings.game.requiredGarbage;
 
         switch (gs) {
             case 1: if (obj1) { this.endGame(`${time}s`, cl + ts); } break;

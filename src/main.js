@@ -1,26 +1,6 @@
-// @ts-check
 import { Game } from "./game.js";
-import settings from "./data/defaultSettings.json" with { type: "json" };
 
-export class Main {
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
-    init() {
-        this.game.rendering.sizeCanvas();
-        
-        this.game.sounds.initSounds();
-        this.game.startGame();
-        this.game.rendering.renderingLoop();
-    }
-}
-
-const game = new Game(settings);
-game.main.init();
+const game = new Game();
 
 window["menu"] = game.menuactions;
 window["modal"] = game.modals;

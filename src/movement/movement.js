@@ -1,7 +1,7 @@
 // @ts-check
-import { spinChecks } from "./data/data.js";
-import { Game } from "./game.js";
-import { KickData, KickData180 } from "./data/kicks.js";
+import { spinChecks } from "../data/data.js";
+import { Game } from "../game.js";
+import { KickData, KickData180 } from "../data/kicks.js";
 
 export class Movement {
     /**
@@ -23,8 +23,8 @@ export class Movement {
         this.mechs.startGravity();
         this.game.firstMove = false;
         this.game.timeouts["stats"] = setInterval(() => this.game.rendering.renderStats(), 20);
-        const time = (60 * 1000) / this.game.gameSettings.survivalRate;
-        if (this.game.gameSettings.gamemode == 5)
+        const time = (60 * 1000) / this.game.settings.game.survivalRate;
+        if (this.game.settings.game.gamemode == 5)
             this.game.timeouts["survival"] = setInterval(() => this.mechs.addGarbage(1), time);
     }
 
@@ -35,7 +35,7 @@ export class Movement {
         this.game.utils.stopInterval("arr");
         this.game.timeouts["das"] = setTimeout(
             () => this.startArr(direction),
-            this.game.gameSettings.das
+            this.game.settings.game.das
         );
     }
 
@@ -49,13 +49,13 @@ export class Movement {
         }
         this.directionState[direction] = "arr";
         this.game.utils.stopInterval("arr");
-        if (this.game.gameSettings.arr == 0) {
+        if (this.game.settings.game.arr == 0) {
             this.game.timeouts["arr"] = -1;
             this.movePieceSide(direction, Infinity);
         } else {
             this.game.timeouts["arr"] = setInterval(
                 () => this.movePieceSide(direction),
-                this.game.gameSettings.arr
+                this.game.settings.game.arr
             );
         }
     }
@@ -63,14 +63,14 @@ export class Movement {
     startArrSD() {
         this.directionState["DOWN"] = "arr";
         clearInterval(this.game.timeouts["sd"]);
-        if (this.game.gameSettings.sdarr == 0) {
+        if (this.game.settings.game.sdarr == 0) {
             this.game.timeouts["sd"] = -1;
             this.movePieceDown(true);
             return;
         }
         this.game.timeouts["sd"] = setInterval(
             () => this.movePieceDown(false),
-            this.game.gameSettings.sdarr
+            this.game.settings.game.sdarr
         );
     }
 
@@ -166,7 +166,7 @@ export class Movement {
         this.game.sounds.playSound("rotate");
         this.game.mechanics.setShadow();
         if (this.mechs.isTspin) this.game.sounds.playSound("spin");
-        if (this.game.gameSettings.gravitySpeed == 0) this.mechs.startGravity();
+        if (this.game.settings.game.gravitySpeed == 0) this.mechs.startGravity();
         this.startArr("current");
         if (this.directionState["DOWN"] == "arr") this.startArrSD();
     }
@@ -196,7 +196,7 @@ export class Movement {
                 direction
             );
         while (check(amount) && Math.abs(amount) < max) direction == "RIGHT" ? amount++ : amount--;
-        if (this.game.gameSettings.gravitySpeed == 0) this.mechs.startGravity();
+        if (this.game.settings.game.gravitySpeed == 0) this.mechs.startGravity();
         if (amount == 0) {
             this.game.utils.stopInterval("arr");
             return;

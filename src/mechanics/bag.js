@@ -1,6 +1,6 @@
 //@ts-check
-import { Game } from "./game.js";
-import pieces from "./data/pieces.json" with { type: "json" };
+import { Game } from "../game.js";
+import pieces from "../data/pieces.json" with { type: "json" };
 
 export class Bag {
     /**
@@ -39,7 +39,7 @@ export class Bag {
     getFirstFive() {
         return this.nextPieces[0]
             .concat(this.nextPieces[1])
-            .slice(0, this.game.gameSettings.nextPieces);
+            .slice(0, this.game.settings.game.nextPieces);
     }
 
     getQueue() {

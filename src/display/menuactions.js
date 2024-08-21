@@ -39,7 +39,7 @@ export class MenuActions {
 
     setKeybind(key) {
         document.getElementById(this.bindingKey).textContent = key;
-        for (let i in this.game.controlSettings) {
+        for (let i in this.game.settings.control) {
             if (i == this.bindingKey) continue;
             const otherKeys = document.getElementById(i);
             if (otherKeys.textContent == key) otherKeys.textContent = "None";
@@ -50,32 +50,20 @@ export class MenuActions {
     }
 
     saveSettings() {
-        const data = [this.game.displaySettings, this.game.gameSettings, this.game.controlSettings];
+        const data = this.game.settings.save();
         localStorage.setItem("settings", JSON.stringify(data));
     }
 
     loadSettings() {
         const data = localStorage.getItem("settings");
         if (data == null) return;
-        const [tempDisplay, tempGame, tempControls] = JSON.parse(data);
-        for (let s in tempDisplay) {
-            if (tempDisplay[s] === undefined || tempDisplay[s] === "") continue;
-            this.game.displaySettings[s] = tempDisplay[s];
-        }
-        for (let s in tempGame) {
-            if (tempGame[s] === undefined || tempGame[s] === "") continue;
-            this.game.gameSettings[s] = tempGame[s];
-        }
-        for (let s in tempControls) {
-            if (tempControls[s] === undefined || tempControls[s] === "") continue;
-            this.game.controlSettings[s] = tempControls[s];
-        }
-        this.divObjectiveText.textContent = modesText[this.game.gameSettings.gamemode];
+        this.game.settings.load(JSON.parse(data))
+        this.divObjectiveText.textContent = modesText[this.game.settings.game.gamemode];
     }
 
     setGamemode(modeNum) {
-        this.game.gameSettings.gamemode = modeNum;
-        this.divObjectiveText.textContent = modesText[this.game.gameSettings.gamemode];
+        this.game.settings.game.gamemode = modeNum;
+        this.divObjectiveText.textContent = modesText[this.game.settings.game.gamemode];
     }
 
     downloadSettings() {
@@ -121,7 +109,7 @@ export class MenuActions {
     }
 
     newGame(k, d) {
-        if (k == this.game.controlSettings.resetKey) {
+        if (k == this.game.settings.control.resetKey) {
             this.game.modals.closeModal(d);
             this.game.startGame();
         }

@@ -1,6 +1,6 @@
 // @ts-check
 
-import { Game } from "./game.js";
+import { Game } from "../game.js";
 
 export class Board {
     boardState = [];
@@ -50,6 +50,20 @@ export class Board {
 
     setCoordEmpty([x, y]) {
         this.boardState[y][x] = "";
+    }
+
+    resetBoard() {
+        this.boardState = [...Array(40)].map(() => [...Array(10)].map(() => ""));
+    }
+
+    getFullRows() {
+        const rows = this.getMinos("S")
+            .map(coord => coord[1])
+            .reduce((prev, curr) => ((prev[curr] = ++prev[curr] || 1), prev), {});
+        return Object.keys(rows)
+            .filter(key => rows[key] >= 10)
+            .map(row => +row)
+            .toReversed();
     }
 
     getCoords(array, filter, [dx, dy]) {
