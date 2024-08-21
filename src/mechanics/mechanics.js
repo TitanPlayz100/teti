@@ -4,7 +4,6 @@ import { Game } from "../game.js";
 import { ClearLines } from "./clearlines.js";
 import { LockPiece } from "./locking.js";
 import pieces from "../data/pieces.json" with { type: "json" };
-import { Bag } from "./bag.js";
 
 export class Mechanics {
     garbRowsLeft;

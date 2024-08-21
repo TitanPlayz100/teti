@@ -1,5 +1,4 @@
 // @ts-check
-import { songs } from "../data/data.js";
 import { Game } from "../game.js";
 import { toExpValue, toLogValue } from "../util.js";
 

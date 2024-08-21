@@ -1,8 +1,8 @@
 // @ts-check
 
-import { modesText } from "./data/data.js";
-import { Game } from "./game.js";
-import { toExpValue } from "./util.js";
+import { modesText } from "../data/data.js";
+import { Game } from "../game.js";
+import { toExpValue } from "../util.js";
 
 export class MenuActions {
     bindingKey;
