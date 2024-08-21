@@ -1,6 +1,6 @@
 // @ts-check
 
-import { songNames, songs } from "./data.js";
+import { songNames, songs } from "./data/data.js";
 import { Game } from "./game.js";
 
 export class Sounds {

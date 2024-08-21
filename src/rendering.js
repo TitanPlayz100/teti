@@ -1,6 +1,7 @@
 // @ts-check
 import { Game } from "./game.js";
 import { toHex } from "./util.js";
+import pieces from "./data/pieces.json" with { type: "json" };
 
 export class Rendering {
     boardAlpha;
@@ -65,9 +66,7 @@ export class Rendering {
 
     updateNext() {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
-        const first5 = this.game.nextPieces[0]
-            .concat(this.game.nextPieces[1])
-            .slice(0, this.game.gameSettings.nextPieces);
+        const first5 = this.game.bag.getFirstFive();
         first5.forEach((name, idx) => {
             const piece = this.game.utils.getPiece(name),
                 pn = piece.name;
@@ -88,7 +87,7 @@ export class Rendering {
         );
         if (this.game.gameSettings.gamemode == 8 || !this.game.displaySettings.colouredQueues)
             return;
-        this.canvasNext.style.outlineColor = this.game.pieces.filter(
+        this.canvasNext.style.outlineColor = pieces.filter(
             e => e.name == first5[0]
         )[0].colour;
     }
@@ -128,7 +127,7 @@ export class Rendering {
             this.game.gameSettings.gamemode != 7;
         if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
         this.inDanger = condition;
-        this.divDanger.style.opacity = condition ? 0.1 : 0;
+        this.divDanger.style.opacity = condition ? "0.1" : "0";
     }
 
     renderActionText(damagetype, isBTB, isPC, damage, linecount) {
@@ -174,10 +173,10 @@ export class Rendering {
         const textbox = document.getElementById(id);
         textbox.textContent = text;
         textbox.style.transform = "translateX(-2%)";
-        textbox.style.opacity = 1;
+        textbox.style.opacity = "1";
         if (this.game.timeouts[id] != 0) this.game.utils.stopTimeout(id);
         this.game.timeouts[id] = setTimeout(() => {
-            textbox.style.opacity = 0;
+            textbox.style.opacity = "0";
             textbox.style.transform = "translateX(2%)";
             this.game.mechanics.spikeCounter = 0;
         }, duration);
@@ -214,7 +213,7 @@ export class Rendering {
         this.elementStats3.textContent = `${pps.toFixed(2)}`;
         this.elementSmallStat1.textContent = `${this.game.mechanics.totalAttack}`;
         this.elementSmallStat2.textContent = `${this.game.mechanics.totalPieceCount}`;
-        this.game.objectives();
+        this.game.checkObjectives();
     }
 
     // board rendering
@@ -245,7 +244,7 @@ export class Rendering {
                     // active piece or stopped piece
                     cntx.fillStyle = cell.includes("G") // garbage piece
                         ? "gray"
-                        : this.game.pieces.filter(p => p.name == cell[1])[0].colour;
+                        : pieces.filter(p => p.name == cell[1])[0].colour;
                     cntx.fillRect(posX + dx, posY + dy, this.minoSize, this.minoSize);
                     cntx.globalAlpha = this.boardAlpha.toFixed(2);
                 } else if (cell.includes("NP") && this.inDanger) {

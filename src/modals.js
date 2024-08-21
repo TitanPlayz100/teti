@@ -1,5 +1,5 @@
 // @ts-check
-import { songs } from "./data.js";
+import { songs } from "./data/data.js";
 import { Game } from "./game.js";
 import { toExpValue, toLogValue } from "./util.js";
 
@@ -28,10 +28,7 @@ export class ModalActions {
                 let newValue = eval(settingGroup)[setting.id];
                 if (setting.classList[2] == "exp") newValue = toLogValue(newValue);
                 if (setting.id == "nextQueue")
-                    newValue = this.game.nextPieces[0]
-                        .concat(this.game.nextPieces[1])
-                        .splice(0, 7)
-                        .join(" ");
+                    newValue = this.game.bag.getQueue();
                 if (setting.id == "holdQueue")
                     newValue = this.game.holdPiece.piece ? this.game.holdPiece.piece.name : "";
                 setting.value = newValue;
@@ -74,9 +71,7 @@ export class ModalActions {
                         ? toExpValue(setting.value)
                         : setting.value;
                 if (settingid == "nextQueue") {
-                    this.game.nextPieces[0] = setting.value
-                        .split(" ")
-                        .filter(p => this.pieceNames.includes(p));
+                    this.game.bag.setQueue(setting.value, this.pieceNames)
                     this.game.mechanics.shuffleRemainingPieces();
                     this.game.rendering.updateNext();
                 }

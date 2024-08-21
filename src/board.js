@@ -17,7 +17,7 @@ export class Board {
     }
 
     MinoToNone(val) {
-        this.getMinos(val).forEach(c => this.rmValue(c, val));
+        this.getMinos(val).forEach(([x, y]) => this.rmValue([x, y], val));
     }
 
     addMinos(val, c, [dx, dy]) {
@@ -44,8 +44,8 @@ export class Board {
         return this.getCoords(this.boardState, c => c.split(" ").includes(name), [0, 0]);
     }
 
-    pieceToCoords(arr, cd = [0, 0]) {
-        return this.getCoords(arr.toReversed(), c => c == 1, cd);
+    pieceToCoords(arr, [dx, dy] = [0, 0]) {
+        return this.getCoords(arr.toReversed(), c => c == 1, [dx, dy]);
     }
 
     setCoordEmpty([x, y]) {
@@ -62,7 +62,7 @@ export class Board {
         return coords.map(([x, y]) => [x + dx, y + dy]);
     }
 
-    moveMinos(coords, dir, size, value = false) {
+    moveMinos(coords, dir, size, value = "") {
         const getChange = ([x, y], a) => {
             return { RIGHT: [x + a, y], LEFT: [x - a, y], DOWN: [x, y - a], UP: [x, y + a] };
         };

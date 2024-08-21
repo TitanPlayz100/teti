@@ -1,6 +1,8 @@
 // @ts-check
 
+import { Bag } from "./bag.js";
 import { Board } from "./board.js";
+import { Controls } from "./controls.js";
 import { Main } from "./main.js";
 import { Mechanics } from "./mechanics.js";
 import { MenuActions } from "./menuactions.js";
@@ -11,48 +13,80 @@ import { Sounds } from "./sound.js";
 import { Utils } from "./util.js";
 
 export class Game {
-    attackValues;
     controlSettings;
-    currentLoc;
-    currentPiece;
     displaySettings;
+    gameSettings;
+
     firstMove;
     gameEnd;
-    gameSettings;
+    
+    currentLoc;
+    currentPiece;
     holdPiece;
     movedPieceFirst;
-    nextPieces;
-    pieces;
+
     timeouts = { arr: 0, das: 0, sd: 0, lockdelay: 0, gravity: 0, stats: 0, lockingTimer: 0 };
     totalTimeSeconds;
 
-    progressDamage = document.getElementById("garbageQueue");
     elementObjective = document.getElementById("objective");
+    elementReason = document.getElementById("reason");
+    elementResult = document.getElementById("result");
   
 
-    constructor(defaultSettings, piecesJSON, attackValuesJSON) {
+    constructor(defaultSettings) {
         this.displaySettings = defaultSettings[0];
         this.gameSettings = defaultSettings[1];
         this.controlSettings = defaultSettings[2];
-        this.pieces = piecesJSON;
-        this.attackValues = attackValuesJSON;
 
+        this.sounds = new Sounds(this);
         this.main = new Main(this);
         this.board = new Board(this);
+        this.bag = new Bag(this);
         this.mechanics = new Mechanics(this);
         this.menuactions = new MenuActions(this);
         this.modals = new ModalActions(this);
         this.movement = new Movement(this);
         this.rendering = new Rendering(this);
-        this.sounds = new Sounds(this);
         this.utils = new Utils(this);
+        this.controls = new Controls(this);
     }
 
     startGame() {
         this.menuactions.loadSettings();
         this.resetState();
         this.rendering.renderStyles();
-        this.mechanics.spawnPiece(this.mechanics.randomiser(), true);
+        this.mechanics.spawnPiece(this.bag.randomiser(), true);
+    }
+
+    
+    endGame(top, bottom = "Better luck next time") {
+        const dead = ["Lockout", "Topout", "Blockout"].includes(top);
+        if (this.gameSettings.gamemode == 5 && dead) {
+            this.gameEnd = true;
+            return;
+        }
+        switch (top) {
+            case "Lockout":
+            case "Topout":
+            case "Blockout":
+                this.sounds.playSound("failure");
+                this.sounds.playSound("topout");
+                break;
+            case undefined:
+                return;
+                break;
+            default:
+                this.sounds.playSound("finish");
+                break;
+        }
+
+        this.gameEnd = true;
+        clearInterval(this.timeouts["gravity"]);
+        clearInterval(this.timeouts["stats"]);
+        clearInterval(this.timeouts["survival"]);
+        this.modals.openModal("gameEnd");
+        this.elementReason.textContent = top;
+        this.elementResult.textContent = bottom;
     }
 
     resetState() {
@@ -62,7 +96,7 @@ export class Game {
         this.mechanics.isTspin = false;
         this.mechanics.isMini = false;
         this.holdPiece = { piece: null, occured: false };
-        this.nextPieces = [[], []];
+        this.bag.nextPieces = [[], []];
         this.mechanics.totalLines = 0;
         this.mechanics.totalScore = 0;
         this.mechanics.garbRowsLeft = this.gameSettings.requiredGarbage;
@@ -84,20 +118,20 @@ export class Game {
 
         clearInterval(this.timeouts["gravity"]);
         clearInterval(this.timeouts["survival"]);
+        clearInterval(this.timeouts['stats']);
 
-        this.progressDamage.value = 0;
+        this.mechanics.clear.progressDamage.value = 0;
         ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
-            document.getElementById(id).style.opacity = 0;
+            document.getElementById(id).style.opacity = "0";
         })
         this.board.boardState = [...Array(40)].map(() => [...Array(10)].map(() => ""));
         this.mechanics.Locking.clearLockDelay();
         this.rendering.renderDanger();
-        clearInterval(this.timeouts['stats']);
         this.rendering.renderStats();
         this.rendering.clearHold();
     }
 
-    objectives() {
+    checkObjectives() {
         const time = (Math.round(this.totalTimeSeconds * 100) / 100).toFixed(2),
             gs = this.gameSettings.gamemode;
         const pieces = this.gameSettings.lookAheadPieces;
@@ -136,33 +170,4 @@ export class Game {
         }
     }
 
-    endGame(top, bottom = "Better luck next time") {
-        const ded = ["Lockout", "Topout", "Blockout"].includes(top);
-        if (this.gameSettings.gamemode == 5 && ded) {
-            this.gameEnd = true;
-            return;
-        }
-        switch (top) {
-            case "Lockout":
-            case "Topout":
-            case "Blockout":
-                this.sounds.playSound("failure");
-                this.sounds.playSound("topout");
-                break;
-            case undefined:
-                return;
-                break;
-            default:
-                this.sounds.playSound("finish");
-                break;
-        }
-
-        this.gameEnd = true;
-        clearInterval(this.timeouts["gravity"]);
-        clearInterval(this.timeouts["stats"]);
-        clearInterval(this.timeouts["survival"]);
-        this.modals.openModal("gameEnd");
-        document.getElementById("reason").textContent = top;
-        document.getElementById("result").textContent = bottom;
-    }
 }

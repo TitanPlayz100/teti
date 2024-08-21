@@ -1,9 +1,13 @@
 // @ts-check
 
-import { cleartypes, scoringTable } from "./data.js";
+import { cleartypes, scoringTable } from "./data/data.js";
 import { Mechanics } from "./mechanics.js";
+import attackValues from "./data/attacktable.json" with { type: "json" };
 
 export class ClearLines {
+    progressDamage = document.getElementById("garbageQueue");
+
+
     /**
      * @param {Mechanics} mechanics
      */
@@ -24,7 +28,7 @@ export class ClearLines {
         let removedGarbage = 0;
         for (let row of clearRows) {
             const stopped = this.mechanics.board.getMinos("S");
-            if (stopped.filter(c => c[1] == row).some(c => this.mechanics.board.checkMino(c, "G")))
+            if (stopped.filter(c => c[1] == row).some(([x, y]) => this.mechanics.board.checkMino([x, y], "G")))
                 removedGarbage++;
             stopped
                 .filter(c => c[1] == row)
@@ -54,8 +58,8 @@ export class ClearLines {
         this.mechanics.btbCount = isBTB
             ? this.mechanics.btbCount + 1
             : linecount != 0
-            ? -1
-            : this.mechanics.btbCount;
+                ? -1
+                : this.mechanics.btbCount;
         if (linecount == 0) this.mechanics.maxCombo = this.mechanics.combonumber;
         this.mechanics.combonumber = linecount == 0 ? -1 : this.mechanics.combonumber + 1;
         const damage = this.calcDamage(
@@ -85,8 +89,8 @@ export class ClearLines {
             this.mechanics.garbageQueue == 0
                 ? garb
                 : this.mechanics.garbageQueue > garb
-                ? this.mechanics.garbageQueue - garb
-                : 0;
+                    ? this.mechanics.garbageQueue - garb
+                    : 0;
         if (this.mechanics.game.gameSettings.gamemode == 6 && garb > 0)
             this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
         if (
@@ -96,10 +100,10 @@ export class ClearLines {
         ) {
             this.mechanics.addGarbage(this.mechanics.garbageQueue, 0);
             this.mechanics.garbageQueue = 0;
-            this.mechanics.game.progressDamage.value = 0;
+            this.progressDamage.value = 0;
         }
         if (damage > 0 && this.mechanics.game.gameSettings.gamemode == 6)
-            this.mechanics.game.progressDamage.value = this.mechanics.garbageQueue;
+            this.progressDamage.value = this.mechanics.garbageQueue;
     }
 
     calcDamage(combo, type, isPC, btb, isBTB) {
@@ -108,8 +112,8 @@ export class ClearLines {
             return ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3);
         };
         return (
-            this.mechanics.game.attackValues[type][combo > 20 ? 20 : combo < 0 ? 0 : combo] +
-            (isPC ? this.mechanics.game.attackValues["ALL CLEAR"] : 0) +
+            attackValues[type][combo > 20 ? 20 : combo < 0 ? 0 : combo] +
+            (isPC ? attackValues["ALL CLEAR"] : 0) +
             (isBTB && btb > 0 ? btbdamage() : 0)
         );
     }

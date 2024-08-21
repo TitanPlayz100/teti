@@ -1,6 +1,6 @@
 // @ts-check
 
-import { modesText } from "./data.js";
+import { modesText } from "./data/data.js";
 import { Game } from "./game.js";
 import { toExpValue } from "./util.js";
 
@@ -93,7 +93,7 @@ export class MenuActions {
         const reader = new FileReader();
         reader.readAsText(el.files[0]);
         reader.onload = () => {
-            localStorage.setItem("settings", reader.result);
+            localStorage.setItem("settings", reader.result.toString());
             this.loadSettings();
         };
     }

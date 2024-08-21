@@ -53,9 +53,9 @@ export class LockPiece {
     }
 
     lockPiece() {
-        this.mechanics.board.getMinos("A").forEach(c => {
-            this.mechanics.board.rmValue(c, "A");
-            this.mechanics.board.addValFront(c, "S");
+        this.mechanics.board.getMinos("A").forEach(([x, y]) => {
+            this.mechanics.board.rmValue([x, y], "A");
+            this.mechanics.board.addValFront([x, y], "S");
         });
         this.game.endGame(
             this.mechanics.checkDeath(
@@ -71,7 +71,7 @@ export class LockPiece {
         this.mechanics.isTspin = false;
         this.mechanics.isMini = false;
         this.game.movedPieceFirst = false;
-        this.mechanics.spawnPiece(this.mechanics.randomiser());
+        this.mechanics.spawnPiece(this.game.bag.randomiser());
         this.mechanics.startGravity();
         this.game.rendering.renderDanger();
     }

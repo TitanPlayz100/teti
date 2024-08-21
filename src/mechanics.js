@@ -3,6 +3,8 @@
 import { Game } from "./game.js";
 import { ClearLines } from "./clearlines.js";
 import { LockPiece } from "./locking.js";
+import pieces from "./data/pieces.json" with { type: "json" };
+import { Bag } from "./bag.js";
 
 export class Mechanics {
     garbRowsLeft;
@@ -27,7 +29,7 @@ export class Mechanics {
     constructor(game) {
         this.game = game;
         this.board = game.board;
-        this.clear = new ClearLines(this, game.sounds);
+        this.clear = new ClearLines(this, this.game.sounds); 
         this.Locking = new LockPiece(this, game);
     }
 
@@ -38,26 +40,6 @@ export class Mechanics {
         if (collision && this.game.gameSettings.allowLockout) return "Lockout";
         if (collision2 && isGarbage) return "Topout";
         if (collision2) return "Blockout";
-    }
-
-    randomiser() {
-        if (this.game.nextPieces[1].length == 0) this.shuffleRemainingPieces();
-        if (this.game.nextPieces[0].length == 0) {
-            this.game.nextPieces = [this.game.nextPieces[1], []];
-            this.shuffleRemainingPieces();
-        }
-        const piece = this.game.nextPieces[0].splice(0, 1);
-        return this.game.pieces.filter(element => {
-            return element.name == piece;
-        })[0];
-    }
-
-    shuffleRemainingPieces() {
-        this.game.pieces.forEach(piece => this.game.nextPieces[1].push(piece.name));
-        this.game.nextPieces[1] = this.game.nextPieces[1]
-            .map(value => ({ value, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value);
     }
 
     spawnPiece(piece, start = false) {
@@ -84,12 +66,12 @@ export class Mechanics {
 
     spawnOverlay() {
         this.board.MinoToNone("NP");
-        const next = this.game.pieces.filter(
-            p => p.name == this.game.nextPieces[0].concat(this.game.nextPieces[1])[0]
+        const next = pieces.filter(
+            p => p.name == this.game.bag.firstNextPiece()
         )[0];
         const x = next.name == "o" ? 4 : 3;
         const y = next.name == "o" ? 21 : next.name == "i" ? 19 : 20;
-        this.board.pieceToCoords(next.shape1, [x, y]).forEach(c => this.board.addValue(c, "NP"));
+        this.board.pieceToCoords(next.shape1, [x, y]).forEach(([x, y]) => this.board.addValue([x, y], "NP"));
     }
 
     setShadow() {
@@ -150,7 +132,7 @@ export class Mechanics {
         this.isMini = false;
         if (this.game.holdPiece.piece == null) {
             this.game.holdPiece.piece = this.game.currentPiece;
-            this.spawnPiece(this.randomiser());
+            this.spawnPiece(this.game.bag.randomiser());
         } else {
             [this.game.holdPiece.piece, this.game.currentPiece] = [
                 this.game.currentPiece,

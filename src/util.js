@@ -1,5 +1,6 @@
 // @ts-check
 import { Game } from "./game.js";
+import pieces from "./data/pieces.json" with { type: "json" };
 
 export class Utils {
     /**
@@ -20,7 +21,7 @@ export class Utils {
     }
 
     getPiece(name) {
-        return this.game.pieces.filter(p => p.name == name)[0];
+        return pieces.filter(p => p.name == name)[0];
     }
 }
 
