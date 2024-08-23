@@ -3,9 +3,11 @@ import { Game } from "../game.js";
 import { toExpValue, toLogValue } from "../util.js";
 
 export class ModalActions {
-    isDialogOpen;
-    currentRangeOption;
+    open;
+    selectedRangeElement;
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
+    settingPanel = document.getElementById("settingsPanel");
+
 
     /**
      * @param {Game} game
@@ -17,83 +19,82 @@ export class ModalActions {
     }
 
     openModal(id) {
-        let settingGroup = "this.game.settings." + id.replace("Dialog", "");
-        if (id == "gamemodeDialog") settingGroup = "this.game.settings.game";
         if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
+        if (id == "gamemodeSelect") this.highlightGamemodeInMenu();
+
+        this.getOptions(id).forEach(setting => {
+            let settingType = this.getSettingType(id);
+            if (setting.classList[2] == "handling") settingType = "handling";
+            if (setting.classList[2] == "sound") settingType = "volume";
+            if (!this.game.settings.hasOwnProperty(settingType)) return;
+            let newval = this.game.settings[settingType][setting.id]
+
+            if (setting.classList[2] == "exp") newval = toLogValue(newval);
+            if (setting.id == "nextQueue") newval = this.game.bag.getQueue();
+            if (setting.id == "holdQueue") newval = this.game.hold.getHold();
+            setting.value = newval;
+            if (setting.classList[1] == "keybind") setting.textContent = newval;
+            if (setting.classList[1] == "check") setting.checked = newval;
+            if (setting.classList[1] == "range") {
+                this.actions.sliderChange(setting);
+                this.actions.rangeClickListener(setting);
+            }
+        });
+
+        document.getElementById(id).showModal();
+        if (id != "settingsPanel" && this.settingPanel.open) this.closeDialog(this.settingPanel);
+        this.open = true;
+
+    }
+
+    getOptions(id) {
         const options = [...document.getElementsByClassName("option")];
-        options
-            .filter(item => item.parentElement.parentElement.id == id)
-            .forEach(setting => {
-                let newValue = eval(settingGroup)[setting.id];
-                if (setting.classList[2] == "exp") newValue = toLogValue(newValue);
-                if (setting.id == "nextQueue")
-                    newValue = this.game.bag.getQueue();
-                if (setting.id == "holdQueue")
-                    newValue = this.game.hold.getHold();
-                setting.value = newValue;
-                if (setting.classList[1] == "keybind") setting.textContent = newValue;
-                if (setting.classList[1] == "check") setting.checked = newValue;
-                if (setting.classList[1] == "range") {
-                    this.actions.sliderChange(setting);
-                    this.actions.rangeClkLisnr(setting);
-                }
-            });
+        return options.filter(item => item.parentElement.parentElement.id == id)
+    }
+
+    getSettingType(id) { // change to just give a game.setting property (like game, controls etc)
+        let type = id.replace("Dialog", "");
+        if (id == "gamemodeDialog") type = "game";
+        return type;
+    }
+
+    highlightGamemodeInMenu() {
         const gamemodeSelect = [...document.getElementsByClassName("gamemodeSelect")];
         gamemodeSelect.forEach(setting => {
             setting.classList.remove("selected");
             if (setting.id == "gamemode" + this.game.settings.game.gamemode)
                 setting.classList.add("selected");
         });
-        document.getElementById(id).showModal();
-        const settingPanel = document.getElementById("settingsPanel");
-        if (id != "settingsPanel" && settingPanel.open) this.closeDialog(settingPanel);
-        this.isDialogOpen = true;
     }
 
     closeModal(id) {
-        let settingGroup = "this.game.settings." + id.replace("Dialog", "");
-        if (id == "gamemodeDialog") settingGroup = "this.game.settings.game";
-        [...document.getElementsByClassName("option")]
-            .filter(item => item.parentElement.parentElement.id == id)
-            .forEach(setting => {
-                    const settingid = setting.id,
-                        type = setting.classList[1];
-                    if (type == "number" && setting.value == "")
-                        setting.value = this.currentRangeOption.min;
+        this.getOptions(id).forEach(setting => {
+            let settingType = this.getSettingType(id);
+            let val = setting.value;
+            if (setting.classList[1] == "number" && setting.value == "") val = this.selectedRangeElement.min;
+            if (setting.classList[1] == "check") val = setting.checked;
+            if (setting.classList[1] == "keybind") val = setting.textContent;
+            if (setting.classList[2] == "exp") val = toExpValue(setting.value);
+            if (setting.classList[2] == "handling") settingType = "handling";
+            if (setting.classList[2] == "sound") settingType = "volume";
+            if (!this.game.settings.hasOwnProperty(settingType)) return;
+            this.game.settings[settingType][setting.id] = val;
 
-                    eval(settingGroup)[settingid] =
-                        type == "check"
-                            ? setting.checked
-                            : type == "keybind"
-                                ? setting.textContent
-                                : setting.classList[2] == "exp"
-                                    ? toExpValue(setting.value)
-                                    : setting.value;
-                    if (settingid == "nextQueue") {
-                        this.game.bag.setQueue(setting.value, this.pieceNames)
-                        this.game.bag.shuffleRemainingPieces();
-                        this.game.rendering.updateNext();
-                    }
-                    if (settingid == "holdQueue") {
-                        const filtp = [setting.value].filter(p => this.pieceNames.includes(p));
-                        this.game.hold.piece = this.game.utils.getPiece(filtp);
-                        this.game.hold.occured = false;
-                        this.game.rendering.updateHold();
-                    }
-                    if (id == "changeRangeValue") {
-                        this.currentRangeOption.value = document.getElementById("rangeValue").value;
-                        this.actions.sliderChange(this.currentRangeOption);
-                    }
-                    if (settingid == "audioLevel") {
-                        this.game.sounds.setAudioLevel();
-                    }
-                });
+            if (setting.id == "nextQueue") this.game.bag.setQueue(setting.value, this.pieceNames);
+            if (setting.id == "holdQueue") this.game.hold.setNewHold(setting.value);
+            if (id == "changeRangeValue") {
+                this.selectedRangeElement.value = document.getElementById("rangeValue").value;
+                this.actions.sliderChange(this.selectedRangeElement);
+            }
+            if (setting.id == "audioLevel") this.game.sounds.setAudioLevel();
+        });
+
         this.closeDialog(document.getElementById(id));
+
         this.actions.saveSettings();
-        if (id == "settings.displayDialog") this.game.rendering.renderStyles();
-        if (id == "settings.gameDialog" || id == "gamemodeDialog" || id == "gameEnd")
-            this.game.startGame();
-        if (id == "changeRangeValue") this.isDialogOpen = true;
+        if (id == "displayDialog") this.game.rendering.renderStyles();
+        if (id == "gameDialog" || id == "gamemodeDialog" || id == "gameEnd") this.game.startGame();
+        if (id == "changeRangeValue") this.open = true;
     }
 
     closeDialog(element) {
@@ -102,7 +103,7 @@ export class ModalActions {
             element.classList.remove("closingAnimation");
             element.close();
         };
-        this.isDialogOpen = false;
+        this.open = false;
         element.classList.add("closingAnimation");
         element.addEventListener("animationend", closingAnimation);
     }

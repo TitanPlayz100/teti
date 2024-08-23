@@ -24,7 +24,7 @@ export class MenuActions {
         el.parentElement.children[0].textContent = `${text}: ${value}`;
     }
 
-    rangeClkLisnr(el) {
+    rangeClickListener(el) {
         el.parentElement.children[0].addEventListener("click", () => {
             this.currentRangeOption = el;
             this.menus.openModal("changeRangeValue");
@@ -45,7 +45,7 @@ export class MenuActions {
             if (otherKeys.textContent == key) otherKeys.textContent = "None";
         }
         this.menus.closeDialog(document.getElementById("frontdrop"));
-        this.game.modals.isDialogOpen = true;
+        this.game.modals.open = true;
         this.bindingKey = undefined;
     }
 
@@ -94,7 +94,7 @@ export class MenuActions {
     }
 
     toggleDialog() {
-        if (this.game.modals.isDialogOpen) {
+        if (this.game.modals.open) {
             document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
         } else {
             this.menus.openModal("settingsPanel");

@@ -1,15 +1,8 @@
 // @ts-check
 import { spinChecks } from "../data/data.js";
 import { Game } from "../game.js";
-import { KickData, KickData180 } from "../data/kicks.js";
 
 export class Movement {
-    /**
-     * @type {{RIGHT: boolean|string, LEFT: boolean|string, DOWN: boolean|string}}
-     */
-    directionState = { RIGHT: false, LEFT: false, DOWN: false };
-    rotationState;
-
     /**
      * @param {Game} game
      */
@@ -18,7 +11,6 @@ export class Movement {
         this.mechs = this.game.mechanics;
     }
 
-    // keypresses
     firstMovement() {
         this.mechs.startGravity();
         this.game.firstMove = false;
@@ -28,73 +20,7 @@ export class Movement {
             this.game.timeouts["survival"] = setInterval(() => this.mechs.addGarbage(1), time);
     }
 
-    startDas(direction) {
-        this.movePieceSide(direction);
-        this.directionState[direction] = "das";
-        this.game.utils.stopTimeout("das");
-        this.game.utils.stopInterval("arr");
-        this.game.timeouts["das"] = setTimeout(
-            () => this.startArr(direction),
-            this.game.settings.game.das
-        );
-    }
-
-    startArr(direction) {
-        if (direction == "current") {
-            if (this.directionState["RIGHT"] == "arr" && this.directionState["LEFT"] == "arr")
-                return;
-            if (this.directionState["RIGHT"] == "arr") this.startArr("RIGHT");
-            if (this.directionState["LEFT"] == "arr") this.startArr("LEFT");
-            return;
-        }
-        this.directionState[direction] = "arr";
-        this.game.utils.stopInterval("arr");
-        if (this.game.settings.game.arr == 0) {
-            this.game.timeouts["arr"] = -1;
-            this.movePieceSide(direction, Infinity);
-        } else {
-            this.game.timeouts["arr"] = setInterval(
-                () => this.movePieceSide(direction),
-                this.game.settings.game.arr
-            );
-        }
-    }
-
-    startArrSD() {
-        this.directionState["DOWN"] = "arr";
-        clearInterval(this.game.timeouts["sd"]);
-        if (this.game.settings.game.sdarr == 0) {
-            this.game.timeouts["sd"] = -1;
-            this.movePieceDown(true);
-            return;
-        }
-        this.game.timeouts["sd"] = setInterval(
-            () => this.movePieceDown(false),
-            this.game.settings.game.sdarr
-        );
-    }
-
-    endDasArr(direction) {
-        this.directionState[direction] = false;
-        if (direction == "RIGHT" || direction == "LEFT") {
-            const oppDirection = direction == "RIGHT" ? "LEFT" : "RIGHT";
-            if (this.directionState[oppDirection] == "das") return;
-            if (this.directionState[oppDirection] == "arr") {
-                this.startArr(oppDirection);
-                return;
-            }
-            this.game.utils.stopTimeout("das");
-            this.game.utils.stopInterval("arr");
-        }
-        if (direction == "DOWN") this.game.utils.stopInterval("sd");
-    }
-
-    resetMovements() {
-        this.directionState = { RIGHT: false, LEFT: false, DOWN: false };
-        this.endDasArr("RIGHT");
-        this.endDasArr("LEFT");
-        this.endDasArr("DOWN");
-    }
+    
 
     // piece movement
     checkCollision(coords, action, collider) {
@@ -124,7 +50,7 @@ export class Movement {
     }
 
     checkTspin(rotation, [x, y], [dx, dy]) {
-        if (this.game.currentPiece.name != "t") return false;
+        if (this.game.falling.piece.name != "t") return false;
         this.mechs.isMini = false;
         const minos = spinChecks[(rotation + 1) % 4]
             .concat(spinChecks[rotation - 1])
@@ -138,13 +64,10 @@ export class Movement {
     }
 
     rotate(type) {
-        if (this.game.currentPiece.name == "o") return;
-        const newRotation = this.newRotateState(type, this.rotationState);
-        const kickdata = this.getKickData(this.game.currentPiece, type, newRotation);
-        const rotatingCoords = this.game.board.pieceToCoords(
-            this.game.currentPiece[`shape${newRotation}`],
-            this.game.currentLoc
-        );
+        if (this.game.falling.piece.name == "o") return;
+        const newRotation = this.game.falling.getRotateState(type);
+        const kickdata = this.game.falling.getKickData(type, newRotation);
+        const rotatingCoords = this.game.falling.getNewCoords(newRotation);
         const change = kickdata.find(
             ([dx, dy]) =>
                 !this.checkCollision(
@@ -154,40 +77,21 @@ export class Movement {
         );
         if (!change) return;
         this.game.board.MinoToNone("A");
-        this.game.board.addMinos("A " + this.game.currentPiece.name, rotatingCoords, change);
-        this.game.currentLoc = [
-            this.game.currentLoc[0] + change[0],
-            this.game.currentLoc[1] + change[1],
-        ];
-        this.mechs.isTspin = this.checkTspin(newRotation, this.game.currentLoc, change);
-        this.rotationState = newRotation;
-        this.game.movedPieceFirst = true;
+        this.game.board.addMinos(this.game.falling.newName(), rotatingCoords, change);
+        this.game.falling.updateLocation(change);
+        this.mechs.isTspin = this.checkTspin(newRotation, this.game.falling.location, change);
+        this.game.falling.rotation = newRotation;
         this.game.mechanics.Locking.incrementLock();
         this.game.sounds.playSound("rotate");
         this.game.mechanics.setShadow();
         if (this.mechs.isTspin) this.game.sounds.playSound("spin");
         if (this.game.settings.game.gravitySpeed == 0) this.mechs.startGravity();
-        this.startArr("current");
-        if (this.directionState["DOWN"] == "arr") this.startArrSD();
-    }
-
-    newRotateState(type, state) {
-        const newState = (state + { CW: 1, CCW: -1, 180: 2 }[type]) % 4;
-        return newState == 0 ? 4 : newState;
-    }
-
-    getKickData(piece, rotationType, shapeNo) {
-        const isI = piece.name == "i" ? 1 : 0;
-        const direction = rotationType == "CCW" ? (shapeNo > 3 ? 0 : shapeNo) : shapeNo - 1;
-        return {
-            180: KickData180[isI][direction],
-            CW: KickData[isI][direction],
-            CCW: KickData[isI][direction].map(row => row.map(x => x * -1)),
-        }[rotationType];
+        this.game.controls.startArr("current");
+        this.game.controls.checkSD();
     }
 
     movePieceSide(direction, max = 1) {
-        if (this.directionState["DOWN"] == "arr") this.startArrSD();
+        this.game.controls.checkSD();
         const minos = this.game.board.getMinos("A");
         let amount = 0;
         const check = dx =>
@@ -202,14 +106,13 @@ export class Movement {
             return;
         }
         this.game.board.moveMinos(minos, "RIGHT", amount);
-        this.game.currentLoc[0] += amount;
+        this.game.falling.updateLocation([amount, 0]);
         this.game.mechanics.isTspin = false;
         this.mechs.isMini = false;
-        this.game.movedPieceFirst = true;
         this.game.mechanics.Locking.incrementLock();
         this.game.sounds.playSound("move");
         this.game.mechanics.setShadow();
-        if (this.directionState["DOWN"] == "arr") this.startArrSD();
+        this.game.controls.checkSD();
     }
 
     movePieceDown(sonic) {
@@ -218,12 +121,11 @@ export class Movement {
         this.game.board.moveMinos(minos, "DOWN", 1);
         this.game.mechanics.isTspin = false;
         this.mechs.isMini = false;
-        this.game.currentLoc[1] -= 1;
+        this.game.falling.updateLocation([0, -1]);
         this.game.mechanics.totalScore += 1;
-        this.game.movedPieceFirst = true;
         if (this.checkCollision(this.game.board.getMinos("A"), "DOWN"))
             this.game.mechanics.Locking.scheduleLock();
-        this.startArr("current");
+        this.game.controls.startArr("current");
         if (sonic) this.movePieceDown(true);
     }
 
@@ -242,7 +144,7 @@ export class Movement {
             this.mechs.isMini = false;
         }
         this.game.board.moveMinos(minos, "DOWN", amount);
-        this.game.currentLoc[1] -= amount;
+        this.game.falling.updateLocation([0, -amount]);
         this.game.mechanics.totalScore += 2;
         this.game.sounds.playSound("harddrop");
         this.game.mechanics.Locking.lockPiece();

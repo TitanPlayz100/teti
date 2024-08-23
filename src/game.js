@@ -12,15 +12,12 @@ import { Rendering } from "./display/rendering.js";
 import { Settings } from "./settings.js";
 import { Sounds } from "./sound.js";
 import { Utils } from "./util.js";
+import { Falling } from "./movement/fallingpiece.js";
 
 export class Game {
     firstMove;
     gameEnd;
     
-    currentLoc;
-    currentPiece;
-    movedPieceFirst;
-
     timeouts = { arr: 0, das: 0, sd: 0, lockdelay: 0, gravity: 0, stats: 0, lockingTimer: 0 };
     totalTimeSeconds;
 
@@ -30,6 +27,7 @@ export class Game {
   
 
     constructor() {
+        this.falling = new Falling(this);
         this.settings = new Settings(this);
         this.hold = new Hold(this);
         this.sounds = new Sounds(this);
@@ -88,8 +86,8 @@ export class Game {
 
     resetState() {
         this.gameEnd = false;
-        this.currentPiece = null;
-        this.currentLoc = [];
+        this.falling.piece = null;
+        this.falling.location = [];
         this.mechanics.isTspin = false;
         this.mechanics.isMini = false;
         this.hold.piece = null;
@@ -105,12 +103,12 @@ export class Game {
         this.mechanics.totalAttack = 0;
         this.mechanics.totalPieceCount = 0;
         this.firstMove = true;
-        this.movement.rotationState = 1;
+        this.falling.rotation = 1;
         this.inDanger = false;
         this.mechanics.totalSentLines = 0;
         this.mechanics.garbageQueue = 0;
         this.mechanics.maxCombo = 0;
-        this.movedPieceFirst = false;
+        this.falling.moved = false;
         this.boardAlpha = 1;
         this.boardAlphaChange = 0;
 

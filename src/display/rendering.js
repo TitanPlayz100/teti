@@ -221,7 +221,7 @@ export class Rendering {
         if (this.game.settings.game.gamemode == 8) {
             if (
                 this.game.mechanics.totalPieceCount % this.game.settings.game.lookAheadPieces == 0 &&
-                !this.game.movedPieceFirst
+                !this.game.falling.moved
             ) {
                 if (this.boardAlpha <= 0) {
                     this.boardAlphaChange = 0;
@@ -254,7 +254,7 @@ export class Rendering {
                 } else if (cell.includes("Sh")) {
                     // shadow piece
                     const colour = this.game.settings.display.colouredShadow
-                        ? this.game.currentPiece.colour
+                        ? this.game.falling.piece.colour
                         : "#ffffff";
                     cntx.fillStyle = colour + toHex(this.game.settings.display.shadowOpacity);
                     cntx.fillRect(posX, posY, this.minoSize, this.minoSize);

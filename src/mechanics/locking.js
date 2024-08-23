@@ -6,6 +6,7 @@ import { Mechanics } from "./mechanics.js";
 export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
     divLockCounter = document.getElementById("lockCounter");
+    lockCount;
 
     /**
      * @param {Game} game
@@ -19,7 +20,7 @@ export class LockPiece {
     incrementLock() {
         if (this.game.timeouts["lockdelay"] != 0) {
             this.mechanics.Locking.clearLockDelay(false);
-            this.mechanics.lockCount++;
+            this.lockCount++;
             if (this.game.settings.game.maxLockMovements != 0 && this.game.settings.display.lockBar) {
                 const amountToAdd = 100 / this.game.settings.game.maxLockMovements;
                 this.divLockCounter.value += amountToAdd;
@@ -34,7 +35,7 @@ export class LockPiece {
             this.game.settings.game.maxLockMovements == 0
                 ? 99999
                 : this.game.settings.game.maxLockMovements;
-        if (this.mechanics.lockCount >= LockMoves) {
+        if (this.lockCount >= LockMoves) {
             this.mechanics.Locking.lockPiece();
             return;
         }
@@ -70,7 +71,7 @@ export class LockPiece {
         this.game.hold.occured = false;
         this.mechanics.isTspin = false;
         this.mechanics.isMini = false;
-        this.game.movedPieceFirst = false;
+        this.game.falling.moved = false;
         this.mechanics.spawnPiece(this.game.bag.randomiser());
         this.mechanics.startGravity();
         this.game.rendering.renderDanger();
@@ -82,8 +83,8 @@ export class LockPiece {
         this.divLockTimer.value = 0;
         if (!clearCount) return;
         this.divLockCounter.value = 0;
-        this.mechanics.lockCount = 0;
+        this.lockCount = 0;
         if (this.game.settings.game.preserveARR) return;
-        this.game.movement.resetMovements();
+        this.game.controls.resetMovements();
     }
 }

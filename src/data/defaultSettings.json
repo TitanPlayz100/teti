@@ -1,5 +1,5 @@
-[
-    {
+{
+    "display": {
         "background": "#080B0C",
         "boardOpacity": 100,
         "gridopacity": 20,
@@ -8,14 +8,9 @@
         "showGrid": true,
         "colouredShadow": false,
         "colouredQueues": true,
-        "lockBar": true,
-        "audioLevel": 15,
-        "sfxLevel": 10
+        "lockBar": true
     },
-    {
-        "arr": 33,
-        "das": 160,
-        "sdarr": 100,
+    "game": {
         "gravitySpeed": 950,
         "lockDelay": 600,
         "maxLockMovements": 15,
@@ -33,7 +28,7 @@
         "allowQueueModify": true,
         "lookAheadPieces": 3
     },
-    {
+    "control": {
         "rightKey": "ArrowRight",
         "leftKey": "ArrowLeft",
         "cwKey": "ArrowUp",
@@ -43,5 +38,14 @@
         "holdKey": "c",
         "resetKey": "r",
         "rotate180Key": "a"
+    },
+    "volume": {
+        "audioLevel": 15,
+        "sfxLevel": 10
+    },
+    "handling": {
+        "arr": 33,
+        "das": 160,
+        "sdarr": 100
     }
-]
+}

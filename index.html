@@ -57,8 +57,8 @@
         <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
         <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
         <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
-        <div class="settingLayout"><label>Music Volume</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="audioLevel" min="0" max="100" step="1" /></div>
-        <div class="settingLayout"><label>SFX Volume</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="sfxLevel" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>Music Volume</label> <input class="option range volume" oninput="menu.sliderChange(this)" type="range" id="audioLevel" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>SFX Volume</label> <input class="option range volume" oninput="menu.sliderChange(this)" type="range" id="sfxLevel" min="0" max="100" step="1" /></div>
 
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="modal.closeModal('displayDialog')">Save and close</button>
@@ -69,9 +69,9 @@
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('game')">
             <img src="./assets/reset.svg" alt="reset" height="100%">
         </button>
-        <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
-        <div class="settingLayout"><label>ARR</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="arr" min="0" max="50" step="2" /></div>
-        <div class="settingLayout"><label>Softdrop ARR</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="sdarr" min="0" max="200" step="5" /></div>
+        <div class="settingLayout"><label>DAS</label> <input class="option range handling" oninput="menu.sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
+        <div class="settingLayout"><label>ARR</label> <input class="option range handling" oninput="menu.sliderChange(this)" type="range" id="arr" min="0" max="50" step="2" /></div>
+        <div class="settingLayout"><label>Softdrop ARR</label> <input class="option range handling" oninput="menu.sliderChange(this)" type="range" id="sdarr" min="0" max="200" step="5" /></div>
         <div class="settingLayout"><label>Gravity</label> <input class="option range exp" oninput="menu.sliderChange(this)" type="range" id="gravitySpeed" min="0" max="100" step="1" /></div>
         <div class="settingLayout"><label>Lock delay</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="lockDelay" min="0" max="1000" step="10" /></div>
         <div class="settingLayout"><label>Lock Movements</label><input class="option range" oninput="menu.sliderChange(this)" type="range" id="maxLockMovements" min="0" max="30" step="1" /></div>

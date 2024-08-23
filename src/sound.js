@@ -20,7 +20,7 @@ export class Sounds {
         if (this.sfx[audioName] == undefined) {
             this.sfx[audioName] = new Audio(`assets/sfx/${audioName}.mp3`);
         }
-        this.sfx[audioName].volume = this.game.settings.display.sfxLevel / 1000;
+        this.sfx[audioName].volume = this.game.settings.volume.sfxLevel / 1000;
         if (this.game.firstMove == true) return;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
         this.sfx[audioName].currentTime = 0;
@@ -33,7 +33,7 @@ export class Sounds {
             this.endSong();
             this.startSong();
         };
-        songs[this.curSongIdx].volume = this.game.settings.display.audioLevel / 1000;
+        songs[this.curSongIdx].volume = this.game.settings.volume.audioLevel / 1000;
         songs[this.curSongIdx].play();
     }
 

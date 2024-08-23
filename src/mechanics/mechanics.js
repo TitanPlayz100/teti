@@ -6,21 +6,20 @@ import { LockPiece } from "./locking.js";
 import pieces from "../data/pieces.json" with { type: "json" };
 
 export class Mechanics {
-    garbRowsLeft;
+    board;
     isTspin;
     isMini;
     combonumber;
-    btbCount;
     maxCombo;
-    totalAttack;
-    spikeCounter;
-    totalLines;
-    totalScore;
+    btbCount;
+    garbRowsLeft;
     garbageQueue;
-    lockCount;
-    totalSentLines;
+    spikeCounter;
+    totalAttack;
+    totalLines;
     totalPieceCount;
-    board;
+    totalScore;
+    totalSentLines;
 
     /**
      * @param {Game} game
@@ -43,12 +42,7 @@ export class Mechanics {
 
     spawnPiece(piece, start = false) {
         if (this.game.gameEnd) return;
-        const dx = piece.name == "o" ? 4 : 3;
-        const dy = piece.name == "o" ? 21 : piece.name == "i" ? 19 : 20;
-        this.board.addMinos("A " + piece.name, this.board.pieceToCoords(piece.shape1), [dx, dy]);
-        this.game.currentLoc = [dx, dy];
-        this.game.movement.rotationState = 1;
-        this.game.currentPiece = piece;
+        this.game.falling.spawn(piece);
         this.spawnOverlay();
         this.game.rendering.updateNext();
         this.game.rendering.updateHold();
@@ -60,7 +54,7 @@ export class Mechanics {
         if (this.garbRowsLeft > 0 && start && this.game.settings.game.gamemode == 4)
             this.addGarbage(rows);
         if (this.game.settings.game.gamemode == 7) this.board.setComboBoard(start);
-        if (this.game.settings.game.preserveARR) this.game.movement.startArr("current");
+        if (this.game.settings.game.preserveARR) this.game.controls.startArr("current");
     }
 
     spawnOverlay() {
@@ -134,7 +128,7 @@ export class Mechanics {
             this.spawnPiece(this.game.bag.randomiser());
         } else {
             this.game.hold.swapHold();
-            this.spawnPiece(this.game.currentPiece);
+            this.spawnPiece(this.game.falling.piece);
         }
         if (this.checkDeath(this.board.getMinos("A"), this.board.getMinos("S")) == "Blockout") {
             this.game.endGame("Blockout");

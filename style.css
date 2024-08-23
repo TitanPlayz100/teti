@@ -77,6 +77,7 @@ body {
     border-radius: 0 1.5vh 1.5vh 0;
     outline: 0.2vh solid var(--cl-blue);
     background-color: black;
+    transition: all 0.3s ease;
 }
 
 #hold {

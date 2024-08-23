@@ -53,11 +53,12 @@ export class Bag {
         this.nextPieces[0] = value
             .split(" ")
             .filter(p => names.includes(p));
+        this.shuffleRemainingPieces();
+        this.game.rendering.updateNext();
     }
 
     firstNextPiece() {
         return this.nextPieces[0]
-        .concat(this.nextPieces[1])[0]
+            .concat(this.nextPieces[1])[0]
     }
-
 }
