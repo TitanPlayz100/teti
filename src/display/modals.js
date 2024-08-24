@@ -20,7 +20,6 @@ export class ModalActions {
 
     openModal(id) {
         if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
-        if (id == "gamemodeSelect") this.highlightGamemodeInMenu();
 
         this.getOptions(id).forEach(setting => {
             let settingType = this.getSettingType(id);
@@ -42,6 +41,7 @@ export class ModalActions {
         });
 
         document.getElementById(id).showModal();
+        if (id == "gamemodeDialog") this.highlightGamemodeInMenu();
         if (id != "settingsPanel" && this.settingPanel.open) this.closeDialog(this.settingPanel);
         this.open = true;
 

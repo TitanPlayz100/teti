@@ -47,7 +47,7 @@ export class Rendering {
 
     sizeCanvas() {
         this.divBoard.setAttribute("style", "");
-        this.game.rendering.renderStyles();
+        this.renderStyles();
         // this.canvasField.offsetWidth = this.divBoard.width;
         [this.canvasField, this.canvasNext, this.canvasHold].forEach(c => {
             c.width = Math.round(c.offsetWidth / 10) * 10;
@@ -85,8 +85,7 @@ export class Rendering {
             this.nextWidth,
             this.nextHeight
         );
-        if (this.game.settings.game.gamemode == 8 || !this.game.settings.display.colouredQueues)
-            return;
+        if (this.game.settings.game.gamemode == 8 || !this.game.settings.display.colouredQueues) return;
         this.canvasNext.style.outlineColor = pieces.filter(
             e => e.name == first5[0]
         )[0].colour;
@@ -194,35 +193,19 @@ export class Rendering {
     }
 
     renderStats() {
-        this.game.totalTimeSeconds += 0.02;
-        const displaytime = (Math.round(this.game.totalTimeSeconds * 10) / 10).toFixed(1);
-        let pps = 0.0,
-            apm = 0.0;
-        if (this.game.totalTimeSeconds != 0)
-            pps =
-                Math.round(
-                    (this.game.mechanics.totalPieceCount * 100) / this.game.totalTimeSeconds
-                ) / 100;
-        if (this.game.totalTimeSeconds != 0)
-            apm =
-                Math.round(
-                    (this.game.mechanics.totalAttack * 10) / (this.game.totalTimeSeconds / 60)
-                ) / 10;
+        const {displaytime, apm, pps} = this.game.stats.getDisplayStats();
         this.elementStats1.textContent = `${displaytime}`;
         this.elementStats2.textContent = `${apm.toFixed(1)}`;
         this.elementStats3.textContent = `${pps.toFixed(2)}`;
-        this.elementSmallStat1.textContent = `${this.game.mechanics.totalAttack}`;
-        this.elementSmallStat2.textContent = `${this.game.mechanics.totalPieceCount}`;
-        this.game.checkObjectives();
+        this.elementSmallStat1.textContent = `${this.game.stats.attack}`;
+        this.elementSmallStat2.textContent = `${this.game.stats.pieceCount}`;
+        this.game.stats.checkObjectives();
     }
 
     // board rendering
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
         if (this.game.settings.game.gamemode == 8) {
-            if (
-                this.game.mechanics.totalPieceCount % this.game.settings.game.lookAheadPieces == 0 &&
-                !this.game.falling.moved
-            ) {
+            if (this.game.stats.checkInvis()) {
                 if (this.boardAlpha <= 0) {
                     this.boardAlphaChange = 0;
                     this.boardAlpha = 1;

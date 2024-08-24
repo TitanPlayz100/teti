@@ -20,9 +20,6 @@ export class Movement {
             this.game.timeouts["survival"] = setInterval(() => this.mechs.addGarbage(1), time);
     }
 
-    
-
-    // piece movement
     checkCollision(coords, action, collider) {
         collider = collider || this.game.board.getMinos("S");
         for (let [x, y] of coords) {
@@ -122,7 +119,7 @@ export class Movement {
         this.game.mechanics.isTspin = false;
         this.mechs.isMini = false;
         this.game.falling.updateLocation([0, -1]);
-        this.game.mechanics.totalScore += 1;
+        this.game.stats.score += 1;
         if (this.checkCollision(this.game.board.getMinos("A"), "DOWN"))
             this.game.mechanics.Locking.scheduleLock();
         this.game.controls.startArr("current");
@@ -145,7 +142,7 @@ export class Movement {
         }
         this.game.board.moveMinos(minos, "DOWN", amount);
         this.game.falling.updateLocation([0, -amount]);
-        this.game.mechanics.totalScore += 2;
+        this.game.stats.score += 2;
         this.game.sounds.playSound("harddrop");
         this.game.mechanics.Locking.lockPiece();
     }

@@ -10,16 +10,10 @@ export class Mechanics {
     isTspin;
     isMini;
     combonumber;
-    maxCombo;
     btbCount;
-    garbRowsLeft;
     garbageQueue;
     spikeCounter;
-    totalAttack;
-    totalLines;
-    totalPieceCount;
-    totalScore;
-    totalSentLines;
+    
 
     /**
      * @param {Game} game
@@ -27,7 +21,7 @@ export class Mechanics {
     constructor(game) {
         this.game = game;
         this.board = game.board;
-        this.clear = new ClearLines(this, this.game.sounds); 
+        this.clear = new ClearLines(this, game); 
         this.Locking = new LockPiece(this, game);
     }
 
@@ -51,7 +45,7 @@ export class Mechanics {
             this.game.settings.game.requiredGarbage < 10
                 ? this.game.settings.game.requiredGarbage
                 : 10;
-        if (this.garbRowsLeft > 0 && start && this.game.settings.game.gamemode == 4)
+        if (this.game.stats.getRemainingGarbage() > 0 && start && this.game.settings.game.gamemode == 4)
             this.addGarbage(rows);
         if (this.game.settings.game.gamemode == 7) this.board.setComboBoard(start);
         if (this.game.settings.game.preserveARR) this.game.controls.startArr("current");
@@ -114,7 +108,7 @@ export class Mechanics {
             }
         }
         this.setShadow();
-        this.totalSentLines += lines;
+        this.game.stats.sent += lines;
     }
 
     switchHold() {

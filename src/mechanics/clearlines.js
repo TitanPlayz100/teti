@@ -3,17 +3,20 @@
 import { cleartypes, scoringTable } from "../data/data.js";
 import { Mechanics } from "./mechanics.js";
 import attackValues from "../data/attacktable.json" with { type: "json" };
+import { Game } from "../game.js";
 
 export class ClearLines {
     progressDamage = document.getElementById("garbageQueue");
 
 
     /**
-     * @param {Mechanics} mechanics
+     * @param {Game} game
      */
-    constructor(mechanics, sounds) {
+    constructor(mechanics, game) {
+        this.game = game
         this.mech = mechanics;
-        this.sounds = sounds;
+        this.sounds = game.sounds;
+        this.stats = game.stats;
     }
 
     clearLines() {
@@ -32,14 +35,14 @@ export class ClearLines {
                 1
             );
         }
-        if (this.mech.garbRowsLeft > 10 && this.mech.game.settings.game.gamemode == 4)
+        if (this.stats.getRemainingGarbage() > 10 && this.game.settings.game.gamemode == 4)
             this.mech.addGarbage(removedGarbage);
 
         this.processLineClear(removedGarbage, clearRows);
     }
 
     processLineClear(garbageCleared, clearRows) {
-        this.mech.garbRowsLeft -= garbageCleared;
+        this.stats.cleargarbage += garbageCleared;
         const linecount = clearRows.length;
         const isBTB =
             (this.mech.isTspin || this.mech.isMini || linecount == 4) && linecount > 0;
@@ -53,7 +56,7 @@ export class ClearLines {
             : linecount != 0
                 ? -1
                 : this.mech.btbCount;
-        if (linecount == 0) this.mech.maxCombo = this.mech.combonumber;
+        if (linecount == 0) this.stats.maxCombo = this.mech.combonumber;
         this.mech.combonumber = linecount == 0 ? -1 : this.mech.combonumber + 1;
         const damage = this.calcDamage(
             this.mech.combonumber,
@@ -62,32 +65,32 @@ export class ClearLines {
             this.mech.btbCount,
             isBTB
         );
-        this.mech.totalScore += this.calcScore(
+        this.game.stats.score += this.calcScore(
             damagetype,
             isPC,
             isBTB,
             this.mech.combonumber
         );
-        this.mech.totalLines += linecount;
-        this.mech.totalAttack += damage;
+        this.stats.clearlines += linecount;
+        this.stats.attack += damage;
         this.mech.spikeCounter += damage;
 
         this.manageGarbageSent(damage);
-        this.mech.game.rendering.renderActionText(damagetype, isBTB, isPC, damage, linecount);
+        this.game.rendering.renderActionText(damagetype, isBTB, isPC, damage, linecount);
     }
 
     manageGarbageSent(damage) {
-        const garb = damage * this.mech.game.settings.game.backfireMulti;
+        const garb = damage * this.game.settings.game.backfireMulti;
         this.mech.garbageQueue =
             this.mech.garbageQueue == 0
                 ? garb
                 : this.mech.garbageQueue > garb
                     ? this.mech.garbageQueue - garb
                     : 0;
-        if (this.mech.game.settings.game.gamemode == 6 && garb > 0)
+        if (this.game.settings.game.gamemode == 6 && garb > 0)
             this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
         if (
-            this.mech.game.settings.game.gamemode == 6 &&
+            this.game.settings.game.gamemode == 6 &&
             this.mech.combonumber == -1 &&
             this.mech.garbageQueue > 0
         ) {
@@ -95,7 +98,7 @@ export class ClearLines {
             this.mech.garbageQueue = 0;
             this.progressDamage.value = 0;
         }
-        if (damage > 0 && this.mech.game.settings.game.gamemode == 6)
+        if (damage > 0 && this.game.settings.game.gamemode == 6)
             this.progressDamage.value = this.mech.garbageQueue;
     }
 

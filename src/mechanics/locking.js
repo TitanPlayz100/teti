@@ -67,7 +67,7 @@ export class LockPiece {
         this.mechanics.Locking.clearLockDelay();
         clearInterval(this.game.timeouts["gravity"]);
         this.mechanics.clear.clearLines();
-        this.mechanics.totalPieceCount++;
+        this.game.stats.pieceCount++;
         this.game.hold.occured = false;
         this.mechanics.isTspin = false;
         this.mechanics.isMini = false;

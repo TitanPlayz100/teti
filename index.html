@@ -162,7 +162,7 @@
         </span>
         <div id="songSelector">
             <p id="songText">Not Playing</p>
-            <button id="pauseSong" onclick="songs.pause()" class="settingPanelButton smallerPanelButton" title="Pause/Play"><img src="./assets/pause.svg"/></button>
+            <button id="pauseSong" onclick="songs.pauseSong()" class="settingPanelButton smallerPanelButton" title="Pause/Play"><img src="./assets/pause.svg"/></button>
             <progress id="songProgress" max=100 value=0></progress>
             <button id="nextSong" onclick="songs.endSong(); songs.startSong();" class="settingPanelButton smallerPanelButton" title="Next Song"><img src="./assets/next.svg" style="transform: translateY(-5%);"/></button>
         </div>
