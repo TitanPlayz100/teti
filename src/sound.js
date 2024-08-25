@@ -40,15 +40,18 @@ export class Sounds {
     endSong() {
         songs[this.curSongIdx].pause();
         songs[this.curSongIdx].currentTime = 0;
-        songs[this.curSongIdx].onended = () => {};
+        songs[this.curSongIdx].onended = () => { };
         this.curSongIdx = (this.curSongIdx + 1) % songs.length;
     }
 
     pauseSong() {
         if (songs[this.curSongIdx].paused) {
             songs[this.curSongIdx].play();
+            this.elSongText.textContent = `Now Playing ${songNames[this.curSongIdx]}`;
         } else {
             songs[this.curSongIdx].pause();
+            this.elSongText.textContent = `Not Playing`;
+
         }
     }
 

@@ -8,10 +8,12 @@ import pieces from "../data/pieces.json" with { type: "json" };
 export class Mechanics {
     board;
     isTspin;
+    isAllspin;
     isMini;
     combonumber;
     garbageQueue;
     spikeCounter;
+    gravityTimer = 0;
     
 
     /**
@@ -21,7 +23,7 @@ export class Mechanics {
         this.game = game;
         this.board = game.board;
         this.clear = new ClearLines(this, game); 
-        this.Locking = new LockPiece(this, game);
+        this.locking = new LockPiece(this, game);
     }
 
     checkDeath(coords, collider) {
@@ -48,6 +50,7 @@ export class Mechanics {
             this.addGarbage(rows);
         if (this.game.settings.game.gamemode == 7) this.board.setComboBoard(start);
         if (this.game.settings.game.preserveARR) this.game.controls.startArr("current");
+        if (this.game.started) this.startGravity();
     }
 
     spawnOverlay() {
@@ -78,15 +81,14 @@ export class Mechanics {
     }
 
     startGravity() {
-        if (this.game.movement.checkCollision(this.board.getMinos("A"), "DOWN"))
-            this.Locking.incrementLock();
+        clearInterval(this.gravityTimer);
         if (this.game.settings.game.gravitySpeed > 1000) return;
         if (this.game.settings.game.gravitySpeed == 0) {
             this.game.movement.movePieceDown(true);
             return;
         }
         this.game.movement.movePieceDown(false);
-        this.game.timeouts["gravity"] = setInterval(
+        this.gravityTimer = setInterval(
             () => this.game.movement.movePieceDown(false),
             this.game.settings.game.gravitySpeed
         );
@@ -96,7 +98,7 @@ export class Mechanics {
         let randCol = Math.floor(Math.random() * 10);
         for (let i = 0; i < lines; i++) {
             if (this.game.movement.checkCollision(this.board.getMinos("A"), "DOWN")) {
-                if (this.game.timeouts["lockdelay"] == 0) this.Locking.incrementLock();
+                if (this.locking.timings.lockdelay == 0) this.locking.incrementLock();
                 this.board.moveMinos(this.board.getMinos("A"), "UP", 1);
             }
             this.board.moveMinos(this.board.getMinos("S"), "UP", 1);
@@ -112,9 +114,10 @@ export class Mechanics {
 
     switchHold() {
         if (this.game.hold.occured) return;
-        this.Locking.clearLockDelay();
+        this.locking.clearLockDelay();
         this.board.MinoToNone("A");
         this.isTspin = false;
+        this.isAllspin = false;
         this.isMini = false;
         if (this.game.hold.piece == null) {
             this.game.hold.setHold();
@@ -130,7 +133,6 @@ export class Mechanics {
         if (!this.game.settings.game.infiniteHold) this.game.hold.occured = true;
         this.game.sounds.playSound("hold");
         this.game.rendering.renderDanger();
-        clearInterval(this.game.timeouts["gravity"]);
         this.startGravity();
         this.game.rendering.updateHold();
     }

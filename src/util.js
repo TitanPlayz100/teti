@@ -10,16 +10,6 @@ export class Utils {
         this.game = game;
     }
 
-    stopTimeout(name) {
-        clearTimeout(this.game.timeouts[name]);
-        this.game.timeouts[name] = 0;
-    }
-
-    stopInterval(name) {
-        clearInterval(this.game.timeouts[name]);
-        this.game.timeouts[name] = 0;
-    }
-
     getPiece(name) {
         return pieces.filter(p => p.name == name)[0];
     }

@@ -19,8 +19,8 @@ export class Game {
     started;
     ended;
 
-    // TODO: refactor timeouts to either be in main file or in a class
-    timeouts = { arr: 0, das: 0, sd: 0, lockdelay: 0, gravity: 0, stats: 0, lockingTimer: 0 };
+    statsTimer = 0;
+    survivalTimer = 0;
 
     elementReason = document.getElementById("reason");
     elementResult = document.getElementById("result");
@@ -77,9 +77,9 @@ export class Game {
         }
 
         this.ended = true;
-        clearInterval(this.timeouts["gravity"]);
-        clearInterval(this.timeouts["stats"]);
-        clearInterval(this.timeouts["survival"]);
+        clearInterval(this.mechanics.gravityTimer);
+        clearInterval(this.statsTimer);
+        clearInterval(this.survivalTimer);
         this.modals.openModal("gameEnd");
         this.elementReason.textContent = top;
         this.elementResult.textContent = bottom;
@@ -90,6 +90,7 @@ export class Game {
         this.falling.piece = null;
         this.falling.location = [];
         this.mechanics.isTspin = false;
+        this.mechanics.isAllspin = false;
         this.mechanics.isMini = false;
         this.hold.piece = null;
         this.hold.occured = false;
@@ -113,16 +114,16 @@ export class Game {
         this.rendering.boardAlpha = 1;
         this.rendering.boardAlphaChange = 0;
 
-        clearInterval(this.timeouts["gravity"]);
-        clearInterval(this.timeouts["survival"]);
-        clearInterval(this.timeouts['stats']);
+        clearInterval(this.mechanics.gravityTimer);
+        clearInterval(this.statsTimer);
+        clearInterval(this.survivalTimer);
 
         this.mechanics.clear.progressDamage.value = 0;
         ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
             document.getElementById(id).style.opacity = "0";
         })
         this.board.resetBoard();
-        this.mechanics.Locking.clearLockDelay();
+        this.mechanics.locking.clearLockDelay();
         this.rendering.renderDanger();
         this.rendering.renderStats();
         this.rendering.clearHold();

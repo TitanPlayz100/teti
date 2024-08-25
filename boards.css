@@ -1,0 +1,148 @@
+
+#board {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0 0;
+    transform: scale(1.1) translate(-50%, -50%);
+    height: 60vh;
+    aspect-ratio: 0.5;
+    outline: 0.2vh solid var(--cl-blue);
+    box-shadow: 0 0 5vh var(--l-gray);
+    background-color: black;
+    transition: outline 0.5s ease;
+}
+
+#board.boardDanger {
+    outline-color: red !important;
+    transition: all 0.2s ease;
+}
+
+#dangerOverlay {
+    position: absolute;
+    background-color: red;
+    transition: all 0.2s ease;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+#playingfield {
+    position: fixed;
+    width: 100%;
+    height: 200%;
+    top: -100%;
+}
+
+#grid {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
+#next {
+    position: fixed;
+    left: 101%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(15, 1fr);
+    height: 75%;
+    width: 40%;
+    border-radius: 0 1.5vh 1.5vh 0;
+    outline: 0.2vh solid var(--cl-blue);
+    background-color: black;
+    transition: all 0.3s ease;
+}
+
+#hold {
+    position: fixed;
+    left: -40%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    height: 15%;
+    width: 39.5%;
+    border-radius: 1.5vh 0 0 1.5vh;
+    background-color: black;
+}
+
+#lockTimer,
+#lockCounter {
+    position: absolute;
+    bottom: -0.8vh;
+    width: 100%;
+    height: 0.8vh;
+    border-radius: 0.5vh;
+}
+
+#lockCounter {
+    bottom: -1.4vh;
+    height: 0.6vh;
+}
+
+#lockTimer::-webkit-progress-bar,
+#lockCounter::-webkit-progress-bar,
+#garbageQueue::-webkit-progress-bar {
+    background-color: var(--invis);
+}
+
+#lockTimer::-webkit-progress-value,
+#lockCounter::-webkit-progress-value {
+    background-color: var(--cl-blue);
+    border-radius: 0.7vh;
+}
+
+#garbageQueue {
+    position: absolute;
+    width: 122vh;
+    height: 0.5vh;
+    border-radius: 0.5vh;
+    transform-origin: 0 0;
+    transform: rotate(-90deg);
+    left: -2%;
+    bottom: -1%;
+}
+
+#garbageQueue::-webkit-progress-value {
+    background-color: red;
+    border-radius: 0.7vh;
+}
+
+.actiontext,
+.statstext {
+    position: fixed;
+    font-size: 3vh;
+    text-shadow: 0 0 3vh var(--vl-gray);
+    margin: 0;
+    text-align: right;
+    width: 200%;
+    user-select: none;
+    transition: all 0.2s ease;
+    right: 105%;
+}
+
+.actiontext {
+    opacity: 0;
+}
+
+.text {
+    position: fixed;
+    font-size: 3vh;
+    margin: 0;
+    user-select: none;
+}
+
+.nextText {
+    left: 110%;
+    bottom: 100%;
+}
+
+.holdText {
+    right: 110%;
+    bottom: 100%;
+}
+
+.objectiveText {
+    left: 110%;
+    bottom: 10%;
+}

@@ -6,6 +6,8 @@
     <link rel="icon" type="image/x-icon" href="./assets/titanicon.ico">
     <title>teti</title>
     <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./boards.css">
+    <link rel="stylesheet" href="./menus.css">
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
@@ -80,7 +82,9 @@
         <div class="settingLayout"><label>Preserve DAS</label> <input class="option check" type="checkbox" id="preserveARR" /></div>
         <div class="settingLayout"><label>Infinite Hold</label> <input class="option check" type="checkbox" id="infiniteHold" /></div>
         <div class="settingLayout"><label>Allow Queue Modification</label> <input class="option check" type="checkbox" id="allowQueueModify" /></div>
-        <p class="smalltextdialog">Press Esc to close without saving</p>
+        <div class="settingLayout"><label>Allspin</label> <input class="option check" type="checkbox" id="allspin" /></div>
+        <div class="settingLayout"><label>Allspin's are mini</label> <input class="option check" type="checkbox" id="allspinminis" /></div>
+        <!-- <p class="smalltextdialog">Press Esc to close without saving</p> -->
         <button class="closeDialog" onclick="modal.closeModal('gameDialog')">Save and close</button>
     </dialog>
 
@@ -140,7 +144,7 @@
     </dialog>
 
     <dialog id="settingsPanel" class="dialog">
-        <p id='explanationText'>Hover for info |  Esc to close</p>
+        <p id='explanationText'><span class="spanright">Hover for info</span> | <span class="spanleft">Esc to close</span></p>
         <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="Display Settings - graphics of the board and background"> 
             <img src="./assets/display.svg" style="transform: translateY(10%); height: 70%;">
         </button>
@@ -153,13 +157,19 @@
         <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
             <img src="./assets/timer.svg" style="transform: translateY(10%); height: 90%;">
         </button>
-        <button id="downloadloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
+        <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="//redirect to info page or open info card" title="See info about this project">
+            <img src="./assets/info.svg" style="height: 80%;">
+        </button>
+        <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
             <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
         </button>
         <span id="uploadSettings" class="settingPanelButton smallPanelButton" style="height: 4.5vh; " onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
             <input type="file" id="fileUpload" onchange="menu.uploadSettings(this)" hidden accept=".teti">
             <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
         </span>
+        <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="Download / Export Settings">
+            <img src="./assets/github.svg" style="transform: translateY(-14%); height: 200%;">
+        </button>
         <div id="songSelector">
             <p id="songText">Not Playing</p>
             <button id="pauseSong" onclick="songs.pauseSong()" class="settingPanelButton smallerPanelButton" title="Pause/Play"><img src="./assets/pause.svg"/></button>

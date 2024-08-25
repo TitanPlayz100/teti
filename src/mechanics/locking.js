@@ -7,6 +7,7 @@ export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
     divLockCounter = document.getElementById("lockCounter");
     lockCount;
+    timings = { lockdelay: 0, lockingTimer: 0 }
 
     /**
      * @param {Game} game
@@ -18,39 +19,41 @@ export class LockPiece {
     }
 
     incrementLock() {
-        if (this.game.timeouts["lockdelay"] != 0) {
-            this.mechanics.Locking.clearLockDelay(false);
+        if (this.timings.lockdelay != 0) {
             this.lockCount++;
+            this.mechanics.locking.clearLockDelay(false);
             if (this.game.settings.game.maxLockMovements != 0 && this.game.settings.display.lockBar) {
                 const amountToAdd = 100 / this.game.settings.game.maxLockMovements;
                 this.divLockCounter.value += amountToAdd;
             }
         }
-        if (this.game.movement.checkCollision(this.mechanics.board.getMinos("A"), "DOWN"))
-            this.mechanics.Locking.scheduleLock();
+        if (this.game.movement.checkCollision(this.mechanics.board.getMinos("A"), "DOWN")) {
+            this.mechanics.locking.scheduleLock();
+        }
     }
 
     scheduleLock() {
         const LockMoves =
             this.game.settings.game.maxLockMovements == 0
-                ? 99999
+                ? Infinity
                 : this.game.settings.game.maxLockMovements;
         if (this.lockCount >= LockMoves) {
-            this.mechanics.Locking.lockPiece();
+            this.mechanics.locking.lockPiece();
             return;
         }
         if (this.game.settings.game.lockDelay == 0) {
-            this.game.timeouts["lockdelay"] = -1;
+            this.timings.lockdelay = -1;
             return;
         }
-        this.game.timeouts["lockdelay"] = setTimeout(
-            () => this.mechanics.Locking.lockPiece(),
+        this.timings.lockdelay = setTimeout(
+            () => this.mechanics.locking.lockPiece(),
             this.game.settings.game.lockDelay
         );
-        this.game.timeouts["lockingTimer"] = setInterval(() => {
+        this.timings.lockingTimer = setInterval(() => {
             const amountToAdd = 1000 / this.game.settings.game.lockDelay;
             if (this.game.settings.display.lockBar) this.divLockTimer.value += amountToAdd;
         }, 10);
+
     }
 
     lockPiece() {
@@ -64,22 +67,22 @@ export class LockPiece {
                 this.mechanics.board.getMinos("NP")
             )
         );
-        this.mechanics.Locking.clearLockDelay();
-        clearInterval(this.game.timeouts["gravity"]);
+        this.mechanics.locking.clearLockDelay();
+        clearInterval(this.mechanics.gravityTimer);
         this.mechanics.clear.clearLines();
         this.game.stats.pieceCount++;
         this.game.hold.occured = false;
         this.mechanics.isTspin = false;
+        this.mechanics.isAllspin = false;
         this.mechanics.isMini = false;
         this.game.falling.moved = false;
         this.mechanics.spawnPiece(this.game.bag.randomiser());
-        this.mechanics.startGravity();
         this.game.rendering.renderDanger();
     }
 
     clearLockDelay(clearCount = true) {
-        clearInterval(this.game.timeouts["lockingTimer"]);
-        this.game.utils.stopTimeout("lockdelay");
+        clearInterval(this.timings.lockingTimer);
+        this.stopTimeout("lockdelay");
         this.divLockTimer.value = 0;
         if (!clearCount) return;
         this.divLockCounter.value = 0;
@@ -87,4 +90,15 @@ export class LockPiece {
         if (this.game.settings.game.preserveARR) return;
         this.game.controls.resetMovements();
     }
+
+    stopTimeout(name) {
+        clearTimeout(this.timings[name]);
+        this.timings[name] = 0;
+    }
+
+    stopInterval(name) {
+        clearInterval(this.timings[name]);
+        this.timings[name] = 0;
+    }
+
 }

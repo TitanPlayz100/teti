@@ -16,6 +16,7 @@ export class Rendering {
     nextQueueGrid = [];
     inDanger;
     minoSize;
+    texttimeouts = {};
 
     canvasField = document.getElementById("playingfield");
     canvasNext = document.getElementById("next");
@@ -150,6 +151,8 @@ export class Rendering {
             this.game.sounds.playSound("clearquad");
         } else if (linecount > 0 && this.game.mechanics.isTspin) {
             this.game.sounds.playSound("clearspin");
+        } else if (linecount > 0 && this.game.mechanics.isAllspin && this.game.settings.game.allspin) {
+            this.game.sounds.playSound("clearspin");
         } else if (linecount > 0) {
             this.game.sounds.playSound("clearline");
         }
@@ -168,17 +171,23 @@ export class Rendering {
         this.divLinesSent.style.fontSize = `${3.5 * size}vh`;
     }
 
+
     setText(id, text, duration) {
         const textbox = document.getElementById(id);
         textbox.textContent = text;
         textbox.style.transform = "translateX(-2%)";
         textbox.style.opacity = "1";
-        if (this.game.timeouts[id] != 0) this.game.utils.stopTimeout(id);
-        this.game.timeouts[id] = setTimeout(() => {
+        if (this.texttimeouts[id] != 0) this.stopTimeout(id);
+        this.texttimeouts[id] = setTimeout(() => {
             textbox.style.opacity = "0";
             textbox.style.transform = "translateX(2%)";
             this.game.mechanics.spikeCounter = 0;
         }, duration);
+    }
+
+    stopTimeout(name) {
+        clearTimeout(this.texttimeouts[name]);
+        this.texttimeouts[name] = 0;
     }
 
     renderStyles() {

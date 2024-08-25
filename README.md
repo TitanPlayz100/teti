@@ -41,6 +41,11 @@ May implement these in the future (no particular order):
 - allspin
 - custom mino skins and music
 - touch settings
+- cooler graphics (maybe using a library like pixijs)
+
+## TODO
+- info page
+- change setting dialogs to allow for scrolling
 
 ## Current Features
 
@@ -60,6 +65,7 @@ May implement these in the future (no particular order):
 - customisable display
 - tetrio sfx
 - touhou jazz music (funny)
+    - can play/pause, skip song
 - technically responsive
 - many modes
     - 40l, blitz, zen

@@ -114,4 +114,8 @@ export class MenuActions {
             this.game.startGame();
         }
     }
+
+    openPage(url) {
+        window.open("https://" + url, "blank_")
+    }
 }

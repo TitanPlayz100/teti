@@ -44,11 +44,13 @@ export class ClearLines {
     processLineClear(garbageCleared, clearRows) {
         this.stats.cleargarbage += garbageCleared;
         const linecount = clearRows.length;
-        const isBTB =
+        // TODO: add allspin option for btb
+        const isBTB = 
             (this.mech.isTspin || this.mech.isMini || linecount == 4) && linecount > 0;
         const isPC = this.mech.board.getMinos("S").length == 0;
-        const damagetype =
-            (this.mech.isTspin ? "Tspin " : "") +
+        // TODO: add allspin option for damage
+        let damagetype = 
+            ((this.mech.isTspin || (this.mech.isAllspin && this.game.settings.game.allspin)) ? "Tspin " : "") + 
             (this.mech.isMini ? "mini " : "") +
             cleartypes[linecount];
         this.game.stats.updateBTB(isBTB, linecount);
@@ -72,6 +74,7 @@ export class ClearLines {
         this.mech.spikeCounter += damage;
 
         this.manageGarbageSent(damage);
+        if (this.mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name +" spin ");
         this.game.rendering.renderActionText(damagetype, isBTB, isPC, damage, linecount);
     }
 

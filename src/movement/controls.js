@@ -8,7 +8,9 @@ export class Controls {
      * @type {{RIGHT: boolean|string, LEFT: boolean|string, DOWN: boolean|string}}
      */
     directionState = { RIGHT: false, LEFT: false, DOWN: false };
-    
+
+    timings = { arr: 0, das: 0, sd: 0 }; // timeout and interval ids
+
 
     /**
      * @param {Game} game
@@ -57,9 +59,9 @@ export class Controls {
     startDas(direction) {
         this.moves.movePieceSide(direction);
         this.directionState[direction] = "das";
-        this.game.utils.stopTimeout("das");
-        this.game.utils.stopInterval("arr");
-        this.game.timeouts["das"] = setTimeout(
+        this.stopTimeout("das");
+        this.stopInterval("arr");
+        this.timings.das = setTimeout(
             () => this.startArr(direction),
             this.game.settings.handling.das
         );
@@ -74,12 +76,12 @@ export class Controls {
             return;
         }
         this.directionState[direction] = "arr";
-        this.game.utils.stopInterval("arr");
+        this.stopInterval("arr");
         if (this.game.settings.handling.arr == 0) {
-            this.game.timeouts["arr"] = -1;
+            this.timings.arr = -1;
             this.moves.movePieceSide(direction, Infinity);
         } else {
-            this.game.timeouts["arr"] = setInterval(
+            this.timings.arr = setInterval(
                 () => this.moves.movePieceSide(direction),
                 this.game.settings.handling.arr
             );
@@ -88,13 +90,13 @@ export class Controls {
 
     startArrSD() {
         this.directionState["DOWN"] = "arr";
-        clearInterval(this.game.timeouts["sd"]);
+        clearInterval(this.timings.sd);
         if (this.game.settings.handling.sdarr == 0) {
-            this.game.timeouts["sd"] = -1;
+            this.timings.sd = -1;
             this.moves.movePieceDown(true);
             return;
         }
-        this.game.timeouts["sd"] = setInterval(
+        this.timings.sd = setInterval(
             () => this.moves.movePieceDown(false),
             this.game.settings.handling.sdarr
         );
@@ -109,10 +111,10 @@ export class Controls {
                 this.startArr(oppDirection);
                 return;
             }
-            this.game.utils.stopTimeout("das");
-            this.game.utils.stopInterval("arr");
+            this.stopTimeout("das");
+            this.stopInterval("arr");
         }
-        if (direction == "DOWN") this.game.utils.stopInterval("sd");
+        if (direction == "DOWN") this.stopInterval("sd");
     }
 
     resetMovements() {
@@ -126,6 +128,17 @@ export class Controls {
         if (this.directionState["DOWN"] == "arr")
             this.startArrSD();
     }
+
+    stopTimeout(name) {
+        clearTimeout(this.timings[name]);
+        this.timings[name] = 0;
+    }
+
+    stopInterval(name) {
+        clearInterval(this.timings[name]);
+        this.timings[name] = 0;
+    }
+
 
 
 }
