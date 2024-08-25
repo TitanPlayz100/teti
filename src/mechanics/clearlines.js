@@ -51,18 +51,14 @@ export class ClearLines {
             (this.mech.isTspin ? "Tspin " : "") +
             (this.mech.isMini ? "mini " : "") +
             cleartypes[linecount];
-        this.mech.btbCount = isBTB
-            ? this.mech.btbCount + 1
-            : linecount != 0
-                ? -1
-                : this.mech.btbCount;
+        this.game.stats.updateBTB(isBTB, linecount);
         if (linecount == 0) this.stats.maxCombo = this.mech.combonumber;
         this.mech.combonumber = linecount == 0 ? -1 : this.mech.combonumber + 1;
         const damage = this.calcDamage(
             this.mech.combonumber,
             damagetype.toUpperCase().trim(),
             isPC,
-            this.mech.btbCount,
+            this.game.stats.btbCount,
             isBTB
         );
         this.game.stats.score += this.calcScore(

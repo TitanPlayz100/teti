@@ -8,6 +8,7 @@ export class Controls {
      * @type {{RIGHT: boolean|string, LEFT: boolean|string, DOWN: boolean|string}}
      */
     directionState = { RIGHT: false, LEFT: false, DOWN: false };
+    
 
     /**
      * @param {Game} game
@@ -27,13 +28,13 @@ export class Controls {
 
         if (event.repeat || this.game.modals.open) return;
         if (disabledKeys.includes(event.key)) event.preventDefault();
-        if (this.game.firstMove && event.key != "Escape") this.moves.firstMovement();
+        if (!this.game.started && event.key != "Escape") this.moves.firstMovement();
 
         if (event.key == this.keys.resetKey) {
             this.game.sounds.playSound("retry");
             this.game.startGame();
         }
-        if (this.game.gameEnd) return;
+        if (this.game.ended) return;
 
         if (event.key == this.keys.cwKey) this.moves.rotate("CW");
         if (event.key == this.keys.ccwKey) this.moves.rotate("CCW");

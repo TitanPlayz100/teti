@@ -133,8 +133,8 @@ export class Rendering {
         if (damagetype != "") this.setText("cleartext", damagetype, 2000);
         if (this.game.mechanics.combonumber > 0)
             this.setText("combotext", `Combo ${this.game.mechanics.combonumber}`, 2000);
-        if (isBTB && this.game.mechanics.btbCount > 0)
-            this.setText("btbtext", `BTB ${this.game.mechanics.btbCount} `, 2000);
+        if (isBTB && this.game.stats.btbCount > 0)
+            this.setText("btbtext", `BTB ${this.game.stats.btbCount} `, 2000);
         if (isPC) this.setText("pctext", "Perfect Clear", 2000);
         if (damage > 0) this.setText("linessent", `${this.game.mechanics.spikeCounter}`, 1500);
 
@@ -143,8 +143,8 @@ export class Rendering {
         if (this.game.mechanics.spikeCounter >= 20) this.spikePattern("lime", 1.2);
 
         if (isPC) this.game.sounds.playSound("allclear");
-        if (this.game.mechanics.btbCount == 2 && isBTB) this.game.sounds.playSound("btb_1");
-        if (linecount == 4 && this.game.mechanics.btbCount > 0) {
+        if (this.game.stats.btbCount == 2 && isBTB) this.game.sounds.playSound("btb_1");
+        if (linecount == 4 && this.game.stats.btbCount > 0) {
             this.game.sounds.playSound("clearbtb");
         } else if (linecount == 4) {
             this.game.sounds.playSound("clearquad");

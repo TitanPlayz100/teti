@@ -16,8 +16,8 @@ import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./mechanics/stats.js";
 
 export class Game {
-    firstMove;
-    gameEnd;
+    started;
+    ended;
 
     // TODO: refactor timeouts to either be in main file or in a class
     timeouts = { arr: 0, das: 0, sd: 0, lockdelay: 0, gravity: 0, stats: 0, lockingTimer: 0 };
@@ -58,7 +58,7 @@ export class Game {
     endGame(top, bottom = "Better luck next time") {
         const dead = ["Lockout", "Topout", "Blockout"].includes(top);
         if (this.settings.game.gamemode == 5 && dead) {
-            this.gameEnd = true;
+            this.ended = true;
             return;
         }
         switch (top) {
@@ -76,7 +76,7 @@ export class Game {
                 break;
         }
 
-        this.gameEnd = true;
+        this.ended = true;
         clearInterval(this.timeouts["gravity"]);
         clearInterval(this.timeouts["stats"]);
         clearInterval(this.timeouts["survival"]);
@@ -86,7 +86,7 @@ export class Game {
     }
 
     resetState() {
-        this.gameEnd = false;
+        this.ended = false;
         this.falling.piece = null;
         this.falling.location = [];
         this.mechanics.isTspin = false;
@@ -98,12 +98,12 @@ export class Game {
         this.stats.score = 0;
         this.stats.cleargarbage = 0;
         this.mechanics.spikeCounter = 0;
-        this.mechanics.btbCount = -1;
+        this.stats.btbCount = -1;
         this.mechanics.combonumber = -1;
         this.stats.time = -0.02;
         this.stats.attack = 0;
         this.stats.pieceCount = 0;
-        this.firstMove = true;
+        this.started = false;
         this.falling.rotation = 1;
         this.rendering.inDanger = false;
         this.stats.sent = 0;

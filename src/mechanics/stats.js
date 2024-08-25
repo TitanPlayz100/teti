@@ -11,6 +11,8 @@ export class GameStats {
     time; // seconds
     cleargarbage;
     maxCombo;
+    btbCount;
+
 
     // TODO: add more stats
 
@@ -45,7 +47,7 @@ export class GameStats {
             obj2 = this.time >= Number(goals.timeLimit),
             obj3 = this.attack >= goals.requiredAttack,
             obj4 = this.cleargarbage >= goals.requiredGarbage,
-            obj5 = this.game.gameEnd,
+            obj5 = this.game.ended,
             obj6 = this.game.mechanics.combonumber == -1 && this.clearlines >= 1,
             ts = ` in ${time} seconds`,
             cl = `Cleared ${this.clearlines} lines`,
@@ -84,6 +86,14 @@ export class GameStats {
 
     getRemainingGarbage() {
         return this.game.settings.game.requiredGarbage - this.cleargarbage
+    }
+
+    updateBTB(isBTB, count) {
+        if (isBTB) {
+            this.btbCount++;
+        } else if (count != 0) {
+            this.btbCount = -1;
+        }
     }
 
 }

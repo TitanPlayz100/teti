@@ -13,7 +13,7 @@ export class Movement {
 
     firstMovement() {
         this.mechs.startGravity();
-        this.game.firstMove = false;
+        this.game.started = true;
         this.game.timeouts["stats"] = setInterval(() => this.game.rendering.renderStats(), 20);
         const time = (60 * 1000) / this.game.settings.game.survivalRate;
         if (this.game.settings.game.gamemode == 5)

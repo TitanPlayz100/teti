@@ -10,7 +10,6 @@ export class Mechanics {
     isTspin;
     isMini;
     combonumber;
-    btbCount;
     garbageQueue;
     spikeCounter;
     
@@ -35,7 +34,7 @@ export class Mechanics {
     }
 
     spawnPiece(piece, start = false) {
-        if (this.game.gameEnd) return;
+        if (this.game.ended) return;
         this.game.falling.spawn(piece);
         this.spawnOverlay();
         this.game.rendering.updateNext();

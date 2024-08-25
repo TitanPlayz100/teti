@@ -21,7 +21,7 @@ export class Sounds {
             this.sfx[audioName] = new Audio(`assets/sfx/${audioName}.mp3`);
         }
         this.sfx[audioName].volume = this.game.settings.volume.sfxLevel / 1000;
-        if (this.game.firstMove == true) return;
+        if (this.game.started == false) return;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
         this.sfx[audioName].currentTime = 0;
         this.sfx[audioName].play();
