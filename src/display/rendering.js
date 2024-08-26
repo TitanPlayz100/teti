@@ -27,6 +27,7 @@ export class Rendering {
     elementStats1 = document.getElementById("stats1");
     elementStats2 = document.getElementById("stats2");
     elementStats3 = document.getElementById("stats3");
+    elementEditPieces = document.getElementById("editMenuPieces");
 
     elementSmallStat1 = document.getElementById("smallStat1");
     elementSmallStat2 = document.getElementById("smallStat2");
@@ -69,7 +70,7 @@ export class Rendering {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
         const first5 = this.game.bag.getFirstFive();
         first5.forEach((name, idx) => {
-            const piece = this.game.utils.getPiece(name),
+            const piece = this.getPiece(name),
                 pn = piece.name;
             let dx = 0,
                 dy = 3 * (4 - idx);
@@ -90,6 +91,11 @@ export class Rendering {
         this.canvasNext.style.outlineColor = pieces.filter(
             e => e.name == first5[0]
         )[0].colour;
+    }
+
+    getPiece(name) {
+        if (name == "G") return {colour: "gray"}
+        return pieces.filter(p => p.name == name)[0];
     }
 
     updateHold() {
@@ -145,9 +151,9 @@ export class Rendering {
 
         if (isPC) this.game.sounds.playSound("allclear");
         if (this.game.stats.btbCount == 2 && isBTB) this.game.sounds.playSound("btb_1");
-        if (linecount == 4 && this.game.stats.btbCount > 0) {
+        if (linecount >= 4 && this.game.stats.btbCount > 0) {
             this.game.sounds.playSound("clearbtb");
-        } else if (linecount == 4) {
+        } else if (linecount >= 4) {
             this.game.sounds.playSound("clearquad");
         } else if (linecount > 0 && this.game.mechanics.isTspin) {
             this.game.sounds.playSound("clearspin");
@@ -209,6 +215,15 @@ export class Rendering {
         this.elementSmallStat1.textContent = `${this.game.stats.attack}`;
         this.elementSmallStat2.textContent = `${this.game.stats.pieceCount}`;
         this.game.stats.checkObjectives();
+        this.setEditPieceColours();
+    }
+
+    setEditPieceColours() {
+        const elPieces = [...this.elementEditPieces.children];
+        elPieces.forEach(elpiece => {
+            const pieceid = elpiece.id.split("_")[0];
+            elpiece.style.backgroundColor = this.getPiece(pieceid).colour
+        })
     }
 
     // board rendering

@@ -39,7 +39,8 @@
         "sdKey": "ArrowDown",
         "holdKey": "c",
         "resetKey": "r",
-        "rotate180Key": "a"
+        "rotate180Key": "a",
+        "editMenuKey": "e"
     },
     "volume": {
         "audioLevel": 15,

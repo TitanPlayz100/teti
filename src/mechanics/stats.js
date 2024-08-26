@@ -13,10 +13,6 @@ export class GameStats {
     maxCombo;
     btbCount;
 
-
-    // TODO: add more stats
-
-
     elementObjective = document.getElementById("objective");
 
     /**

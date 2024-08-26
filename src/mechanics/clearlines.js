@@ -41,18 +41,32 @@ export class ClearLines {
         this.processLineClear(removedGarbage, clearRows);
     }
 
+    clearRow(rowNumber) {
+        const stopped = this.mech.board.getMinos("S");
+        stopped
+            .filter(c => c[1] == rowNumber)
+            .forEach(([x, y]) => this.mech.board.setCoordEmpty([x, y]));
+        this.mech.board.moveMinos(
+            stopped.filter(c => c[1] > rowNumber),
+            "DOWN",
+            1
+        );
+    }
+
     processLineClear(garbageCleared, clearRows) {
         this.stats.cleargarbage += garbageCleared;
         const linecount = clearRows.length;
-        // TODO: add allspin option for btb
-        const isBTB = 
-            (this.mech.isTspin || this.mech.isMini || linecount == 4) && linecount > 0;
+        const isBTB =
+            (this.mech.isTspin
+                || this.mech.isMini
+                || linecount >= 4
+                || (this.mech.isAllspin && this.game.settings.game.allspin))
+            && linecount > 0;
         const isPC = this.mech.board.getMinos("S").length == 0;
-        // TODO: add allspin option for damage
-        let damagetype = 
-            ((this.mech.isTspin || (this.mech.isAllspin && this.game.settings.game.allspin)) ? "Tspin " : "") + 
+        let damagetype =
+            ((this.mech.isTspin || (this.mech.isAllspin && this.game.settings.game.allspin)) ? "Tspin " : "") +
             (this.mech.isMini ? "mini " : "") +
-            cleartypes[linecount];
+            cleartypes[Math.min(linecount, 5)]; // limit to 5 line clear
         this.game.stats.updateBTB(isBTB, linecount);
         if (linecount == 0) this.stats.maxCombo = this.mech.combonumber;
         this.mech.combonumber = linecount == 0 ? -1 : this.mech.combonumber + 1;
@@ -74,7 +88,7 @@ export class ClearLines {
         this.mech.spikeCounter += damage;
 
         this.manageGarbageSent(damage);
-        if (this.mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name +" spin ");
+        if (this.mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
         this.game.rendering.renderActionText(damagetype, isBTB, isPC, damage, linecount);
     }
 
@@ -106,6 +120,7 @@ export class ClearLines {
             const x = Math.log1p(btb * 0.8);
             return ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3);
         };
+        if (!attackValues.hasOwnProperty(type)) return 0;
         return (
             attackValues[type][combo > 20 ? 20 : combo < 0 ? 0 : combo] +
             (isPC ? attackValues["ALL CLEAR"] : 0) +

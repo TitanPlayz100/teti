@@ -20,6 +20,8 @@
         <canvas id="next" onclick="modal.openModal('queueModify')"></canvas>
         <canvas id="hold" onclick="modal.openModal('queueModify')"></canvas>
         <canvas id="playingfield"></canvas>
+        <div id="clickareas"></div>
+
         <progress id="garbageQueue" max="40" value="0"></progress>
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
@@ -46,7 +48,7 @@
     </div>
 
     <dialog id="displayDialog" class="dialog">
-        <h1>General Settings</h1>
+        <h1>User Settings</h1>
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('display')">
             <img src="./assets/reset.svg" alt="reset" height="100%">
         </button>
@@ -59,8 +61,7 @@
         <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
         <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
         <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
-        <div class="settingLayout"><label>Music Volume</label> <input class="option range volume" oninput="menu.sliderChange(this)" type="range" id="audioLevel" min="0" max="100" step="1" /></div>
-        <div class="settingLayout"><label>SFX Volume</label> <input class="option range volume" oninput="menu.sliderChange(this)" type="range" id="sfxLevel" min="0" max="100" step="1" /></div>
+        
 
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="modal.closeModal('displayDialog')">Save and close</button>
@@ -71,9 +72,7 @@
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('game')">
             <img src="./assets/reset.svg" alt="reset" height="100%">
         </button>
-        <div class="settingLayout"><label>DAS</label> <input class="option range handling" oninput="menu.sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
-        <div class="settingLayout"><label>ARR</label> <input class="option range handling" oninput="menu.sliderChange(this)" type="range" id="arr" min="0" max="50" step="2" /></div>
-        <div class="settingLayout"><label>Softdrop ARR</label> <input class="option range handling" oninput="menu.sliderChange(this)" type="range" id="sdarr" min="0" max="200" step="5" /></div>
+        
         <div class="settingLayout"><label>Gravity</label> <input class="option range exp" oninput="menu.sliderChange(this)" type="range" id="gravitySpeed" min="0" max="100" step="1" /></div>
         <div class="settingLayout"><label>Lock delay</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="lockDelay" min="0" max="1000" step="10" /></div>
         <div class="settingLayout"><label>Lock Movements</label><input class="option range" oninput="menu.sliderChange(this)" type="range" id="maxLockMovements" min="0" max="30" step="1" /></div>
@@ -84,7 +83,7 @@
         <div class="settingLayout"><label>Allow Queue Modification</label> <input class="option check" type="checkbox" id="allowQueueModify" /></div>
         <div class="settingLayout"><label>Allspin</label> <input class="option check" type="checkbox" id="allspin" /></div>
         <div class="settingLayout"><label>Allspin's are mini</label> <input class="option check" type="checkbox" id="allspinminis" /></div>
-        <!-- <p class="smalltextdialog">Press Esc to close without saving</p> -->
+        <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="modal.closeModal('gameDialog')">Save and close</button>
     </dialog>
 
@@ -102,6 +101,7 @@
         <div class="settingLayout"><label>Harddrop</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="hdKey"></button></div>
         <div class="settingLayout"><label>Hold Piece</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="holdKey"></button></div>
         <div class="settingLayout"><label>Reset Game</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="resetKey"></button></div>
+        <div class="settingLayout"><label>Open Edit Menu (Custom)</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="editMenuKey"></button></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="modal.closeModal('controlDialog')">Save and close</button>
     </dialog>
@@ -115,7 +115,7 @@
 
     <dialog id="gamemodeDialog" class="dialog">
         <h1>Select Gamemode</h1>
-        <button id="gamemode0" class="gamemodeSelect" onclick="menu.setGamemode(0);modal.closeModal('gamemodeDialog')">Zen</button>
+        <button id="gamemode0" class="gamemodeSelect" onclick="menu.setGamemode(0);modal.closeModal('gamemodeDialog')">Zen/Custom</button>
         <button id="gamemode1" class="gamemodeSelect" onclick="menu.setGamemode(1);modal.closeModal('gamemodeDialog')">Sprint</button>
         <button id="gamemode2" class="gamemodeSelect" onclick="menu.setGamemode(2);modal.closeModal('gamemodeDialog')">Ultra</button>
         <button id="gamemode3" class="gamemodeSelect" onclick="menu.setGamemode(3);modal.closeModal('gamemodeDialog')">Attacker</button>
@@ -135,6 +135,32 @@
         <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
     </dialog>
 
+    <dialog id="handlingDialog" class="dialog">
+        <h1>Change Handling</h1>
+        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('handling')">
+            <img src="./assets/reset.svg" alt="reset" height="100%">
+        </button>
+
+        <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
+        <div class="settingLayout"><label>ARR</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="arr" min="0" max="50" step="2" /></div>
+        <div class="settingLayout"><label>Softdrop ARR</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="sdarr" min="0" max="200" step="5" /></div>
+        <p class="smalltextdialog">Press Esc to close without saving</p>
+        <button class="closeDialog" onclick="modal.closeModal('handlingDialog')">Save and close</button>
+    </dialog>
+
+    <dialog id="volumeDialog" class="dialog">
+        <h1>Change Handling</h1>
+        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('handling')">
+            <img src="./assets/reset.svg" alt="reset" height="100%">
+        </button>
+
+        <div class="settingLayout"><label>Music Volume</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="audioLevel" min="0" max="100" step="1" /></div>
+        <div class="settingLayout"><label>SFX Volume</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="sfxLevel" min="0" max="100" step="1" /></div>
+        <p class="smalltextdialog">Press Esc to close without saving</p>
+        <button class="closeDialog" onclick="modal.closeModal('volumeDialog')">Save and close</button>
+    </dialog>
+
+
     <dialog id="gameEnd" class="dialog" onkeydown="menu.newGame(event.key, 'gameEnd')">
         <h1><b>GAME ENDED</b></h1>
         <p id="reason" style="font-size: 3.6vh;"></p>
@@ -144,11 +170,18 @@
     </dialog>
 
     <dialog id="settingsPanel" class="dialog">
-        <p id='explanationText'><span class="spanright">Hover for info</span> | <span class="spanleft">Esc to close</span></p>
-        <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="Display Settings - graphics of the board and background"> 
+        <button id="handling" class="settingPanelButton smallPanelButton" onclick="modal.openModal('handlingDialog')" title="Change handling/tuning">
+            <img src="./assets/handling.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <button id="volume" class="settingPanelButton smallPanelButton" onclick="modal.openModal('volumeDialog')" title="Change audio settings">
+            <img src="./assets/volume.svg" style="transform: translateY(5%); height: 110%;">
+        </button>
+        <br>
+
+        <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="User Settings - Graphics, board, and background"> 
             <img src="./assets/display.svg" style="transform: translateY(10%); height: 70%;">
         </button>
-        <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - gameplay features or mechanics such as tuning or gravity">
+        <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - Gameplay features and mechanics">
             <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%;">
         </button>
         <button id="control" class="settingPanelButton" onclick="modal.openModal('controlDialog')" title="Controls - keybinds for different actions">
@@ -157,19 +190,26 @@
         <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
             <img src="./assets/timer.svg" style="transform: translateY(10%); height: 90%;">
         </button>
+        <br>
+
+        <p id='explanationText'><span class="spanright">Hover for info</span> | <span class="spanleft">Esc to close</span></p>
+        <br>
+
         <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="//redirect to info page or open info card" title="See info about this project">
             <img src="./assets/info.svg" style="height: 80%;">
         </button>
-        <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
+        <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download Export Settings">
             <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
         </button>
         <span id="uploadSettings" class="settingPanelButton smallPanelButton" style="height: 4.5vh; " onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
             <input type="file" id="fileUpload" onchange="menu.uploadSettings(this)" hidden accept=".teti">
             <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
         </span>
-        <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="Download / Export Settings">
+        <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="See the github page, star if you like it">
             <img src="./assets/github.svg" style="transform: translateY(-14%); height: 200%;">
         </button>
+        <br>
+
         <div id="songSelector">
             <p id="songText">Not Playing</p>
             <button id="pauseSong" onclick="songs.pauseSong()" class="settingPanelButton smallerPanelButton" title="Pause/Play"><img src="./assets/pause.svg"/></button>
@@ -182,13 +222,36 @@
         <h1><b>Change Queues</b></h1>
         <div class="settingLayout"><label>Next</label> <input class="option textInput next" type="text" id="nextQueue" /></div>
         <div class="settingLayout"><label>Hold</label> <input class="option textInput hold" type="text" id="holdQueue" /></div>
-        <button class="closeDialog" onclick="modal.closeModal('queueModify')" style="bottom: 10%;" >Save</button>
+        <button class="closeDialog" onclick="modal.closeModal('queueModify')">Save</button>
     </dialog>
 
     <dialog id="changeRangeValue" class="dialog">
         <h1>Enter Value</h1>
         <div class="settingLayout"><input class="option number" type="number" id="rangeValue" oninput="menu.checkValue(this)" /></div>
-        <button class="closeDialog" onclick="modal.closeModal('changeRangeValue')" style="bottom: 10%;" >Save</button>
+        <button class="closeDialog" onclick="modal.closeModal('changeRangeValue')">Save</button>
+    </dialog>
+
+    <dialog id="editMenu" class="dialog">
+        <h1>Edit Menu</h1>
+        <!-- options: change colour, fill row, add garbage row, remove garbage row, remove all garbage -->
+        <h3>Choose Piece</h3>
+        <div style="width: 100%; display: flex; justify-content: center;" id="editMenuPieces">
+            <button class="pieceselection" id="i_piece_colour" onclick="menu.changeEditPiece('i')"></button>
+            <button class="pieceselection" id="j_piece_colour" onclick="menu.changeEditPiece('j')"></button>
+            <button class="pieceselection" id="l_piece_colour" onclick="menu.changeEditPiece('l')"></button>
+            <button class="pieceselection" id="o_piece_colour" onclick="menu.changeEditPiece('o')"></button>
+            <button class="pieceselection" id="s_piece_colour" onclick="menu.changeEditPiece('s')"></button>
+            <button class="pieceselection" id="t_piece_colour" onclick="menu.changeEditPiece('t')"></button>
+            <button class="pieceselection" id="z_piece_colour" onclick="menu.changeEditPiece('z')"></button>
+            <button class="pieceselection" id="G_piece_colour" onclick="menu.changeEditPiece('G')"></button>
+        </div> 
+        <div class="settingLayout"><label>Row Fill Mode</label> <input class="option check custom" type="checkbox" id="rowfillmode" /></div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <button class="customGameAction" onclick="menu.addGarbageRow()">Add garbage row</button>
+            <button class="customGameAction" onclick="menu.removeLastRow()">Remove bottom row</button>
+            <button class="customGameAction" onclick="menu.clearGarbage()">Clear all garbage</button>
+        </div>
+        <button class="closeDialog" onclick="modal.closeModal('editMenu')">Save and Close</button>
     </dialog>
 </body>
 </html>

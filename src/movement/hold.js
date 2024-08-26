@@ -1,6 +1,8 @@
 //@ts-check
 
 import { Game } from "../game.js";
+import pieces from "../data/pieces.json" with { type: "json" };
+
 
 export class Hold {
     piece;
@@ -30,9 +32,13 @@ export class Hold {
 
     setNewHold(val) {
         const validPiece = [val].filter(p => this.pieceNames.includes(p));
-        this.piece = this.game.utils.getPiece(validPiece);
+        this.piece = this.getPiece(validPiece);
         this.occured = false;
         this.game.rendering.updateHold();
+    }
+
+    getPiece(name) {
+        return pieces.filter(p => p.name == name)[0];
     }
 
 }

@@ -23,14 +23,13 @@ export class ModalActions {
 
         this.getOptions(id).forEach(setting => {
             let settingType = this.getSettingType(id);
-            if (setting.classList[2] == "handling") settingType = "handling";
-            if (setting.classList[2] == "sound") settingType = "volume";
             if (!this.game.settings.hasOwnProperty(settingType)) return;
             let newval = this.game.settings[settingType][setting.id]
 
             if (setting.classList[2] == "exp") newval = toLogValue(newval);
             if (setting.id == "nextQueue") newval = this.game.bag.getQueue();
             if (setting.id == "holdQueue") newval = this.game.hold.getHold();
+            if (setting.id == "rowfillmode") newval = this.game.boardeditor.fillRow;
             setting.value = newval;
             if (setting.classList[1] == "keybind") setting.textContent = newval;
             if (setting.classList[1] == "check") setting.checked = newval;
@@ -52,7 +51,7 @@ export class ModalActions {
         return options.filter(item => item.parentElement.parentElement.id == id)
     }
 
-    getSettingType(id) { // change to just give a game.setting property (like game, controls etc)
+    getSettingType(id) {
         let type = id.replace("Dialog", "");
         if (id == "gamemodeDialog") type = "game";
         return type;
@@ -71,22 +70,23 @@ export class ModalActions {
         this.getOptions(id).forEach(setting => {
             let settingType = this.getSettingType(id);
             let val = setting.value;
-            if (setting.classList[1] == "number" && setting.value == "") val = this.selectedRangeElement.min;
+            if (setting.classList[1] == "number" && val == "") val = this.selectedRangeElement.min;
             if (setting.classList[1] == "check") val = setting.checked;
             if (setting.classList[1] == "keybind") val = setting.textContent;
-            if (setting.classList[2] == "exp") val = toExpValue(setting.value);
-            if (setting.classList[2] == "handling") settingType = "handling";
-            if (setting.classList[2] == "sound") settingType = "volume";
-            if (!this.game.settings.hasOwnProperty(settingType)) return;
-            this.game.settings[settingType][setting.id] = val;
+            if (setting.classList[2] == "exp") val = toExpValue(val);
+            if (setting.id == "nextQueue") this.game.bag.setQueue(val, this.pieceNames);
+            if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
+            if (setting.id == "rowfillmode") this.game.boardeditor.fillRow = val;
 
-            if (setting.id == "nextQueue") this.game.bag.setQueue(setting.value, this.pieceNames);
-            if (setting.id == "holdQueue") this.game.hold.setNewHold(setting.value);
             if (id == "changeRangeValue") {
                 this.selectedRangeElement.value = document.getElementById("rangeValue").value;
                 this.actions.sliderChange(this.selectedRangeElement);
             }
             if (setting.id == "audioLevel") this.game.sounds.setAudioLevel();
+
+            if (!this.game.settings.hasOwnProperty(settingType)) return;
+
+            this.game.settings[settingType][setting.id] = val;
         });
 
         this.closeDialog(document.getElementById(id));

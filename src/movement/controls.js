@@ -27,6 +27,7 @@ export class Controls {
         if (event.key == "Escape" && this.game.menuactions.bindingKey == undefined) {
             this.game.menuactions.toggleDialog();
         }
+        if (event.key == this.keys.editMenuKey) this.game.menuactions.openEditMenu();
 
         if (event.repeat || this.game.modals.open) return;
         if (disabledKeys.includes(event.key)) event.preventDefault();

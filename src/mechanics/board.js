@@ -3,6 +3,9 @@
 import { Game } from "../game.js";
 
 export class Board {
+    /**
+     * @type {string[][]}
+     */
     boardState = [];
 
     /**
@@ -18,6 +21,10 @@ export class Board {
 
     MinoToNone(val) {
         this.getMinos(val).forEach(([x, y]) => this.rmValue([x, y], val));
+    }
+
+    EradicateMinoCells(val) {
+        this.getCoords(this.boardState, c => c.includes(val), [0, 0]).forEach(([x, y]) => this.rmValue([x, y], val));
     }
 
     addMinos(val, c, [dx, dy]) {

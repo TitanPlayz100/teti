@@ -11,9 +11,9 @@ import { Movement } from "./movement/movement.js";
 import { Rendering } from "./display/rendering.js";
 import { Settings } from "./settings.js";
 import { Sounds } from "./sound.js";
-import { Utils } from "./util.js";
 import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./mechanics/stats.js";
+import { BoardEditor } from "./display/editboard.js";
 
 export class Game {
     started;
@@ -39,13 +39,14 @@ export class Game {
         this.modals = new ModalActions(this);
         this.movement = new Movement(this);
         this.rendering = new Rendering(this);
-        this.utils = new Utils(this);
+        this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
 
         this.rendering.sizeCanvas();
         this.sounds.initSounds();
         this.startGame();
         this.rendering.renderingLoop();
+        this.boardeditor.addListeners();
     }
 
     startGame() {

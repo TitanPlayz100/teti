@@ -5,11 +5,11 @@ import defaultSettings from "./data/defaultSettings.json" with { type: "json" };
 
 
 export class Settings {
-    control;
-    display;
-    game;
     handling;
     volume;
+    display;
+    game;
+    control;
 
     /**
      * @param {Game} game

@@ -1,19 +1,4 @@
 // @ts-check
-import { Game } from "./game.js";
-import pieces from "./data/pieces.json" with { type: "json" };
-
-export class Utils {
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
-    getPiece(name) {
-        return pieces.filter(p => p.name == name)[0];
-    }
-}
 
 export function toExpValue(x) {
     return Math.round(Math.pow(2, 0.1 * x) - 1);

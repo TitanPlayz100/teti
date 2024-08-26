@@ -26,7 +26,7 @@ Probably won't keep up to date
 
 May implement these in the future (no particular order):
 - undo/redo
-- edit board tiles
+- edit board tiles (add garb line feature with hole, show mino preview, add colours)
 - custom game
 - guide like progression thing? using custom boards (kinda like tetris tres bien)
 - title screen maybe
@@ -38,14 +38,13 @@ May implement these in the future (no particular order):
 - replay functionality (either save gamestate or save keystrokes idk yet)
 - finesse detection
 - pb logging
-- allspin
 - custom mino skins and music
 - touch settings
 - cooler graphics (maybe using a library like pixijs)
+- more rotation systems (ars, trs, srs/srsX, none)
 
 ## TODO
 - info page
-- change setting dialogs to allow for scrolling
 
 ## Current Features
 
@@ -68,7 +67,7 @@ May implement these in the future (no particular order):
     - can play/pause, skip song
 - technically responsive
 - many modes
-    - 40l, blitz, zen
+    - 40l, blitz, custom
     - attacker (reach certain attack amount)
     - dig, survival, backfire
     - semi invis mode
@@ -76,3 +75,4 @@ May implement these in the future (no particular order):
 - menu animations
 - import/export settings
 - customise queues
+- allspin (immobile check like tetrio)

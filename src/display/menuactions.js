@@ -26,7 +26,7 @@ export class MenuActions {
 
     rangeClickListener(el) {
         el.parentElement.children[0].addEventListener("click", () => {
-            this.currentRangeOption = el;
+            this.game.modals.selectedRangeElement = el;
             this.menus.openModal("changeRangeValue");
             document.getElementById("rangeValue").value = el.value;
         });
@@ -86,9 +86,10 @@ export class MenuActions {
         };
     }
 
-    resetSettings(settingGroup) {
-        settingGroup = "this.game." + settingGroup;
-        for (let setting in eval(settingGroup)) eval(settingGroup)[setting] = "";
+    resetSettings(group) {
+        for (let setting in this.game.settings[group]) {
+            this.game.settings[group][setting] = "";
+        }
         this.saveSettings();
         location.reload();
     }
@@ -101,8 +102,8 @@ export class MenuActions {
         }
     }
 
-    checkValue(el, el2 = this.currentRangeOption) {
-        this.currentRangeOption = el2;
+    checkValue(el, el2 = this.game.modals.selectedRangeElement) {
+        this.game.modals.selectedRangeElement = el2;
         if (el.value == "") return;
         if (el.value < Number(el2.min)) el.value = Number(el2.min);
         if (el.value > Number(el2.max)) el.value = Number(el2.max);
@@ -117,5 +118,30 @@ export class MenuActions {
 
     openPage(url) {
         window.open("https://" + url, "blank_")
+    }
+
+    openEditMenu() {
+        if (this.game.modals.open) {
+            this.menus.closeModal("editMenu");
+            return;
+        }
+        this.menus.openModal("editMenu");
+    }
+
+    changeEditPiece(pieceName) { this.game.boardeditor.fillPiece = pieceName; }
+
+    addGarbageRow() {
+        this.game.mechanics.addGarbage(1);
+        this.game.mechanics.setShadow();
+    }
+
+    removeLastRow() {
+        this.game.mechanics.clear.clearRow(0);
+        this.game.mechanics.setShadow();
+    }
+
+    clearGarbage() {
+        this.game.mechanics.board.EradicateMinoCells("S G");
+        this.game.mechanics.setShadow();
     }
 }

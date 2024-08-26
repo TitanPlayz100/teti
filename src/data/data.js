@@ -1,4 +1,4 @@
-export const cleartypes = { 0: "", 1: "Single", 2: "Double", 3: "Triple", 4: "Quad" };
+export const cleartypes = { 0: "", 1: "Single", 2: "Double", 3: "Triple", 4: "Quad", 5: "Teti-tris" };
 
 export const scoringTable = {
     "": 0,
@@ -17,7 +17,7 @@ export const scoringTable = {
 };
 
 export const modesText = {
-    0: "Zen",
+    0: "Custom",
     1: "Lines",
     2: "Score",
     3: "Damage",

@@ -70,6 +70,6 @@ export class Sounds {
     }
 
     setAudioLevel() {
-        songs[this.curSongIdx].volume = Number(this.game.settings.display.audioLevel) / 1000;
+        songs[this.curSongIdx].volume = Number(this.game.settings.volume.audioLevel) / 1000;
     }
 }
