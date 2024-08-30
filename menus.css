@@ -36,7 +36,7 @@ button>img {
 .smallerPanelButton {
     height: 6vh;
     aspect-ratio: 1/1;
-    border-radius: 1vh;
+    border-radius: 1vmin;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -136,8 +136,8 @@ button>img {
 }
 
 #editMenu {
-    height: 50vh;
-    aspect-ratio: 5/5;
+    height: 60vh;
+    aspect-ratio: 5/6;
 }
 
 #gameEnd {
@@ -296,7 +296,7 @@ button>img {
     width: 100%;
     padding: 1vh;
     background-color: var(--invis);
-    border: 0.2vh solid var(--gray);
+    border: 0.3vmin solid var(--gray);
     border-radius: 1vh;
     font-size: 1.3em;
     color: var(--cl-blue);
@@ -442,6 +442,10 @@ button>img {
 
 .pieceselection:hover {
     transform: scale(1.1);
+}
+
+.pieceselection:active {
+    transform: scale(0.9);
 }
 
 .customGameAction {

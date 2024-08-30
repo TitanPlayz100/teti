@@ -198,7 +198,7 @@
         <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="//redirect to info page or open info card" title="See info about this project">
             <img src="./assets/info.svg" style="height: 80%;">
         </button>
-        <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download Export Settings">
+        <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
             <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
         </button>
         <span id="uploadSettings" class="settingPanelButton smallPanelButton" style="height: 4.5vh; " onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
@@ -246,10 +246,20 @@
             <button class="pieceselection" id="G_piece_colour" onclick="menu.changeEditPiece('G')"></button>
         </div> 
         <div class="settingLayout"><label>Row Fill Mode</label> <input class="option check custom" type="checkbox" id="rowfillmode" /></div>
+        <div class="settingLayout"><label>Override Other Minos</label> <input class="option check custom" type="checkbox" id="override" /></div>
         <div style="display: flex; flex-direction: column; align-items: center;">
             <button class="customGameAction" onclick="menu.addGarbageRow()">Add garbage row</button>
             <button class="customGameAction" onclick="menu.removeLastRow()">Remove bottom row</button>
             <button class="customGameAction" onclick="menu.clearGarbage()">Clear all garbage</button>
+            <div style="display: flex; gap: 1vw;">
+                <button id="copyBoardString" class="settingPanelButton smallPanelButton" onclick="menu.getBoardString()" title="Copy current board">
+                    <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
+                </button>
+                <button id="setBoardState" class="settingPanelButton smallPanelButton" onclick="menu.setBoard()" title="Set current board">
+                    <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
+                </button>
+    
+            </div>
         </div>
         <button class="closeDialog" onclick="modal.closeModal('editMenu')">Save and Close</button>
     </dialog>

@@ -26,8 +26,7 @@ Probably won't keep up to date
 
 May implement these in the future (no particular order):
 - undo/redo
-- edit board tiles (add garb line feature with hole, show mino preview, add colours)
-- custom game
+- gamemode presets
 - guide like progression thing? using custom boards (kinda like tetris tres bien)
 - title screen maybe
 - more unique gamemodes (techmino styled)
@@ -42,6 +41,7 @@ May implement these in the future (no particular order):
 - touch settings
 - cooler graphics (maybe using a library like pixijs)
 - more rotation systems (ars, trs, srs/srsX, none)
+- misdrop remover mode
 
 ## TODO
 - info page
@@ -76,3 +76,4 @@ May implement these in the future (no particular order):
 - import/export settings
 - customise queues
 - allspin (immobile check like tetrio)
+- edit and draw on board (custom game)

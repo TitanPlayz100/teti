@@ -23,9 +23,8 @@ export class ModalActions {
 
         this.getOptions(id).forEach(setting => {
             let settingType = this.getSettingType(id);
-            if (!this.game.settings.hasOwnProperty(settingType)) return;
-            let newval = this.game.settings[settingType][setting.id]
-
+            let newval;
+            if (this.game.settings.hasOwnProperty(settingType)) newval = this.game.settings[settingType][setting.id]
             if (setting.classList[2] == "exp") newval = toLogValue(newval);
             if (setting.id == "nextQueue") newval = this.game.bag.getQueue();
             if (setting.id == "holdQueue") newval = this.game.hold.getHold();
@@ -77,6 +76,7 @@ export class ModalActions {
             if (setting.id == "nextQueue") this.game.bag.setQueue(val, this.pieceNames);
             if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
             if (setting.id == "rowfillmode") this.game.boardeditor.fillRow = val;
+            if (setting.id == "override") this.game.boardeditor.override = val;
 
             if (id == "changeRangeValue") {
                 this.selectedRangeElement.value = document.getElementById("rangeValue").value;

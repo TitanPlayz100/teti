@@ -43,18 +43,26 @@ export class Bag {
     }
 
     getQueue() {
-        this.nextPieces[0]
-            .concat(this.nextPieces[1])
-            .splice(0, 7)
-            .join(" ");
+        return this.game.falling.piece.name
+            + this.nextPieces[0]
+                .concat(this.nextPieces[1])
+                .splice(0, 6)
+                .join("");
     }
 
     setQueue(value, names) {
         this.nextPieces[0] = value
-            .split(" ")
+            .split("")
             .filter(p => names.includes(p));
         this.shuffleRemainingPieces();
         this.game.rendering.updateNext();
+
+        this.game.mechanics.locking.clearLockDelay();
+        this.game.board.MinoToNone("A");
+        this.isTspin = false;
+        this.isAllspin = false;
+        this.isMini = false;
+        this.game.mechanics.spawnPiece(this.game.bag.randomiser());
     }
 
     firstNextPiece() {

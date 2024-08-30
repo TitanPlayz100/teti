@@ -144,4 +144,15 @@ export class MenuActions {
         this.game.mechanics.board.EradicateMinoCells("S G");
         this.game.mechanics.setShadow();
     }
+
+    setBoard() {
+        const input = prompt("Enter Map String Here:")
+        this.game.boardeditor.convertFromTetrioMap(input);
+    }
+
+    getBoardString() {
+        const exportstring = this.game.boardeditor.convertToTetrioMap();
+        navigator.clipboard.writeText(exportstring)
+        alert("TETR.IO Map String (copied to clipboard):\n"+exportstring)
+    }
 }
