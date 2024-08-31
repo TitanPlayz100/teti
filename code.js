@@ -71,7 +71,7 @@ this.addEventListener('keydown', event => {
     if (firstMove && event.key != 'Escape') firstMovement();
     if (event.key == controlSettings.resetKey) { playSound('retry'); startGame(); }
     if (gameEnd) return;
-    if (event.key.toLowerCase() == controlSettings.cwKey) rotate("CW");
+    if (event.key.toLowerCase() == controlSettings.cwKey || event.key.toLowerCase() == 'x') rotate("CW");
     if (event.key.toLowerCase() == controlSettings.ccwKey) rotate("CCW");
     if (event.key.toLowerCase() == controlSettings.rotate180Key) rotate("180");
     if (event.key.toLowerCase() == controlSettings.hdKey) harddrop();
