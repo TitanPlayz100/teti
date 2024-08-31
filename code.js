@@ -494,7 +494,7 @@ function updateHold() {
     coords.forEach(([x, y]) => holdQueueGrid[y + dy][x + dx] = 'A ' + name)
     const len = Math.round(minoSize / 2);
     const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
-    renderToCanvas(ctxH, holdQueueGrid, 2, [shiftX, shiftY], holdWidth, holdHeight-50)
+    renderToCanvas(ctxH, holdQueueGrid, 2, [shiftX, shiftY], holdWidth, holdHeight)
     if (gameSettings.gamemode == 8 || !displaySettings.colouredQueues) return;
     canvasHold.style.outline = `0.2vh solid ${holdPiece.piece.colour}`
 }
