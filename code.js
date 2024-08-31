@@ -42,13 +42,12 @@ function init() {
 
 function sizeCanvas() {
     divBoard.setAttribute('style', ''); renderStyles();
-    canvasField.offsetWidth = divBoard.width;
     [canvasField, canvasNext, canvasHold].forEach(c => {
-        c.width = Math.round(c.offsetWidth / 10) * 10;
-        c.height = Math.round(c.offsetHeight / 40) * 40;
+        c.width = c.offsetWidth;
+        c.height = c.offsetHeight;
     });
-    divBoard.style.width = `${canvasField.width}px`
-    divBoard.style.height = `${canvasField.height / 2}px`
+    divBoard.style.width = `${canvasField.width}px`;
+    divBoard.style.height = `${canvasField.height / 2}px`;
     minoSize = canvasField.width / 10;
     boardWidth = canvasField.offsetWidth, boardHeight = canvasField.offsetHeight;
     nextWidth = canvasNext.offsetWidth, nextHeight = canvasNext.offsetHeight;
@@ -495,7 +494,7 @@ function updateHold() {
     coords.forEach(([x, y]) => holdQueueGrid[y + dy][x + dx] = 'A ' + name)
     const len = Math.round(minoSize / 2);
     const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
-    renderToCanvas(ctxH, holdQueueGrid, 2, [shiftX, shiftY], holdWidth, holdHeight)
+    renderToCanvas(ctxH, holdQueueGrid, 2, [shiftX, shiftY], holdWidth, holdHeight-50)
     if (gameSettings.gamemode == 8 || !displaySettings.colouredQueues) return;
     canvasHold.style.outline = `0.2vh solid ${holdPiece.piece.colour}`
 }
@@ -988,6 +987,7 @@ const attackValues = {
     'TSPIN MINI DOUBLE': [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6],
     'ALL CLEAR': 10,
 };
+
 const cleartypes = { '0': '', '1': 'Single', '2': 'Double', '3': 'Triple', '4': 'Quad' };
 const scoringTable = { '': 0, 'TSPIN': 400, 'TSPIN MINI': 100, 'SINGLE': 100, 'DOUBLE': 300, 'TRIPLE': 500, 'QUAD': 800, 'TSPIN SINGLE': 800, 'TSPIN DOUBLE': 1200, 'TSPIN TRIPLE': 1600, 'TSPIN MINI SINGLE': 200, 'TSPIN MINI DOUBLE': 400, 'ALL CLEAR': 3500 }
 const modesText = { 0: 'Zen', 1: 'Lines', 2: 'Score', 3: 'Damage', 4: 'Remaining', 5: 'Lines Survived', 6: 'Sent', 7: 'Combo', 8: 'Lines' }
