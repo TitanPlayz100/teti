@@ -71,20 +71,20 @@ this.addEventListener('keydown', event => {
     if (firstMove && event.key != 'Escape') firstMovement();
     if (event.key == controlSettings.resetKey) { playSound('retry'); startGame(); }
     if (gameEnd) return;
-    if (event.key == controlSettings.cwKey) rotate("CW");
-    if (event.key == controlSettings.ccwKey) rotate("CCW");
-    if (event.key == controlSettings.rotate180Key) rotate("180");
-    if (event.key == controlSettings.hdKey) harddrop();
-    if (event.key == controlSettings.holdKey) switchHold();
-    if (event.key == controlSettings.rightKey) startDas("RIGHT");
-    if (event.key == controlSettings.leftKey) startDas("LEFT");
-    if (event.key == controlSettings.sdKey) startArrSD();
+    if (event.key.toLowerCase() == controlSettings.cwKey) rotate("CW");
+    if (event.key.toLowerCase() == controlSettings.ccwKey) rotate("CCW");
+    if (event.key.toLowerCase() == controlSettings.rotate180Key) rotate("180");
+    if (event.key.toLowerCase() == controlSettings.hdKey) harddrop();
+    if (event.key.toLowerCase() == controlSettings.holdKey) switchHold();
+    if (event.key.toLowerCase() == controlSettings.rightKey) startDas("RIGHT");
+    if (event.key.toLowerCase() == controlSettings.leftKey) startDas("LEFT");
+    if (event.key.toLowerCase() == controlSettings.sdKey) startArrSD();
 });
 
 this.addEventListener('keyup', event => {
-    if (event.key == controlSettings.rightKey) endDasArr('RIGHT');
-    if (event.key == controlSettings.leftKey) endDasArr('LEFT');
-    if (event.key == controlSettings.sdKey) endDasArr('DOWN');
+    if (event.key.toLowerCase() == controlSettings.rightKey) endDasArr('RIGHT');
+    if (event.key.toLowerCase() == controlSettings.leftKey) endDasArr('LEFT');
+    if (event.key.toLowerCase() == controlSettings.sdKey) endDasArr('DOWN');
 });
 
 function firstMovement() {
@@ -756,7 +756,7 @@ function closeModal(id) {
             if (type == 'number' && setting.value == '') setting.value = currentRangeOption.min;
             eval(settingGroup)[settingid] =
                 type == 'check' ? setting.checked :
-                    type == 'keybind' ? setting.textContent :
+                    type == 'keybind' ? setting.textContent.toLowerCase() :
                         setting.classList[2] == 'exp' ? toExpValue(setting.value) :
                             setting.value;
             if (settingid == 'nextQueue') {
