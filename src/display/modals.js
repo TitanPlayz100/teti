@@ -94,7 +94,7 @@ export class ModalActions {
         });
 
         this.closeDialog(document.getElementById(id));
-        if (this.game.started) this.game.movement.firstMovement();
+        if (this.game.started) this.game.movement.firstMovement();  
 
         this.actions.saveSettings();
         if (id == "displayDialog") this.game.rendering.renderStyles();
