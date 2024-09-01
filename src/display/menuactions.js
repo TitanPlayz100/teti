@@ -97,10 +97,10 @@ export class MenuActions {
     toggleDialog() {
         if (this.game.modals.open) {
             document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
-            if (this.game.started) this.game.movement.firstMovement();
+            if (this.game.started) this.game.movement.firstMovement();  
+
         } else {
             this.menus.openModal("settingsPanel");
-            this.game.stopGameTimers();
         }
     }
 

@@ -19,6 +19,7 @@ export class ModalActions {
     }
 
     openModal(id) {
+        this.game.stopGameTimers()
         if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
 
         this.getOptions(id).forEach(setting => {
