@@ -2,7 +2,6 @@
 
 import { modesText } from "../data/data.js";
 import { Game } from "../game.js";
-import { Falling } from "../mechanics/fallingpiece.js";
 import { toExpValue } from "../util.js";
 
 export class MenuActions {
