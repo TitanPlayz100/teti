@@ -57,6 +57,12 @@ export class Game {
         this.mechanics.spawnPiece(this.bag.randomiser(), true);
     }
 
+    stopGameTimers(){ //stop all the game's timers
+        clearInterval(this.mechanics.gravityTimer);
+        clearInterval(this.statsTimer);
+        clearInterval(this.survivalTimer);
+    }
+
     endGame(top, bottom = "Better luck next time") {
         const dead = ["Lockout", "Topout", "Blockout"].includes(top);
         if (this.settings.game.gamemode == 5 && dead) {
@@ -79,10 +85,8 @@ export class Game {
         }
 
         this.ended = true;
-        clearInterval(this.mechanics.gravityTimer);
-        clearInterval(this.statsTimer);
-        clearInterval(this.survivalTimer);
         this.modals.openModal("gameEnd");
+        this.stopGameTimers()
         this.elementReason.textContent = top;
         this.elementResult.textContent = bottom;
     }

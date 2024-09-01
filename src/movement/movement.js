@@ -125,7 +125,10 @@ export class Movement {
 
     movePieceDown(sonic) {
         const minos = this.game.board.getMinos("A");
-        if (this.checkCollision(minos, "DOWN")) return;
+        if (this.checkCollision(minos, "DOWN")){
+            if (minos[1][1] > 20) this.game.mechanics.locking.lockPiece();
+            return;
+        }
         this.game.board.moveMinos(minos, "DOWN", 1);
         this.game.mechanics.isTspin = false;
         this.game.mechanics.isAllspin = false;
