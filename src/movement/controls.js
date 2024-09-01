@@ -52,7 +52,7 @@ export class Controls {
 
     onKeyUp(event) {
         this.keys = this.game.settings.control;
-        const key = event.key > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
+        const key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
 
         if (key == this.keys.rightKey) this.endDasArr("RIGHT");
         if (key == this.keys.leftKey) this.endDasArr("LEFT");
