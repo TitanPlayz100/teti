@@ -2,6 +2,7 @@
 
 import { modesText } from "../data/data.js";
 import { Game } from "../game.js";
+import { Falling } from "../mechanics/fallingpiece.js";
 import { toExpValue } from "../util.js";
 
 export class MenuActions {
@@ -97,8 +98,10 @@ export class MenuActions {
     toggleDialog() {
         if (this.game.modals.open) {
             document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
+            if (this.game.started) this.game.movement.firstMovement();
         } else {
             this.menus.openModal("settingsPanel");
+            this.game.stopGameTimers();
         }
     }
 
