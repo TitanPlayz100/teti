@@ -1,0 +1,54 @@
+{
+    "display": {
+        "background": "#080B0C",
+        "boardOpacity": 100,
+        "gridopacity": 20,
+        "shadowOpacity": 20,
+        "boardHeight": 80,
+        "showGrid": true,
+        "colouredShadow": false,
+        "colouredQueues": true,
+        "lockBar": true
+    },
+    "game": {
+        "gravitySpeed": 950,
+        "lockDelay": 600,
+        "maxLockMovements": 15,
+        "nextPieces": 5,
+        "allowLockout": false,
+        "preserveARR": true,
+        "infiniteHold": false,
+        "gamemode": 1,
+        "requiredLines": 40,
+        "timeLimit": 120,
+        "requiredAttack": 40,
+        "requiredGarbage": 10,
+        "survivalRate": 60,
+        "backfireMulti": 1,
+        "allowQueueModify": true,
+        "lookAheadPieces": 3,
+        "allspin":true,
+        "allspinminis":true
+    },
+    "control": {
+        "rightKey": "ArrowRight",
+        "leftKey": "ArrowLeft",
+        "cwKey": "ArrowUp",
+        "ccwKey": "z",
+        "hdKey": " ",
+        "sdKey": "ArrowDown",
+        "holdKey": "c",
+        "resetKey": "r",
+        "rotate180Key": "a",
+        "editMenuKey": "e"
+    },
+    "volume": {
+        "audioLevel": 15,
+        "sfxLevel": 10
+    },
+    "handling": {
+        "arr": 33,
+        "das": 160,
+        "sdarr": 100
+    }
+}

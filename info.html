@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md@3?register"></script>
+
+    <title>Teti - Info</title>
+</head>
+
+<style>
+    body.dark {
+        --bg-color: #000;
+        --font-color: #f5f5f5;
+        --color-primary: #17c16f;
+        max-width: 720px;
+        margin: 5rem auto;
+        padding-bottom: 10vh;
+    }
+</style>
+
+<body class="dark">
+    <nav>
+        <div class="nav-center">
+            <h1 style="font-size: 4em;">TETI</h1>
+        </div>
+        <div class="nav-center">
+            <p>Made By TitanPlayz100</p>
+        </div>
+    </nav>
+    <hr>
+    
+    <!-- markdown renderer -->
+    <zero-md src="info.md">
+        <template>
+            <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+            <style>
+                h2 {
+                    margin-top: 4vh;
+                }
+            </style>
+        </template>
+    </zero-md>
+
+    <hr>
+    <p class="text-right">css using <a href="https://jenil.github.io/chota/">chota</a></p>
+    <p class="text-right">md renderer with <a href="https://zerodevx.github.io/zero-md/">zero-md</a></p>
+    <a class="button outline primary pull-right" href="index.html">Back to teti</a>
+</body>
+
+</html>

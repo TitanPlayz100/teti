@@ -2,10 +2,9 @@
 
 Hosted on github pages [here](https://titanplayz100.github.io/teti/)
 
-No dependancies, pure html, css, js
+The info page can be found [here](https://titanplayz100.github.io/teti/info.html)
 
-I invite you in attempting to comprehend the abomination of js code, cause i can't either
+## Desktop App
+All the information is in the tauri branch, can download in releases
 
-## Tauri
-
-All the information is in the tauri branch
+Probably won't keep up to date
