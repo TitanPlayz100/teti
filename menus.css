@@ -5,13 +5,13 @@
     flex-wrap: wrap;
     flex-direction: row;
     border: none;
-    width:  100vw;
+    width: 100vw;
     height: 50vh;
     background-color: var(--invis);
     overflow: visible;
 }
 
-#settingsPanel > br {
+#settingsPanel>br {
     width: 100%;
     content: ' ';
 }
@@ -130,7 +130,8 @@ button>img {
     overflow-y: scroll;
 }
 
-#handlingDialog, #volumeDialog {
+#handlingDialog,
+#volumeDialog {
     height: 40vh;
     aspect-ratio: 6/5;
 }
@@ -291,7 +292,8 @@ button>img {
     transition: all 0.4s ease;
 }
 
-.gamemodeSelect, .customGameAction {
+.gamemodeSelect,
+.customGameAction {
     outline: none;
     width: 100%;
     padding: 1vh;
@@ -412,7 +414,7 @@ button>img {
     text-align: right;
 }
 
-#explanationText {
+#explanationText, #updatetext {
     display: flex;
     margin: 0;
     opacity: 0.4;
@@ -480,6 +482,21 @@ button>img {
 .number::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+#editbuttons {
+    display: flex;
+    gap: 1vw;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 3vh;
+}
+
+#editbuttons>br {
+    width: 100%;
+    content: ' ';
 }
 
 

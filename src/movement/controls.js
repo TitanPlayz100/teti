@@ -22,6 +22,7 @@ export class Controls {
 
     onKeyDown(event) {
         this.keys = this.game.settings.control;
+        const key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
 
         if (event.key == "Escape") event.preventDefault();
         if (event.key == "Escape" && this.game.menuactions.bindingKey == undefined) {
@@ -33,28 +34,29 @@ export class Controls {
         if (disabledKeys.includes(event.key)) event.preventDefault();
         if (!this.game.started && event.key != "Escape") this.moves.firstMovement();
 
-        if (event.key == this.keys.resetKey) {
+        if (key == this.keys.resetKey) {
             this.game.sounds.playSound("retry");
             this.game.startGame();
         }
         if (this.game.ended) return;
 
-        if (event.key == this.keys.cwKey) this.moves.rotate("CW");
-        if (event.key == this.keys.ccwKey) this.moves.rotate("CCW");
-        if (event.key == this.keys.rotate180Key) this.moves.rotate("180");
-        if (event.key == this.keys.hdKey) this.moves.harddrop();
-        if (event.key == this.keys.holdKey) this.game.mechanics.switchHold();
-        if (event.key == this.keys.rightKey) this.startDas("RIGHT");
-        if (event.key == this.keys.leftKey) this.startDas("LEFT");
-        if (event.key == this.keys.sdKey) this.startArrSD();
+        if (key == this.keys.cwKey) this.moves.rotate("CW");
+        if (key == this.keys.ccwKey) this.moves.rotate("CCW");
+        if (key == this.keys.rotate180Key) this.moves.rotate("180");
+        if (key == this.keys.hdKey) this.moves.harddrop();
+        if (key == this.keys.holdKey) this.game.mechanics.switchHold();
+        if (key == this.keys.rightKey) this.startDas("RIGHT");
+        if (key == this.keys.leftKey) this.startDas("LEFT");
+        if (key == this.keys.sdKey) this.startArrSD();
     }
 
     onKeyUp(event) {
         this.keys = this.game.settings.control;
+        const key = event.key > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
 
-        if (event.key == this.keys.rightKey) this.endDasArr("RIGHT");
-        if (event.key == this.keys.leftKey) this.endDasArr("LEFT");
-        if (event.key == this.keys.sdKey) this.endDasArr("DOWN");
+        if (key == this.keys.rightKey) this.endDasArr("RIGHT");
+        if (key == this.keys.leftKey) this.endDasArr("LEFT");
+        if (key == this.keys.sdKey) this.endDasArr("DOWN");
     }
 
     startDas(direction) {

@@ -24,7 +24,7 @@ export class Game {
 
     elementReason = document.getElementById("reason");
     elementResult = document.getElementById("result");
-  
+
 
     constructor() {
         this.stats = new GameStats(this);
@@ -47,6 +47,7 @@ export class Game {
         this.startGame();
         this.rendering.renderingLoop();
         this.boardeditor.addListeners();
+        this.versionChecker();
     }
 
     startGame() {
@@ -130,5 +131,11 @@ export class Game {
         this.rendering.clearHold();
     }
 
+    versionChecker() {
+        const version = '1.0.0';
+        const userver = window.localStorage.getItem('version');
+        document.getElementById('updatetext').style.display = version == userver ? "none" : "block";
+        window.localStorage.setItem('version', version);
+    }
 
 }

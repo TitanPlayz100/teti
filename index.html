@@ -194,8 +194,10 @@
 
         <p id='explanationText'><span class="spanright">Hover for info</span> | <span class="spanleft">Esc to close</span></p>
         <br>
+        <p id='updatetext'>Check out the new update in the info button</p>
+        <br>
 
-        <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="//redirect to info page or open info card" title="See info about this project">
+        <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="window.location = './info.html'" title="See info about this project">
             <img src="./assets/info.svg" style="height: 80%;">
         </button>
         <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
@@ -233,7 +235,6 @@
 
     <dialog id="editMenu" class="dialog">
         <h1>Edit Menu</h1>
-        <!-- options: change colour, fill row, add garbage row, remove garbage row, remove all garbage -->
         <h3>Choose Piece</h3>
         <div style="width: 100%; display: flex; justify-content: center;" id="editMenuPieces">
             <button class="pieceselection" id="i_piece_colour" onclick="menu.changeEditPiece('i')"></button>
@@ -247,19 +248,24 @@
         </div> 
         <div class="settingLayout"><label>Row Fill Mode</label> <input class="option check custom" type="checkbox" id="rowfillmode" /></div>
         <div class="settingLayout"><label>Override Other Minos</label> <input class="option check custom" type="checkbox" id="override" /></div>
-        <div style="display: flex; flex-direction: column; align-items: center;">
-            <button class="customGameAction" onclick="menu.addGarbageRow()">Add garbage row</button>
-            <button class="customGameAction" onclick="menu.removeLastRow()">Remove bottom row</button>
-            <button class="customGameAction" onclick="menu.clearGarbage()">Clear all garbage</button>
-            <div style="display: flex; gap: 1vw;">
-                <button id="copyBoardString" class="settingPanelButton smallPanelButton" onclick="menu.getBoardString()" title="Copy current board">
-                    <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
-                </button>
-                <button id="setBoardState" class="settingPanelButton smallPanelButton" onclick="menu.setBoard()" title="Set current board">
-                    <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
-                </button>
-    
-            </div>
+        <div id="editbuttons">
+            <button id="addGarbage" class="settingPanelButton smallPanelButton" onclick="menu.addGarbageRow()" title="Add garbage row">
+                <img src="./assets/addgarb.svg" style="transform: translateY(10%); height: 90%;">
+            </button>
+            <button id="removeLine" class="settingPanelButton smallPanelButton" onclick="menu.removeLastRow()" title="Remove bottom row">
+                <img src="./assets/addgarb.svg" style="transform: translateY(-5%) rotate(180deg); height: 90%;">
+            </button>
+            <button id="clearGarbage" class="settingPanelButton smallPanelButton" onclick="menu.clearGarbage()" title="Clear all garbage">
+                <img src="./assets/cleargarb.svg" style="height: 110%;">
+            </button>
+            <br>
+
+            <button id="copyBoardString" class="settingPanelButton smallPanelButton" onclick="menu.getBoardString()" title="Copy current board">
+                <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
+            </button>
+            <button id="setBoardState" class="settingPanelButton smallPanelButton" onclick="menu.setBoard()" title="Set current board">
+                <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
+            </button>
         </div>
         <button class="closeDialog" onclick="modal.closeModal('editMenu')">Save and Close</button>
     </dialog>

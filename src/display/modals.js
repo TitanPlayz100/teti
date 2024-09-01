@@ -71,7 +71,11 @@ export class ModalActions {
             let val = setting.value;
             if (setting.classList[1] == "number" && val == "") val = this.selectedRangeElement.min;
             if (setting.classList[1] == "check") val = setting.checked;
-            if (setting.classList[1] == "keybind") val = setting.textContent;
+            if (setting.classList[1] == "keybind") {
+                val = setting.textContent.length > 1
+                    ? setting.textContent
+                    : setting.textContent.toLowerCase();
+            }
             if (setting.classList[2] == "exp") val = toExpValue(val);
             if (setting.id == "nextQueue") this.game.bag.setQueue(val, this.pieceNames);
             if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
