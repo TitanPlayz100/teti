@@ -19,6 +19,7 @@ export class ModalActions {
     }
 
     openModal(id) {
+        this.game.stopGameTimers()
         if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
 
         this.getOptions(id).forEach(setting => {
@@ -94,7 +95,7 @@ export class ModalActions {
         });
 
         this.closeDialog(document.getElementById(id));
-        if (this.game.started) this.game.movement.firstMovement();  
+        if (this.game.started && !this.game.ended) this.game.movement.firstMovement();  
 
         this.actions.saveSettings();
         if (id == "displayDialog") this.game.rendering.renderStyles();
