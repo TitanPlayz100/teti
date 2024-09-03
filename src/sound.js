@@ -64,6 +64,7 @@ export class Sounds {
         menuSFX(".settingLayout", "menutap");
         menuSFX(".gamemodeSelect", "menutap");
         setInterval(() => {
+            if (songs[this.curSongIdx].currentTime == 0) return;
             this.elSongProgress.value =
                 (songs[this.curSongIdx].currentTime * 100) / songs[this.curSongIdx].duration;
         }, 2000);

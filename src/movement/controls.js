@@ -40,6 +40,8 @@ export class Controls {
         }
         if (this.game.ended) return;
 
+        // TODO: add undo/redo keys
+
         if (key == this.keys.cwKey) this.moves.rotate("CW");
         if (key == this.keys.ccwKey) this.moves.rotate("CCW");
         if (key == this.keys.rotate180Key) this.moves.rotate("180");

@@ -14,6 +14,7 @@ import { Sounds } from "./sound.js";
 import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./mechanics/stats.js";
 import { BoardEditor } from "./display/editboard.js";
+import { Versions } from "./mechanics/boardversions.js";
 
 export class Game {
     started;
@@ -41,6 +42,7 @@ export class Game {
         this.rendering = new Rendering(this);
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
+        this.versions = new Versions(this);
 
         this.rendering.sizeCanvas();
         this.sounds.initSounds();
