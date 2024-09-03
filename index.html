@@ -44,6 +44,7 @@
             <p class="smalltext" style="left: -15%; bottom: 0%;">sec</p>
             <p class="text objectiveText" id="objective"></p>
             <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
+            <p class="smalltext" id="branches" style="left: 110%; bottom: 0%; width: 10vw;">history: 0/0</p>
         </div>
     </div>
 
@@ -102,7 +103,8 @@
         <div class="settingLayout"><label>Hold Piece</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="holdKey"></button></div>
         <div class="settingLayout"><label>Reset Game</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="resetKey"></button></div>
         <div class="settingLayout"><label>Open Edit Menu (Custom)</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="editMenuKey"></button></div>
-        <!-- TODO: add undo/redo keys -->
+        <div class="settingLayout"><label>Undo</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="undoKey"></button></div>
+        <div class="settingLayout"><label>Redo</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="redoKey"></button></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="modal.closeModal('controlDialog')">Save and close</button>
     </dialog>

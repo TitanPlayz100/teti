@@ -24,13 +24,13 @@ export class Controls {
         this.keys = this.game.settings.control;
         const key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
 
+        if (event.repeat) return;
         if (event.key == "Escape") event.preventDefault();
         if (event.key == "Escape" && this.game.menuactions.bindingKey == undefined) {
             this.game.menuactions.toggleDialog();
         }
         if (event.key == this.keys.editMenuKey) this.game.menuactions.openEditMenu();
-
-        if (event.repeat || this.game.modals.open) return;
+        if (this.game.modals.open) return;
         if (disabledKeys.includes(event.key)) event.preventDefault();
         if (!this.game.started && event.key != "Escape") this.moves.firstMovement();
 
@@ -40,8 +40,6 @@ export class Controls {
         }
         if (this.game.ended) return;
 
-        // TODO: add undo/redo keys
-
         if (key == this.keys.cwKey) this.moves.rotate("CW");
         if (key == this.keys.ccwKey) this.moves.rotate("CCW");
         if (key == this.keys.rotate180Key) this.moves.rotate("180");
@@ -50,6 +48,13 @@ export class Controls {
         if (key == this.keys.rightKey) this.startDas("RIGHT");
         if (key == this.keys.leftKey) this.startDas("LEFT");
         if (key == this.keys.sdKey) this.startArrSD();
+    }
+
+    onKeyDownRepeat(event) { // allows for repeating
+        this.keys = this.game.settings.control;
+        const key = event.key.length > 1 ? event.key : event.key.toLowerCase();
+        if (key == this.keys.undoKey) this.game.versions.undo();
+        if (key == this.keys.redoKey) this.game.versions.redo()
     }
 
     onKeyUp(event) {

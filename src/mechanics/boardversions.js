@@ -16,6 +16,7 @@ export class Versions {
     currentState = 0;
     redoMostRecentBranch = false;
 
+    brancheselement = document.getElementById("branches");
 
     /**
      * @param {Game} game
@@ -24,13 +25,11 @@ export class Versions {
         this.game = game;
     }
 
-    storeData() {
+    save() {
         const map = this.convertToMapCompressed();
         this.pushHistory(map);
-    }
-
-    getData() {
-        return this.historyStates[this.currentState]
+        const branches = this.historyConnections[this.currentState] || [];
+        this.brancheselement.textContent = `history: ${this.currentState}/${branches.length}`;
     }
 
     pushHistory(map) {
@@ -43,9 +42,11 @@ export class Versions {
         this.historyConnections[prevState].push(this.currentState);
     }
 
-    gotoState(num) {
-        this.currentState = num;
-        this.getData();
+    load() {
+        const state = this.historyStates[this.currentState]
+        this.convertFromMapCompressed(state);
+        const branches = this.historyConnections[this.currentState] || [];
+        this.brancheselement.textContent = `history: ${this.currentState}/${branches.length}`;
     }
 
     undo() {
@@ -55,6 +56,7 @@ export class Versions {
                 this.currentState = ind;
             }
         })
+        this.load()
     }
 
     redo() {
@@ -62,6 +64,12 @@ export class Versions {
         if (connection == undefined) return;
         const next = this.redoMostRecentBranch ? Math.max(...connection) : Math.min(...connection);
         this.currentState = next;
+        this.load()
+    }
+
+    goto(num) {
+        this.currentState = num;
+        this.load();
     }
 
     clearFuture(node) {
@@ -75,33 +83,36 @@ export class Versions {
 
     testing() {
         // 0
-        this.storeData();
+        this.save();
         this.game.board.boardState[0][0] = 'S G'; // 1
-        this.storeData();
+        this.save();
         this.game.board.boardState[0][0] = 'S t'; // 2
-        this.storeData();
+        this.save();
         this.game.board.boardState[0][0] = 'S o'; // 3a
-        this.storeData();
+        this.save();
         this.game.board.boardState[0][0] = 'S l'; // 4a
-        this.storeData();
-        this.gotoState(2); // back to 2
+        this.save();
+        this.goto(2); // back to 2
         this.game.board.boardState[0][0] = 'S i'; // 3b
-        this.storeData();
+        this.save();
         this.game.board.boardState[0][0] = 'S z'; // 4b
-        this.storeData();
+        this.save();
         this.undo(); // back to 3b
         this.undo(); // back to 2
         this.redo(); // forward to 3a
         this.redo(); // forward to 4a
         this.redo(); // does nothing (no more redos)
-        this.gotoState(1);
+        this.goto(1);
         this.clearFuture(2);
         console.log(this.historyStates);
         console.log(this.historyConnections);
         console.log(this.historyStates[this.currentState]);
     }
 
-    compress(s) {
+    compress(s) { 
+        // saves anywhere from 60% to 90%
+        // around 200 blocks (messy gameplay) is 330kB ~~ 5 min of 3.3pps play is 1.6MB
+
         let cs = "";
         let count = 1;
         for (let i = 1; i < s.length; i++) {
@@ -113,6 +124,7 @@ export class Versions {
             }
         }
         cs += `${count}${s[s.length - 1]}`;
+        console.log('reduced size by ' + (s.length - cs.length) / s.length * 100 + '%');
         return cs;
     }
 
@@ -136,14 +148,15 @@ export class Versions {
         const board = this.game.board.boardState;
         const next = this.game.bag.nextPieces;
         const hold = this.game.hold.piece == null ? "" : this.game.hold.piece.name;
-        const currPiece = this.game.falling.piece.name;
+        const currPiece = this.game.falling.piece == null ? "" : this.game.falling.piece.name;
         let boardstring = board.toReversed().flatMap(row => {
             return row.map(col => {
                 col = col.replace("Sh", "").replace("NP", "").replace("G", "#");
+                col = col.trim();
                 if (col.length == 1) col = ""
                 if (col[0] == "A") col = "";
                 if (col[0] == "S") col = col[2];
-                if (col.trim() == "") col = "_";
+                if (col == "") col = "_";
                 return col;
             })
         }).join("")
@@ -154,6 +167,9 @@ export class Versions {
     convertFromMapCompressed(string) {
         let [board, next, hold] = string.split("?");
         board = this.decompress(board);
+        if (board.length > 400) {
+            console.log('test')
+        }
         board = board.match(/.{1,10}/g).toReversed().map(row => {
             return row.split("").map(col => {
                 col = col.replace("#", "G").replace("_", "")
@@ -161,7 +177,10 @@ export class Versions {
                 return col
             });
         })
-        return { board, next, hold }
+        this.game.board.boardState = board;
+        this.game.bag.nextPieces = [next.split(","), []];
+        this.game.hold.piece = this.game.rendering.getPiece(hold);
+        this.game.mechanics.spawnPiece(this.game.bag.randomiser());
     }
 
 }

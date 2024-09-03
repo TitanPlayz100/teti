@@ -41,8 +41,8 @@
         "resetKey": "r",
         "rotate180Key": "a",
         "editMenuKey": "e",
-        "undo": "n",
-        "redo": "m"
+        "undoKey": "n",
+        "redoKey": "m"
     },
     "volume": {
         "audioLevel": 15,

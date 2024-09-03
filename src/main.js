@@ -8,6 +8,7 @@ window["songs"] = game.sounds;
 
 window.addEventListener("keydown", event => {
     game.controls.onKeyDown(event);
+    game.controls.onKeyDownRepeat(event);
 })
 
 window.addEventListener("keyup", event => {

@@ -57,6 +57,7 @@ export class Game {
         this.resetState();
         this.rendering.renderStyles();
         this.mechanics.spawnPiece(this.bag.randomiser(), true);
+        this.versions.save();
     }
 
     stopGameTimers(){ //stop all the game's timers
@@ -121,6 +122,9 @@ export class Game {
         this.falling.moved = false;
         this.rendering.boardAlpha = 1;
         this.rendering.boardAlphaChange = 0;
+        this.versions.historyConnections = [];
+        this.versions.historyStates = [];
+        this.versions.currentState = 0;
 
         clearInterval(this.mechanics.gravityTimer);
         clearInterval(this.statsTimer);
