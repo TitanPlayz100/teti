@@ -4,19 +4,21 @@ import { Game } from "../game.js";
 
 export class Versions {
     /**
+     * stores every game state existing indexed
      * @type {string[]}
      */
-    // stores every game state existing indexed
     historyStates = [];
     /**
+     * stores connections by assigning index as the node, and the value as an array of every connection to other nodes
      * @type {Number[][]}
      */
-    // stores connections by assigning index as the node, and the value as an array of every connection to other nodes
     historyConnections = [];
     currentState = 0;
-    redoMostRecentBranch = false;
+    selectedbranch = 0;
 
-    brancheselement = document.getElementById("branches");
+    historyelement = document.getElementById("history");
+    choiceselement = document.getElementById("redochoices");
+    // TODO: add way to change branch when current state has more than 1 connection, using choices
 
     /**
      * @param {Game} game
@@ -28,8 +30,7 @@ export class Versions {
     save() {
         const map = this.convertToMapCompressed();
         this.pushHistory(map);
-        const branches = this.historyConnections[this.currentState] || [];
-        this.brancheselement.textContent = `history: ${this.currentState}/${branches.length}`;
+        this.updateUI();
     }
 
     pushHistory(map) {
@@ -45,8 +46,7 @@ export class Versions {
     load() {
         const state = this.historyStates[this.currentState]
         this.convertFromMapCompressed(state);
-        const branches = this.historyConnections[this.currentState] || [];
-        this.brancheselement.textContent = `history: ${this.currentState}/${branches.length}`;
+        this.updateUI()
     }
 
     undo() {
@@ -62,8 +62,7 @@ export class Versions {
     redo() {
         const connection = this.historyConnections[this.currentState];
         if (connection == undefined) return;
-        const next = this.redoMostRecentBranch ? Math.max(...connection) : Math.min(...connection);
-        this.currentState = next;
+        this.currentState = this.selectedbranch ||Math.max(...connection);
         this.load()
     }
 
@@ -81,38 +80,39 @@ export class Versions {
         this.historyConnections[node] = undefined;
     }
 
-    testing() {
-        // 0
-        this.save();
-        this.game.board.boardState[0][0] = 'S G'; // 1
-        this.save();
-        this.game.board.boardState[0][0] = 'S t'; // 2
-        this.save();
-        this.game.board.boardState[0][0] = 'S o'; // 3a
-        this.save();
-        this.game.board.boardState[0][0] = 'S l'; // 4a
-        this.save();
-        this.goto(2); // back to 2
-        this.game.board.boardState[0][0] = 'S i'; // 3b
-        this.save();
-        this.game.board.boardState[0][0] = 'S z'; // 4b
-        this.save();
-        this.undo(); // back to 3b
-        this.undo(); // back to 2
-        this.redo(); // forward to 3a
-        this.redo(); // forward to 4a
-        this.redo(); // does nothing (no more redos)
-        this.goto(1);
-        this.clearFuture(2);
-        console.log(this.historyStates);
-        console.log(this.historyConnections);
-        console.log(this.historyStates[this.currentState]);
+    updateUI() {
+        const branches = this.historyConnections[this.currentState] || [];
+        this.selectedbranch = Math.max(...branches);
+        this.historyelement.textContent = `history: ${this.currentState}`;
+        if (branches.length <= 1) {
+            this.choiceselement.style.display = "none";
+            this.selectedbranch = 0;
+            return; 
+        }
+
+        [...this.choiceselement.children].forEach(button => button.remove())
+        this.choiceselement.style.display = "block"
+        branches.forEach(state => {
+            const button = document.createElement("button");
+            button.classList.add("redochoice");
+            if (state == this.selectedbranch) button.classList.add("selected");
+            button.textContent = state.toString();
+            button.onclick = () => this.setSelected(state, button);
+            this.choiceselement.appendChild(button)
+        })
     }
 
-    compress(s) { 
-        // saves anywhere from 60% to 90%
-        // around 200 blocks (messy gameplay) is 330kB ~~ 5 min of 3.3pps play is 1.6MB
+    setSelected(state, button) {
+        this.selectedbranch = state;
+        [...this.choiceselement.children].forEach(el => {
+            el.classList.remove("selected");
+        })
+        button.classList.add("selected");
+    }
 
+    compress(s) {
+        // saves anywhere from 60% to 90%
+        // 200 blocks is 330kB ~~ 5 min of 3.3pps play is 1.6MB
         let cs = "";
         let count = 1;
         for (let i = 1; i < s.length; i++) {
@@ -124,7 +124,6 @@ export class Versions {
             }
         }
         cs += `${count}${s[s.length - 1]}`;
-        console.log('reduced size by ' + (s.length - cs.length) / s.length * 100 + '%');
         return cs;
     }
 
@@ -168,7 +167,6 @@ export class Versions {
         let [board, next, hold] = string.split("?");
         board = this.decompress(board);
         if (board.length > 400) {
-            console.log('test')
         }
         board = board.match(/.{1,10}/g).toReversed().map(row => {
             return row.split("").map(col => {

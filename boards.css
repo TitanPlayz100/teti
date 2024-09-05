@@ -1,4 +1,3 @@
-
 #board {
     position: fixed;
     top: 50%;
@@ -167,4 +166,41 @@
 .objectiveText {
     left: 110%;
     bottom: 10%;
+}
+
+#redochoices {
+    position: absolute;
+    top: 100%;
+    left: 110%;
+    width: max-content;
+    max-width: 40vw;
+}
+
+.redochoice {
+    height: 3.5vh;
+    aspect-ratio: 1/1;
+    border: 0.3vh solid var(--l-gray);
+    border-radius: 10vmin;
+    transition: all 0.3s ease-out;
+    background-color: var(--invis);
+    outline: none;
+    color: var(--l-gray);
+    margin: 0.3vmin;
+}
+
+.redochoice:hover {
+    border-color: var(--cl-blue);
+    color: var(--cl-blue);
+    transition: all 0.05s ease;
+}
+
+.redochoice.selected {
+    border-color: var(--p-green);
+    color: var(--p-green);
+}
+
+.redochoice.selected:hover {
+    border-color: var(--green);
+    color: var(--green);
+    transition: all 0.05s ease;
 }
