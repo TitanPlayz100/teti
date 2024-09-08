@@ -14,6 +14,7 @@ import { Sounds } from "./sound.js";
 import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./mechanics/stats.js";
 import { BoardEditor } from "./display/editboard.js";
+import { Versions } from "./mechanics/versions.js";
 
 export class Game {
     started;
@@ -41,6 +42,7 @@ export class Game {
         this.rendering = new Rendering(this);
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
+        this.versions = new Versions(this);
 
         this.rendering.sizeCanvas();
         this.sounds.initSounds();
@@ -55,6 +57,7 @@ export class Game {
         this.resetState();
         this.rendering.renderStyles();
         this.mechanics.spawnPiece(this.bag.randomiser(), true);
+        this.versions.save();
     }
 
     stopGameTimers(){ //stop all the game's timers
@@ -119,6 +122,9 @@ export class Game {
         this.falling.moved = false;
         this.rendering.boardAlpha = 1;
         this.rendering.boardAlphaChange = 0;
+        this.versions.historyConnections = [];
+        this.versions.historyStates = [];
+        this.versions.currentState = 0;
 
         clearInterval(this.mechanics.gravityTimer);
         clearInterval(this.statsTimer);
@@ -136,7 +142,7 @@ export class Game {
     }
 
     versionChecker() {
-        const version = '1.0.0';
+        const version = '1.1.0';
         const userver = window.localStorage.getItem('version');
         document.getElementById('updatetext').style.display = version == userver ? "none" : "block";
         window.localStorage.setItem('version', version);

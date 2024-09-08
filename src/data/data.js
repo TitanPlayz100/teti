@@ -58,14 +58,29 @@ export const spinChecks = [
     ],
 ];
 
-export const songs = [
-    new Audio("https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/patc.mp3"),
-    new Audio("https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/sato.mp3"),
-    new Audio("https://github.com/TitanPlayz100/teti/raw/Tauri-Branch/src/assets/songs/flan.mp3"),
-];
-
 export const songNames = [
     "Cafe de Touhou 3 - The Girl's Secret Room",
     "ShibayanRecords - Acoustic Image",
     "ShibayanRecords - Close to your Mind",
+];
+
+// const sfx = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx")
+// const combo = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx/combo")
+// const songs = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/songs")
+export const songsobj = [
+    {
+        "name": "Cafe de Touhou 3 - The Girl's Secret Room.mp3",
+        "path": "assets/songs/Cafe de Touhou 3 - The Girl's Secret Room.mp3",
+        "type": "file"
+    },
+    {
+        "name": "ShibayanRecords - Acoustic Image.mp3",
+        "path": "assets/songs/ShibayanRecords - Acoustic Image.mp3",
+        "type": "file"
+    },
+    {
+        "name": "ShibayanRecords - Close to your Mind.mp3",
+        "path": "assets/songs/ShibayanRecords - Close to your Mind.mp3",
+        "type": "file"
+    }
 ];

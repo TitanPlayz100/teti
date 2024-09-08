@@ -149,12 +149,16 @@ export class MenuActions {
 
     setBoard() {
         const input = prompt("Enter Map String Here:")
-        this.game.boardeditor.convertFromTetrioMap(input);
+        const { board, next, hold } = this.game.boardeditor.convertFromMap(input);
+        this.game.board.boardState = board;
+        this.game.bag.nextPieces = [next.split(","), []];
+        this.game.hold.piece = this.game.rendering.getPiece(hold);
+        this.game.mechanics.spawnPiece(this.game.bag.randomiser());
     }
 
     getBoardString() {
-        const exportstring = this.game.boardeditor.convertToTetrioMap();
+        const exportstring = this.game.boardeditor.convertToMap();
         navigator.clipboard.writeText(exportstring)
-        alert("TETR.IO Map String (copied to clipboard):\n"+exportstring)
+        alert("TETR.IO Map String (copied to clipboard):\n" + exportstring)
     }
 }

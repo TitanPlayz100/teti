@@ -64,7 +64,7 @@ export class BoardEditor {
         }
     }
 
-    convertToTetrioMap() {
+    convertToMap() {
         const board = this.game.board.boardState;
         const next = this.game.bag.nextPieces;
         const hold = this.game.hold.piece == null ? "" : this.game.hold.piece.name;
@@ -84,7 +84,7 @@ export class BoardEditor {
 
     }
 
-    convertFromTetrioMap(string) {
+    convertFromMap(string) {
         let [board, next, hold] = string.split("?");
         board = board.match(/.{1,10}/g).toReversed().map(row => {
             return row.split("").map(col => {
@@ -93,9 +93,6 @@ export class BoardEditor {
                 return col
             });
         })
-        this.game.board.boardState = board;
-        this.game.bag.nextPieces = [next.split(","), []];
-        this.game.hold.piece = this.game.rendering.getPiece(hold);
-        this.game.mechanics.spawnPiece(this.game.bag.randomiser());
+        return { board, next, hold }
     }
 }

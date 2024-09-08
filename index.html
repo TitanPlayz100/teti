@@ -14,7 +14,7 @@
     <div id="board">
         <div id="dangerOverlay"></div>
         <button id="openSettingsButton" onclick="modal.openModal('settingsPanel')">
-            <img src="./assets/settings.svg">
+            <img src="./assets/icons/settings.svg">
         </button>
         
         <canvas id="next" onclick="modal.openModal('queueModify')"></canvas>
@@ -44,13 +44,20 @@
             <p class="smalltext" style="left: -15%; bottom: 0%;">sec</p>
             <p class="text objectiveText" id="objective"></p>
             <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
+            <p class="smalltext" id="history" style="left: 110%; bottom: 0%; width: 10vw; display: none;">history: 0</p>
+            <!-- TODO: incorporate history display somehow -->
+        </div>
+
+        <div id="redochoices">
+            <button class="redochoice selected">1</button>
+            <button class="redochoice">2</button>
         </div>
     </div>
 
     <dialog id="displayDialog" class="dialog">
         <h1>User Settings</h1>
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('display')">
-            <img src="./assets/reset.svg" alt="reset" height="100%">
+            <img src="./assets/icons/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>BG hex</label> <input class="option textInput" type="text" id="background" /></div>
         <div class="settingLayout"><label>Board Opacity</label> <input class="option range" type="range" id="boardOpacity" oninput="menu.sliderChange(this)" min="0" max="100" step="1"/></div>
@@ -70,7 +77,7 @@
     <dialog id="gameDialog" class="dialog">
         <h1>Game Settings</h1>
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('game')">
-            <img src="./assets/reset.svg" alt="reset" height="100%">
+            <img src="./assets/icons/reset.svg" alt="reset" height="100%">
         </button>
         
         <div class="settingLayout"><label>Gravity</label> <input class="option range exp" oninput="menu.sliderChange(this)" type="range" id="gravitySpeed" min="0" max="100" step="1" /></div>
@@ -90,7 +97,7 @@
     <dialog id="controlDialog" class="dialog">
         <h1>Keybinds</h1>
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('control')">
-            <img src="./assets/reset.svg" alt="reset" height="100%">
+            <img src="./assets/icons/reset.svg" alt="reset" height="100%">
         </button>
         <div class="settingLayout"><label>Move Right</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="rightKey"></button></div>
         <div class="settingLayout"><label>Move Left</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="leftKey"></button></div>
@@ -102,6 +109,8 @@
         <div class="settingLayout"><label>Hold Piece</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="holdKey"></button></div>
         <div class="settingLayout"><label>Reset Game</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="resetKey"></button></div>
         <div class="settingLayout"><label>Open Edit Menu (Custom)</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="editMenuKey"></button></div>
+        <div class="settingLayout"><label>Undo</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="undoKey"></button></div>
+        <div class="settingLayout"><label>Redo</label> <button class="option keybind" onclick="menu.buttonInput(this)" id="redoKey"></button></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="modal.closeModal('controlDialog')">Save and close</button>
     </dialog>
@@ -138,7 +147,7 @@
     <dialog id="handlingDialog" class="dialog">
         <h1>Change Handling</h1>
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('handling')">
-            <img src="./assets/reset.svg" alt="reset" height="100%">
+            <img src="./assets/icons/reset.svg" alt="reset" height="100%">
         </button>
 
         <div class="settingLayout"><label>DAS</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="das" min="0" max="250" step="1" /></div>
@@ -151,7 +160,7 @@
     <dialog id="volumeDialog" class="dialog">
         <h1>Change Volume</h1>
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('handling')">
-            <img src="./assets/reset.svg" alt="reset" height="100%">
+            <img src="./assets/icons/reset.svg" alt="reset" height="100%">
         </button>
 
         <div class="settingLayout"><label>Music Volume</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="audioLevel" min="0" max="100" step="1" /></div>
@@ -171,24 +180,24 @@
 
     <dialog id="settingsPanel" class="dialog">
         <button id="handling" class="settingPanelButton smallPanelButton" onclick="modal.openModal('handlingDialog')" title="Change handling/tuning">
-            <img src="./assets/handling.svg" style="transform: translateY(10%); height: 90%;">
+            <img src="./assets/icons/handling.svg" style="transform: translateY(10%); height: 90%;">
         </button>
         <button id="volume" class="settingPanelButton smallPanelButton" onclick="modal.openModal('volumeDialog')" title="Change audio settings">
-            <img src="./assets/volume.svg" style="transform: translateY(5%); height: 110%;">
+            <img src="./assets/icons/volume.svg" style="transform: translateY(5%); height: 110%;">
         </button>
         <br>
 
         <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="User Settings - Graphics, board, and background"> 
-            <img src="./assets/display.svg" style="transform: translateY(10%); height: 70%;">
+            <img src="./assets/icons/display.svg" style="transform: translateY(10%); height: 70%;">
         </button>
         <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - Gameplay features and mechanics">
-            <img src="./assets/settings.svg" style="transform: translateY(10%); height: 90%;">
+            <img src="./assets/icons/settings.svg" style="transform: translateY(10%); height: 90%;">
         </button>
         <button id="control" class="settingPanelButton" onclick="modal.openModal('controlDialog')" title="Controls - keybinds for different actions">
-            <img src="./assets/joystick.svg" style="transform: translateY(0%); height: 75%;">
+            <img src="./assets/icons/joystick.svg" style="transform: translateY(0%); height: 75%;">
         </button>
         <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
-            <img src="./assets/timer.svg" style="transform: translateY(10%); height: 90%;">
+            <img src="./assets/icons/timer.svg" style="transform: translateY(10%); height: 90%;">
         </button>
         <br>
 
@@ -198,25 +207,25 @@
         <br>
 
         <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="window.location = './info.html'" title="See info about this project">
-            <img src="./assets/info.svg" style="height: 80%;">
+            <img src="./assets/icons/info.svg" style="height: 80%;">
         </button>
         <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
-            <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
+            <img src="./assets/icons/download.svg" style="transform: translateY(10%); height: 90%;">
         </button>
         <span id="uploadSettings" class="settingPanelButton smallPanelButton" style="height: 4.5vh; " onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
             <input type="file" id="fileUpload" onchange="menu.uploadSettings(this)" hidden accept=".teti">
-            <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
+            <img src="./assets/icons/upload.svg" style="transform: translateY(10%); height: 90%;">
         </span>
         <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="See the github page, star if you like it">
-            <img src="./assets/github.svg" style="transform: translateY(-14%); height: 200%;">
+            <img src="./assets/icons/github.svg" style="transform: translateY(-14%); height: 200%;">
         </button>
         <br>
 
         <div id="songSelector">
             <p id="songText">Not Playing</p>
-            <button id="pauseSong" onclick="songs.pauseSong()" class="settingPanelButton smallerPanelButton" title="Pause/Play"><img src="./assets/pause.svg"/></button>
+            <button id="pauseSong" onclick="songs.pauseSong()" class="settingPanelButton smallerPanelButton" title="Pause/Play"><img src="./assets/icons/pause.svg"/></button>
             <progress id="songProgress" max=100 value=0></progress>
-            <button id="nextSong" onclick="songs.endSong(); songs.startSong();" class="settingPanelButton smallerPanelButton" title="Next Song"><img src="./assets/next.svg" style="transform: translateY(-5%);"/></button>
+            <button id="nextSong" onclick="songs.endSong(); songs.startSong();" class="settingPanelButton smallerPanelButton" title="Next Song"><img src="./assets/icons/next.svg" style="transform: translateY(-5%);"/></button>
         </div>
     </dialog>
 
@@ -250,21 +259,21 @@
         <div class="settingLayout"><label>Override Other Minos</label> <input class="option check custom" type="checkbox" id="override" /></div>
         <div id="editbuttons">
             <button id="addGarbage" class="settingPanelButton smallPanelButton" onclick="menu.addGarbageRow()" title="Add garbage row">
-                <img src="./assets/addgarb.svg" style="transform: translateY(10%); height: 90%;">
+                <img src="./assets/icons/addgarb.svg" style="transform: translateY(10%); height: 90%;">
             </button>
             <button id="removeLine" class="settingPanelButton smallPanelButton" onclick="menu.removeLastRow()" title="Remove bottom row">
-                <img src="./assets/addgarb.svg" style="transform: translateY(-5%) rotate(180deg); height: 90%;">
+                <img src="./assets/icons/addgarb.svg" style="transform: translateY(-5%) rotate(180deg); height: 90%;">
             </button>
             <button id="clearGarbage" class="settingPanelButton smallPanelButton" onclick="menu.clearGarbage()" title="Clear all garbage">
-                <img src="./assets/cleargarb.svg" style="height: 110%;">
+                <img src="./assets/icons/cleargarb.svg" style="height: 110%;">
             </button>
             <br>
 
             <button id="copyBoardString" class="settingPanelButton smallPanelButton" onclick="menu.getBoardString()" title="Copy current board">
-                <img src="./assets/download.svg" style="transform: translateY(10%); height: 90%;">
+                <img src="./assets/icons/download.svg" style="transform: translateY(10%); height: 90%;">
             </button>
             <button id="setBoardState" class="settingPanelButton smallPanelButton" onclick="menu.setBoard()" title="Set current board">
-                <img src="./assets/upload.svg" style="transform: translateY(10%); height: 90%;">
+                <img src="./assets/icons/upload.svg" style="transform: translateY(10%); height: 90%;">
             </button>
         </div>
         <button class="closeDialog" onclick="modal.closeModal('editMenu')">Save and Close</button>

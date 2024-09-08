@@ -77,6 +77,7 @@ export class LockPiece {
         this.mechanics.isMini = false;
         this.game.falling.moved = false;
         this.mechanics.spawnPiece(this.game.bag.randomiser());
+        this.game.versions.save();
         this.game.rendering.renderDanger();
     }
 
