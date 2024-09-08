@@ -1,0 +1,187 @@
+[
+    {
+        "name": "allclear.mp3",
+        "path": "assets/sfx/allclear.mp3",
+        "type": "file"
+    },
+    {
+        "name": "btb_1.mp3",
+        "path": "assets/sfx/btb_1.mp3",
+        "type": "file"
+    },
+    {
+        "name": "clearbtb.mp3",
+        "path": "assets/sfx/clearbtb.mp3",
+        "type": "file"
+    },
+    {
+        "name": "clearline.mp3",
+        "path": "assets/sfx/clearline.mp3",
+        "type": "file"
+    },
+    {
+        "name": "clearquad.mp3",
+        "path": "assets/sfx/clearquad.mp3",
+        "type": "file"
+    },
+    {
+        "name": "clearspin.mp3",
+        "path": "assets/sfx/clearspin.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo",
+        "path": "assets/sfx/combo",
+        "type": "dir"
+    },
+    {
+        "name": "damage_alert.mp3",
+        "path": "assets/sfx/damage_alert.mp3",
+        "type": "file"
+    },
+    {
+        "name": "failure.mp3",
+        "path": "assets/sfx/failure.mp3",
+        "type": "file"
+    },
+    {
+        "name": "finish.mp3",
+        "path": "assets/sfx/finish.mp3",
+        "type": "file"
+    },
+    {
+        "name": "garbage_in_large.mp3",
+        "path": "assets/sfx/garbage_in_large.mp3",
+        "type": "file"
+    },
+    {
+        "name": "garbage_in_small.mp3",
+        "path": "assets/sfx/garbage_in_small.mp3",
+        "type": "file"
+    },
+    {
+        "name": "harddrop.mp3",
+        "path": "assets/sfx/harddrop.mp3",
+        "type": "file"
+    },
+    {
+        "name": "hold.mp3",
+        "path": "assets/sfx/hold.mp3",
+        "type": "file"
+    },
+    {
+        "name": "menutap.mp3",
+        "path": "assets/sfx/menutap.mp3",
+        "type": "file"
+    },
+    {
+        "name": "move.mp3",
+        "path": "assets/sfx/move.mp3",
+        "type": "file"
+    },
+    {
+        "name": "retry.mp3",
+        "path": "assets/sfx/retry.mp3",
+        "type": "file"
+    },
+    {
+        "name": "rotate.mp3",
+        "path": "assets/sfx/rotate.mp3",
+        "type": "file"
+    },
+    {
+        "name": "spin.mp3",
+        "path": "assets/sfx/spin.mp3",
+        "type": "file"
+    },
+    {
+        "name": "thunder.mp3",
+        "path": "assets/sfx/thunder.mp3",
+        "type": "file"
+    },
+    {
+        "name": "topout.mp3",
+        "path": "assets/sfx/topout.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_1.mp3",
+        "path": "assets/sfx/combo/combo_1.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_10.mp3",
+        "path": "assets/sfx/combo/combo_10.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_11.mp3",
+        "path": "assets/sfx/combo/combo_11.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_12.mp3",
+        "path": "assets/sfx/combo/combo_12.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_13.mp3",
+        "path": "assets/sfx/combo/combo_13.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_14.mp3",
+        "path": "assets/sfx/combo/combo_14.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_15.mp3",
+        "path": "assets/sfx/combo/combo_15.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_16.mp3",
+        "path": "assets/sfx/combo/combo_16.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_2.mp3",
+        "path": "assets/sfx/combo/combo_2.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_3.mp3",
+        "path": "assets/sfx/combo/combo_3.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_4.mp3",
+        "path": "assets/sfx/combo/combo_4.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_5.mp3",
+        "path": "assets/sfx/combo/combo_5.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_6.mp3",
+        "path": "assets/sfx/combo/combo_6.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_7.mp3",
+        "path": "assets/sfx/combo/combo_7.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_8.mp3",
+        "path": "assets/sfx/combo/combo_8.mp3",
+        "type": "file"
+    },
+    {
+        "name": "combo_9.mp3",
+        "path": "assets/sfx/combo/combo_9.mp3",
+        "type": "file"
+    }
+]

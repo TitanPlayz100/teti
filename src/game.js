@@ -14,7 +14,7 @@ import { Sounds } from "./sound.js";
 import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./mechanics/stats.js";
 import { BoardEditor } from "./display/editboard.js";
-import { Versions } from "./mechanics/boardversions.js";
+import { Versions } from "./mechanics/versions.js";
 
 export class Game {
     started;
@@ -142,7 +142,7 @@ export class Game {
     }
 
     versionChecker() {
-        const version = '1.0.0';
+        const version = '1.1.0';
         const userver = window.localStorage.getItem('version');
         document.getElementById('updatetext').style.display = version == userver ? "none" : "block";
         window.localStorage.setItem('version', version);

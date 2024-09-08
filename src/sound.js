@@ -1,10 +1,12 @@
 // @ts-check
-
-import { songNames, songs } from "./data/data.js";
+import sfxobj from "./data/sfxlist.json" with { type: "json" };
+import { songsobj } from "./data/data.js";
 import { Game } from "./game.js";
 
 export class Sounds {
     sfx = {};
+    songs = [];
+    songNames = [];
     curSongIdx = 0;
     elSongProgress = document.getElementById("songProgress");
     elSongText = document.getElementById("songText");
@@ -17,9 +19,7 @@ export class Sounds {
     }
 
     playSound(audioName, replace = true) {
-        if (this.sfx[audioName] == undefined) {
-            this.sfx[audioName] = new Audio(`assets/sfx/${audioName}.mp3`);
-        }
+        if (this.sfx[audioName] == undefined) { console.log(audioName + ' not found'); return; }
         this.sfx[audioName].volume = this.game.settings.volume.sfxLevel / 1000;
         if (this.game.started == false) return;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
@@ -28,49 +28,61 @@ export class Sounds {
     }
 
     startSong() {
-        this.elSongText.textContent = `Now Playing ${songNames[this.curSongIdx]}`;
-        songs[this.curSongIdx].onended = () => {
+        this.elSongText.textContent = `Now Playing ${this.songNames[this.curSongIdx]}`;
+        this.songs[this.curSongIdx].onended = () => {
             this.endSong();
             this.startSong();
         };
-        songs[this.curSongIdx].volume = this.game.settings.volume.audioLevel / 1000;
-        songs[this.curSongIdx].play();
+        this.songs[this.curSongIdx].volume = this.game.settings.volume.audioLevel / 1000;
+        this.songs[this.curSongIdx].play();
     }
 
     endSong() {
-        songs[this.curSongIdx].pause();
-        songs[this.curSongIdx].currentTime = 0;
-        songs[this.curSongIdx].onended = () => { };
-        this.curSongIdx = (this.curSongIdx + 1) % songs.length;
+        this.songs[this.curSongIdx].pause();
+        this.songs[this.curSongIdx].currentTime = 0;
+        this.songs[this.curSongIdx].onended = () => { };
+        this.curSongIdx = (this.curSongIdx + 1) % this.songs.length;
     }
 
     pauseSong() {
-        if (songs[this.curSongIdx].paused) {
-            songs[this.curSongIdx].play();
-            this.elSongText.textContent = `Now Playing ${songNames[this.curSongIdx]}`;
+        if (this.songs[this.curSongIdx].paused) {
+            this.songs[this.curSongIdx].play();
+            this.elSongText.textContent = `Now Playing ${this.songNames[this.curSongIdx]}`;
         } else {
-            songs[this.curSongIdx].pause();
+            this.songs[this.curSongIdx].pause();
             this.elSongText.textContent = `Not Playing`;
 
         }
     }
 
-    initSounds() {
+    async initSounds() {
         let menuSFX = (e, sfx) => {
-            document
-                .querySelectorAll(e)
+            document.querySelectorAll(e)
                 .forEach(el => (el.onmouseenter = () => this.game.sounds.playSound(sfx)));
         };
         menuSFX(".settingLayout", "menutap");
         menuSFX(".gamemodeSelect", "menutap");
+        
         setInterval(() => {
-            if (songs[this.curSongIdx].currentTime == 0) return;
+            if (this.songs[this.curSongIdx].currentTime == 0) return;
             this.elSongProgress.value =
-                (songs[this.curSongIdx].currentTime * 100) / songs[this.curSongIdx].duration;
+                (this.songs[this.curSongIdx].currentTime * 100) / this.songs[this.curSongIdx].duration;
         }, 2000);
+
+        // preload all sfx
+        sfxobj.forEach(file => {
+            if (file.type == "dir") return;
+            this.sfx[file.name.split(".")[0]] = new Audio(file.path);
+        })
+
+        songsobj.forEach(file => {
+            this.songs.push(new Audio(file.path));
+            this.songNames.push(file.name.split(".")[0]);
+        })
+
     }
 
     setAudioLevel() {
-        songs[this.curSongIdx].volume = Number(this.game.settings.volume.audioLevel) / 1000;
+        this.songs[this.curSongIdx].volume = Number(this.game.settings.volume.audioLevel) / 1000;
     }
 }

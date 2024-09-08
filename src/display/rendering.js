@@ -165,7 +165,7 @@ export class Rendering {
         if (this.game.mechanics.spikeCounter >= 15) this.game.sounds.playSound("thunder", false);
         if (this.game.mechanics.combonumber > 0)
             this.game.sounds.playSound(
-                `combo/combo_${
+                `combo_${
                     this.game.mechanics.combonumber > 16 ? 16 : this.game.mechanics.combonumber
                 }`
             );
