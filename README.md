@@ -6,3 +6,7 @@ The info page can be found [here](https://titanplayz100.github.io/teti/info.html
 
 ## Desktop App
 All the information is in the tauri branch, can download in releases
+
+## My fork
+Added 'race' mode
++ Based on TGM3's levelling system
