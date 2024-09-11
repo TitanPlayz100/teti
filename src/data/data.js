@@ -34,7 +34,7 @@ export const modesText = {
     6: "Sent",
     7: "Combo",
     8: "Lines",
-    9: "Race",
+    9: "Level",
 };
 
 export const disabledKeys = [
