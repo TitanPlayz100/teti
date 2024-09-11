@@ -1,5 +1,3 @@
-// @ts-check
-
 import { modesText } from "../data/data.js";
 import { Game } from "../game.js";
 import { toExpValue } from "../util.js";
@@ -97,7 +95,7 @@ export class MenuActions {
     toggleDialog() {
         if (this.game.modals.open) {
             document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
-            if (this.game.started && !this.game.ended) this.game.movement.firstMovement();  
+            if (this.game.started && !this.game.ended) this.game.movement.firstMovement();
 
         } else {
             this.menus.openModal("settingsPanel");
@@ -127,6 +125,7 @@ export class MenuActions {
             this.menus.closeModal("editMenu");
             return;
         }
+        if (this.game.settings.game.gamemode != '0') return
         this.menus.openModal("editMenu");
     }
 

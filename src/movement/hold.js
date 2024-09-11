@@ -1,5 +1,3 @@
-//@ts-check
-
 import { Game } from "../game.js";
 import pieces from "../data/pieces.json" with { type: "json" };
 
@@ -35,6 +33,7 @@ export class Hold {
         this.piece = this.getPiece(validPiece);
         this.occured = false;
         this.game.rendering.updateHold();
+        this.game.history.save();
     }
 
     getPiece(name) {

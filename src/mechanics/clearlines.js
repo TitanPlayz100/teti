@@ -1,5 +1,3 @@
-// @ts-check
-
 import { cleartypes, scoringTable } from "../data/data.js";
 import { Mechanics } from "./mechanics.js";
 import attackValues from "../data/attacktable.json" with { type: "json" };

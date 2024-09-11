@@ -1,4 +1,3 @@
-// @ts-check
 import sfxobj from "./data/sfxlist.json" with { type: "json" };
 import { songsobj } from "./data/data.js";
 import { Game } from "./game.js";

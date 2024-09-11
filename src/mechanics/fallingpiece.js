@@ -1,5 +1,3 @@
-//@ts-check
-
 import { KickData, KickData180 } from "../data/kicks.js";
 import { Game } from "../game.js";
 

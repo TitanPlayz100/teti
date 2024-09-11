@@ -1,5 +1,3 @@
-// @ts-check
-
 import { Bag } from "./mechanics/bag.js";
 import { Board } from "./mechanics/board.js";
 import { Controls } from "./movement/controls.js";
@@ -14,7 +12,7 @@ import { Sounds } from "./sound.js";
 import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./mechanics/stats.js";
 import { BoardEditor } from "./display/editboard.js";
-import { Versions } from "./mechanics/versions.js";
+import { History } from "./mechanics/history.js";
 
 export class Game {
     started;
@@ -42,7 +40,7 @@ export class Game {
         this.rendering = new Rendering(this);
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
-        this.versions = new Versions(this);
+        this.history = new History(this);
 
         this.rendering.sizeCanvas();
         this.sounds.initSounds();
@@ -57,7 +55,7 @@ export class Game {
         this.resetState();
         this.rendering.renderStyles();
         this.mechanics.spawnPiece(this.bag.randomiser(), true);
-        this.versions.save();
+        this.history.save();
     }
 
     stopGameTimers(){ //stop all the game's timers
@@ -122,9 +120,9 @@ export class Game {
         this.falling.moved = false;
         this.rendering.boardAlpha = 1;
         this.rendering.boardAlphaChange = 0;
-        this.versions.historyConnections = [];
-        this.versions.historyStates = [];
-        this.versions.currentState = 0;
+        this.history.historyConnections = [];
+        this.history.historyStates = [];
+        this.history.currentState = 0;
 
         clearInterval(this.mechanics.gravityTimer);
         clearInterval(this.statsTimer);

@@ -58,12 +58,6 @@ export const spinChecks = [
     ],
 ];
 
-export const songNames = [
-    "Cafe de Touhou 3 - The Girl's Secret Room",
-    "ShibayanRecords - Acoustic Image",
-    "ShibayanRecords - Close to your Mind",
-];
-
 // const sfx = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx")
 // const combo = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx/combo")
 // const songs = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/songs")
