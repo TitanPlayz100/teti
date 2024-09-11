@@ -1,4 +1,4 @@
-import { cleartypes, scoringTable } from "../data/data.js";
+import { cleartypes, scoringTable, levellingTable } from "../data/data.js";
 import { Mechanics } from "./mechanics.js";
 import attackValues from "../data/attacktable.json" with { type: "json" };
 import { Game } from "../game.js";
@@ -84,6 +84,7 @@ export class ClearLines {
         this.stats.clearlines += linecount;
         this.stats.attack += damage;
         this.mech.spikeCounter += damage;
+        this.stats.level += levellingTable[linecount];
 
         this.manageGarbageSent(damage);
         if (this.mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
