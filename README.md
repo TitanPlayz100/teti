@@ -10,3 +10,4 @@ All the information is in the tauri branch, can download in releases
 ## My fork
 Added 'race' mode
 + Based on TGM3's levelling system
++ You can set the "Race Target" (default is 500)
