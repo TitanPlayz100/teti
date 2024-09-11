@@ -1,4 +1,3 @@
-//@ts-check
 import { Game } from "../game.js";
 
 export class BoardEditor {
@@ -18,31 +17,48 @@ export class BoardEditor {
         this.board = game.board;
     }
 
-    // change event listeners to delegate listener for efficiency
     addListeners() {
-        for (let i = 0; i < 20; i++) {
-            for (let j = 0; j < 10; j++) {
-                const clickarea = document.createElement("div");
-                clickarea.classList.add("clickmino");
-                clickarea.addEventListener("mousedown", () => {
-                    if (this.game.settings.game.gamemode != 0) return;
-                    if (this.fillRow) { this.fillWholeRow([j, 19 - i]) }
-                    else { this.fillCell([j, 19 - i]); }
-                })
-                window.addEventListener("mouseup", () => {
-                    this.mousedown = false;
-                })
-                clickarea.addEventListener("mouseenter", () => {
-                    if (this.game.settings.game.gamemode != 0) return;
-                    clickarea.classList.add('highlighting')
+        // delegate listeners for efficiency
+        document.body.addEventListener("mousedown", (e) => {
+            if (e.target.classList.contains('clickmino')) {
+                const j = Number(e.target.dataset.x)
+                const i = Number(e.target.dataset.y)
+                if (this.game.settings.game.gamemode != 0) return;
+                if (this.fillRow) { this.fillWholeRow([j, 19 - i]) }
+                else { this.fillCell([j, 19 - i]); }
+            }
+        });
+
+        document.body.addEventListener("mouseenter", (e) => {
+            if (e.target.classList.contains('clickmino')) {
+                const j = Number(e.target.dataset.x)
+                const i = Number(e.target.dataset.y)
+                if (this.game.settings.game.gamemode != 0) return;
+                    e.target.classList.add('highlighting')
                     if (this.mousedown) {
                         if (this.fillRow) { this.fillWholeRow([j, 19 - i]) }
                         else { this.fillCell([j, 19 - i]); }
                     }
-                })
-                clickarea.addEventListener("mouseleave", () => {
-                    clickarea.classList.remove('highlighting');
-                })
+            }
+        }, true);
+
+        document.body.addEventListener("mouseleave", (e) => {
+            if (e.target.classList.contains('clickmino')) {
+                e.target.classList.remove('highlighting')
+            }
+        }, true);
+
+        document.body.addEventListener("mouseup", () => {
+            if (this.mousedown) this.game.history.save();
+            this.mousedown = false;
+        });
+
+        for (let i = 0; i < 20; i++) {
+            for (let j = 0; j < 10; j++) {
+                const clickarea = document.createElement("div");
+                clickarea.classList.add("clickmino");
+                clickarea.dataset.x = j.toString();
+                clickarea.dataset.y = i.toString();
                 this.clickareasdiv.appendChild(clickarea);
             }
         }

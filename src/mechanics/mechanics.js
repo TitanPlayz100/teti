@@ -1,5 +1,3 @@
-// @ts-check
-
 import { Game } from "../game.js";
 import { ClearLines } from "./clearlines.js";
 import { LockPiece } from "./locking.js";
@@ -42,6 +40,7 @@ export class Mechanics {
         this.game.rendering.updateNext();
         this.game.rendering.updateHold();
         this.setShadow();
+        this.locking.incrementLock();
         const rows =
             this.game.settings.game.requiredGarbage < 10
                 ? this.game.settings.game.requiredGarbage

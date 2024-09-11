@@ -1,5 +1,3 @@
-//@ts-check
-
 import { Game } from "./game.js";
 import defaultSettings from "./data/defaultSettings.json" with { type: "json" };
 
@@ -35,17 +33,17 @@ export class Settings {
         })
     }
 
-    save() { // TODO: maybe change to not be explicit 
-        return {
-            "control": this.control,
-            "display": this.display,
-            "game": this.game,
-            "handling": this.handling,
-            "volume": this.volume
-        };
+    save() {
+        const data = {};
+        Object.getOwnPropertyNames(this).forEach(key => {
+            if (key == 'gameObject') return;
+            data[key] = this[key];
+        })
+        return data;
     }
 
-    convert(arr) { // can probably remove later in the future
+    // for backwards compatibility
+    convert(arr) {
         const display = arr[0]
         const game = arr[1]
         const control = arr[2]

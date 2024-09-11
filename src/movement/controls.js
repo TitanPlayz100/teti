@@ -1,5 +1,3 @@
-// @ts-check
-
 import { disabledKeys } from "../data/data.js";
 import { Game } from "../game.js";
 
@@ -53,8 +51,8 @@ export class Controls {
     onKeyDownRepeat(event) { // allows for repeating
         this.keys = this.game.settings.control;
         const key = event.key.length > 1 ? event.key : event.key.toLowerCase();
-        if (key == this.keys.undoKey) this.game.versions.undo();
-        if (key == this.keys.redoKey) this.game.versions.redo()
+        if (key == this.keys.undoKey) this.game.history.undo();
+        if (key == this.keys.redoKey) this.game.history.redo()
     }
 
     onKeyUp(event) {

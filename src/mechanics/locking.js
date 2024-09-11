@@ -1,5 +1,3 @@
-// @ts-check
-
 import { Game } from "../game.js";
 import { Mechanics } from "./mechanics.js";
 
@@ -77,7 +75,7 @@ export class LockPiece {
         this.mechanics.isMini = false;
         this.game.falling.moved = false;
         this.mechanics.spawnPiece(this.game.bag.randomiser());
-        this.game.versions.save();
+        this.game.history.save();
         this.game.rendering.renderDanger();
     }
 

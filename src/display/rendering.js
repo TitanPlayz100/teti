@@ -1,4 +1,3 @@
-// @ts-check
 import { Game } from "../game.js";
 import { toHex } from "../util.js";
 import pieces from "../data/pieces.json" with { type: "json" };

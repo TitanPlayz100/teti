@@ -1,4 +1,3 @@
-// @ts-check
 import { Game } from "../game.js";
 import { toExpValue, toLogValue } from "../util.js";
 

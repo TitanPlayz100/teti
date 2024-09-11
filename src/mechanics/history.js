@@ -1,8 +1,6 @@
-//@ts-check
-
 import { Game } from "../game.js";
 
-export class Versions {
+export class History {
     /**
      * stores every game state existing indexed
      * @type {string[]}
@@ -18,7 +16,7 @@ export class Versions {
 
     historyelement = document.getElementById("history");
     choiceselement = document.getElementById("redochoices");
-    // TODO: add option to enable and disable versions
+    // TODO: add option to enable and disable history
 
     /**
      * @param {Game} game

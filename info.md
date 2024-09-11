@@ -41,13 +41,18 @@ Feel free to contribute with pull requests and issues. I'll try to keep up with 
     - dig, survival, backfire
     - semi invis mode
     - 4W
-- menu animations
+- clean modern animated menus
 - import/export settings
 - customise queues
 - edit and draw on board (custom game)
 - undo and redo with non linear branches
 
 ## Updates
+#### v1.1.1
+- editing boards now is undoable (gamestate is saved)
+- changed some event listeners for efficiency
+- piece schedules lock on top rather than topout
+
 ### v1.1.0
 - added undo and redo feautures
 - non linear timeline: branches can be made and navigated, much like a git tree
@@ -65,24 +70,26 @@ Feel free to contribute with pull requests and issues. I'll try to keep up with 
 Things that I am working on, and most likely will release in the next update
 - allow for modifiers to be added to keybinds
 - loading page for the first second or so
+- add edit menu button
+- show history number when in custom game
+- title screen maybe
 
 ## Feature Wishlist
-No particular order or time frame, may or may not add these
-- gamemode presets
-- guide like progression thing? using custom boards (kinda like tetris tres bien)
-- title screen maybe
-- more unique gamemodes (techmino styled)
+May or may not add these, kinda ordered by ease and want for feature
+- add different 4w residue (both 3 and 6 residue)
 - more stats + customise stat sidebar
 - more garbage settings
-- maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats
-- allow importing tetrio settings and custom game files
-- replay functionality (either save gamestate or save keystrokes idk yet)
 - finesse detection
 - pb logging
+- allow importing tetrio settings and custom game files
 - custom mino skins and music
+- show info when hovering over settings
+- replay functionality (either save gamestate or save keystrokes idk yet)
+- more unique gamemodes (techmino styled)
+    - misdrop remover mode
+    - gamemode presets
+- more rotation systems (ars, trs, srs/srsX, none)
+- guide like progression thing? using custom boards (kinda like tetris tres bien)
+- maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats
 - touch settings
 - cooler graphics (maybe using a library like pixijs)
-- more rotation systems (ars, trs, srs/srsX, none)
-- misdrop remover mode
-- add different 4w residue (both 3 and 6 residue)
-- show info when hovering over settings

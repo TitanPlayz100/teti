@@ -1,5 +1,3 @@
-// @ts-check
-
 export function toExpValue(x) {
     return Math.round(Math.pow(2, 0.1 * x) - 1);
 }

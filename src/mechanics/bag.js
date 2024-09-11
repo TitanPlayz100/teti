@@ -1,4 +1,3 @@
-//@ts-check
 import { Game } from "../game.js";
 import pieces from "../data/pieces.json" with { type: "json" };
 
@@ -63,6 +62,7 @@ export class Bag {
         this.isAllspin = false;
         this.isMini = false;
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
+        this.game.history.save();
     }
 
     firstNextPiece() {
