@@ -74,6 +74,7 @@ export class LockPiece {
         this.mechanics.isAllspin = false;
         this.mechanics.isMini = false;
         this.game.falling.moved = false;
+        if(this.game.stats.level % 100 != 99 && this.game.stats.level != this.game.settings.game.raceTarget - 1 )  this.game.stats.level++;
         this.mechanics.spawnPiece(this.game.bag.randomiser());
         this.game.history.save();
         this.game.rendering.renderDanger();

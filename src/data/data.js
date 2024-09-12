@@ -16,6 +16,14 @@ export const scoringTable = {
     "ALL CLEAR": 3500,
 };
 
+export const levellingTable = {
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 4,
+    4: 6,
+};
+
 export const modesText = {
     0: "Custom",
     1: "Lines",
@@ -26,6 +34,7 @@ export const modesText = {
     6: "Sent",
     7: "Combo",
     8: "Lines",
+    9: "Level",
 };
 
 export const disabledKeys = [

@@ -27,6 +27,7 @@
         "backfireMulti": 1,
         "allowQueueModify": true,
         "lookAheadPieces": 3,
+        "raceTarget": 500,
         "allspin":true,
         "allspinminis":true
     },
