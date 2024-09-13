@@ -9,14 +9,22 @@ This project started out as a learning experience, because suprisingly it was my
 
 I hope you enjoy TETI, and give a star if you like it. The code is no longer 1000 lines, but I want this to grow to a proper maintainable tetris client.
 
-Also is it just me or is the movement a bit off
+(Also is it just me or is the movement a bit off)
 
-### contributions
-Thank you [existancepy](https://github.com/existancepy) for all the fixes.
+## Contributions
+Thank you [existancepy](https://github.com/existancepy) for all the fixes.  
+Design inspired by [blocks by strangelinx.](https://strangelinx.github.io/blocks/)  
+Icons from [The Noun Project](https://thenounproject.com)
 
 Feel free to contribute with pull requests and issues. I'll try to keep up with new features and fixes.
 
-## Current Features
+
+#### Music
+[(Locked Girl ~ The Girl's Secret Room) - Cafe de Touhou 3](https://www.youtube.com/watch?v=7Q3c2vmXEyg)  
+[ShibayanRecords - Acoustic Image](https://www.youtube.com/watch?v=4RC2hrMFIMQ)  
+[ShibayanRecords - Close to your mind](https://www.youtube.com/watch?v=kPIyxq9K-Yw)
+
+## Features
 - modern guideline (customisable)
     - colours
     - 7bag
@@ -47,6 +55,12 @@ Feel free to contribute with pull requests and issues. I'll try to keep up with 
 - edit and draw on board (custom game)
 - undo and redo with non linear branches
 
+## TODO list
+Things that I am working on, and most likely will release in the next update
+- allow for modifiers to be added to keybinds
+- loading page / title screen
+
+
 ## Updates
 #### v1.1.1
 - editing boards now is undoable (gamestate is saved)
@@ -66,16 +80,9 @@ Feel free to contribute with pull requests and issues. I'll try to keep up with 
 - The main menu is more organised, and each menu now organises a certain setting group for better code efficiency.
 - The settings object is changed to be a hashmap (js object) rather than an array, more closely matches tetrio setting.ttc files.
 
-## TODO list
-Things that I am working on, and most likely will release in the next update
-- allow for modifiers to be added to keybinds
-- loading page for the first second or so
-- add edit menu button
-- show history number when in custom game
-- title screen maybe
 
 ## Feature Wishlist
-May or may not add these, kinda ordered by ease and want for feature
+May or may not add these, kinda ordered by ease and desire for feature
 - add different 4w residue (both 3 and 6 residue)
 - more stats + customise stat sidebar
 - more garbage settings
@@ -93,3 +100,4 @@ May or may not add these, kinda ordered by ease and want for feature
 - maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats
 - touch settings
 - cooler graphics (maybe using a library like pixijs)
+- bot to play against

@@ -12,9 +12,14 @@
 </head>
 <body id="body">
     <div id="board">
+        <div id="backboard"></div>
+        <div id="backborder"></div>
         <div id="dangerOverlay"></div>
         <button id="openSettingsButton" onclick="modal.openModal('settingsPanel')">
             <img src="./assets/icons/settings.svg">
+        </button>
+        <button id="editButton" onclick="modal.openModal('editMenu')">
+            <img src="./assets/icons/edit.svg">
         </button>
         
         <canvas id="next" onclick="modal.openModal('queueModify')"></canvas>
@@ -45,13 +50,13 @@
             <p class="text objectiveText" id="objective"></p>
             <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
             <p class="smalltext" id="history" style="left: 110%; bottom: 0%; width: 10vw; display: none;">history: 0</p>
-            <!-- TODO: incorporate history display somehow -->
         </div>
 
         <div id="redochoices">
             <button class="redochoice selected">1</button>
             <button class="redochoice">2</button>
         </div>
+
     </div>
 
     <dialog id="displayDialog" class="dialog">
@@ -65,6 +70,7 @@
         <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox" id="showGrid" /></div>
         <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
         <div class="settingLayout"><label>Shadow opacity</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
+        <div class="settingLayout"><label>Board Bounciness</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="boardBounce" min="-5" max="20" step="0.1" /></div>
         <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
         <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
         <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>

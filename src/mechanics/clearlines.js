@@ -27,15 +27,12 @@ export class ClearLines {
             stopped
                 .filter(c => c[1] == row)
                 .forEach(([x, y]) => this.mech.board.setCoordEmpty([x, y]));
-            this.mech.board.moveMinos(
-                stopped.filter(c => c[1] > row),
-                "DOWN",
-                1
-            );
+            this.mech.board.moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1);
         }
         if (this.stats.getRemainingGarbage() > 10 && this.game.settings.game.gamemode == 4)
             this.mech.addGarbage(removedGarbage);
 
+        if (clearRows.length > 0) this.game.rendering.bounceBoard("DOWN");
         this.processLineClear(removedGarbage, clearRows);
     }
 

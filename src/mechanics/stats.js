@@ -24,7 +24,7 @@ export class GameStats {
         const goals = this.game.settings.game,
             time = (Math.round(this.time * 100) / 100).toFixed(2),
             pieces = goals.lookAheadPieces;
-            
+
         this.elementObjective.textContent = {
             0: "",
             1: `${this.clearlines}/${goals.requiredLines}`,

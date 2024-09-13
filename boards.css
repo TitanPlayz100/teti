@@ -1,3 +1,7 @@
+body {
+    --background: black;
+}
+
 #board {
     position: fixed;
     top: 50%;
@@ -6,14 +10,81 @@
     transform: scale(1.1) translate(-50%, -50%);
     height: 60vh;
     aspect-ratio: 0.5;
+}
+
+#backboard,
+#backborder {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: var(--background);
     outline: 0.2vh solid var(--cl-blue);
     box-shadow: 0 0 5vh var(--l-gray);
-    background-color: black;
-    transition: outline 0.5s ease;
+}
+
+@property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+#backboard {
+    --blur-size: 7vmin;
+    --spin-speed: 6s;
+    --blur-radius: 20vmin;
+    --blur-strength: 0;
+    --colours: #ff4545, #00ff99, #006aff, #ff0095, #ff4545;
+}
+
+#backborder {
+    --blur-size: 0.3vmin;
+    --spin-speed: 2s;
+    --blur-radius: 0.3vmin;
+    --blur-strength: 0;
+    --colours: #ff4545, #00ff99, #006aff, #ff0095, #ff4545;
+}
+
+#backboard::before,
+#backborder::before {
+    content: " ";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: conic-gradient(from var(--angle), var(--colours));
+    padding: var(--blur-size);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 1vmin;
+    animation: var(--spin-speed) spin linear infinite;
+    filter: blur(var(--blur-radius));
+    opacity: var(--blur-strength);
+    transition: all 1s ease;
+
+}
+
+@keyframes spin {
+    from {
+        --angle: 0deg;
+    }
+
+    to {
+        --angle: 360deg;
+    }
+}
+
+#backboard::after, 
+#backborder::after {
+    content: " ";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background);
 }
 
 #board.boardDanger {
     outline-color: red !important;
+    box-shadow: 0 0 3vh red;
     transition: all 0.2s ease;
 }
 

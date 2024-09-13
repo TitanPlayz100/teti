@@ -8,7 +8,8 @@
         "showGrid": true,
         "colouredShadow": false,
         "colouredQueues": true,
-        "lockBar": true
+        "lockBar": true,
+        "boardBounce": 1
     },
     "game": {
         "gravitySpeed": 950,

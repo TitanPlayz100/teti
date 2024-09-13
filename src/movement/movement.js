@@ -63,7 +63,7 @@ export class Movement {
         if (this.game.falling.piece.name == "t") return false;
         const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
         const validSpin = directions.every(([dx, dy]) => this.checkCollision(pieceCoords.map(([x, y]) => [x + dx, y + dy]), "ROTATE"));
-        if (validSpin && this.game.settings.game.allspinminis) this.mechs.isMini = true; 
+        if (validSpin && this.game.settings.game.allspinminis) this.mechs.isMini = true;
         return validSpin;
     }
 
@@ -94,18 +94,16 @@ export class Movement {
         if (this.game.settings.game.gravitySpeed == 0) this.mechs.startGravity();
         this.game.controls.startArr("current");
         this.game.controls.checkSD();
+        if (this.mechs.isTspin || this.mechs.isAllspin) this.game.rendering.rotateBoard(type);
     }
 
     movePieceSide(direction, max = 1) {
         this.game.controls.checkSD();
         const minos = this.game.board.getMinos("A");
         let amount = 0;
-        const check = dx =>
-            !this.checkCollision(
-                minos.map(([x, y]) => [x + dx, y]),
-                direction
-            );
+        const check = dx => !this.checkCollision(minos.map(([x, y]) => [x + dx, y]), direction);
         while (check(amount) && Math.abs(amount) < max) direction == "RIGHT" ? amount++ : amount--;
+        if (!check(amount)) this.game.rendering.bounceBoard(direction);
         if (amount == 0) {
             this.game.controls.stopInterval("arr");
             return;
@@ -131,22 +129,18 @@ export class Movement {
         this.mechs.isMini = false;
         this.game.falling.updateLocation([0, -1]);
         this.game.stats.score += 1;
-        if (this.checkCollision(this.game.board.getMinos("A"), "DOWN"))
+        if (this.checkCollision(this.game.board.getMinos("A"), "DOWN")) {
             this.game.mechanics.locking.scheduleLock();
-        this.game.controls.startArr("current");
+            this.game.rendering.bounceBoard("DOWN");
+            this.game.controls.startArr("current");
+        }
         if (sonic) this.movePieceDown(true);
     }
 
     harddrop() {
         const minos = this.game.board.getMinos("A");
         let amount = 0;
-        while (
-            !this.checkCollision(
-                minos.map(([x, y]) => [x, y - amount]),
-                "DOWN"
-            )
-        )
-            amount++;
+        while (!this.checkCollision(minos.map(([x, y]) => [x, y - amount]), "DOWN")) amount++;
         if (amount > 0) {
             this.game.mechanics.isTspin = false;
             this.game.mechanics.isAllspin = false;
@@ -156,6 +150,7 @@ export class Movement {
         this.game.falling.updateLocation([0, -amount]);
         this.game.stats.score += 2;
         this.game.sounds.playSound("harddrop");
+        this.game.rendering.bounceBoard('DOWN');
         this.game.mechanics.locking.lockPiece();
     }
 }

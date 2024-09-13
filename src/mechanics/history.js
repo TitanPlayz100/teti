@@ -182,4 +182,8 @@ export class History {
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
     }
 
+    setHistoryDiv(bool) {
+        this.historyelement.style.display = bool ? "block" : "none";
+    }
+
 }

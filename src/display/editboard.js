@@ -8,6 +8,7 @@ export class BoardEditor {
     fillRow = false;
     override = false;
 
+    elementEditButton = document.getElementById("editButton");
 
     /**
      * @param {Game} game
@@ -110,5 +111,9 @@ export class BoardEditor {
             });
         })
         return { board, next, hold }
+    }
+
+    setEditButton(bool) {
+        this.elementEditButton.style.display = bool ? "flex" : "none";
     }
 }

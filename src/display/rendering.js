@@ -1,6 +1,7 @@
 import { Game } from "../game.js";
 import { toHex } from "../util.js";
 import pieces from "../data/pieces.json" with { type: "json" };
+import { BoardEffects } from "./boardEffects.js";
 
 export class Rendering {
     boardAlpha;
@@ -22,6 +23,7 @@ export class Rendering {
     canvasHold = document.getElementById("hold");
     divBoard = document.getElementById("board");
     divDanger = document.getElementById("dangerOverlay");
+    divBackboard = document.getElementById("backboard");
     divLinesSent = document.getElementById("linessent");
     elementStats1 = document.getElementById("stats1");
     elementStats2 = document.getElementById("stats2");
@@ -40,6 +42,7 @@ export class Rendering {
     constructor(game) {
         this.game = game;
         this.board = game.board;
+        this.effects = new BoardEffects();
 
         this.ctx = this.canvasField.getContext("2d");
         this.ctxN = this.canvasNext.getContext("2d");
@@ -47,9 +50,7 @@ export class Rendering {
     }
 
     sizeCanvas() {
-        this.divBoard.setAttribute("style", "");
         this.renderStyles();
-        // this.canvasField.offsetWidth = this.divBoard.width;
         [this.canvasField, this.canvasNext, this.canvasHold].forEach(c => {
             c.width = Math.round(c.offsetWidth / 10) * 10;
             c.height = Math.round(c.offsetHeight / 40) * 40;
@@ -93,7 +94,7 @@ export class Rendering {
     }
 
     getPiece(name) {
-        if (name == "G") return {colour: "gray"}
+        if (name == "G") return { colour: "gray" }
         return pieces.filter(p => p.name == name)[0];
     }
 
@@ -131,6 +132,7 @@ export class Rendering {
             this.game.board.getMinos("S").some(c => c[1] > 16) &&
             this.game.settings.game.gamemode != 7;
         if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
+        this.divBoard.classList.toggle("boardDanger", condition);
         this.inDanger = condition;
         this.divDanger.style.opacity = condition ? "0.1" : "0";
     }
@@ -164,8 +166,7 @@ export class Rendering {
         if (this.game.mechanics.spikeCounter >= 15) this.game.sounds.playSound("thunder", false);
         if (this.game.mechanics.combonumber > 0)
             this.game.sounds.playSound(
-                `combo_${
-                    this.game.mechanics.combonumber > 16 ? 16 : this.game.mechanics.combonumber
+                `combo_${this.game.mechanics.combonumber > 16 ? 16 : this.game.mechanics.combonumber
                 }`
             );
     }
@@ -201,13 +202,12 @@ export class Rendering {
         this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
         this.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
         const background = `rgba(0, 0, 0, ${Number(this.game.settings.display.boardOpacity) / 100})`;
-        this.divBoard.style.backgroundColor = background;
-        this.canvasHold.style.backgroundColor = background;
-        this.canvasNext.style.backgroundColor = background;
+        this.divBackboard.style.backgroundColor = background;
+        document.body.style.setProperty('--background', background);
     }
 
     renderStats() {
-        const {displaytime, apm, pps} = this.game.stats.getDisplayStats();
+        const { displaytime, apm, pps } = this.game.stats.getDisplayStats();
         this.elementStats1.textContent = `${displaytime}`;
         this.elementStats2.textContent = `${apm.toFixed(1)}`;
         this.elementStats3.textContent = `${pps.toFixed(2)}`;
@@ -215,6 +215,23 @@ export class Rendering {
         this.elementSmallStat2.textContent = `${this.game.stats.pieceCount}`;
         this.game.stats.checkObjectives();
         this.setEditPieceColours();
+
+        // const pbpps = 2.2;
+
+        // if (pps < pbpps) {
+        //     const border = document.getElementById('backborder')
+        //     const backboard = document.getElementById('backboard')
+
+        //     border.style.setProperty('--blur-size', `0vmin`)
+        //     border.style.setProperty('--blur-strength', '0')
+        //     backboard.style.setProperty('--blur-strength', '0')
+        // } else {
+        //     const border = document.getElementById('backborder')
+        //     const backboard = document.getElementById('backboard')
+        //     border.style.setProperty('--blur-size', `0.3vmin`)
+        //     border.style.setProperty('--blur-strength', '0.7vmin')
+        //     backboard.style.setProperty('--blur-strength', '0.5vmin')
+        // }
     }
 
     setEditPieceColours() {
@@ -294,6 +311,35 @@ export class Rendering {
             this.updateNext();
             this.updateHold();
         }
-        setTimeout(() => requestAnimationFrame(this.renderingLoop.bind(this)), 0);
+        this.effects.move(0, 0);
+        this.effects.rotate(0);
+        requestAnimationFrame(this.renderingLoop.bind(this))
+    }
+
+    bounceBoard(direction) {
+        const force = Number(this.game.settings.display.boardBounce);
+        switch (direction) {
+            case "LEFT":
+                this.effects.move(-force, 0);
+                break;
+            case "RIGHT":
+                this.effects.move(force, 0);
+                break;
+            case "DOWN":
+                this.effects.move(0, force);
+                break;
+        }
+    }
+
+    rotateBoard(type) {
+        const force = Number(this.game.settings.display.boardBounce)*0.5;
+        switch (type) {
+            case "CW":
+                this.effects.rotate(force);
+                break;
+            case "CCW":
+                this.effects.rotate(-force);
+                break;
+        }
     }
 }

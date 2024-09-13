@@ -13,11 +13,11 @@ import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./mechanics/stats.js";
 import { BoardEditor } from "./display/editboard.js";
 import { History } from "./mechanics/history.js";
+import { BoardEffects } from "./display/boardEffects.js";
 
 export class Game {
     started;
     ended;
-
     statsTimer = 0;
     survivalTimer = 0;
 
@@ -41,6 +41,7 @@ export class Game {
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
         this.history = new History(this);
+        this.boardEffects = new BoardEffects();
 
         this.rendering.sizeCanvas();
         this.sounds.initSounds();
@@ -48,6 +49,8 @@ export class Game {
         this.rendering.renderingLoop();
         this.boardeditor.addListeners();
         this.versionChecker();
+        window.addEventListener("DOMContentLoaded", () => {console.log('page loaded')})
+        window.addEventListener("load", () => {console.log('assets loaded');});
     }
 
     startGame() {

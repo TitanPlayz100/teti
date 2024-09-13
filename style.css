@@ -25,7 +25,7 @@ body {
     background: var(--night);
 }
 
-#openSettingsButton {
+#openSettingsButton, #editButton {
     top: 5%;
     position: fixed;
     left: 126%;
@@ -42,7 +42,11 @@ body {
     outline: none;
 }
 
-#openSettingsButton:hover {
+#editButton {
+    top: 15%;
+}
+
+#openSettingsButton:hover, #editButton:hover {
     left: 133%;
     border: 0.2vh solid var(--cl-blue);
     transition: all 0.2s ease;
@@ -51,6 +55,11 @@ body {
 #openSettingsButton > img {
     transform: translateY(10%);
     height: 90%;
+    user-select: none;
+}
+
+#editButton > img {
+    height: 100%;
     user-select: none;
 }
 

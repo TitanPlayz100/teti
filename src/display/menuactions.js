@@ -57,11 +57,15 @@ export class MenuActions {
         if (data == null) return;
         this.game.settings.load(JSON.parse(data))
         this.divObjectiveText.textContent = modesText[this.game.settings.game.gamemode];
+        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 0);
+        this.game.boardeditor.setEditButton(this.game.settings.game.gamemode == 0);
     }
 
     setGamemode(modeNum) {
         this.game.settings.game.gamemode = modeNum;
         this.divObjectiveText.textContent = modesText[this.game.settings.game.gamemode];
+        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 0);
+        this.game.boardeditor.setEditButton(this.game.settings.game.gamemode == 0);
     }
 
     downloadSettings() {

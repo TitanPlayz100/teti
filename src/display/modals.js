@@ -7,7 +7,6 @@ export class ModalActions {
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
     settingPanel = document.getElementById("settingsPanel");
 
-
     /**
      * @param {Game} game
      */
@@ -89,7 +88,6 @@ export class ModalActions {
             if (setting.id == "audioLevel") this.game.sounds.setAudioLevel();
 
             if (!this.game.settings.hasOwnProperty(settingType)) return;
-
             this.game.settings[settingType][setting.id] = val;
         });
 

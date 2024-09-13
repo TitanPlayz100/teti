@@ -78,6 +78,7 @@ export class Sounds {
             this.songs.push(new Audio(file.path));
             this.songNames.push(file.name.split(".")[0]);
         })
+        // this.playSound("allclear") wait literally how is this fine by chrome
 
     }
 
