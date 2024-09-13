@@ -139,6 +139,7 @@
         <button id="gamemode6" class="gamemodeSelect" onclick="menu.setGamemode(6);modal.closeModal('gamemodeDialog')">Backfire</button>
         <button id="gamemode7" class="gamemodeSelect" onclick="menu.setGamemode(7);modal.closeModal('gamemodeDialog')">4w</button>
         <button id="gamemode8" class="gamemodeSelect" onclick="menu.setGamemode(8);modal.closeModal('gamemodeDialog')">Lookahead</button>
+        <button id="gamemode9" class="gamemodeSelect" onclick="menu.setGamemode(9);modal.closeModal('gamemodeDialog')">Race</button>
         <input id="limiter" type="range" min="1" max="9999" style="display: none;"/>
         <input id="limiter2" type="range" min="0.1" max="9999" style="display: none;"/>
         <div class="settingLayout"><label>Required Lines (sprint, lookahead)</label> <input class="option number" type="number" id="requiredLines" oninput="menu.checkValue(this, document.getElementById('limiter'))"/></div>
@@ -148,6 +149,7 @@
         <div class="settingLayout"><label>APM (survival)</label> <input class="option number" type="number" id="survivalRate" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
         <div class="settingLayout"><label>Multiplier (backfire)</label> <input class="option number" type="number" id="backfireMulti" oninput="menu.checkValue(this, document.getElementById('limiter2'))" /></div>
         <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Race Target</label> <input class="option number" type="number" id="raceTarget"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
     </dialog>
 
     <dialog id="handlingDialog" class="dialog">

@@ -118,6 +118,7 @@ export class Game {
         this.falling.rotation = 1;
         this.rendering.inDanger = false;
         this.stats.sent = 0;
+        this.stats.level = 0;
         this.mechanics.garbageQueue = 0;
         this.stats.maxCombo = 0;
         this.falling.moved = false;

@@ -10,6 +10,7 @@ export class GameStats {
     cleargarbage;
     maxCombo;
     btbCount;
+    level;
 
     elementObjective = document.getElementById("objective");
 
@@ -35,6 +36,7 @@ export class GameStats {
             6: `${this.attack}/${goals.requiredAttack}`,
             7: `${this.game.mechanics.combonumber}`,
             8: `${this.clearlines}/${goals.requiredLines}`,
+            9: `${this.level}/${goals.raceTarget}`,
         }[goals.gamemode];
 
         const obj1 = this.clearlines >= goals.requiredLines,
@@ -43,9 +45,11 @@ export class GameStats {
             obj4 = this.cleargarbage >= goals.requiredGarbage,
             obj5 = this.game.ended,
             obj6 = this.game.mechanics.combonumber == -1 && this.clearlines >= 1,
+            obj7 = this.level >= goals.raceTarget,
             ts = ` in ${time} seconds`,
             cl = `Cleared ${this.clearlines} lines`,
             total = this.score,
+            race = `Reached ${this.level} in ` + ts,
             reqGarb = goals.requiredGarbage;
 
         switch (goals.gamemode) {
@@ -57,6 +61,7 @@ export class GameStats {
             case 6: if (obj3) { this.game.endGame(`${time}s`, `Sent ${this.attack} damage` + ts); } break;
             case 7: if (obj6) { this.game.endGame(`${time}s`, `Got a ${this.maxCombo} combo` + ts); } break;
             case 8: if (obj1) { this.game.endGame(`${time}s`, cl + ` using ${pieces} lookahead`); } break;
+            case 9: if (obj7) { this.game.endGame(`${time}s`, race); } break;
         }
     }
 
