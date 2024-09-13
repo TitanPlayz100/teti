@@ -9,15 +9,13 @@ This project started out as a learning experience, because suprisingly it was my
 
 I hope you enjoy TETI, and give a star if you like it. The code is no longer 1000 lines, but I want this to grow to a proper maintainable tetris client.
 
-(Also is it just me or is the movement a bit off)
-
 ## Contributions
 Thank you [existancepy](https://github.com/existancepy) for all the fixes.  
-Design inspired by [blocks by strangelinx.](https://strangelinx.github.io/blocks/)  
+Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding the TGM Race mode.  
+Design inspired by [Strangelinx's 'blocks'.](https://strangelinx.github.io/blocks/)  
 Icons from [The Noun Project](https://thenounproject.com)
 
-Feel free to contribute with pull requests and issues. I'll try to keep up with new features and fixes.
-
+Feel free to contribute with features and issues. 
 
 #### Music
 [(Locked Girl ~ The Girl's Secret Room) - Cafe de Touhou 3](https://www.youtube.com/watch?v=7Q3c2vmXEyg)  
@@ -49,6 +47,7 @@ Feel free to contribute with pull requests and issues. I'll try to keep up with 
     - dig, survival, backfire
     - semi invis mode
     - 4W
+    - Race (TGM style)
 - clean modern animated menus
 - import/export settings
 - customise queues
@@ -62,6 +61,11 @@ Things that I am working on, and most likely will release in the next update
 
 
 ## Updates
+#### v1.1.2
+- added board bounce
+- custom mode has button for edit menu and a history display 
+- Race mode added by itsblack6093
+
 #### v1.1.1
 - editing boards now is undoable (gamestate is saved)
 - changed some event listeners for efficiency
