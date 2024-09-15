@@ -16,10 +16,11 @@ export class ProfileStats {
      */
     setPB(score, gamemode, lower) {
         this.game.elementGameEndTitle.textContent = 'GAME ENDED';
-
         const gamemodeStats = this.personalBests[gamemode] ?? {};
         const currentScore = Number(gamemodeStats.score);
-        if (currentScore == undefined || (lower && score < currentScore) || (!lower && score > currentScore)) {
+        score = Number(score)
+        if (isNaN(currentScore) || currentScore == undefined || (lower && score < currentScore) || (!lower && score > currentScore)) {
+            console.log('test')
             let gameStatsKeys = Object.getOwnPropertyNames(this.game.stats)
             gameStatsKeys = gameStatsKeys.filter(key => key != 'game')
             const gameStats = {};
