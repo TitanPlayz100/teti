@@ -14,18 +14,23 @@ import { GameStats } from "./mechanics/stats.js";
 import { BoardEditor } from "./display/editboard.js";
 import { History } from "./mechanics/history.js";
 import { BoardEffects } from "./display/boardEffects.js";
+import { ProfileStats } from "./mechanics/profileStats.js";
 
 export class Game {
     started;
     ended;
     statsTimer = 0;
     survivalTimer = 0;
+    version = '1.2.0';
 
     elementReason = document.getElementById("reason");
     elementResult = document.getElementById("result");
+    elementGameEndTitle = document.getElementById("gameEndTitle");
 
 
     constructor() {
+        this.boardEffects = new BoardEffects();
+        this.profilestats = new ProfileStats(this);
         this.stats = new GameStats(this);
         this.falling = new Falling(this);
         this.settings = new Settings(this);
@@ -41,16 +46,15 @@ export class Game {
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
         this.history = new History(this);
-        this.boardEffects = new BoardEffects();
 
         this.rendering.sizeCanvas();
         this.sounds.initSounds();
         this.startGame();
         this.rendering.renderingLoop();
         this.boardeditor.addListeners();
+        this.menuactions.addRangeListener();
         this.versionChecker();
-        window.addEventListener("DOMContentLoaded", () => {console.log('page loaded')})
-        window.addEventListener("load", () => {console.log('assets loaded');});
+        this.profilestats.loadPBs();
     }
 
     startGame() {
@@ -61,7 +65,7 @@ export class Game {
         this.history.save();
     }
 
-    stopGameTimers(){ //stop all the game's timers
+    stopGameTimers() { //stop all the game's timers
         clearInterval(this.mechanics.gravityTimer);
         clearInterval(this.statsTimer);
         clearInterval(this.survivalTimer);
@@ -93,6 +97,7 @@ export class Game {
         this.stopGameTimers()
         this.elementReason.textContent = top;
         this.elementResult.textContent = bottom;
+        this.profilestats.saveSession();
     }
 
     resetState() {
@@ -144,10 +149,9 @@ export class Game {
     }
 
     versionChecker() {
-        const version = '1.1.0';
         const userver = window.localStorage.getItem('version');
-        document.getElementById('updatetext').style.display = version == userver ? "none" : "block";
-        window.localStorage.setItem('version', version);
+        document.getElementById('updatetext').style.display = this.version == userver ? "none" : "block";
+        window.localStorage.setItem('version', this.version);
     }
 
 }

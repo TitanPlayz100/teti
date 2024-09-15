@@ -56,11 +56,22 @@ Feel free to contribute with features and issues.
 
 ## TODO list
 Things that I am working on, and most likely will release in the next update
-- allow for modifiers to be added to keybinds
-- loading page / title screen
-
+- nothing
 
 ## Updates
+### v1.2.0
+- added key modifiers
+    - you can make undo (or any key) ctrl+z now
+    - modifiers are ctrl and alt (no shift)
+- added splash screen to cover ugly board and audio loading
+- improved movement feeling, can increase das to tetrio settings lmao
+- option to enable/disable history 
+- Added the storing of PBs and lifetime stats
+    - in the future can be displayed
+- optimised more event handlers to be delegates
+- you get a glow when on pb pace
+- fixed danger glow outline
+
 #### v1.1.2
 - added board bounce
 - custom mode has button for edit menu and a history display 
@@ -91,15 +102,14 @@ May or may not add these, kinda ordered by ease and desire for feature
 - more stats + customise stat sidebar
 - more garbage settings
 - finesse detection
-- pb logging
 - allow importing tetrio settings and custom game files
-- custom mino skins and music
 - show info when hovering over settings
+- more rotation systems (ars, trs, srs/srsX, none)
+- custom mino skins and music
 - replay functionality (either save gamestate or save keystrokes idk yet)
 - more unique gamemodes (techmino styled)
     - misdrop remover mode
     - gamemode presets
-- more rotation systems (ars, trs, srs/srsX, none)
 - guide like progression thing? using custom boards (kinda like tetris tres bien)
 - maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats
 - touch settings

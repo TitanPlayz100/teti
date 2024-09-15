@@ -4,8 +4,11 @@ import { toExpValue } from "../util.js";
 
 export class MenuActions {
     bindingKey;
-    divObjectiveText = document.getElementById("objectiveText");
     menus;
+    divObjectiveText = document.getElementById("objectiveText");
+    elementSelectKeyText = document.getElementById("selectkeytext");
+    controlUsed = false;
+    altUsed = false;
 
     /**
      * @param {Game} game
@@ -22,12 +25,19 @@ export class MenuActions {
         el.parentElement.children[0].textContent = `${text}: ${value}`;
     }
 
-    rangeClickListener(el) {
-        el.parentElement.children[0].addEventListener("click", () => {
-            this.game.modals.selectedRangeElement = el;
-            this.menus.openModal("changeRangeValue");
-            document.getElementById("rangeValue").value = el.value;
-        });
+    addRangeListener() {
+        document.body.addEventListener("click", (event) => {
+            if (event.target.dataset.isRange == "true") {
+                const el = event.target.children[1]
+                this.game.modals.selectedRangeElement = el;
+                this.menus.openModal("changeRangeValue");
+                document.getElementById("rangeValue").value = el.value;
+            }
+        })
+    }
+
+    rangeClickInit(el) {
+        el.parentElement.dataset.isRange = true;
     }
 
     buttonInput(el) {
@@ -35,7 +45,26 @@ export class MenuActions {
         this.bindingKey = el.id;
     }
 
-    setKeybind(key) {
+    checkKeybind(event) {
+        if (!event.ctrlKey) this.controlUsed = false;
+        if (!event.altKey) this.altUsed = false;
+        this.elementSelectKeyText.textContent = "Click to remove keybind";
+
+    }
+
+    setKeybind(event) {
+        if (!this.controlUsed && event.ctrlKey) {
+            this.controlUsed = true;
+            this.elementSelectKeyText.textContent += ". Control modifier used";
+            return;
+        }
+        if (!this.altUsed && event.altKey) {
+            this.altUsed = true;
+            this.elementSelectKeyText.textContent += ". Alt modifier used";
+            return;
+        }
+
+        const key = (event.ctrlKey ? "Ctrl+" : "") + (event.altKey ? "Alt+" : "") + event.key;
         document.getElementById(this.bindingKey).textContent = key;
         for (let i in this.game.settings.control) {
             if (i == this.bindingKey) continue;
@@ -45,6 +74,9 @@ export class MenuActions {
         this.menus.closeDialog(document.getElementById("frontdrop"));
         this.game.modals.open = true;
         this.bindingKey = undefined;
+        this.controlUsed = false;
+        this.altUsed = false;
+        this.elementSelectKeyText.textContent = "Click to remove keybind";
     }
 
     saveSettings() {

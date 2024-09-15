@@ -2,7 +2,7 @@ import { Game } from "../game.js";
 
 export class History {
     /**
-     * stores every game state existing indexed
+     * stores every game state indexed
      * @type {string[]}
      */
     historyStates = [];
@@ -16,7 +16,6 @@ export class History {
 
     historyelement = document.getElementById("history");
     choiceselement = document.getElementById("redochoices");
-    // TODO: add option to enable and disable history
 
     /**
      * @param {Game} game
@@ -26,6 +25,7 @@ export class History {
     }
 
     save() {
+        if (!this.game.settings.game.history) return;
         const map = this.convertToMapCompressed();
         this.pushHistory(map);
         this.updateUI();
@@ -48,7 +48,7 @@ export class History {
     }
 
     undo() {
-        if (this.currentState == 0 || this.game.settings.game.gamemode != 0) return;
+        if (this.currentState == 0 || !this.game.settings.game.history) return;
         this.historyConnections.forEach((next, ind) => {
             if (next.includes(this.currentState)) {
                 this.currentState = ind;
@@ -58,7 +58,7 @@ export class History {
     }
 
     redo() {
-        if (this.game.settings.game.gamemode != 0) return;
+        if (!this.game.settings.game.history) return;
         const connection = this.historyConnections[this.currentState];
         if (connection == undefined) return;
         this.currentState = this.selectedbranch || Math.max(...connection);
@@ -80,7 +80,7 @@ export class History {
     }
 
     updateUI() {
-        const branches = this.historyConnections[this.currentState] || [];
+        const branches = this.historyConnections[this.currentState] ?? [];
         this.selectedbranch = Math.max(...branches);
         this.historyelement.textContent = `history: ${this.currentState}`;
         if (branches.length <= 1) {
@@ -112,8 +112,8 @@ export class History {
     }
 
     compress(s) {
-        // saves anywhere from 60% to 90%
-        // 200 blocks is 330kB ~~ 5 min of 3.3pps play is 1.6MB
+        // saves anywhere from 50% worst case to 90% on average
+        // 250 blocks is 30kB ~~ 5 min of 3.3pps play is 120kB
         let cs = "";
         let count = 1;
         for (let i = 1; i < s.length; i++) {

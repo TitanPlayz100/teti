@@ -17,8 +17,9 @@ export class Sounds {
         this.game = game;
     }
 
-    playSound(audioName, replace = true) {
-        if (this.sfx[audioName] == undefined) { console.log(audioName + ' not found'); return; }
+    playSound(audioName, replace = true, silent = false) {
+        this.sfx[audioName].muted = silent;
+        if (this.sfx[audioName] == undefined) return;
         this.sfx[audioName].volume = this.game.settings.volume.sfxLevel / 1000;
         if (this.game.started == false) return;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
@@ -72,6 +73,7 @@ export class Sounds {
         sfxobj.forEach(file => {
             if (file.type == "dir") return;
             this.sfx[file.name.split(".")[0]] = new Audio(file.path);
+            this.playSound(file.name.split('.')[0], false, true);
         })
 
         songsobj.forEach(file => {

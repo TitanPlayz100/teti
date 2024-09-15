@@ -1,7 +1,6 @@
 import { Game } from "../game.js";
 import { toHex } from "../util.js";
 import pieces from "../data/pieces.json" with { type: "json" };
-import { BoardEffects } from "./boardEffects.js";
 
 export class Rendering {
     boardAlpha;
@@ -22,7 +21,6 @@ export class Rendering {
     canvasNext = document.getElementById("next");
     canvasHold = document.getElementById("hold");
     divBoard = document.getElementById("board");
-    divDanger = document.getElementById("dangerOverlay");
     divBackboard = document.getElementById("backboard");
     divLinesSent = document.getElementById("linessent");
     elementStats1 = document.getElementById("stats1");
@@ -42,7 +40,6 @@ export class Rendering {
     constructor(game) {
         this.game = game;
         this.board = game.board;
-        this.effects = new BoardEffects();
 
         this.ctx = this.canvasField.getContext("2d");
         this.ctxN = this.canvasNext.getContext("2d");
@@ -132,9 +129,8 @@ export class Rendering {
             this.game.board.getMinos("S").some(c => c[1] > 16) &&
             this.game.settings.game.gamemode != 7;
         if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
-        this.divBoard.classList.toggle("boardDanger", condition);
+        this.game.boardEffects.toggleDangerBoard(condition)
         this.inDanger = condition;
-        this.divDanger.style.opacity = condition ? "0.1" : "0";
     }
 
     renderActionText(damagetype, isBTB, isPC, damage, linecount) {
@@ -216,22 +212,6 @@ export class Rendering {
         this.game.stats.checkObjectives();
         this.setEditPieceColours();
 
-        // const pbpps = 2.2;
-
-        // if (pps < pbpps) {
-        //     const border = document.getElementById('backborder')
-        //     const backboard = document.getElementById('backboard')
-
-        //     border.style.setProperty('--blur-size', `0vmin`)
-        //     border.style.setProperty('--blur-strength', '0')
-        //     backboard.style.setProperty('--blur-strength', '0')
-        // } else {
-        //     const border = document.getElementById('backborder')
-        //     const backboard = document.getElementById('backboard')
-        //     border.style.setProperty('--blur-size', `0.3vmin`)
-        //     border.style.setProperty('--blur-strength', '0.7vmin')
-        //     backboard.style.setProperty('--blur-strength', '0.5vmin')
-        // }
     }
 
     setEditPieceColours() {
@@ -311,8 +291,9 @@ export class Rendering {
             this.updateNext();
             this.updateHold();
         }
-        this.effects.move(0, 0);
-        this.effects.rotate(0);
+        this.game.boardEffects.move(0, 0);
+        this.game.boardEffects.rotate(0);
+        this.game.boardEffects.rainbowBoard(this.game.stats, this.game.profilestats.personalBests, this.game.settings.game.gamemode);
         requestAnimationFrame(this.renderingLoop.bind(this))
     }
 
@@ -320,25 +301,25 @@ export class Rendering {
         const force = Number(this.game.settings.display.boardBounce);
         switch (direction) {
             case "LEFT":
-                this.effects.move(-force, 0);
+                this.game.boardEffects.move(-force, 0);
                 break;
             case "RIGHT":
-                this.effects.move(force, 0);
+                this.game.boardEffects.move(force, 0);
                 break;
             case "DOWN":
-                this.effects.move(0, force);
+                this.game.boardEffects.move(0, force);
                 break;
         }
     }
 
     rotateBoard(type) {
-        const force = Number(this.game.settings.display.boardBounce)*0.5;
+        const force = Number(this.game.settings.display.boardBounce) * 0.5;
         switch (type) {
             case "CW":
-                this.effects.rotate(force);
+                this.game.boardEffects.rotate(force);
                 break;
             case "CCW":
-                this.effects.rotate(-force);
+                this.game.boardEffects.rotate(-force);
                 break;
         }
     }

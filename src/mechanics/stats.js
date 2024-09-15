@@ -1,3 +1,4 @@
+import { gamemodeNames } from "../data/data.js";
 import { Game } from "../game.js";
 
 export class GameStats {
@@ -12,8 +13,6 @@ export class GameStats {
     btbCount;
     level;
 
-    elementObjective = document.getElementById("objective");
-
     /**
      * @param {Game} game
      */
@@ -26,7 +25,7 @@ export class GameStats {
             time = (Math.round(this.time * 100) / 100).toFixed(2),
             pieces = goals.lookAheadPieces;
 
-        this.elementObjective.textContent = {
+        document.getElementById("objective").textContent = {
             0: "",
             1: `${this.clearlines}/${goals.requiredLines}`,
             2: `${this.score}`,
@@ -50,18 +49,46 @@ export class GameStats {
             cl = `Cleared ${this.clearlines} lines`,
             total = this.score,
             race = `Reached ${this.level} in ` + ts,
-            reqGarb = goals.requiredGarbage;
+            reqGarb = goals.requiredGarbage,
+            gamemodeName = gamemodeNames[goals.gamemode];
 
         switch (goals.gamemode) {
-            case 1: if (obj1) { this.game.endGame(`${time}s`, cl + ts); } break;
-            case 2: if (obj2) { this.game.endGame(`${total} points`, `Scored ${total} points` + ts); } break;
-            case 3: if (obj3) { this.game.endGame(`${time}s`, `Sent ${this.attack} damage` + ts); } break;
-            case 4: if (obj4) { this.game.endGame(`${time}s`, `Dug ${reqGarb} lines` + ts); } break;
-            case 5: if (obj5) { this.game.endGame(`${time}s`, `Survived ${this.sent} lines` + ts); } break;
-            case 6: if (obj3) { this.game.endGame(`${time}s`, `Sent ${this.attack} damage` + ts); } break;
-            case 7: if (obj6) { this.game.endGame(`${time}s`, `Got a ${this.maxCombo} combo` + ts); } break;
-            case 8: if (obj1) { this.game.endGame(`${time}s`, cl + ` using ${pieces} lookahead`); } break;
-            case 9: if (obj7) { this.game.endGame(`${time}s`, race); } break;
+            case 1: if (obj1) {
+                this.game.profilestats.setPB(time, gamemodeName, true);
+                this.game.endGame(`${time}s`, cl + ts);
+            } break;
+            case 2: if (obj2) {
+                this.game.profilestats.setPB(total, gamemodeName, false);
+                this.game.endGame(`${total} points`, `Scored ${total} points` + ts);
+            } break;
+            case 3: if (obj3) {
+                this.game.profilestats.setPB(time, gamemodeName, true);
+                this.game.endGame(`${time}s`, `Sent ${this.attack} damage` + ts);
+            } break;
+            case 4: if (obj4) {
+                this.game.profilestats.setPB(time, gamemodeName, true);
+                this.game.endGame(`${time}s`, `Dug ${reqGarb} lines` + ts);
+            } break;
+            case 5: if (obj5) {
+                this.game.profilestats.setPB(time, gamemodeName, true);
+                this.game.endGame(`${time}s`, `Survived ${this.sent} lines` + ts);
+            } break;
+            case 6: if (obj3) {
+                this.game.profilestats.setPB(time, gamemodeName, true);
+                this.game.endGame(`${time}s`, `Sent ${this.attack} damage` + ts);
+            } break;
+            case 7: if (obj6) {
+                this.game.profilestats.setPB(this.maxCombo, gamemodeName, false);
+                this.game.endGame(`${this.maxCombo} Combo`, `Got a ${this.maxCombo} combo` + ts);
+            } break;
+            case 8: if (obj1) {
+                this.game.profilestats.setPB(time, gamemodeName, true);
+                this.game.endGame(`${time}s`, cl + ` using ${pieces} lookahead`);
+            } break;
+            case 9: if (obj7) {
+                this.game.profilestats.setPB(time, gamemodeName, true);
+                this.game.endGame(`${time}s`, race);
+            } break;
         }
     }
 

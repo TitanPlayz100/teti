@@ -11,6 +11,11 @@
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
+    <div id="splashScreen" onclick="finishLoad()">
+        <h1>Teti</h1>
+        <p id="splashText">loading code</p>
+        <p id="ignoreText" >Click to ignore</p>
+    </div>
     <div id="board">
         <div id="backboard"></div>
         <div id="backborder"></div>
@@ -96,6 +101,7 @@
         <div class="settingLayout"><label>Allow Queue Modification</label> <input class="option check" type="checkbox" id="allowQueueModify" /></div>
         <div class="settingLayout"><label>Allspin</label> <input class="option check" type="checkbox" id="allspin" /></div>
         <div class="settingLayout"><label>Allspin's are mini</label> <input class="option check" type="checkbox" id="allspinminis" /></div>
+        <div class="settingLayout"><label>Allow history (undo/redo)</label> <input class="option check" type="checkbox" id="history" /></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="modal.closeModal('gameDialog')">Save and close</button>
     </dialog>
@@ -121,7 +127,7 @@
         <button class="closeDialog" onclick="modal.closeModal('controlDialog')">Save and close</button>
     </dialog>
 
-    <dialog id="frontdrop" onkeydown="menu.setKeybind(event.key)">
+    <dialog id="frontdrop" onkeydown="menu.setKeybind(event)" onkeyup="menu.checkKeybind(event)">
         <div id="selectkeydiv" onclick="menu.setKeybind('None')">
             <p id="selectkeybigtext">PRESS ANY KEY</p>
             <p id="selectkeytext">Click to remove keybind</p>
@@ -179,7 +185,7 @@
 
 
     <dialog id="gameEnd" class="dialog" onkeydown="menu.newGame(event.key, 'gameEnd')">
-        <h1><b>GAME ENDED</b></h1>
+        <h1 id="gameEndTitle"><b>GAME ENDED</b></h1>
         <p id="reason" style="font-size: 3.6vh;"></p>
         <p id="result"></p>
         <button style="opacity: 0;" autofocus></button>

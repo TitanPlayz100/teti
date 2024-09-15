@@ -60,7 +60,10 @@ body {
     filter: blur(var(--blur-radius));
     opacity: var(--blur-strength);
     transition: all 1s ease;
+}
 
+#backboard {
+    outline: none;
 }
 
 @keyframes spin {
@@ -73,7 +76,7 @@ body {
     }
 }
 
-#backboard::after, 
+#backboard::after,
 #backborder::after {
     content: " ";
     position: absolute;
@@ -82,10 +85,10 @@ body {
     background-color: var(--background);
 }
 
-#board.boardDanger {
-    outline-color: red !important;
-    box-shadow: 0 0 3vh red;
-    transition: all 0.2s ease;
+#backborder.boardDanger {
+    outline: 0.2vh solid red !important;
+    box-shadow: 0 0 3vh red !important;
+    transition: all 0.5s ease;
 }
 
 #dangerOverlay {

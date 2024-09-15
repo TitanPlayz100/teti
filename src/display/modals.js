@@ -33,7 +33,7 @@ export class ModalActions {
             if (setting.classList[1] == "check") setting.checked = newval;
             if (setting.classList[1] == "range") {
                 this.actions.sliderChange(setting);
-                this.actions.rangeClickListener(setting);
+                this.actions.rangeClickInit(setting);
             }
         });
 
@@ -92,7 +92,10 @@ export class ModalActions {
         });
 
         this.closeDialog(document.getElementById(id));
-        if (this.game.started && !this.game.ended) this.game.movement.firstMovement();  
+        if (id != 'changeRangeValue' &&
+            id != "frontdrop" &&
+            this.game.started &&
+            !this.game.ended) this.game.movement.firstMovement();
 
         this.actions.saveSettings();
         if (id == "displayDialog") this.game.rendering.renderStyles();

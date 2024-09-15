@@ -20,7 +20,9 @@ export class Controls {
 
     onKeyDown(event) {
         this.keys = this.game.settings.control;
-        const key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
+        let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
+        if (event.altKey) key = "Alt+" + key;
+        if (event.ctrlKey) key = "Ctrl+" + key;
 
         if (event.repeat) return;
         if (event.key == "Escape") event.preventDefault();
@@ -50,7 +52,10 @@ export class Controls {
 
     onKeyDownRepeat(event) { // allows for repeating
         this.keys = this.game.settings.control;
-        const key = event.key.length > 1 ? event.key : event.key.toLowerCase();
+        let key = event.key.length > 1 ? event.key : event.key.toLowerCase();
+        if (event.altKey) key = "Alt+" + key;
+        if (event.ctrlKey) key = "Ctrl+" + key;
+
         if (key == this.keys.undoKey) this.game.history.undo();
         if (key == this.keys.redoKey) this.game.history.redo()
     }
@@ -69,8 +74,8 @@ export class Controls {
         this.directionState[direction] = "das";
         this.stopTimeout("das");
         this.stopInterval("arr");
-        this.timings.das = setTimeout(
-            () => this.startArr(direction),
+        this.timings.das = setTimeout(() =>
+            Promise.resolve().then(() => this.startArr(direction)),
             this.game.settings.handling.das
         );
     }

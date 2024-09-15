@@ -25,7 +25,37 @@ body {
     background: var(--night);
 }
 
-#openSettingsButton, #editButton {
+#splashScreen {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--slight-invis);
+    backdrop-filter: blur(10px);
+    z-index: 1;
+    text-shadow: 0 0 8vh rgb(255, 255, 255);
+    transition: all 0.5s ease, display 1.5s allow-discrete;
+    scale: 1;
+}
+
+#splashScreen>h1 {
+    font-size: 7em;
+    animation: pulse 2s infinite ease;
+    opacity: 1;
+}
+
+#ignoreText {
+    opacity: 0;
+    transition: all 1s ease;
+}
+
+#openSettingsButton,
+#editButton {
     top: 5%;
     position: fixed;
     left: 126%;
@@ -46,19 +76,20 @@ body {
     top: 15%;
 }
 
-#openSettingsButton:hover, #editButton:hover {
+#openSettingsButton:hover,
+#editButton:hover {
     left: 133%;
     border: 0.2vh solid var(--cl-blue);
     transition: all 0.2s ease;
 }
 
-#openSettingsButton > img {
+#openSettingsButton>img {
     transform: translateY(10%);
     height: 90%;
     user-select: none;
 }
 
-#editButton > img {
+#editButton>img {
     height: 100%;
     user-select: none;
 }

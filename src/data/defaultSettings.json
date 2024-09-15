@@ -29,8 +29,9 @@
         "allowQueueModify": true,
         "lookAheadPieces": 3,
         "raceTarget": 500,
-        "allspin":true,
-        "allspinminis":true
+        "allspin": true,
+        "allspinminis": true,
+        "history": true
     },
     "control": {
         "rightKey": "ArrowRight",
@@ -43,8 +44,8 @@
         "resetKey": "r",
         "rotate180Key": "a",
         "editMenuKey": "e",
-        "undoKey": "n",
-        "redoKey": "m"
+        "undoKey": "Ctrl+z",
+        "redoKey": "Ctrl+y"
     },
     "volume": {
         "audioLevel": 15,

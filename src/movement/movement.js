@@ -20,7 +20,7 @@ export class Movement {
     }
 
     checkCollision(coords, action, collider) {
-        collider = collider || this.game.board.getMinos("S");
+        collider = collider ?? this.game.board.getMinos("S");
         for (let [x, y] of coords) {
             if (
                 (action == "RIGHT" && x > 8) ||

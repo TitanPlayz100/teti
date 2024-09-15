@@ -37,6 +37,19 @@ export const modesText = {
     9: "Level",
 };
 
+export const gamemodeNames = [
+    "Zen",
+    "Sprint",
+    "Ultra",
+    "Attacker",
+    "Digger",
+    "Survival",
+    "Backfire",
+    "4w",
+    "Lookahead",
+    "Race"
+]
+
 export const disabledKeys = [
     "ArrowRight",
     "ArrowLeft",
