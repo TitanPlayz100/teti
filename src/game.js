@@ -120,9 +120,7 @@ export class Game {
         this.rendering.boardAlpha = 1;
         this.rendering.boardAlphaChange = 0;
 
-        clearInterval(this.mechanics.gravityTimer);
-        clearInterval(this.statsTimer);
-        clearInterval(this.survivalTimer);
+        this.stopGameTimers()
 
         this.mechanics.clear.progressDamage.value = 0;
         ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
