@@ -3,6 +3,7 @@ import { toExpValue, toLogValue } from "../util.js";
 
 export class ModalActions {
     open;
+    closing;
     selectedRangeElement;
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
     settingPanel = document.getElementById("settingsPanel");
@@ -17,6 +18,7 @@ export class ModalActions {
     }
 
     openModal(id) {
+        if (id == "settingsPanel" && this.closing) return //ensure that everything has been closed before trying to open the settings panel
         this.game.stopGameTimers()
         if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
 
@@ -104,10 +106,12 @@ export class ModalActions {
     }
 
     closeDialog(element) {
+        this.closing = true //track if the closing animation is still ongoing
         const closingAnimation = () => {
             element.removeEventListener("animationend", closingAnimation);
             element.classList.remove("closingAnimation");
             element.close();
+            this.closing = false
         };
         this.open = false;
         element.classList.add("closingAnimation");

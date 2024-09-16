@@ -133,9 +133,7 @@ export class Game {
         this.history.historyStates = [];
         this.history.currentState = 0;
 
-        clearInterval(this.mechanics.gravityTimer);
-        clearInterval(this.statsTimer);
-        clearInterval(this.survivalTimer);
+        this.stopGameTimers()
 
         this.mechanics.clear.progressDamage.value = 0;
         ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
