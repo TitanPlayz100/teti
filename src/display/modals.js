@@ -89,7 +89,7 @@ export class ModalActions {
     }
 
     renderPBs() {
-        const previous = document.getElementsByClassName("pbbox");
+        const previous = [...document.getElementsByClassName("pbbox")] ?? [];
         previous.forEach(el => el.remove());
 
         const pbs = this.game.profilestats.personalBests;
