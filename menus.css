@@ -32,6 +32,11 @@ button>img {
     outline: none;
 }
 
+.settingPanelButton:disabled, .smallPanelButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .smallPanelButton,
 .smallerPanelButton {
     height: 6vh;
@@ -115,6 +120,10 @@ button>img {
     font-size: 1.8vh;
     text-shadow: 0 0 5vh var(--vl-gray);
     border: 0.3vh solid var(--vl-gray);
+}
+
+.dialog label {
+    pointer-events: none;
 }
 
 .dialog h1 {
@@ -497,6 +506,17 @@ button>img {
 #editbuttons>br {
     width: 100%;
     content: ' ';
+}
+
+.pbbox {
+    display: flex;
+    justify-content:center;
+    align-items:baseline;
+    gap: 2vw;
+    background-color: rgba(172, 183, 232, 0.095);
+}
+.pbbox>h2 {
+    margin: 0;
 }
 
 

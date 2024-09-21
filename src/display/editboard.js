@@ -24,7 +24,7 @@ export class BoardEditor {
             if (e.target.classList.contains('clickmino')) {
                 const j = Number(e.target.dataset.x)
                 const i = Number(e.target.dataset.y)
-                if (this.game.settings.game.gamemode != 0) return;
+                if (this.game.settings.game.gamemode != 'custom') return;
                 if (this.fillRow) { this.fillWholeRow([j, 19 - i]) }
                 else { this.fillCell([j, 19 - i]); }
             }
@@ -34,7 +34,7 @@ export class BoardEditor {
             if (e.target.classList.contains('clickmino')) {
                 const j = Number(e.target.dataset.x)
                 const i = Number(e.target.dataset.y)
-                if (this.game.settings.game.gamemode != 0) return;
+                if (this.game.settings.game.gamemode != 'custom') return;
                     e.target.classList.add('highlighting')
                     if (this.mousedown) {
                         if (this.fillRow) { this.fillWholeRow([j, 19 - i]) }

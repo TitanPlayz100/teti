@@ -1,11 +1,9 @@
-import { modesText } from "../data/data.js";
 import { Game } from "../game.js";
 import { toExpValue } from "../util.js";
 
 export class MenuActions {
     bindingKey;
     menus;
-    divObjectiveText = document.getElementById("objectiveText");
     elementSelectKeyText = document.getElementById("selectkeytext");
     controlUsed = false;
     altUsed = false;
@@ -85,19 +83,18 @@ export class MenuActions {
     }
 
     loadSettings() {
-        const data = localStorage.getItem("settings");
-        if (data == null) return;
+        const data = localStorage.getItem("settings") ?? "{}";
         this.game.settings.load(JSON.parse(data))
-        this.divObjectiveText.textContent = modesText[this.game.settings.game.gamemode];
-        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 0);
-        this.game.boardeditor.setEditButton(this.game.settings.game.gamemode == 0);
+        this.game.modes.loadModes();
+        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 'custom');
+        this.game.boardeditor.setEditButton(this.game.settings.game.gamemode == 'custom');
     }
 
-    setGamemode(modeNum) {
-        this.game.settings.game.gamemode = modeNum;
-        this.divObjectiveText.textContent = modesText[this.game.settings.game.gamemode];
-        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 0);
-        this.game.boardeditor.setEditButton(this.game.settings.game.gamemode == 0);
+    setGamemode(mode) {
+        this.game.modes.setGamemode(mode);
+        this.game.modes.loadModes();
+        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 'custom');
+        this.game.boardeditor.setEditButton(this.game.settings.game.gamemode == 'custom');
     }
 
     downloadSettings() {
@@ -159,10 +156,10 @@ export class MenuActions {
     openEditMenu() {
         if (this.game.modals.open) {
             this.menus.closeModal("editMenu");
-            return;
+        } else {
+            if (this.game.settings.game.gamemode != 'custom') return
+            this.menus.openModal("editMenu");
         }
-        if (this.game.settings.game.gamemode != '0') return
-        this.menus.openModal("editMenu");
     }
 
     changeEditPiece(pieceName) { this.game.boardeditor.fillPiece = pieceName; }

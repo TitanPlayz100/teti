@@ -1,5 +1,3 @@
-import { gamemodeNames } from "../data/data.js";
-
 export class BoardEffects {
     X = 0;
     Y = 0;
@@ -62,16 +60,21 @@ export class BoardEffects {
         return num
     }
 
-    rainbowBoard(stats, pbs, gamemode) {
+    rainbowBoard(game) {
+        const stats = game.stats;
+        const pbs = game.profilestats.personalBests;
+        const gamemode = game.settings.game.gamemode;
+
+        if (!game.settings.display.rainbowPB) return;
         const reset = () => {
             this.border.style.setProperty('--blur-size', `0vmin`)
             this.border.style.setProperty('--blur-strength', '0')
             this.backboard.style.setProperty('--blur-strength', '0')
         }
 
-        if (stats.time < 0.5 || pbs[gamemodeNames[gamemode]] == undefined) { reset(); return; }
+        if (stats.time < 0.5 || pbs[gamemode] == undefined) { reset(); return; }
         let pps = stats.pieceCount / stats.time;
-        const pbstats = pbs[gamemodeNames[gamemode]].pbstats;
+        const pbstats = pbs[gamemode].pbstats;
         const pbpps = pbstats.pieceCount / pbstats.time;
 
         if (pps < pbpps) {

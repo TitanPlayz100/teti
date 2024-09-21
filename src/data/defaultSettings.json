@@ -9,6 +9,7 @@
         "colouredShadow": false,
         "colouredQueues": true,
         "lockBar": true,
+        "rainbowPB": true,
         "boardBounce": 1
     },
     "game": {
@@ -18,8 +19,8 @@
         "nextPieces": 5,
         "allowLockout": false,
         "preserveARR": true,
-        "infiniteHold": false,
-        "gamemode": 1,
+        "infiniteHold": true,
+        "gamemode": "sprint",
         "requiredLines": 40,
         "timeLimit": 120,
         "requiredAttack": 40,
@@ -31,7 +32,8 @@
         "raceTarget": 500,
         "allspin": true,
         "allspinminis": true,
-        "history": true
+        "history": true,
+        "competitiveMode": false
     },
     "control": {
         "rightKey": "ArrowRight",

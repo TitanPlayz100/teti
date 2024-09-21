@@ -8,7 +8,6 @@ export class Mechanics {
     isTspin;
     isAllspin;
     isMini;
-    combonumber;
     garbageQueue;
     spikeCounter;
     gravityTimer = 0;
@@ -45,9 +44,9 @@ export class Mechanics {
             this.game.settings.game.requiredGarbage < 10
                 ? this.game.settings.game.requiredGarbage
                 : 10;
-        if (this.game.stats.getRemainingGarbage() > 0 && start && this.game.settings.game.gamemode == 4)
+        if (this.game.stats.getRemainingGarbage() > 0 && start && this.game.settings.game.gamemode == 'digger')
             this.addGarbage(rows);
-        if (this.game.settings.game.gamemode == 7) this.board.setComboBoard(start);
+        this.game.modes.set4WCols(start);
         if (this.game.settings.game.preserveARR) this.game.controls.startArr("current");
         if (this.game.started) this.startGravity();
     }

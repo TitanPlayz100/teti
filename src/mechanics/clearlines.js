@@ -1,5 +1,4 @@
 import { cleartypes, scoringTable, levellingTable } from "../data/data.js";
-import { Mechanics } from "./mechanics.js";
 import attackValues from "../data/attacktable.json" with { type: "json" };
 import { Game } from "../game.js";
 
@@ -29,9 +28,7 @@ export class ClearLines {
                 .forEach(([x, y]) => this.mech.board.setCoordEmpty([x, y]));
             this.mech.board.moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1);
         }
-        if (this.stats.getRemainingGarbage() > 10 && this.game.settings.game.gamemode == 4)
-            this.mech.addGarbage(removedGarbage);
-
+        this.game.modes.diggerAddGarbage(removedGarbage);
         if (clearRows.length > 0) this.game.rendering.bounceBoard("DOWN");
         this.processLineClear(removedGarbage, clearRows);
     }
@@ -63,10 +60,10 @@ export class ClearLines {
             (this.mech.isMini ? "mini " : "") +
             cleartypes[Math.min(linecount, 5)]; // limit to 5 line clear
         this.game.stats.updateBTB(isBTB, linecount);
-        if (linecount == 0) this.stats.maxCombo = this.mech.combonumber;
-        this.mech.combonumber = linecount == 0 ? -1 : this.mech.combonumber + 1;
+        if (linecount == 0) this.stats.maxCombo = this.game.stats.combo;
+        this.game.stats.combo = linecount == 0 ? -1 : this.game.stats.combo + 1;
         const damage = this.calcDamage(
-            this.mech.combonumber,
+            this.game.stats.combo,
             damagetype.toUpperCase().trim(),
             isPC,
             this.game.stats.btbCount,
@@ -76,7 +73,7 @@ export class ClearLines {
             damagetype,
             isPC,
             isBTB,
-            this.mech.combonumber
+            this.game.stats.combo
         );
         this.stats.clearlines += linecount;
         this.stats.attack += damage;
@@ -96,19 +93,15 @@ export class ClearLines {
                 : this.mech.garbageQueue > garb
                     ? this.mech.garbageQueue - garb
                     : 0;
-        if (this.game.settings.game.gamemode == 6 && garb > 0)
-            this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
-        if (
-            this.game.settings.game.gamemode == 6 &&
-            this.mech.combonumber == -1 &&
-            this.mech.garbageQueue > 0
-        ) {
+
+        if (this.game.settings.game.gamemode != 'backfire') return;
+        if (garb > 0) this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
+        if (this.game.stats.combo == -1 && this.mech.garbageQueue > 0) {
             this.mech.addGarbage(this.mech.garbageQueue, 0);
             this.mech.garbageQueue = 0;
             this.progressDamage.value = 0;
         }
-        if (damage > 0 && this.game.settings.game.gamemode == 6)
-            this.progressDamage.value = this.mech.garbageQueue;
+        if (damage > 0) this.progressDamage.value = this.mech.garbageQueue;
     }
 
     calcDamage(combo, type, isPC, btb, isBTB) {

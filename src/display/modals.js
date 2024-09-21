@@ -6,7 +6,10 @@ export class ModalActions {
     closing;
     selectedRangeElement;
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
+
     settingPanel = document.getElementById("settingsPanel");
+    pblistStart = document.getElementById("PBlist");
+    gamemodeStart = document.getElementById("startGamemodeList");
 
     /**
      * @param {Game} game
@@ -18,9 +21,10 @@ export class ModalActions {
     }
 
     openModal(id) {
-        if (id == "settingsPanel" && this.closing) return //ensure that everything has been closed before trying to open the settings panel
-        this.game.stopGameTimers()
+        //ensure that everything has been closed before trying to open the settings panel
+        if (id == "settingsPanel" && this.closing) return;
         if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
+        this.game.stopGameTimers()
 
         this.getOptions(id).forEach(setting => {
             let settingType = this.getSettingType(id);
@@ -41,8 +45,10 @@ export class ModalActions {
 
         document.getElementById(id).showModal();
         if (id == "gamemodeDialog") this.highlightGamemodeInMenu();
+        if (id == "competitiveDialog") this.renderPBs();
         if (id != "settingsPanel" && this.settingPanel.open) this.closeDialog(this.settingPanel);
         this.open = true;
+        this.game.sounds.toggleSongMuffle(this.open);
 
     }
 
@@ -53,17 +59,64 @@ export class ModalActions {
 
     getSettingType(id) {
         let type = id.replace("Dialog", "");
-        if (id == "gamemodeDialog") type = "game";
+        if (id == "gamemodeDialog" || id == "goalsDialog" || id == "competitiveDialog") type = "game";
         return type;
+    }
+
+    generateGamemodeMenu() {
+        this.game.modes.getGamemodeNames().forEach(name => {
+            const setting = this.game.modes.getGamemodeJSON(name);
+            const button = document.createElement("button");
+            button.id = name;
+            button.classList = "gamemodeSelect";
+            button.textContent = setting.displayName;
+            button.onclick = () => {
+                menu.setGamemode(name);
+                modal.closeModal("gamemodeDialog");
+            }
+            this.gamemodeStart.parentNode.insertBefore(button, this.gamemodeStart);
+        })
+        this.gamemodeStart.remove();
     }
 
     highlightGamemodeInMenu() {
         const gamemodeSelect = [...document.getElementsByClassName("gamemodeSelect")];
         gamemodeSelect.forEach(setting => {
             setting.classList.remove("selected");
-            if (setting.id == "gamemode" + this.game.settings.game.gamemode)
+            if (setting.id == this.game.settings.game.gamemode)
                 setting.classList.add("selected");
         });
+    }
+
+    renderPBs() {
+        const previous = document.getElementsByClassName("pbbox");
+        previous.forEach(el => el.remove());
+
+        const pbs = this.game.profilestats.personalBests;
+        Object.keys(pbs).forEach(mode => {
+            const stats = pbs[mode].pbstats
+            const score = pbs[mode].score
+            const pbbox = document.createElement("div");
+
+            const text1 = document.createElement("h2")
+            text1.textContent = mode[0].toUpperCase() + mode.slice(1) + ': ';
+            const text2 = document.createElement("h2")
+            text2.textContent = score
+            pbbox.appendChild(text1);
+            pbbox.appendChild(text2);
+
+            pbbox.onclick = () => {
+                let el = document.createElement("a");
+                el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(stats)));
+                el.setAttribute("download", `${mode}_pb.json`);
+                document.body.appendChild(el);
+                el.click();
+                document.body.removeChild(el);
+            }
+
+            pbbox.classList = "pbbox settingLayout";
+            this.pblistStart.parentNode.insertBefore(pbbox, this.pblistStart);
+        })
     }
 
     closeModal(id) {
@@ -101,7 +154,8 @@ export class ModalActions {
 
         this.actions.saveSettings();
         if (id == "displayDialog") this.game.rendering.renderStyles();
-        if (id == "gameDialog" || id == "gamemodeDialog" || id == "gameEnd") this.game.startGame();
+        const restartMenus = ["gameDialog", "gamemodeDialog", "gameEnd", "goalsDialog", "competitiveDialog"];
+        if (restartMenus.includes(id)) this.game.startGame();
         if (id == "changeRangeValue") this.open = true;
     }
 
@@ -114,6 +168,7 @@ export class ModalActions {
             this.closing = false
         };
         this.open = false;
+        this.game.sounds.toggleSongMuffle(this.open);
         element.classList.add("closingAnimation");
         element.addEventListener("animationend", closingAnimation);
     }

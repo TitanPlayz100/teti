@@ -11,7 +11,7 @@
 </head>
 
 <style>
-    body.dark {
+    body {
         --bg-color: #000;
         --font-color: #f5f5f5;
         --color-primary: #17c16f;
@@ -19,22 +19,46 @@
         margin: 5rem auto;
         padding-bottom: 10vh;
     }
+
+    #background {
+        background-image: url("./assets/peakpx.jpg");
+        background-size: cover;
+        background-repeat: repeat;
+        background-position: 0 -70vh;
+        width: 100vw;
+        height: 200vh;
+        position: fixed;
+        z-index: -1;
+        top: 0vh;
+        left: 0;
+        filter: blur(6px) brightness(0.3);
+    }
+
+    #title {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 70vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 </style>
 
-<body class="dark">
-    <nav>
-        <div class="nav-center">
-            <h1 style="font-size: 4em;">TETI</h1>
-        </div>
-        <div class="nav-center">
-            <p>Made By TitanPlayz100</p>
-        </div>
+<body>
+    <div id="background"></div>
+    <nav id="title">
+        <h1 style="font-size: 8em; margin-bottom: 0;">TETI</h1>
+        <p>Made By TitanPlayz100</p>
     </nav>
-    <hr>
+    <hr style="margin-top: 70vh;">
     <a class="button outline primary pull-right" href="index.html">Back to teti</a>
-    
+
     <!-- markdown renderer -->
-    <zero-md src="info.md">
+    <zero-md src="info.md" id="info">
         <template>
             <link rel="stylesheet" href="https://unpkg.com/chota@latest">
             <style>
@@ -48,6 +72,18 @@
     <hr>
     <p class="text-right">css using <a href="https://jenil.github.io/chota/">chota</a></p>
     <p class="text-right">md renderer with <a href="https://zerodevx.github.io/zero-md/">zero-md</a></p>
+    <div id="bottom"></div>
 </body>
+
+<script defer>
+    window.addEventListener("scroll", () => {
+        const totalHeight = document.body.scrollHeight
+        const clientHeight = window.innerHeight
+        const totalScroll = -(window.scrollY * 100 / totalHeight)
+        const clientScroll = 70 - (window.scrollY * 100 / clientHeight)
+        document.getElementById("background").style.top = `${totalScroll}vh`
+        document.getElementById("title").style.height = `${clientScroll < 0 ? 0 : clientScroll}vh`
+    })
+</script>
 
 </html>

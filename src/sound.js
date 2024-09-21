@@ -9,6 +9,10 @@ export class Sounds {
     curSongIdx = 0;
     elSongProgress = document.getElementById("songProgress");
     elSongText = document.getElementById("songText");
+    
+    lowpassfilter;
+    audioContext;
+
 
     /**
      * @param {Game} game
@@ -18,8 +22,8 @@ export class Sounds {
     }
 
     playSound(audioName, replace = true, silent = false) {
-        this.sfx[audioName].muted = silent;
         if (this.sfx[audioName] == undefined) return;
+        this.sfx[audioName].muted = silent;
         this.sfx[audioName].volume = this.game.settings.volume.sfxLevel / 1000;
         if (this.game.started == false) return;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
@@ -62,7 +66,7 @@ export class Sounds {
         };
         menuSFX(".settingLayout", "menutap");
         menuSFX(".gamemodeSelect", "menutap");
-        
+
         setInterval(() => {
             if (this.songs[this.curSongIdx].currentTime == 0) return;
             this.elSongProgress.value =
@@ -72,19 +76,35 @@ export class Sounds {
         // preload all sfx
         sfxobj.forEach(file => {
             if (file.type == "dir") return;
-            this.sfx[file.name.split(".")[0]] = new Audio(file.path);
-            this.playSound(file.name.split('.')[0], false, true);
+            const name = file.name.split(".")[0];
+            this.sfx[name] = new Audio(file.path);
         })
+
+        this.audioContext = new window.AudioContext();
+        this.lowpassfilter = this.audioContext.createBiquadFilter();
+        this.lowpassfilter.type = "lowpass";
+        this.lowpassfilter.frequency.value = 20000;
 
         songsobj.forEach(file => {
-            this.songs.push(new Audio(file.path));
+            const songaudio = new Audio(file.path);
+            this.songs.push(songaudio);
             this.songNames.push(file.name.split(".")[0]);
-        })
-        // this.playSound("allclear") wait literally how is this fine by chrome
 
+            const track = this.audioContext.createMediaElementSource(songaudio);
+            track.connect(this.lowpassfilter);
+            this.lowpassfilter.connect(this.audioContext.destination);
+        })
+        // this.playSound("allclear") // wait literally how is this fine by chrome
     }
 
     setAudioLevel() {
         this.songs[this.curSongIdx].volume = Number(this.game.settings.volume.audioLevel) / 1000;
+    }
+
+    toggleSongMuffle(muffled) {
+        const currentTime = this.audioContext.currentTime;
+        this.lowpassfilter.frequency.cancelScheduledValues(currentTime);
+        this.lowpassfilter.frequency.setValueAtTime(this.lowpassfilter.frequency.value, currentTime);  
+        this.lowpassfilter.frequency.exponentialRampToValueAtTime(muffled ? 300 : 20000, currentTime + 1);  
     }
 }

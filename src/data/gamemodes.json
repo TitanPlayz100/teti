@@ -1,0 +1,120 @@
+{
+    "*": {
+        "settings": {
+            "gravitySpeed": 950,
+            "lockDelay": 600,
+            "maxLockMovements": 15,
+            "nextPieces": 5,
+            "allowLockout": false,
+            "preserveARR": true,
+            "infiniteHold": false,
+            "allowQueueModify": false,
+            "allspin": false,
+            "allspinminis": false,
+            "history": false
+        },
+        "displayName": "Unset",
+        "objectiveText": "",
+        "goalStat": "",
+        "target": "",
+        "result": "",
+        "music": "",
+        "pbmusic": "",
+        "skin": "",
+        "board": "",
+        "sidebar": [],
+        "background": ""
+    },
+    "custom": {
+        "displayName": "Zen / Custom"
+    },
+    "sprint": {
+        "displayName": "Sprint",
+        "objectiveText": "Lines",
+        "goalStat": "clearlines",
+        "target": "requiredLines",
+        "result": "time",
+        "settings": {
+            "requiredLines": 40
+        }
+    },
+    "ultra": {
+        "displayName": "Ultra",
+        "objectiveText": "Score",
+        "goalStat": "time",
+        "target": "timeLimit",
+        "result": "score",
+        "settings": {
+            "timeLimit": 2
+        }
+    },
+    "attacker": {
+        "displayName": "Attacker",
+        "objectiveText": "Damage",
+        "goalStat": "attack",
+        "target": "requiredAttack",
+        "result": "time",
+        "settings": {
+            "requiredAttack": 100
+        }
+    },
+    "digger": {
+        "displayName": "Digger",
+        "objectiveText": "Remaining",
+        "goalStat": "cleargarbage",
+        "target": "requiredGarbage",
+        "result": "time",
+        "settings": {
+            "requiredGarbage": 100
+        }
+    },
+    "survival": {
+        "displayName": "Survival",
+        "objectiveText": "Lines survived",
+        "goalStat": "clearlines",
+        "target": "gameEnd",
+        "result": "time",
+        "settings": {
+            "survivalRate": 60
+        }
+    },
+    "backfire": {
+        "displayName": "Backfire",
+        "objectiveText": "Sent",
+        "goalStat": "attack",
+        "target": "requiredAttack",
+        "result": "time",
+        "settings": {
+            "requiredAttack": 100,
+            "backfireMulti": 1
+        }
+    },
+    "combo": {
+        "displayName": "4w / Combo",
+        "objectiveText": "Combo",
+        "goalStat": "combo",
+        "target": "combobreak",
+        "result": "maxCombo"
+    },
+    "lookahead": {
+        "displayName": "Lookahead",
+        "objectiveText": "Lines",
+        "goalStat": "clearlines",
+        "target": "requiredLines",
+        "result": "time",
+        "settings": {
+            "requiredLines": 40,
+            "lookAheadPieces": 3
+        }
+    },
+    "race": {
+        "displayName": "Race",
+        "objectiveText": "Level",
+        "goalStat": "level",
+        "target": "raceTarget",
+        "result": "time",
+        "settings": {
+            "raceTarget": 500
+        }
+    }
+}

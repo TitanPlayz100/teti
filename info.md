@@ -3,7 +3,7 @@ This is the official info page now, instead of the README. I'll add all update c
 
 TETI (the name is in the works) is a modern tetris clone I've been working on for the past year or so, on and off. It's a moderately large project, and there's still many things I want to work on.
 
-This project started out as a learning experience, because suprisingly it was my first time actually using javascript. For my year 12 major project (pseudohuman) I wanted to build a multiplayer web based game, and thus I made this to gain experience before starting. I had already programmed in Java, as wlel as some C# and python, so I was not unfamiliar to programming, and I already knew frontend basics. Teti was able to combine my interest for tetris, and also challenge me to learn javascript. Well after the project was over, I could truly improve the code and game to make an amazing experience
+This project started out as a learning experience, because surprisingly it was my first time actually using Javascript. For my year 12 major project (pseudohuman) I wanted to build a multiplayer web based game, and thus I made this to gain experience before starting. I had already programmed in Java, as well as some C# and Python, so I was not unfamiliar to programming, and I already knew frontend basics. Teti was able to combine my interest for tetris, and also challenge me to learn Javascript. Well after the project was over, I could truly improve the code and game to make an amazing experience
 
 [Here is the trailer video](https://www.youtube.com/watch?v=Gf2dsPRf2uM)
 
@@ -53,12 +53,26 @@ Feel free to contribute with features and issues.
 - customise queues
 - edit and draw on board (custom game)
 - undo and redo with non linear branches
+- pbs are recorded, as well as lifetime stats
 
 ## TODO list
 Things that I am working on, and most likely will release in the next update
-- nothing
+- add undo redo sfx and visuals
+- button click animations and better menu transitions
+- board particle effects
+- view lifetime stats and legacy stats in pb menu
 
 ## Updates
+### v1.2.1
+- fun with parallax effect in info page
+- changed gamemodes to be stored using JSON instead of in code
+- can easily add custom gamemodes now using gamemodes JSON
+- competitive mode 
+    - sets certain gamerules, disables custom game settings
+    - PBs are onyl saved when used
+- seperated goals into its own menu
+- view pbs in competitive mode menu
+
 ### v1.2.0
 - added key modifiers
     - you can make undo (or any key) ctrl+z now
@@ -83,7 +97,7 @@ Things that I am working on, and most likely will release in the next update
 - piece schedules lock on top rather than topout
 
 ### v1.1.0
-- added undo and redo feautures
+- added undo and redo features
 - non linear timeline: branches can be made and navigated, much like a git tree
 - preloaded all sfx and songs
 
@@ -109,9 +123,13 @@ May or may not add these, kinda ordered by ease and desire for feature
 - replay functionality (either save gamestate or save keystrokes idk yet)
 - more unique gamemodes (techmino styled)
     - misdrop remover mode
-    - gamemode presets
 - guide like progression thing? using custom boards (kinda like tetris tres bien)
 - maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats
 - touch settings
 - cooler graphics (maybe using a library like pixijs)
 - bot to play against
+- statistics graph
+- colourblind gamemode
+- holdless and next queueless gamemode - kinda like qp2 cards
+- achievements, progression tree
+- glossary of useful terms

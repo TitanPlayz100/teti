@@ -84,7 +84,7 @@ export class Rendering {
             this.nextWidth,
             this.nextHeight
         );
-        if (this.game.settings.game.gamemode == 8 || !this.game.settings.display.colouredQueues) return;
+        if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
         this.canvasNext.style.outlineColor = pieces.filter(
             e => e.name == first5[0]
         )[0].colour;
@@ -115,7 +115,7 @@ export class Rendering {
             this.holdWidth,
             this.holdHeight
         );
-        if (this.game.settings.game.gamemode == 8 || !this.game.settings.display.colouredQueues)
+        if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues)
             return;
         this.canvasHold.style.outline = `0.2vh solid ${this.game.hold.piece.colour}`;
     }
@@ -127,7 +127,7 @@ export class Rendering {
     renderDanger() {
         const condition =
             this.game.board.getMinos("S").some(c => c[1] > 16) &&
-            this.game.settings.game.gamemode != 7;
+            this.game.settings.game.gamemode != 'combo';
         if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
         this.game.boardEffects.toggleDangerBoard(condition)
         this.inDanger = condition;
@@ -135,8 +135,8 @@ export class Rendering {
 
     renderActionText(damagetype, isBTB, isPC, damage, linecount) {
         if (damagetype != "") this.setText("cleartext", damagetype, 2000);
-        if (this.game.mechanics.combonumber > 0)
-            this.setText("combotext", `Combo ${this.game.mechanics.combonumber}`, 2000);
+        if (this.game.stats.combo > 0)
+            this.setText("combotext", `Combo ${this.game.stats.combo}`, 2000);
         if (isBTB && this.game.stats.btbCount > 0)
             this.setText("btbtext", `BTB ${this.game.stats.btbCount} `, 2000);
         if (isPC) this.setText("pctext", "Perfect Clear", 2000);
@@ -160,9 +160,9 @@ export class Rendering {
             this.game.sounds.playSound("clearline");
         }
         if (this.game.mechanics.spikeCounter >= 15) this.game.sounds.playSound("thunder", false);
-        if (this.game.mechanics.combonumber > 0)
+        if (this.game.stats.combo > 0)
             this.game.sounds.playSound(
-                `combo_${this.game.mechanics.combonumber > 16 ? 16 : this.game.mechanics.combonumber
+                `combo_${this.game.stats.combo > 16 ? 16 : this.game.stats.combo
                 }`
             );
     }
@@ -209,7 +209,7 @@ export class Rendering {
         this.elementStats3.textContent = `${pps.toFixed(2)}`;
         this.elementSmallStat1.textContent = `${this.game.stats.attack}`;
         this.elementSmallStat2.textContent = `${this.game.stats.pieceCount}`;
-        this.game.stats.checkObjectives();
+        this.game.modes.checkFinished();
         this.setEditPieceColours();
 
     }
@@ -224,7 +224,7 @@ export class Rendering {
 
     // board rendering
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
-        if (this.game.settings.game.gamemode == 8) {
+        if (this.game.settings.game.gamemode == 'lookahead') {
             if (this.game.stats.checkInvis()) {
                 if (this.boardAlpha <= 0) {
                     this.boardAlphaChange = 0;
@@ -293,7 +293,7 @@ export class Rendering {
         }
         this.game.boardEffects.move(0, 0);
         this.game.boardEffects.rotate(0);
-        this.game.boardEffects.rainbowBoard(this.game.stats, this.game.profilestats.personalBests, this.game.settings.game.gamemode);
+        this.game.boardEffects.rainbowBoard(this.game);
         requestAnimationFrame(this.renderingLoop.bind(this))
     }
 

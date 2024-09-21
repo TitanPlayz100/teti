@@ -15,13 +15,14 @@ import { BoardEditor } from "./display/editboard.js";
 import { History } from "./mechanics/history.js";
 import { BoardEffects } from "./display/boardEffects.js";
 import { ProfileStats } from "./mechanics/profileStats.js";
+import { Modes } from "./mechanics/modes.js";
 
 export class Game {
     started;
     ended;
-    statsTimer = 0;
-    survivalTimer = 0;
-    version = '1.2.0';
+    statsTimer = 0; // id of timeout
+    survivalTimer = 0; // id of timeout
+    version = '1.2.1';
 
     elementReason = document.getElementById("reason");
     elementResult = document.getElementById("result");
@@ -46,6 +47,7 @@ export class Game {
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
         this.history = new History(this);
+        this.modes = new Modes(this);
 
         this.rendering.sizeCanvas();
         this.sounds.initSounds();
@@ -55,6 +57,8 @@ export class Game {
         this.menuactions.addRangeListener();
         this.versionChecker();
         this.profilestats.loadPBs();
+        this.modals.generateGamemodeMenu();
+
     }
 
     startGame() {
@@ -73,7 +77,7 @@ export class Game {
 
     endGame(top, bottom = "Better luck next time") {
         const dead = ["Lockout", "Topout", "Blockout"].includes(top);
-        if (this.settings.game.gamemode == 5 && dead) {
+        if (this.settings.game.gamemode == 'survival' && dead) {
             this.ended = true;
             return;
         }
@@ -115,7 +119,7 @@ export class Game {
         this.stats.cleargarbage = 0;
         this.mechanics.spikeCounter = 0;
         this.stats.btbCount = -1;
-        this.mechanics.combonumber = -1;
+        this.stats.combo = -1;
         this.stats.time = -0.02;
         this.stats.attack = 0;
         this.stats.pieceCount = 0;

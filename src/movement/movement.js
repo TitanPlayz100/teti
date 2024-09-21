@@ -14,9 +14,7 @@ export class Movement {
         this.mechs.startGravity();
         this.game.started = true;
         this.game.statsTimer = setInterval(() => this.game.rendering.renderStats(), 20);
-        const time = (60 * 1000) / this.game.settings.game.survivalRate;
-        if (this.game.settings.game.gamemode == 5)
-            this.game.survivalTimer = setInterval(() => this.mechs.addGarbage(1), time);
+        this.game.modes.startSurvival();
     }
 
     checkCollision(coords, action, collider) {

@@ -3,6 +3,13 @@ import { Game } from "../game.js";
 export class ProfileStats {
     personalBests = {};
 
+    lowerData = {
+        time: true,
+        score: false,
+        maxCombo: false
+    }
+
+
     /**
      * @param {Game} game 
      */
@@ -14,18 +21,22 @@ export class ProfileStats {
      * @param {Boolean} lower 
      * Lower is used depending on objective type e.g. lower time is better thus lower is true
      */
-    setPB(score, gamemode, lower) {
+
+    setPB(score) {
         this.game.elementGameEndTitle.textContent = 'GAME ENDED';
+        const gamemode = this.game.settings.game.gamemode
         const gamemodeStats = this.personalBests[gamemode] ?? {};
         const currentScore = Number(gamemodeStats.score);
-        score = Number(score)
+        const lower = this.lowerData[this.game.modes.modeJSON.result];
+
+        if (!this.game.settings.game.competitiveMode) return;
+
         if (isNaN(currentScore) || currentScore == undefined || (lower && score < currentScore) || (!lower && score > currentScore)) {
-            console.log('test')
             let gameStatsKeys = Object.getOwnPropertyNames(this.game.stats)
             gameStatsKeys = gameStatsKeys.filter(key => key != 'game')
             const gameStats = {};
             gameStatsKeys.forEach(key => gameStats[key] = this.game.stats[key])
-            this.personalBests[gamemode] = { score, pbstats: gameStats };
+            this.personalBests[gamemode] = { score, pbstats: gameStats, version: this.game.version };
             this.game.elementGameEndTitle.textContent = 'NEW PB!';
         }
     }

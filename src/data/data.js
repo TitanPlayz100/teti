@@ -24,32 +24,6 @@ export const levellingTable = {
     4: 6,
 };
 
-export const modesText = {
-    0: "Custom",
-    1: "Lines",
-    2: "Score",
-    3: "Damage",
-    4: "Remaining",
-    5: "Lines Survived",
-    6: "Sent",
-    7: "Combo",
-    8: "Lines",
-    9: "Level",
-};
-
-export const gamemodeNames = [
-    "Zen",
-    "Sprint",
-    "Ultra",
-    "Attacker",
-    "Digger",
-    "Survival",
-    "Backfire",
-    "4w",
-    "Lookahead",
-    "Race"
-]
-
 export const disabledKeys = [
     "ArrowRight",
     "ArrowLeft",

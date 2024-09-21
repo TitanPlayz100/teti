@@ -1,17 +1,41 @@
-import { gamemodeNames } from "../data/data.js";
 import { Game } from "../game.js";
 
 export class GameStats {
-    attack;
     clearlines; // cleared lines
     pieceCount;
     score;
     sent;
     time; // seconds
-    cleargarbage;
     maxCombo;
     btbCount;
     level;
+    combo;
+
+    attack;
+    cleargarbage;
+
+    pps;
+    apm;
+
+    // app, scorepp, inputs, kps, kpp, holds, rotates, pcs, maxBTB, vs
+
+    // lineClearColumns, lineClearPieces, clearTypeCounts, tspins, allspins
+
+    // garbage stats - sent, recieved
+
+    // ds/s, vs/apm, garb efficiecny, cheese i, weighted app
+
+    /**
+        VS = [ ( lines sent + garbage cleared ) / pieces ] * PPS * 100
+        APP: APM/(PPS*60) 
+        DS/Second: (VS/100)-(APM/60) 
+        DS/Piece: ((VS/100)-(APM/60))/PPS 
+        APP+DS/Piece: (((VS/100)-(APM/60))/PPS) + APM/(PPS*60) 
+        Cheese Index: ((DS/Piece * 150) + (((VS/APM)-2)*50) + (0.6-APP)*125) 
+        Garbage Effi.: (attack*downstack)/pieces^2 
+        Area: apm + pps * 45 + vs * 0.444 + app * 185 + dssecond * 175 + dspiece * 450 + garbageEffi * 315 
+        Weighted APP: APP - 5 * tan((cheeseIndex/ -30) + 1) 
+     */
 
     /**
      * @param {Game} game
@@ -20,90 +44,18 @@ export class GameStats {
         this.game = game;
     }
 
-    checkObjectives() {
-        const goals = this.game.settings.game,
-            time = (Math.round(this.time * 100) / 100).toFixed(2),
-            pieces = goals.lookAheadPieces;
-
-        document.getElementById("objective").textContent = {
-            0: "",
-            1: `${this.clearlines}/${goals.requiredLines}`,
-            2: `${this.score}`,
-            3: `${this.attack}/${goals.requiredAttack}`,
-            4: `${this.getRemainingGarbage()}`,
-            5: `${this.sent}`,
-            6: `${this.attack}/${goals.requiredAttack}`,
-            7: `${this.game.mechanics.combonumber}`,
-            8: `${this.clearlines}/${goals.requiredLines}`,
-            9: `${this.level}/${goals.raceTarget}`,
-        }[goals.gamemode];
-
-        const obj1 = this.clearlines >= goals.requiredLines,
-            obj2 = this.time >= Number(goals.timeLimit),
-            obj3 = this.attack >= goals.requiredAttack,
-            obj4 = this.cleargarbage >= goals.requiredGarbage,
-            obj5 = this.game.ended,
-            obj6 = this.game.mechanics.combonumber == -1 && this.clearlines >= 1,
-            obj7 = this.level >= goals.raceTarget,
-            ts = ` in ${time} seconds`,
-            cl = `Cleared ${this.clearlines} lines`,
-            total = this.score,
-            race = `Reached ${this.level} in ` + ts,
-            reqGarb = goals.requiredGarbage,
-            gamemodeName = gamemodeNames[goals.gamemode];
-
-        switch (goals.gamemode) {
-            case 1: if (obj1) {
-                this.game.profilestats.setPB(time, gamemodeName, true);
-                this.game.endGame(`${time}s`, cl + ts);
-            } break;
-            case 2: if (obj2) {
-                this.game.profilestats.setPB(total, gamemodeName, false);
-                this.game.endGame(`${total} points`, `Scored ${total} points` + ts);
-            } break;
-            case 3: if (obj3) {
-                this.game.profilestats.setPB(time, gamemodeName, true);
-                this.game.endGame(`${time}s`, `Sent ${this.attack} damage` + ts);
-            } break;
-            case 4: if (obj4) {
-                this.game.profilestats.setPB(time, gamemodeName, true);
-                this.game.endGame(`${time}s`, `Dug ${reqGarb} lines` + ts);
-            } break;
-            case 5: if (obj5) {
-                this.game.profilestats.setPB(time, gamemodeName, true);
-                this.game.endGame(`${time}s`, `Survived ${this.sent} lines` + ts);
-            } break;
-            case 6: if (obj3) {
-                this.game.profilestats.setPB(time, gamemodeName, true);
-                this.game.endGame(`${time}s`, `Sent ${this.attack} damage` + ts);
-            } break;
-            case 7: if (obj6) {
-                this.game.profilestats.setPB(this.maxCombo, gamemodeName, false);
-                this.game.endGame(`${this.maxCombo} Combo`, `Got a ${this.maxCombo} combo` + ts);
-            } break;
-            case 8: if (obj1) {
-                this.game.profilestats.setPB(time, gamemodeName, true);
-                this.game.endGame(`${time}s`, cl + ` using ${pieces} lookahead`);
-            } break;
-            case 9: if (obj7) {
-                this.game.profilestats.setPB(time, gamemodeName, true);
-                this.game.endGame(`${time}s`, race);
-            } break;
-        }
-    }
-
     getDisplayStats() {
         this.time += 0.02;
+        if (this.time != 0) {
+            this.pps = this.pieceCount / this.time;
+            this.apm = this.attack / (this.time / 60);
+        } else {
+            this.pps = 0;
+            this.apm = 0;
+        }
+
         let displaytime = (Math.round(this.time * 10) / 10).toFixed(1);
-        let pps = 0.0;
-        if (this.time != 0) {
-            pps = Math.round((this.pieceCount * 100) / this.time) / 100;
-        }
-        let apm = 0.0;
-        if (this.time != 0) {
-            apm = Math.round((this.attack * 10) / (this.time / 60)) / 10;
-        }
-        return { displaytime, pps, apm }
+        return { displaytime, pps: this.pps, apm: this.apm }
     }
 
     checkInvis() {

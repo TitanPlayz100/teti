@@ -246,8 +246,8 @@ body {
     position: absolute;
     top: 100%;
     left: 110%;
-    width: max-content;
-    max-width: 40vw;
+    width: 40vw;
+    /* max-width: 40vw; */
     opacity: 0;
     pointer-events: none;
     transition: all 0.3s ease;
