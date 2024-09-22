@@ -104,7 +104,8 @@
         "result": "time",
         "settings": {
             "requiredLines": 40,
-            "lookAheadPieces": 3
+            "lookAheadPieces": 3,
+            "gravitySpeed": 1001
         }
     },
     "race": {

@@ -61,9 +61,16 @@ Things that I am working on, and most likely will release in the next update
 - button click animations and better menu transitions
 - board particle effects
 - view lifetime stats and legacy stats in pb menu
+- remove 4w pb replace with combo
+- ability to remove pbs
 
 ## Updates
-### v1.2.1
+#### v1.2.1.1
+- fixed edit modal breaking when main menu open
+- fixed flashing being too fast in lookahead mode
+- fixed setting snot properly saving with competitive mode active
+
+#### v1.2.1
 - fun with parallax effect in info page
 - changed gamemodes to be stored using JSON instead of in code
 - can easily add custom gamemodes now using gamemodes JSON

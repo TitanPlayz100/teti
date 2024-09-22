@@ -4,7 +4,6 @@ import pieces from "../data/pieces.json" with { type: "json" };
 
 export class Rendering {
     boardAlpha;
-    boardAlphaChange;
     boardHeight;
     boardWidth;
     holdHeight;
@@ -202,15 +201,46 @@ export class Rendering {
         document.body.style.setProperty('--background', background);
     }
 
-    renderStats() {
-        const { displaytime, apm, pps } = this.game.stats.getDisplayStats();
-        this.elementStats1.textContent = `${displaytime}`;
-        this.elementStats2.textContent = `${apm.toFixed(1)}`;
-        this.elementStats3.textContent = `${pps.toFixed(2)}`;
-        this.elementSmallStat1.textContent = `${this.game.stats.attack}`;
-        this.elementSmallStat2.textContent = `${this.game.stats.pieceCount}`;
+    gameClock() {
+        this.renderSidebar();
         this.game.modes.checkFinished();
         this.setEditPieceColours();
+        this.game.stats.updateStats();
+        this.updateAlpha();
+    }
+
+    renderSidebar() {
+        const stats = ['time', 'apm', 'pps'];
+        const fixedVal = [1, 1, 2];
+        const statsSecondary = ['attack', 'pieceCount'];
+
+        stats.forEach((stat, index) => {
+            const displayStat = (Math.round(this.game.stats[stat] * 100) / 100).toFixed(fixedVal[index]);
+            this[`elementStats${index + 1}`].textContent = displayStat || 0;
+        })
+
+        statsSecondary.forEach((stat, index) => {
+            this[`elementSmallStat${index + 1}`].textContent = this.game.stats[stat];
+        })
+    }
+
+    updateAlpha() {
+        if (this.game.settings.game.gamemode == 'lookahead') {
+            if (this.game.stats.checkInvis()) {
+                if (this.boardAlpha <= 0) {
+                    this.boardAlpha = 1;
+                    this.updateNext();
+                    this.updateHold();
+                }
+            } else {
+                if (this.boardAlpha > 0) {
+                    this.boardAlpha += -0.06;
+                    this.updateNext();
+                    this.updateHold();
+                }
+                if (this.boardAlpha <= 0) this.boardAlpha = 0;
+            }
+        }
 
     }
 
@@ -224,18 +254,6 @@ export class Rendering {
 
     // board rendering
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
-        if (this.game.settings.game.gamemode == 'lookahead') {
-            if (this.game.stats.checkInvis()) {
-                if (this.boardAlpha <= 0) {
-                    this.boardAlphaChange = 0;
-                    this.boardAlpha = 1;
-                }
-            } else {
-                if (this.boardAlpha >= 1) this.boardAlphaChange = -0.05;
-                if (this.boardAlpha <= 0) this.boardAlphaChange = 0;
-            }
-        }
-        if (this.boardAlphaChange != 0) this.boardAlpha += this.boardAlphaChange;
         cntx.globalAlpha = this.boardAlpha.toFixed(2);
         cntx.clearRect(0, 0, width, height);
         grid.forEach((row, y) => {
@@ -287,10 +305,6 @@ export class Rendering {
             this.boardWidth,
             this.boardHeight
         );
-        if (this.boardAlphaChange != 0) {
-            this.updateNext();
-            this.updateHold();
-        }
         this.game.boardEffects.move(0, 0);
         this.game.boardEffects.rotate(0);
         this.game.boardEffects.rainbowBoard(this.game);

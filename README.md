@@ -11,7 +11,7 @@ All the information is in the tauri branch, can download in releases
 ## Data Formats
 ### Gamemodes Format
 ```json
-"*": {
+{
     settings: {}, // default settings that are applied to all games, can be overridden
     displayName: "", // name shown on gamemode selection
     objectiveText: "", // subtext displayed on right side
@@ -24,5 +24,5 @@ All the information is in the tauri branch, can download in releases
     board: "", // starting board, tetrio map format
     sidebar: [], // sidebar stats that are displayed
     background: "", // custom background / effects
-},
+}
 ```

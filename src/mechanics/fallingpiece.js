@@ -56,7 +56,9 @@ export class Falling {
             this.location[0] + dx,
             this.location[1] + dy,
         ];
-        this.moved = true;
+        if (dx != 0 || dy != 0) {
+            this.moved = true;
+        }
     }
 
 

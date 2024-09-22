@@ -13,7 +13,7 @@ export class Movement {
     firstMovement() {
         this.mechs.startGravity();
         this.game.started = true;
-        this.game.statsTimer = setInterval(() => this.game.rendering.renderStats(), 20);
+        this.game.gameTimer = setInterval(() => this.game.rendering.gameClock(), 20);
         this.game.modes.startSurvival();
     }
 

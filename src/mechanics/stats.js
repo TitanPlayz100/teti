@@ -1,21 +1,21 @@
 import { Game } from "../game.js";
 
 export class GameStats {
-    clearlines; // cleared lines
-    pieceCount;
-    score;
-    sent;
-    time; // seconds
-    maxCombo;
-    btbCount;
-    level;
-    combo;
+    clearlines = 0; // cleared lines
+    pieceCount = 0;
+    score = 0;
+    sent = 0;
+    time = 0; // seconds
+    maxCombo = -1;
+    btbCount = -1;
+    level = 0;
+    combo = -1;
 
-    attack;
-    cleargarbage;
+    attack = 0;
+    cleargarbage = 0;
 
-    pps;
-    apm;
+    pps = 0;
+    apm = 0;
 
     // app, scorepp, inputs, kps, kpp, holds, rotates, pcs, maxBTB, vs
 
@@ -44,7 +44,7 @@ export class GameStats {
         this.game = game;
     }
 
-    getDisplayStats() {
+    updateStats() {
         this.time += 0.02;
         if (this.time != 0) {
             this.pps = this.pieceCount / this.time;
@@ -53,9 +53,6 @@ export class GameStats {
             this.pps = 0;
             this.apm = 0;
         }
-
-        let displaytime = (Math.round(this.time * 10) / 10).toFixed(1);
-        return { displaytime, pps: this.pps, apm: this.apm }
     }
 
     checkInvis() {

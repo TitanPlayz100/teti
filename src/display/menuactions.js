@@ -155,11 +155,12 @@ export class MenuActions {
 
     openEditMenu() {
         if (this.game.modals.open) {
-            this.menus.closeModal("editMenu");
-        } else {
-            if (this.game.settings.game.gamemode != 'custom') return
-            this.menus.openModal("editMenu");
+            this.toggleDialog();
+            return;
         }
+        if (this.game.settings.game.gamemode != 'custom') return
+        
+        this.menus.openModal("editMenu");
     }
 
     changeEditPiece(pieceName) { this.game.boardeditor.fillPiece = pieceName; }

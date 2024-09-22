@@ -116,7 +116,8 @@ export class Modes {
         this.game.settings.game.gamemode = mode;
         const competitive = this.game.settings.game.competitiveMode;
         if (competitive) {
-            localStorage.setItem('customGame', JSON.stringify(this.game.settings.game));
+            if (localStorage.getItem('customGame') == null)
+                localStorage.setItem('customGame', JSON.stringify(this.game.settings.game));
             this.modeJSON = this.getGamemodeJSON(mode);
             this.game.settings.game = { ...this.game.settings.game, ...this.modeJSON.settings };
             document.getElementById('game').disabled = true;

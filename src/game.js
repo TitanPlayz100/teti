@@ -20,7 +20,7 @@ import { Modes } from "./mechanics/modes.js";
 export class Game {
     started;
     ended;
-    statsTimer = 0; // id of timeout
+    gameTimer = 0; // id of timeout
     survivalTimer = 0; // id of timeout
     version = '1.2.1';
 
@@ -58,7 +58,6 @@ export class Game {
         this.versionChecker();
         this.profilestats.loadPBs();
         this.modals.generateGamemodeMenu();
-
     }
 
     startGame() {
@@ -71,29 +70,24 @@ export class Game {
 
     stopGameTimers() { //stop all the game's timers
         clearInterval(this.mechanics.gravityTimer);
-        clearInterval(this.statsTimer);
+        clearInterval(this.gameTimer);
         clearInterval(this.survivalTimer);
     }
 
     endGame(top, bottom = "Better luck next time") {
-        const dead = ["Lockout", "Topout", "Blockout"].includes(top);
+        const dead = ["Lockout", "Topout", "Blockout"].includes(top); // survival mode end instead of lose
         if (this.settings.game.gamemode == 'survival' && dead) {
             this.ended = true;
             return;
         }
-        switch (top) {
-            case "Lockout":
-            case "Topout":
-            case "Blockout":
-                this.sounds.playSound("failure");
-                this.sounds.playSound("topout");
-                break;
-            case undefined:
-                return;
-                break;
-            default:
-                this.sounds.playSound("finish");
-                break;
+
+        if (top == "Topout" || top == "Blockout" || top == "Lockout") {
+            this.sounds.playSound("topout");
+            this.sounds.playSound("failure");
+        } else if (top == undefined) {
+            return;
+        } else {
+            this.sounds.playSound("finish");
         }
 
         this.ended = true;
@@ -104,38 +98,28 @@ export class Game {
         this.profilestats.saveSession();
     }
 
-    resetState() {
-        this.ended = false;
-        this.falling.piece = null;
-        this.falling.location = [];
-        this.mechanics.isTspin = false;
-        this.mechanics.isAllspin = false;
-        this.mechanics.isMini = false;
-        this.hold.piece = null;
-        this.hold.occured = false;
+    resetState() { // todo maybe refactor this to each class
         this.bag.nextPieces = [[], []];
-        this.stats.clearlines = 0;
-        this.stats.score = 0;
-        this.stats.cleargarbage = 0;
-        this.mechanics.spikeCounter = 0;
-        this.stats.btbCount = -1;
-        this.stats.combo = -1;
-        this.stats.time = -0.02;
-        this.stats.attack = 0;
-        this.stats.pieceCount = 0;
-        this.started = false;
-        this.falling.rotation = 1;
-        this.rendering.inDanger = false;
-        this.stats.sent = 0;
-        this.stats.level = 0;
-        this.mechanics.garbageQueue = 0;
-        this.stats.maxCombo = 0;
+        this.falling.location = [];
         this.falling.moved = false;
-        this.rendering.boardAlpha = 1;
-        this.rendering.boardAlphaChange = 0;
+        this.falling.piece = null;
+        this.falling.rotation = 1;
+        this.history.currentState = 0;
         this.history.historyConnections = [];
         this.history.historyStates = [];
-        this.history.currentState = 0;
+        this.hold.occured = false;
+        this.hold.piece = null;
+        this.mechanics.garbageQueue = 0;
+        this.mechanics.isAllspin = false;
+        this.mechanics.isMini = false;
+        this.mechanics.isTspin = false;
+        this.mechanics.spikeCounter = 0;
+        this.rendering.boardAlpha = 1;
+        this.rendering.inDanger = false;
+
+        this.started = false;
+        this.ended = false;
+        this.stats = new GameStats(this);
 
         this.stopGameTimers()
 
@@ -146,7 +130,7 @@ export class Game {
         this.board.resetBoard();
         this.mechanics.locking.clearLockDelay();
         this.rendering.renderDanger();
-        this.rendering.renderStats();
+        this.rendering.gameClock();
         this.rendering.clearHold();
     }
 
