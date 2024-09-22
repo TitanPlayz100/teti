@@ -1,5 +1,5 @@
-import { Game } from "./game.js";
-import defaultSettings from "./data/defaultSettings.json" with { type: "json" };
+import { Game } from "../game.js";
+import defaultSettings from "../data/defaultSettings.json" with { type: "json" };
 
 
 export class Settings {

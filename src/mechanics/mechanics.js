@@ -107,7 +107,6 @@ export class Mechanics {
             }
         }
         this.setShadow();
-        this.game.stats.sent += lines;
     }
 
     switchHold() {
@@ -117,6 +116,7 @@ export class Mechanics {
         this.isTspin = false;
         this.isAllspin = false;
         this.isMini = false;
+        this.game.stats.holds++;
         if (this.game.hold.piece == null) {
             this.game.hold.setHold();
             this.spawnPiece(this.game.bag.randomiser());

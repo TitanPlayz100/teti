@@ -56,15 +56,23 @@ Feel free to contribute with features and issues.
 - pbs are recorded, as well as lifetime stats
 
 ## TODO list
-Things that I am working on, and most likely will release in the next update
+Things that I am working on based on other changes
 - add undo redo sfx and visuals
 - button click animations and better menu transitions
-- board particle effects
 - view lifetime stats and legacy stats in pb menu
+- show stats at end of each game
 - remove 4w pb replace with combo
 - ability to remove pbs
+- better loading screen with toast popup when assets load instead
 
 ## Updates
+#### v1.2.2
+- added different 4w residue (both 3 and 6 residue)
+- piece changes opacity as it locks
+- added a LARGE variety of new stats
+    - all are stored part of each game and added to lifetime stats
+    - in the future these will be accessible and visible
+
 #### v1.2.1.1
 - fixed edit modal breaking when main menu open
 - fixed flashing being too fast in lookahead mode
@@ -119,7 +127,6 @@ Things that I am working on, and most likely will release in the next update
 
 ## Feature Wishlist
 May or may not add these, kinda ordered by ease and desire for feature
-- add different 4w residue (both 3 and 6 residue)
 - more stats + customise stat sidebar
 - more garbage settings
 - finesse detection

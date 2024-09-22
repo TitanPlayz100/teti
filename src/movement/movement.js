@@ -13,7 +13,7 @@ export class Movement {
     firstMovement() {
         this.mechs.startGravity();
         this.game.started = true;
-        this.game.gameTimer = setInterval(() => this.game.rendering.gameClock(), 20);
+        this.game.gameTimer = setInterval(() => this.game.gameClock(), 20);
         this.game.modes.startSurvival();
     }
 
@@ -85,6 +85,7 @@ export class Movement {
         this.mechs.isAllspin = this.checkAllspin(this.game.board.getMinos("A"));
         this.game.falling.rotation = newRotation;
         this.game.mechanics.locking.incrementLock();
+        this.game.stats.rotates++;
         this.game.sounds.playSound("rotate");
         this.game.mechanics.setShadow();
         if (this.mechs.isTspin) this.game.sounds.playSound("spin");

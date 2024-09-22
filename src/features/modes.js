@@ -27,7 +27,6 @@ export class Modes {
         // hardcoded objectives
         let combobreak = this.game.stats.combo == -1 && stats.clearlines >= 1 && this.modeJSON.target == 'combobreak';
         let gameend = this.game.ended && this.modeJSON.target == 'gameEnd';
-
         let stat = stats[this.modeJSON.goalStat]
         let goal = goals[this.modeJSON.target]
         let result = stats[this.modeJSON.result]

@@ -40,6 +40,7 @@ export class Controls {
         }
         if (this.game.ended) return;
 
+        this.game.stats.inputs++;
         if (key == this.keys.cwKey) this.moves.rotate("CW");
         if (key == this.keys.ccwKey) this.moves.rotate("CCW");
         if (key == this.keys.rotate180Key) this.moves.rotate("180");

@@ -7,15 +7,15 @@ import { MenuActions } from "./display/menuactions.js";
 import { ModalActions } from "./display/modals.js";
 import { Movement } from "./movement/movement.js";
 import { Rendering } from "./display/rendering.js";
-import { Settings } from "./settings.js";
-import { Sounds } from "./sound.js";
+import { Settings } from "./features/settings.js";
+import { Sounds } from "./features/sound.js";
 import { Falling } from "./mechanics/fallingpiece.js";
-import { GameStats } from "./mechanics/stats.js";
+import { GameStats } from "./features/stats.js";
 import { BoardEditor } from "./display/editboard.js";
-import { History } from "./mechanics/history.js";
+import { History } from "./features/history.js";
 import { BoardEffects } from "./display/boardEffects.js";
-import { ProfileStats } from "./mechanics/profileStats.js";
-import { Modes } from "./mechanics/modes.js";
+import { ProfileStats } from "./features/profileStats.js";
+import { Modes } from "./features/modes.js";
 
 export class Game {
     started;
@@ -130,8 +130,16 @@ export class Game {
         this.board.resetBoard();
         this.mechanics.locking.clearLockDelay();
         this.rendering.renderDanger();
-        this.rendering.gameClock();
+        this.gameClock();
         this.rendering.clearHold();
+    }
+
+    gameClock() {
+        this.rendering.renderSidebar();
+        this.modes.checkFinished();
+        this.rendering.setEditPieceColours();
+        this.stats.updateStats();
+        this.rendering.updateAlpha();
     }
 
     versionChecker() {

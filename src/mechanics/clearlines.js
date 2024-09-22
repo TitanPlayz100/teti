@@ -13,12 +13,12 @@ export class ClearLines {
         this.game = game
         this.mech = mechanics;
         this.sounds = game.sounds;
-        this.stats = game.stats;
     }
 
-    clearLines() {
+    clearLines(clearCoords) {
         const clearRows = this.mech.board.getFullRows();
         let removedGarbage = 0;
+
         for (let row of clearRows) {
             const stopped = this.mech.board.getMinos("S");
             if (stopped.filter(c => c[1] == row).some(([x, y]) => this.mech.board.checkMino([x, y], "G")))
@@ -30,6 +30,10 @@ export class ClearLines {
         }
         this.game.modes.diggerAddGarbage(removedGarbage);
         if (clearRows.length > 0) this.game.rendering.bounceBoard("DOWN");
+
+        clearCoords.forEach(([x, y]) => {
+            if (clearRows.includes(y)) this.game.stats.clearCols[x]++;
+        })
         this.processLineClear(removedGarbage, clearRows);
     }
 
@@ -46,7 +50,7 @@ export class ClearLines {
     }
 
     processLineClear(garbageCleared, clearRows) {
-        this.stats.cleargarbage += garbageCleared;
+        this.game.stats.cleargarbage += garbageCleared;
         const linecount = clearRows.length;
         const isBTB =
             (this.mech.isTspin
@@ -60,7 +64,7 @@ export class ClearLines {
             (this.mech.isMini ? "mini " : "") +
             cleartypes[Math.min(linecount, 5)]; // limit to 5 line clear
         this.game.stats.updateBTB(isBTB, linecount);
-        if (linecount == 0) this.stats.maxCombo = this.game.stats.combo;
+        if (linecount == 0) this.game.stats.maxCombo = this.game.stats.combo;
         this.game.stats.combo = linecount == 0 ? -1 : this.game.stats.combo + 1;
         const damage = this.calcDamage(
             this.game.stats.combo,
@@ -75,10 +79,15 @@ export class ClearLines {
             isBTB,
             this.game.stats.combo
         );
-        this.stats.clearlines += linecount;
-        this.stats.attack += damage;
+        this.game.stats.clearlines += linecount;
+        this.game.stats.attack += damage;
         this.mech.spikeCounter += damage;
-        this.stats.level += levellingTable[linecount];
+        this.game.stats.pcs += isPC ? 1 : 0;
+        this.game.stats.tspins += this.mech.isTspin ? 1 : 0;
+        this.game.stats.allspins += this.mech.isAllspin ? 1 : 0;
+        this.game.stats.level += levellingTable[linecount];
+        if (linecount > 0)
+            this.game.stats.clearPieces[this.game.falling.piece.name][linecount-1]++;
 
         this.manageGarbageSent(damage);
         if (this.mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
@@ -86,6 +95,7 @@ export class ClearLines {
     }
 
     manageGarbageSent(damage) {
+        this.game.stats.sent += damage;
         const garb = damage * this.game.settings.game.backfireMulti;
         this.mech.garbageQueue =
             this.mech.garbageQueue == 0
@@ -98,6 +108,7 @@ export class ClearLines {
         if (garb > 0) this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
         if (this.game.stats.combo == -1 && this.mech.garbageQueue > 0) {
             this.mech.addGarbage(this.mech.garbageQueue, 0);
+            this.game.stats.recieved += this.mech.garbageQueue;
             this.mech.garbageQueue = 0;
             this.progressDamage.value = 0;
         }

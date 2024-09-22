@@ -9,20 +9,23 @@ All the information is in the tauri branch, can download in releases
 
 
 ## Data Formats
-### Gamemodes Format
-```json
-{
-    settings: {}, // default settings that are applied to all games, can be overridden
-    displayName: "", // name shown on gamemode selection
-    objectiveText: "", // subtext displayed on right side
-    goalStat: "", // stat being tracked (valid property in stats class)
-    target: "", // target (valid target in settings)
-    result: "", // displayed as result (another valid stat in stats class)
-    music: "", // to be implemented, custom song that can play 
-    pbmusic: "", // to be implemented, custom song that played on pb pace
-    skin: "", // to be implemented
-    board: "", // starting board, tetrio map format
-    sidebar: [], // sidebar stats that are displayed
-    background: "", // custom background / effects
+### Gamemode Structure (gamemodes.json)
+```js
+gamemodes = {
+    "gamemode_name": {
+        settings: {}, // settings that override the default * settings
+        displayName: "", // name shown on gamemode selection
+        objectiveText: "", // subtext displayed on right side
+        goalStat: "", // stat being tracked (valid property in stats class)
+        target: "", // target (valid target in settings)
+        result: "", // displayed as result (another valid stat in stats class)
+        
+        music: "", // to be implemented, custom song that can play 
+        pbmusic: "", // to be implemented, custom song that played on pb pace
+        skin: "", // to be implemented
+        board: "", // to be implemented, starting board, tetrio map format
+        sidebar: [], // to be implemented, sidebar stats that are displayed
+        background: "", // to be implemented, custom background / effects
+    }
 }
 ```

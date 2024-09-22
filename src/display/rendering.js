@@ -201,14 +201,6 @@ export class Rendering {
         document.body.style.setProperty('--background', background);
     }
 
-    gameClock() {
-        this.renderSidebar();
-        this.game.modes.checkFinished();
-        this.setEditPieceColours();
-        this.game.stats.updateStats();
-        this.updateAlpha();
-    }
-
     renderSidebar() {
         const stats = ['time', 'apm', 'pps'];
         const fixedVal = [1, 1, 2];
@@ -216,7 +208,7 @@ export class Rendering {
 
         stats.forEach((stat, index) => {
             const displayStat = (Math.round(this.game.stats[stat] * 100) / 100).toFixed(fixedVal[index]);
-            this[`elementStats${index + 1}`].textContent = displayStat || 0;
+            this[`elementStats${index + 1}`].textContent = displayStat ?? 0;
         })
 
         statsSecondary.forEach((stat, index) => {
@@ -252,6 +244,7 @@ export class Rendering {
         })
     }
 
+    divlock = document.getElementById("lockTimer");
     // board rendering
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
         cntx.globalAlpha = this.boardAlpha.toFixed(2);
@@ -263,6 +256,9 @@ export class Rendering {
                 cntx.lineWidth = 1;
                 if (cell.includes("A") || cell.includes("S")) {
                     // active piece or stopped piece
+                    if (this.divlock.value != 0 && cell.includes("A")) {
+                        cntx.globalAlpha = 1 - (this.divlock.value/250);
+                    }
                     cntx.fillStyle = cell.includes("G") // garbage piece
                         ? "gray"
                         : pieces.filter(p => p.name == cell[1])[0].colour;
@@ -297,14 +293,7 @@ export class Rendering {
     }
 
     renderingLoop() {
-        this.renderToCanvas(
-            this.ctx,
-            this.game.board.boardState,
-            39,
-            [0, 0],
-            this.boardWidth,
-            this.boardHeight
-        );
+        this.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
         this.game.boardEffects.move(0, 0);
         this.game.boardEffects.rotate(0);
         this.game.boardEffects.rainbowBoard(this.game);
