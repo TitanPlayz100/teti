@@ -45,7 +45,7 @@
         "target": "timeLimit",
         "result": "score",
         "settings": {
-            "timeLimit": 2
+            "timeLimit": 120
         }
     },
     "attacker": {
