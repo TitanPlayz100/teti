@@ -30,7 +30,7 @@ export class Game {
 
 
     constructor() {
-        this.boardEffects = new BoardEffects();
+        this.boardEffects = new BoardEffects(this);
         this.profilestats = new ProfileStats(this);
         this.stats = new GameStats(this);
         this.falling = new Falling(this);
@@ -100,6 +100,7 @@ export class Game {
 
     resetState() { // todo maybe refactor this to each class
         this.bag.nextPieces = [[], []];
+        this.boardEffects.hasPace = true;
         this.falling.location = [];
         this.falling.moved = false;
         this.falling.piece = null;

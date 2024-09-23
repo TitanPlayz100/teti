@@ -57,15 +57,20 @@ Feel free to contribute with features and issues.
 
 ## TODO list
 Things that I am working on based on other changes
-- add undo redo sfx and visuals
-- button click animations and better menu transitions
 - view lifetime stats and legacy stats in pb menu
 - show stats at end of each game
-- remove 4w pb replace with combo
 - ability to remove pbs
+- button click animations and better menu transitions
 - better loading screen with toast popup when assets load instead
 
 ## Updates
+#### v1.2.3
+- thanks itsblack6093 for out of focus text
+    - option to disable text
+- reorganised html with comments
+- add undo redo sfx and board shake
+- added pb and pace sfx
+
 #### v1.2.2
 - added different 4w residue (both 3 and 6 residue)
 - piece changes opacity as it locks
@@ -132,11 +137,13 @@ May or may not add these, kinda ordered by ease and desire for feature
 - finesse detection
 - allow importing tetrio settings and custom game files
 - show info when hovering over settings
+- small guide on essential things for game
 - more rotation systems (ars, trs, srs/srsX, none)
 - custom mino skins and music
 - replay functionality (either save gamestate or save keystrokes idk yet)
 - more unique gamemodes (techmino styled)
     - misdrop remover mode
+- WIKI for technical docs about project
 - guide like progression thing? using custom boards (kinda like tetris tres bien)
 - maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats
 - touch settings

@@ -520,7 +520,9 @@ button>img {
 }
 
 #nofocus {
-    opacity: 0;
+    font-family: "Montserrat", sans-serif;
+    display: none;
+    opacity: 1;
     text-align: center;
     position: fixed;
     left: 50%;

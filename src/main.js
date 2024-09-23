@@ -40,9 +40,10 @@ window.finishLoad = () => {
 }
 
 window.addEventListener("focus", function(){ 
-    document.getElementById("nofocus").style.opacity = 0;
+    document.getElementById("nofocus").style.display = "none";
 });
 
 window.addEventListener("blur", function(){ 
-    document.getElementById("nofocus").style.opacity = 1;
+    if (!game.settings.display.outoffocus) return
+    document.getElementById("nofocus").style.display = "block";
 });

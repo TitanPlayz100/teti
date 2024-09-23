@@ -296,7 +296,7 @@ export class Rendering {
         this.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
         this.game.boardEffects.move(0, 0);
         this.game.boardEffects.rotate(0);
-        this.game.boardEffects.rainbowBoard(this.game);
+        this.game.boardEffects.rainbowBoard();
         requestAnimationFrame(this.renderingLoop.bind(this))
     }
 

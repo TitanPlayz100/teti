@@ -11,11 +11,7 @@
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
-    <div id="splashScreen" onclick="finishLoad()">
-        <h1>Teti</h1>
-        <p id="splashText">loading code</p>
-        <p id="ignoreText" >Click to ignore</p>
-    </div>
+    <!-- BOARD -->
     <div id="board">
         <div id="backboard"></div>
         <div id="backborder"></div>
@@ -61,10 +57,77 @@
             <button class="redochoice selected">1</button>
             <button class="redochoice">2</button>
         </div>
-
+    </div>
+    
+    <!-- INFO OVERLAYS -->
+    <div id="splashScreen" onclick="finishLoad()">
+        <h1>Teti</h1>
+        <p id="splashText">loading code</p>
+        <p id="ignoreText" >Click to ignore</p>
     </div>
 
-    <div id="nofocus">OUT OF FOCUS<span>click to return</span></div>
+    <div id="nofocus">OUT OF FOCUS<span>Click To Return</span></div>
+
+    <!-- MAIN MENU / SETTINGS DIALOG -->
+    <dialog id="settingsPanel" class="dialog">
+        <!-- top row -->
+        <button id="handling" class="settingPanelButton smallPanelButton" onclick="modal.openModal('handlingDialog')" title="Change handling/tuning">
+            <img src="./assets/icons/handling.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <button id="volume" class="settingPanelButton smallPanelButton" onclick="modal.openModal('volumeDialog')" title="Change audio settings">
+            <img src="./assets/icons/volume.svg" style="transform: translateY(5%); height: 110%;">
+        </button>
+        <button id="goals" class="settingPanelButton smallPanelButton" onclick="modal.openModal('goalsDialog')" title="Change goals for gamemodes">
+            <img src="./assets/icons/goal.svg" style="transform: translateY(0%); height: 130%;">
+        </button>
+        <button id="competitive" class="settingPanelButton smallPanelButton" onclick="modal.openModal('competitiveDialog')" title="Toggle competitive mode and view PBs">
+            <img src="./assets/icons/medal.svg" style="transform: translateY(-8%); height: 140%;">
+        </button>
+        <br>
+
+        <!-- main row -->
+        <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="User Settings - Graphics, board, and background"> 
+            <img src="./assets/icons/display.svg" style="transform: translateY(10%); height: 70%;">
+        </button>
+        <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - Gameplay features and mechanics">
+            <img src="./assets/icons/settings.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <button id="control" class="settingPanelButton" onclick="modal.openModal('controlDialog')" title="Controls - keybinds for different actions">
+            <img src="./assets/icons/joystick.svg" style="transform: translateY(0%); height: 75%;">
+        </button>
+        <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
+            <img src="./assets/icons/timer.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <br>
+
+        <!-- bottom row -->
+        <p id='explanationText'><span class="spanright">Hover for info</span> | <span class="spanleft">Esc to close</span></p>
+        <br>
+        <p id='updatetext'>Check out the new update in the info button</p>
+        <br>
+
+        <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="window.location = './info.html'" title="See info about this project">
+            <img src="./assets/icons/info.svg" style="height: 80%;">
+        </button>
+        <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
+            <img src="./assets/icons/download.svg" style="transform: translateY(10%); height: 90%;">
+        </button>
+        <span id="uploadSettings" class="settingPanelButton smallPanelButton" style="height: 4.5vh; " onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
+            <input type="file" id="fileUpload" onchange="menu.uploadSettings(this)" hidden accept=".teti">
+            <img src="./assets/icons/upload.svg" style="transform: translateY(10%); height: 90%;">
+        </span>
+        <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="See the github page, star if you like it">
+            <img src="./assets/icons/github.svg" style="transform: translateY(-14%); height: 200%;">
+        </button>
+        <br>
+
+        <div id="songSelector">
+            <p id="songText">Not Playing</p>
+            <button id="pauseSong" onclick="songs.pauseSong()" class="settingPanelButton smallerPanelButton" title="Pause/Play"><img src="./assets/icons/pause.svg"/></button>
+            <progress id="songProgress" max=100 value=0></progress>
+            <button id="nextSong" onclick="songs.endSong(); songs.startSong();" class="settingPanelButton smallerPanelButton" title="Next Song"><img src="./assets/icons/next.svg" style="transform: translateY(-5%);"/></button>
+        </div>
+    </dialog>
 
     <dialog id="displayDialog" class="dialog">
         <h1>User Settings</h1>
@@ -82,8 +145,7 @@
         <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
         <div class="settingLayout"><label>Rainbow effect on fast pace</label> <input class="option check" type="checkbox" id="rainbowPB" /></div>
         <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
-        
-
+        <div class="settingLayout"><label>Show out of focus text</label> <input class="option check" type="checkbox" id="outoffocus" /></div>
         <p class="smalltextdialog">Press Esc to close without saving</p>
         <button class="closeDialog" onclick="modal.closeModal('displayDialog')">Save and close</button>
     </dialog>
@@ -93,7 +155,6 @@
         <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('game')">
             <img src="./assets/icons/reset.svg" alt="reset" height="100%">
         </button>
-        
         <div class="settingLayout"><label>Gravity</label> <input class="option range exp" oninput="menu.sliderChange(this)" type="range" id="gravitySpeed" min="0" max="100" step="1" /></div>
         <div class="settingLayout"><label>Lock delay</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="lockDelay" min="0" max="1000" step="10" /></div>
         <div class="settingLayout"><label>Lock Movements</label><input class="option range" oninput="menu.sliderChange(this)" type="range" id="maxLockMovements" min="0" max="30" step="1" /></div>
@@ -169,70 +230,38 @@
         <button class="closeDialog" onclick="modal.closeModal('volumeDialog')">Save and close</button>
     </dialog>
 
+    <dialog id="goalsDialog" class="dialog">
+        <h1>Change Goals</h1>
+        <div class="settingLayout"><label>Required Lines (sprint, lookahead)</label> <input class="option number" type="number" id="requiredLines" oninput="menu.checkValue(this, document.getElementById('limiter'))"/></div>
+        <div class="settingLayout"><label>Time Limit (ultra, survival)</label> <input class="option number" type="number" id="timeLimit" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Attack (attacker, backfire)</label> <input class="option number" type="number" id="requiredAttack" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Garbage Rows (digger)</label> <input class="option number" type="number" id="requiredGarbage" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>APM (survival)</label> <input class="option number" type="number" id="survivalRate" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Multiplier (backfire)</label> <input class="option number" type="number" id="backfireMulti" oninput="menu.checkValue(this, document.getElementById('limiter2'))" /></div>
+        <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Race Target</label> <input class="option number" type="number" id="raceTarget"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
 
-    <dialog id="gameEnd" class="dialog" onkeydown="menu.newGame(event.key, 'gameEnd')">
-        <h1 id="gameEndTitle"><b>GAME ENDED</b></h1>
-        <p id="reason" style="font-size: 3.6vh;"></p>
-        <p id="result"></p>
-        <button style="opacity: 0;" autofocus></button>
-        <button class="closeDialog" onclick="modal.closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
+        <button class="closeDialog" onclick="modal.closeModal('goalsDialog')">Save and Close</button>
     </dialog>
 
-    <dialog id="settingsPanel" class="dialog">
-        <button id="handling" class="settingPanelButton smallPanelButton" onclick="modal.openModal('handlingDialog')" title="Change handling/tuning">
-            <img src="./assets/icons/handling.svg" style="transform: translateY(10%); height: 90%;">
-        </button>
-        <button id="volume" class="settingPanelButton smallPanelButton" onclick="modal.openModal('volumeDialog')" title="Change audio settings">
-            <img src="./assets/icons/volume.svg" style="transform: translateY(5%); height: 110%;">
-        </button>
-        <button id="goals" class="settingPanelButton smallPanelButton" onclick="modal.openModal('goalsDialog')" title="Change goals for gamemodes">
-            <img src="./assets/icons/goal.svg" style="transform: translateY(0%); height: 130%;">
-        </button>
-        <button id="competitive" class="settingPanelButton smallPanelButton" onclick="modal.openModal('competitiveDialog')" title="Toggle competitive mode and view PBs">
-            <img src="./assets/icons/medal.svg" style="transform: translateY(-8%); height: 140%;">
-        </button>
-        <br>
+    <dialog id="competitiveDialog" class="dialog">
+        <h1>PBs and Competitive Mode</h1>
+        <div class="settingLayout"><label>Competitive Mode</label> <input class="option check" type="checkbox" id="competitiveMode" /></div>
 
-        <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="User Settings - Graphics, board, and background"> 
-            <img src="./assets/icons/display.svg" style="transform: translateY(10%); height: 70%;">
-        </button>
-        <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - Gameplay features and mechanics">
-            <img src="./assets/icons/settings.svg" style="transform: translateY(10%); height: 90%;">
-        </button>
-        <button id="control" class="settingPanelButton" onclick="modal.openModal('controlDialog')" title="Controls - keybinds for different actions">
-            <img src="./assets/icons/joystick.svg" style="transform: translateY(0%); height: 75%;">
-        </button>
-        <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
-            <img src="./assets/icons/timer.svg" style="transform: translateY(10%); height: 90%;">
-        </button>
-        <br>
+        <h3>Personal Bests</h3>
+        <div id="PBlist"></div>
+        <p style="margin-left: 1vw;">Click to download stats</p>
+        <p style="margin-left: 1vw;">Legacy stats stored safely, export coming soon</p>
+        <p style="margin-left: 1vw;">Lifetime stats stored, display coming soon</p>
+        <button class="closeDialog" onclick="modal.closeModal('competitiveDialog')">Save and Close</button>
+    </dialog>
 
-        <p id='explanationText'><span class="spanright">Hover for info</span> | <span class="spanleft">Esc to close</span></p>
-        <br>
-        <p id='updatetext'>Check out the new update in the info button</p>
-        <br>
 
-        <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="window.location = './info.html'" title="See info about this project">
-            <img src="./assets/icons/info.svg" style="height: 80%;">
-        </button>
-        <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
-            <img src="./assets/icons/download.svg" style="transform: translateY(10%); height: 90%;">
-        </button>
-        <span id="uploadSettings" class="settingPanelButton smallPanelButton" style="height: 4.5vh; " onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
-            <input type="file" id="fileUpload" onchange="menu.uploadSettings(this)" hidden accept=".teti">
-            <img src="./assets/icons/upload.svg" style="transform: translateY(10%); height: 90%;">
-        </span>
-        <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="See the github page, star if you like it">
-            <img src="./assets/icons/github.svg" style="transform: translateY(-14%); height: 200%;">
-        </button>
-        <br>
-
-        <div id="songSelector">
-            <p id="songText">Not Playing</p>
-            <button id="pauseSong" onclick="songs.pauseSong()" class="settingPanelButton smallerPanelButton" title="Pause/Play"><img src="./assets/icons/pause.svg"/></button>
-            <progress id="songProgress" max=100 value=0></progress>
-            <button id="nextSong" onclick="songs.endSong(); songs.startSong();" class="settingPanelButton smallerPanelButton" title="Next Song"><img src="./assets/icons/next.svg" style="transform: translateY(-5%);"/></button>
-        </div>
+    <!-- GAME MENUS -->
+    <dialog id="changeRangeValue" class="dialog">
+        <h1>Enter Value</h1>
+        <div class="settingLayout"><input class="option number" type="number" id="rangeValue" oninput="menu.checkValue(this)" /></div>
+        <button class="closeDialog" onclick="modal.closeModal('changeRangeValue')">Save</button>
     </dialog>
 
     <dialog id="queueModify" class="dialog">
@@ -240,12 +269,6 @@
         <div class="settingLayout"><label>Next</label> <input class="option textInput next" type="text" id="nextQueue" /></div>
         <div class="settingLayout"><label>Hold</label> <input class="option textInput hold" type="text" id="holdQueue" /></div>
         <button class="closeDialog" onclick="modal.closeModal('queueModify')">Save</button>
-    </dialog>
-
-    <dialog id="changeRangeValue" class="dialog">
-        <h1>Enter Value</h1>
-        <div class="settingLayout"><input class="option number" type="number" id="rangeValue" oninput="menu.checkValue(this)" /></div>
-        <button class="closeDialog" onclick="modal.closeModal('changeRangeValue')">Save</button>
     </dialog>
 
     <dialog id="editMenu" class="dialog">
@@ -274,7 +297,6 @@
                 <img src="./assets/icons/cleargarb.svg" style="height: 110%;">
             </button>
             <br>
-
             <button id="copyBoardString" class="settingPanelButton smallPanelButton" onclick="menu.getBoardString()" title="Copy current board">
                 <img src="./assets/icons/download.svg" style="transform: translateY(10%); height: 90%;">
             </button>
@@ -285,30 +307,12 @@
         <button class="closeDialog" onclick="modal.closeModal('editMenu')">Save and Close</button>
     </dialog>
 
-    <dialog id="goalsDialog" class="dialog">
-        <h1>Change Goals</h1>
-        <div class="settingLayout"><label>Required Lines (sprint, lookahead)</label> <input class="option number" type="number" id="requiredLines" oninput="menu.checkValue(this, document.getElementById('limiter'))"/></div>
-        <div class="settingLayout"><label>Time Limit (ultra, survival)</label> <input class="option number" type="number" id="timeLimit" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
-        <div class="settingLayout"><label>Attack (attacker, backfire)</label> <input class="option number" type="number" id="requiredAttack" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
-        <div class="settingLayout"><label>Garbage Rows (digger)</label> <input class="option number" type="number" id="requiredGarbage" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
-        <div class="settingLayout"><label>APM (survival)</label> <input class="option number" type="number" id="survivalRate" oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
-        <div class="settingLayout"><label>Multiplier (backfire)</label> <input class="option number" type="number" id="backfireMulti" oninput="menu.checkValue(this, document.getElementById('limiter2'))" /></div>
-        <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
-        <div class="settingLayout"><label>Race Target</label> <input class="option number" type="number" id="raceTarget"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
-
-        <button class="closeDialog" onclick="modal.closeModal('goalsDialog')">Save and Close</button>
-    </dialog>
-
-    <dialog id="competitiveDialog" class="dialog">
-        <h1>PBs and Competitive Mode</h1>
-        <div class="settingLayout"><label>Competitive Mode</label> <input class="option check" type="checkbox" id="competitiveMode" /></div>
-
-        <h3>Personal Bests</h3>
-        <div id="PBlist"></div>
-        <p style="margin-left: 1vw;">Click to download stats</p>
-        <p style="margin-left: 1vw;">Legacy stats stored safely, export coming soon</p>
-        <p style="margin-left: 1vw;">Lifetime stats stored, display coming soon</p>
-        <button class="closeDialog" onclick="modal.closeModal('competitiveDialog')">Save and Close</button>
+    <dialog id="gameEnd" class="dialog" onkeydown="menu.newGame(event.key, 'gameEnd')">
+        <h1 id="gameEndTitle"><b>GAME ENDED</b></h1>
+        <p id="reason" style="font-size: 3.6vh;"></p>
+        <p id="result"></p>
+        <button style="opacity: 0;" autofocus></button>
+        <button class="closeDialog" onclick="modal.closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
     </dialog>
 </body>
 </html>

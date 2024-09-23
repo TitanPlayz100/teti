@@ -54,6 +54,8 @@ export class History {
                 this.currentState = ind;
             }
         })
+        this.game.sounds.playSound("undo");
+        this.game.boardEffects.move(-3, 0);
         this.load()
     }
 
@@ -62,6 +64,8 @@ export class History {
         const connection = this.historyConnections[this.currentState];
         if (connection == undefined) return;
         this.currentState = this.selectedbranch || Math.max(...connection);
+        this.game.sounds.playSound("redo");
+        this.game.boardEffects.move(3, 0);
         this.load()
     }
 

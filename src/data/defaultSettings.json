@@ -10,7 +10,8 @@
         "colouredQueues": true,
         "lockBar": true,
         "rainbowPB": true,
-        "boardBounce": 1
+        "boardBounce": 1,
+        "outoffocus": true
     },
     "game": {
         "gravitySpeed": 950,

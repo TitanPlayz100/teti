@@ -38,6 +38,7 @@ export class ProfileStats {
             gameStatsKeys.forEach(key => gameStats[key] = this.game.stats[key])
             this.personalBests[gamemode] = { score, pbstats: gameStats, version: this.game.version };
             this.game.elementGameEndTitle.textContent = 'NEW PB!';
+            this.game.sounds.playSound("personalbest")
         }
     }
 

@@ -8,13 +8,19 @@ export class BoardEffects {
     targetX = 0;
     targetY = 0;
     R = 0;
-    dR = 0
-    targetR = 0
+    dR = 0;
+    targetR = 0;
+
+    hasPace = true;
 
     divBoard = document.getElementById("board");
     divDanger = document.getElementById("dangerOverlay");
     border = document.getElementById('backborder')
     backboard = document.getElementById('backboard')
+
+    constructor(game) {
+        this.game = game;
+    }
 
     move(forceX, forceY) {
         this.dX += forceX;
@@ -60,16 +66,17 @@ export class BoardEffects {
         return num
     }
 
-    rainbowBoard(game) {
-        const stats = game.stats;
-        const pbs = game.profilestats.personalBests;
-        const gamemode = game.settings.game.gamemode;
+    rainbowBoard() {
+        const stats = this.game.stats;
+        const pbs = this.game.profilestats.personalBests;
+        const gamemode = this.game.settings.game.gamemode;
 
-        if (!game.settings.display.rainbowPB) return;
+        if (!this.game.settings.display.rainbowPB) return;
         const reset = () => {
             this.border.style.setProperty('--blur-size', `0vmin`)
             this.border.style.setProperty('--blur-strength', '0')
             this.backboard.style.setProperty('--blur-strength', '0')
+            this.hasPace = false
         }
 
         if (stats.time < 0.5 || pbs[gamemode] == undefined) { reset(); return; }
@@ -78,11 +85,14 @@ export class BoardEffects {
         const pbpps = pbstats.pieceCount / pbstats.time;
 
         if (pps < pbpps) {
+            if (this.hasPace) this.game.sounds.playSound("pbend")
             reset()
         } else {
             this.border.style.setProperty('--blur-size', `0.3vmin`)
             this.border.style.setProperty('--blur-strength', '0.7vmin')
             this.backboard.style.setProperty('--blur-strength', '0.5vmin')
+            if (!this.hasPace) this.game.sounds.playSound("pbstart")
+            this.hasPace = true
         }
     }
 
