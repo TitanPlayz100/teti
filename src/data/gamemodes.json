@@ -45,7 +45,7 @@
         "target": "timeLimit",
         "result": "score",
         "settings": {
-            "timeLimit": 2
+            "timeLimit": 120
         }
     },
     "attacker": {
@@ -115,7 +115,8 @@
         "target": "raceTarget",
         "result": "time",
         "settings": {
-            "raceTarget": 500
+            "raceTarget": 500,
+            "gravitySpeed": 0
         }
     }
 }

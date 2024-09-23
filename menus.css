@@ -519,6 +519,27 @@ button>img {
     margin: 0;
 }
 
+#nofocus {
+    opacity: 0;
+    text-align: center;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid red;
+    color: red;
+    font-size: 2.5em;
+    padding: .2em;
+    background-color: #000A;
+    transition: 0.2s;
+}
+
+#nofocus span {
+    display: block;
+    color: #fff;
+    font-size: .6em;
+}
+
 
 @keyframes fadein {
     from {
