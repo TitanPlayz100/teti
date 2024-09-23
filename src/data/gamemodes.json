@@ -115,7 +115,8 @@
         "target": "raceTarget",
         "result": "time",
         "settings": {
-            "raceTarget": 500
+            "raceTarget": 500,
+            "gravitySpeed": 0
         }
     }
 }

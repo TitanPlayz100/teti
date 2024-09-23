@@ -38,3 +38,11 @@ window.finishLoad = () => {
     elementSplashScreen.style.scale = 1.2;
     elementSplashScreen.style.display = "none";
 }
+
+window.addEventListener("focus", function(){ 
+    document.getElementById("nofocus").style.opacity = 0;
+});
+
+window.addEventListener("blur", function(){ 
+    document.getElementById("nofocus").style.opacity = 1;
+});
