@@ -146,7 +146,7 @@ export class Modes {
     }
 
     getSuffix(mode) {
-        const modeinfo = gamemodeJSON[mode];
-        return resultSuffix[modeinfo.result];
+        const modeinfo = gamemodeJSON[mode] ?? {};
+        return resultSuffix[modeinfo.result] ?? " (legacy)";
     }
 }
