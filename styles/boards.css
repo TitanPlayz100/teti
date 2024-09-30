@@ -137,7 +137,7 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(15, 1fr);
-    height: 75%;
+    height: 79%;
     width: 40%;
     border-radius: 0 1.5vh 1.5vh 0;
     outline: 0.2vh solid var(--cl-blue);

@@ -7,6 +7,7 @@
             "nextPieces": 5,
             "allowLockout": false,
             "preserveARR": true,
+            "allowHold": true,
             "infiniteHold": false,
             "allowQueueModify": false,
             "allspin": false,

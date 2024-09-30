@@ -7,7 +7,8 @@ export class GameStats {
     pieceCount = 0;
     score = 0;
     pcs = 0;
-    tspins = 0;
+    quads = 0;
+    tspins = [0, 0, 0, 0];
     allspins = 0;
     level = 0;
 
@@ -26,15 +27,21 @@ export class GameStats {
     // calculated stats
     pps = 0;
     apm = 0;
-    vs = 0;
+    vs = 0; // tetrio versus score
+    lpm = 0; // lines per minute
     app = 0;
-    appw = 0;
+    apl = 0; // attack per line
+    appw = 0; // weighted attack per piece 
     ppb = 0;
-    dss = 0;
-    dsp = 0;
-    chzind = 0;
-    garbeff = 0;
-    vsOnApm = 0;
+    dss = 0; // garbage per second
+    dsp = 0; // garbage per piece
+    chzind = 0; // cheese index
+    garbeff = 0; // garbage efficiency
+    vsOnApm = 0; // vs / apm
+
+    // x piece efficiency
+    tpE = 0;
+    ipE = 0;
 
     // input stats
     inputs = 0;
@@ -42,16 +49,16 @@ export class GameStats {
     kpp = 0;
     holds = 0;
     rotates = 0;
-    
+
     clearCols = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // amount cleared in a col = clearCols[col - 1]
     clearPieces = { // lineclears by piece = clearPieces[piece][line_count - 1]
-        i:[0, 0, 0, 0],
-        j:[0, 0, 0, 0],
-        l:[0, 0, 0, 0],
-        o:[0, 0, 0, 0],
-        t:[0, 0, 0, 0], 
-        s:[0, 0, 0, 0],
-        z:[0, 0, 0, 0],
+        i: [0, 0, 0, 0],
+        j: [0, 0, 0, 0],
+        l: [0, 0, 0, 0],
+        o: [0, 0, 0, 0],
+        t: [0, 0, 0, 0],
+        s: [0, 0, 0, 0],
+        z: [0, 0, 0, 0],
     };
 
     /**
@@ -62,22 +69,28 @@ export class GameStats {
     }
 
     updateStats() {
-        this.time += 0.02;
+        this.time += 1 / this.game.tickrate;
 
         this.pps = this.pieceCount / this.time;
-        this.apm = this.attack / (this.time / 60);
-        this.vs = ((this.attack + this.cleargarbage) / (this.pieceCount)) * this.pps * 100 || 0;
+        this.apm = this.attack * 60 / this.time;
+        this.vs = (this.attack + this.cleargarbage) * 100 / this.time;
 
+        this.lpm = this.clearlines * 60 / this.time;
         this.app = this.attack / this.pieceCount || 0;
-        this.appw = this.app - 5 * Math.tan((this.cheeseIndex / -30) + 1) || 0;
+        this.apl = this.attack / this.clearlines || 0;
         this.ppb = this.score / this.pieceCount || 0;
-        this.dss = (this.vs / 100) - (this.apm / 60);
-        this.dsp = ((this.vs / 100) - (this.apm / 60)) / this.pps;
-        this.chzind = ((this.dsp * 150) + ((this.vs / this.apm) - 2) * 50 + (0.6 - this.app) * 125);
-        this.garbeff = ((this.app * this.dss) / this.pps) * 2;
+        this.dss = this.cleargarbage / this.time
+        this.dsp = this.cleargarbage / this.pieceCount || 0;
         this.vsOnApm = this.vs / this.apm || 0;
+        this.chzind = 25 * (this.dsp * 6 + this.vsOnApm * 2 - this.app * 5 - 1);
+        this.garbeff = this.app * this.dsp * 2;
+        this.appw = this.app - 5 * Math.tan(1 - this.chzind / 30) || 0;
         this.kps = this.inputs / this.time;
         this.kpp = this.inputs / this.pieceCount || 0;
+
+        this.tpE = this.tspins.reduce((a, b) => a + b, 0) * 700 / this.pieceCount || 0;
+        this.ipE = this.quads * 700 / this.pieceCount || 0;
+        // use of || 0 to not show NaN
     }
 
     checkInvis() {
@@ -89,12 +102,10 @@ export class GameStats {
     }
 
     updateBTB(isBTB, count) {
-        if (isBTB) {
-            this.btbCount++;
-        } else if (count != 0) {
-            if (this.btbCount > this.maxBTB) this.maxBTB = this.btbCount;
-            this.btbCount = -1;
-        }
+        this.btbCount = isBTB ?
+            this.btbCount + 1 :
+            count == 0 ? this.btbCount : -1;
+        if (this.btbCount > this.maxBTB) this.maxBTB = this.btbCount;
     }
 
 }

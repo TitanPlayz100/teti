@@ -20,6 +20,7 @@
         "nextPieces": 5,
         "allowLockout": false,
         "preserveARR": true,
+        "allowHold": true,
         "infiniteHold": true,
         "gamemode": "sprint",
         "requiredLines": 40,

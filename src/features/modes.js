@@ -1,17 +1,12 @@
 import { Game } from "../game.js";
 import gamemodeJSON from "../data/gamemodes.json" with { type: "json" };
+import { resultSuffix } from "../data/data.js";
 
 export class Modes {
     elementobjectives = document.getElementById("objective");
     divObjectiveText = document.getElementById("objectiveText");
     modeJSON;
     customSettings;
-
-    resultSuffix = {
-        time: 's',
-        score: ' Points',
-        maxCombo: ' Combo'
-    }
 
     /**
      * @param {Game} game 
@@ -36,7 +31,7 @@ export class Modes {
             stat = Math.round(stat * 1000) / 1000
             this.game.profilestats.setPB(Number(result));
             const text = this.statText(this.modeJSON.goalStat, stat, this.modeJSON.result, result)
-            const suffix = this.resultSuffix[this.modeJSON.result]
+            const suffix = resultSuffix[this.modeJSON.result]
             this.game.endGame(result + suffix, text);
         }
 
@@ -148,5 +143,10 @@ export class Modes {
 
     getGamemodeNames() {
         return Object.keys(gamemodeJSON).filter(key => key != "*");
+    }
+
+    getSuffix(mode) {
+        const modeinfo = gamemodeJSON[mode];
+        return resultSuffix[modeinfo.result];
     }
 }

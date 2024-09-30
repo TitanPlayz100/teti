@@ -107,11 +107,14 @@ export class Controls {
         clearInterval(this.timings.sd);
         if (this.game.settings.handling.sdarr == 0) {
             this.timings.sd = -1;
-            this.moves.movePieceDown(true);
+            this.moves.movePieceDown(true, true);
             return;
         }
         this.timings.sd = setInterval(
-            () => this.moves.movePieceDown(false),
+            () => {
+                this.moves.movePieceDown(false);
+                this.game.stats.score += 1;
+            },
             this.game.settings.handling.sdarr
         );
     }

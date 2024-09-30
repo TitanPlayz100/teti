@@ -71,7 +71,7 @@ export class Board {
             .toReversed();
     }
 
-    getCoords(array, filter, [dx, dy]) {
+    getCoords(array, filter, [dx, dy]) { // todo optimise
         const coords = [];
         array.forEach((row, y) =>
             row.forEach((col, x) => {

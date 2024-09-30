@@ -96,7 +96,7 @@ export class Mechanics {
         let randCol = Math.floor(Math.random() * 10);
         for (let i = 0; i < lines; i++) {
             if (this.game.movement.checkCollision(this.board.getMinos("A"), "DOWN")) {
-                if (this.locking.timings.lockdelay == 0) this.locking.incrementLock();
+                if (this.locking.timings.lockdelay == -1) this.locking.incrementLock();
                 this.board.moveMinos(this.board.getMinos("A"), "UP", 1);
             }
             this.board.moveMinos(this.board.getMinos("S"), "UP", 1);
@@ -110,7 +110,7 @@ export class Mechanics {
     }
 
     switchHold() {
-        if (this.game.hold.occured) return;
+        if (this.game.hold.occured || !this.game.settings.game.allowHold) return;
         this.locking.clearLockDelay();
         this.board.MinoToNone("A");
         this.isTspin = false;

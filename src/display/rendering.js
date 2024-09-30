@@ -15,6 +15,8 @@ export class Rendering {
     inDanger;
     minoSize;
     texttimeouts = {};
+    justPlacedCoords = [];
+    justPlacedAlpha = 1;
 
     canvasField = document.getElementById("playingfield");
     canvasNext = document.getElementById("next");
@@ -116,7 +118,8 @@ export class Rendering {
         );
         if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues)
             return;
-        this.canvasHold.style.outline = `0.2vh solid ${this.game.hold.piece.colour}`;
+        const colour = this.game.hold.occured ? "gray" : this.game.hold.piece.colour
+        this.canvasHold.style.outline = `0.2vh solid ${colour}`;
     }
 
     clearHold() {
@@ -203,11 +206,11 @@ export class Rendering {
 
     renderSidebar() {
         const stats = ['time', 'apm', 'pps'];
-        const fixedVal = [1, 1, 2];
+        const fixedVal = [2, 1, 2];
         const statsSecondary = ['attack', 'pieceCount'];
 
         stats.forEach((stat, index) => {
-            const displayStat = (Math.round(this.game.stats[stat] * 100) / 100).toFixed(fixedVal[index]);
+            const displayStat = (Math.round(this.game.stats[stat] * 1000) / 1000).toFixed(fixedVal[index]);
             this[`elementStats${index + 1}`].textContent = displayStat ?? 0;
         })
 
@@ -218,20 +221,24 @@ export class Rendering {
 
     updateAlpha() {
         if (this.game.settings.game.gamemode == 'lookahead') {
-            if (this.game.stats.checkInvis()) {
-                if (this.boardAlpha <= 0) {
-                    this.boardAlpha = 1;
-                    this.updateNext();
-                    this.updateHold();
+            const update = (type, amount) => {
+                if (this.game.stats.checkInvis()) {
+                    if (this[type] <= 0) {
+                        this[type] = 1;
+                        this.updateNext();
+                        this.updateHold();
+                    }
+                } else {
+                    if (this[type] > 0) {
+                        this[type] += -amount / this.game.tickrate;
+                        this.updateNext();
+                        this.updateHold();
+                    }
+                    if (this[type] <= 0) this[type] = 0;
                 }
-            } else {
-                if (this.boardAlpha > 0) {
-                    this.boardAlpha += -0.06;
-                    this.updateNext();
-                    this.updateHold();
-                }
-                if (this.boardAlpha <= 0) this.boardAlpha = 0;
             }
+            update("boardAlpha", 3)
+            update("justPlacedAlpha", 6)
         }
 
     }
@@ -254,14 +261,24 @@ export class Rendering {
                 const [posX, posY] = [x * this.minoSize, (yPosChange - y) * this.minoSize];
                 const cell = col.split(" ");
                 cntx.lineWidth = 1;
-                if (cell.includes("A") || cell.includes("S")) {
-                    // active piece or stopped piece
-                    if (this.divlock.value != 0 && cell.includes("A")) {
-                        cntx.globalAlpha = 1 - (this.divlock.value/250);
+                
+                if (cell.includes("A") || cell.includes("S")) { // active piece or stopped piece
+                    // opacity changes based on gamemode and lock timer
+                    if (this.divlock.value != 0 && cell.includes("A") && this.game.settings.game.gamemode != "lookahead") {
+                        cntx.globalAlpha = 1 - (this.divlock.value / 250);
                     }
+                    this.justPlacedCoords.forEach(([placedX, placedY]) => {
+                        if (placedX == x && placedY == y && cntx == this.ctx) {
+                            cntx.globalAlpha = this.justPlacedAlpha.toFixed(2);
+                        }
+                    })
+
                     cntx.fillStyle = cell.includes("G") // garbage piece
                         ? "gray"
                         : pieces.filter(p => p.name == cell[1])[0].colour;
+                    if (cntx == this.ctxH && this.game.hold.occured) {
+                        cntx.fillStyle = "gray";
+                    }
                     cntx.fillRect(posX + dx, posY + dy, this.minoSize, this.minoSize);
                     cntx.globalAlpha = this.boardAlpha.toFixed(2);
                 } else if (cell.includes("NP") && this.inDanger) {

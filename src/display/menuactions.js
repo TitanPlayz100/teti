@@ -159,7 +159,7 @@ export class MenuActions {
             return;
         }
         if (this.game.settings.game.gamemode != 'custom') return
-        
+
         this.menus.openModal("editMenu");
     }
 
@@ -193,5 +193,25 @@ export class MenuActions {
         const exportstring = this.game.boardeditor.convertToMap();
         navigator.clipboard.writeText(exportstring)
         alert("TETR.IO Map String (copied to clipboard):\n" + exportstring)
+    }
+
+    exportStats() {
+        let stats = {}
+        Object.getOwnPropertyNames(this.game.stats).forEach(key => {
+            if (key == "game") return;
+            stats[key] = this.game.stats[key];
+        })
+
+        let el = document.createElement("a");
+        el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(stats)));
+        el.setAttribute("download", "stats.json");
+        document.body.appendChild(el);
+        el.click();
+        document.body.removeChild(el);
+    }
+
+    closeStats() {
+        this.menus.closeDialog(document.getElementById("gameStatsDialog"));
+        this.game.modals.open = true;
     }
 }

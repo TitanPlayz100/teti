@@ -1,14 +1,9 @@
+import { lowerIsBetter } from "../data/data.js";
 import { Game } from "../game.js";
 
 export class ProfileStats {
     personalBests = {};
-
-    lowerData = {
-        time: true,
-        score: false,
-        maxCombo: false
-    }
-
+    notSaved = ['game', 'level', 'combo']
 
     /**
      * @param {Game} game 
@@ -27,7 +22,7 @@ export class ProfileStats {
         const gamemode = this.game.settings.game.gamemode
         const gamemodeStats = this.personalBests[gamemode] ?? {};
         const currentScore = Number(gamemodeStats.score);
-        const lower = this.lowerData[this.game.modes.modeJSON.result];
+        const lower = lowerIsBetter[this.game.modes.modeJSON.result];
 
         if (!this.game.settings.game.competitiveMode) return;
 
@@ -36,9 +31,10 @@ export class ProfileStats {
             gameStatsKeys = gameStatsKeys.filter(key => key != 'game')
             const gameStats = {};
             gameStatsKeys.forEach(key => gameStats[key] = this.game.stats[key])
-            this.personalBests[gamemode] = { score, pbstats: gameStats, version: this.game.version };
+            const ts = new Date().toJSON();
+            this.personalBests[gamemode] = { score, pbstats: gameStats, version: this.game.version, ts };
             this.game.elementGameEndTitle.textContent = 'NEW PB!';
-            this.game.sounds.playSound("personalbest")
+            setTimeout(() => this.game.sounds.playSound("personalbest"), 1000);
         }
     }
 
@@ -47,30 +43,35 @@ export class ProfileStats {
         this.personalBests = stats.pbs ?? {};
     }
 
+    removePB(mode) {
+        delete this.personalBests[mode];
+        this.saveSession();
+    }
+
     saveSession() {
         const prevstats = JSON.parse(localStorage.getItem("stats")) ?? {};
         const statsData = prevstats.lifetime ?? {};
 
         Object.getOwnPropertyNames(this.game.stats).forEach(key => {
-            const notSaved = ['game', 'level', 'combo']
-            if (notSaved.includes(key)) return;
-            if (key == 'clearCols') {
-                if (statsData[key] == undefined) statsData[key] = []
-                this.game.stats.clearCols.forEach((col, index) => {
+            if (this.notSaved.includes(key)) return;
+
+            if (key == 'clearCols' || key == 'tspins') {
+                if (statsData[key] == undefined || typeof statsData[key] != 'object') statsData[key] = []
+                this.game.stats[key].forEach((_, index) => {
                     if (statsData[key][index] == undefined) statsData[key][index] = 0
-                    statsData[key][index] += this.game.stats.clearCols[index];
+                    statsData[key][index] += this.game.stats[key][index];
                 });
                 return;
             }
             if (key == 'clearPieces') {
                 if (statsData[key] == undefined) {
-                    statsData[key] = this.game.stats.clearPieces;
+                    statsData[key] = this.game.stats[key];
                     return;
                 }
-                Object.keys(this.game.stats.clearPieces).forEach(piece => {
-                    this.game.stats.clearPieces[piece].forEach((lineclear, index) => {
+                Object.keys(this.game.stats[key]).forEach(piece => {
+                    this.game.stats[key][piece].forEach((_, index) => {
                         if (statsData[key][piece] == undefined) statsData[key][piece] = [0, 0, 0, 0];
-                        statsData[key][piece][index] += this.game.stats.clearPieces[piece][index];
+                        statsData[key][piece][index] += this.game.stats[key][piece][index];
                     });
                 });
                 return;

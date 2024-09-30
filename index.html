@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="./assets/titanicon.ico">
     <title>teti</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="./boards.css">
-    <link rel="stylesheet" href="./menus.css">
+    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="stylesheet" href="./styles/boards.css">
+    <link rel="stylesheet" href="./styles/menus.css">
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
@@ -161,6 +161,7 @@
         <div class="settingLayout"><label>Next Pieces</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="nextPieces" min="0" max="5" step="1" /></div>
         <div class="settingLayout"><label>Lockout Deaths</label> <input class="option check" type="checkbox" id="allowLockout" /></div>
         <div class="settingLayout"><label>Preserve DAS</label> <input class="option check" type="checkbox" id="preserveARR" /></div>
+        <div class="settingLayout"><label>Allow Hold Queue</label> <input class="option check" type="checkbox" id="allowHold" /></div>
         <div class="settingLayout"><label>Infinite Hold</label> <input class="option check" type="checkbox" id="infiniteHold" /></div>
         <div class="settingLayout"><label>Allow Queue Modification</label> <input class="option check" type="checkbox" id="allowQueueModify" /></div>
         <div class="settingLayout"><label>Allspin</label> <input class="option check" type="checkbox" id="allspin" /></div>
@@ -250,8 +251,7 @@
 
         <h3>Personal Bests</h3>
         <div id="PBlist"></div>
-        <p style="margin-left: 1vw;">Click to download stats</p>
-        <p style="margin-left: 1vw;">Legacy stats stored safely, export coming soon</p>
+        <p style="margin-left: 1vw;">Click to save PB</p>
         <p style="margin-left: 1vw;">Lifetime stats stored, display coming soon</p>
         <button class="closeDialog" onclick="modal.closeModal('competitiveDialog')">Save and Close</button>
     </dialog>
@@ -311,8 +311,19 @@
         <h1 id="gameEndTitle"><b>GAME ENDED</b></h1>
         <p id="reason" style="font-size: 3.6vh;"></p>
         <p id="result"></p>
+        <button id="seeStats" class="closeDialog" onclick="modal.openModal('gameStatsDialog')">See Stats</button>
         <button style="opacity: 0;" autofocus></button>
         <button class="closeDialog" onclick="modal.closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
+    </dialog>
+
+    <dialog id="gameStatsDialog" class="dialog">
+        <h1>Game Stats</h1>
+        <div style="display: flex; align-items: center; flex-direction: column; gap:1vh">
+            <button onclick="menu.exportStats()" class="closeDialog statButtons">Export Stats</button>
+            <button onclick="menu.closeStats()" class="closeDialog statButtons">Back</button>
+            <hr width="100%" style="margin: 2vh; opacity: 0.5;">
+            <div id="startStatsList"></div>
+        </div>
     </dialog>
 </body>
 </html>

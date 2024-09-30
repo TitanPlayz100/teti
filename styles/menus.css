@@ -32,7 +32,8 @@ button>img {
     outline: none;
 }
 
-.settingPanelButton:disabled, .smallPanelButton:disabled {
+.settingPanelButton:disabled,
+.smallPanelButton:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -152,8 +153,14 @@ button>img {
 
 #gameEnd {
     text-align: center;
-    height: 30vh;
-    aspect-ratio: 1.5/1;
+    height: 35vh;
+    aspect-ratio: 1.3/1;
+}
+
+#gameStatsDialog {
+    aspect-ratio: 1/1.6;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .dialog.closingAnimation {
@@ -301,6 +308,21 @@ button>img {
     transition: all 0.4s ease;
 }
 
+#seeStats {
+    position: relative;
+    right:unset;
+    margin-left: 8%;
+    font-size: 1em;
+    padding: 0.5vmin;
+}
+
+.statButtons {
+    position: relative;
+    right: unset;
+    font-size: 1em;
+    margin: 0.5vmin;
+}
+
 .gamemodeSelect,
 .customGameAction {
     outline: none;
@@ -423,20 +445,26 @@ button>img {
     text-align: right;
 }
 
-#explanationText, #updatetext {
+.statText,
+#explanationText,
+#updatetext {
     display: flex;
     margin: 0;
     opacity: 0.4;
 }
 
-#explanationText>.spanright {
+.statText {
+    opacity: 1;
+}
+
+.spanright {
     flex: 1;
     text-align: right;
     padding-right: 1vw;
     width: 15vw;
 }
 
-#explanationText>.spanleft {
+.spanleft {
     flex: 1;
     padding-left: 1vw;
 }
@@ -510,13 +538,31 @@ button>img {
 
 .pbbox {
     display: flex;
-    justify-content:center;
-    align-items:baseline;
+    justify-content: space-evenly;
+    align-items: baseline;
     gap: 2vw;
     background-color: rgba(172, 183, 232, 0.095);
 }
+
 .pbbox>h2 {
     margin: 0;
+    pointer-events: none;
+}
+
+.pbbox>button {
+    height: 4vh;
+    aspect-ratio: 1/1;
+    border: 0.3vh solid var(--l-gray);
+    color: var(--cl-blue);
+    border-radius: 1vmin;
+    transition: all 0.1s ease-out;
+    background-color: var(--invis);
+    padding: 0.5vh;
+    outline: none;
+}
+
+.pbbox>button:hover {
+    border: 0.3vh solid var(--cl-blue);
 }
 
 #nofocus {

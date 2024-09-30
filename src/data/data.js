@@ -54,6 +54,29 @@ export const spinChecks = [
     ],
 ];
 
+export const lowerIsBetter = {
+    time: true,
+    score: false,
+    maxCombo: false
+}
+
+export const pbTrackingStat = {
+    clearlines: "pps",
+    time: "score",
+    attack: "apm",
+    cleargarbage: "dss",
+    combo: "maxCombo",
+    level: "pps"
+}
+
+
+export const resultSuffix = {
+    time: 's',
+    score: ' Points',
+    maxCombo: ' Combo'
+}
+
+
 // const sfx = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx")
 // const combo = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx/combo")
 // const songs = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/songs")

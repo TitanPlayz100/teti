@@ -64,8 +64,8 @@ export class ClearLines {
             (this.mech.isMini ? "mini " : "") +
             cleartypes[Math.min(linecount, 5)]; // limit to 5 line clear
         this.game.stats.updateBTB(isBTB, linecount);
-        if (linecount == 0) this.game.stats.maxCombo = this.game.stats.combo;
         this.game.stats.combo = linecount == 0 ? -1 : this.game.stats.combo + 1;
+        if (this.game.stats.combo > this.game.stats.maxCombo) this.game.stats.maxCombo = this.game.stats.combo;
         const damage = this.calcDamage(
             this.game.stats.combo,
             damagetype.toUpperCase().trim(),
@@ -82,8 +82,9 @@ export class ClearLines {
         this.game.stats.clearlines += linecount;
         this.game.stats.attack += damage;
         this.mech.spikeCounter += damage;
+        this.game.stats.quads += linecount >= 4 ? 1 : 0;
         this.game.stats.pcs += isPC ? 1 : 0;
-        this.game.stats.tspins += this.mech.isTspin ? 1 : 0;
+        if (this.mech.isTspin) this.game.stats.tspins[linecount]++;
         this.game.stats.allspins += this.mech.isAllspin ? 1 : 0;
         this.game.stats.level += levellingTable[linecount];
         if (linecount > 0)

@@ -22,7 +22,8 @@ export class Game {
     ended;
     gameTimer = 0; // id of timeout
     survivalTimer = 0; // id of timeout
-    version = '1.2.1';
+    version = '1.2.4';
+    tickrate = 50;
 
     elementReason = document.getElementById("reason");
     elementResult = document.getElementById("result");
@@ -50,6 +51,7 @@ export class Game {
         this.modes = new Modes(this);
 
         this.rendering.sizeCanvas();
+        this.rendering.setEditPieceColours();
         this.sounds.initSounds();
         this.startGame();
         this.rendering.renderingLoop();
@@ -72,6 +74,7 @@ export class Game {
         clearInterval(this.mechanics.gravityTimer);
         clearInterval(this.gameTimer);
         clearInterval(this.survivalTimer);
+        this.mechanics.locking.lockingPause();
     }
 
     endGame(top, bottom = "Better luck next time") {
@@ -138,7 +141,6 @@ export class Game {
     gameClock() {
         this.rendering.renderSidebar();
         this.modes.checkFinished();
-        this.rendering.setEditPieceColours();
         this.stats.updateStats();
         this.rendering.updateAlpha();
     }

@@ -13,8 +13,9 @@ export class Movement {
     firstMovement() {
         this.mechs.startGravity();
         this.game.started = true;
-        this.game.gameTimer = setInterval(() => this.game.gameClock(), 20);
+        this.game.gameTimer = setInterval(() => this.game.gameClock(), (1000 / this.game.tickrate));
         this.game.modes.startSurvival();
+        this.game.mechanics.locking.lockingResume();
     }
 
     checkCollision(coords, action, collider) {
@@ -119,7 +120,7 @@ export class Movement {
         if (this.game.settings.game.gravitySpeed == 0) this.mechs.startGravity();
     }
 
-    movePieceDown(sonic) {
+    movePieceDown(sonic, scoring = false) {
         const minos = this.game.board.getMinos("A");
         if (this.checkCollision(minos, "DOWN")) return;
         this.game.board.moveMinos(minos, "DOWN", 1);
@@ -127,13 +128,13 @@ export class Movement {
         this.game.mechanics.isAllspin = false;
         this.mechs.isMini = false;
         this.game.falling.updateLocation([0, -1]);
-        this.game.stats.score += 1;
         if (this.checkCollision(this.game.board.getMinos("A"), "DOWN")) {
             this.game.mechanics.locking.scheduleLock();
             this.game.rendering.bounceBoard("DOWN");
             this.game.controls.startArr("current");
         }
-        if (sonic) this.movePieceDown(true);
+        if (scoring && sonic) this.game.stats.score += 1;
+        if (sonic) this.movePieceDown(true, scoring);
     }
 
     harddrop() {
@@ -147,7 +148,7 @@ export class Movement {
         }
         this.game.board.moveMinos(minos, "DOWN", amount);
         this.game.falling.updateLocation([0, -amount]);
-        this.game.stats.score += 2;
+        this.game.stats.score += 2 * amount;
         this.game.sounds.playSound("harddrop");
         this.game.rendering.bounceBoard('DOWN');
         this.game.mechanics.locking.lockPiece();

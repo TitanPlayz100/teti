@@ -1,3 +1,6 @@
+import { pbTrackingStat } from "../data/data.js";
+import { Game } from "../game.js";
+
 export class BoardEffects {
     X = 0;
     Y = 0;
@@ -12,12 +15,16 @@ export class BoardEffects {
     targetR = 0;
 
     hasPace = true;
-
+    
     divBoard = document.getElementById("board");
     divDanger = document.getElementById("dangerOverlay");
     border = document.getElementById('backborder')
     backboard = document.getElementById('backboard')
 
+    /**
+     * 
+     * @param {Game} game 
+     */
     constructor(game) {
         this.game = game;
     }
@@ -71,20 +78,20 @@ export class BoardEffects {
         const pbs = this.game.profilestats.personalBests;
         const gamemode = this.game.settings.game.gamemode;
 
-        if (!this.game.settings.display.rainbowPB) return;
-        const reset = () => {
+        const reset = () => { // todo dont fire this all the time
             this.border.style.setProperty('--blur-size', `0vmin`)
             this.border.style.setProperty('--blur-strength', '0')
             this.backboard.style.setProperty('--blur-strength', '0')
             this.hasPace = false
         }
 
+        if (!this.game.settings.display.rainbowPB || !this.game.settings.game.competitiveMode) return;
         if (stats.time < 0.5 || pbs[gamemode] == undefined) { reset(); return; }
-        let pps = stats.pieceCount / stats.time;
-        const pbstats = pbs[gamemode].pbstats;
-        const pbpps = pbstats.pieceCount / pbstats.time;
 
-        if (pps < pbpps) {
+        const trackingStat = pbTrackingStat[this.game.modes.modeJSON.goalStat];
+        const current = stats[trackingStat];
+        const pbpace = pbs[gamemode].pbstats[trackingStat];
+        if (current < pbpace) {
             if (this.hasPace) this.game.sounds.playSound("pbend")
             reset()
         } else {

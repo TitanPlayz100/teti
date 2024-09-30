@@ -7,6 +7,10 @@ export class LockPiece {
     lockCount;
     timings = { lockdelay: 0, lockingTimer: 0 }
 
+    startTime = 0;
+    remaining = 0;
+
+
     /**
      * @param {Game} game
      * @param {Mechanics} mechanics
@@ -40,22 +44,43 @@ export class LockPiece {
             return;
         }
         if (this.game.settings.game.lockDelay == 0) {
-            this.timings.lockdelay = -1;
+            // this.timings.lockdelay = 0;
             return;
         }
+
+        this.lockDelayStart(this.game.settings.game.lockDelay);
+    }
+
+    lockDelayStart(delay) {
+        clearTimeout(this.timings.lockdelay);
+        clearInterval(this.timings.lockingTimer);
+        this.startTime = Date.now();
         this.timings.lockdelay = setTimeout(
             () => this.mechanics.locking.lockPiece(),
-            this.game.settings.game.lockDelay
+            delay
         );
         this.timings.lockingTimer = setInterval(() => {
             const amountToAdd = 1000 / this.game.settings.game.lockDelay;
             if (this.game.settings.display.lockBar) this.divLockTimer.value += amountToAdd;
         }, 10);
+    }
 
+    lockingPause() {
+        if (this.timings.lockdelay == 0) return;
+        this.remaining = this.game.settings.game.lockDelay - (Date.now() - this.startTime);
+        clearTimeout(this.timings.lockdelay);
+        clearInterval(this.timings.lockingTimer);
+    }
+
+    lockingResume() {
+        if (this.timings.lockdelay == 0) return;
+        this.lockDelayStart(this.remaining);
     }
 
     lockPiece() {
         const lockCoords = this.mechanics.board.getMinos("A");
+        this.game.rendering.justPlacedCoords = lockCoords;
+        this.game.rendering.justPlacedAlpha = 1;
         this.mechanics.board.getMinos("A").forEach(([x, y]) => {
             this.mechanics.board.rmValue([x, y], "A");
             this.mechanics.board.addValFront([x, y], "S");
@@ -96,10 +121,4 @@ export class LockPiece {
         clearTimeout(this.timings[name]);
         this.timings[name] = 0;
     }
-
-    stopInterval(name) {
-        clearInterval(this.timings[name]);
-        this.timings[name] = 0;
-    }
-
 }

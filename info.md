@@ -58,12 +58,22 @@ Feel free to contribute with features and issues.
 ## TODO list
 Things that I am working on based on other changes
 - view lifetime stats and legacy stats in pb menu
-- show stats at end of each game
-- ability to remove pbs
-- button click animations and better menu transitions
-- better loading screen with toast popup when assets load instead
+- customise stat sidebar
 
 ## Updates
+#### v1.2.4
+- added button to delete pbs
+- changed pb border effect to be based on better tracked stats (like apm for attacker)
+- made pausing pause locking timer
+- maxBTB and maxCombo update properly
+- added more stats and dates to saving stats
+- hold piece now turns gray when it cannot be used
+- lookahead piece now flashes when placed
+- fixed scoring with softdrop and harddrop
+- reorganised styles pages
+- stats are shown at end of each game, can export stats
+- game option to disable hold piece
+
 #### v1.2.3
 - thanks itsblack6093 for out of focus text
     - option to disable text
@@ -132,9 +142,10 @@ Things that I am working on based on other changes
 
 ## Feature Wishlist
 May or may not add these, kinda ordered by ease and desire for feature
-- more stats + customise stat sidebar
 - more garbage settings
 - finesse detection
+- ui button animations and better scrolling menus
+- better loading screen with toast popup when assets load instead
 - allow importing tetrio settings and custom game files
 - show info when hovering over settings
 - small guide on essential things for game
