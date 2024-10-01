@@ -55,7 +55,7 @@ export class History {
             }
         })
         this.game.sounds.playSound("undo");
-        this.game.boardEffects.move(-1, 0);
+        this.game.boardeffects.move(-1, 0);
         this.load()
     }
 
@@ -65,7 +65,7 @@ export class History {
         if (connection == undefined) return;
         this.currentState = this.selectedbranch || Math.max(...connection);
         this.game.sounds.playSound("redo");
-        this.game.boardEffects.move(1, 0);
+        this.game.boardeffects.move(1, 0);
         this.load()
     }
 
@@ -182,7 +182,7 @@ export class History {
         })
         this.game.board.boardState = board;
         this.game.bag.nextPieces = [next.split(","), []];
-        this.game.hold.piece = this.game.rendering.getPiece(hold);
+        this.game.hold.piece = this.game.renderer.getPiece(hold);
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
     }
 

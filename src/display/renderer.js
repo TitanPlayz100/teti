@@ -1,9 +1,7 @@
 import { Game } from "../game.js";
-import { toHex } from "../util.js";
 import pieces from "../data/pieces.json" with { type: "json" };
 
-export class Rendering {
-    boardAlpha;
+export class Renderer {
     boardHeight;
     boardWidth;
     holdHeight;
@@ -13,10 +11,7 @@ export class Rendering {
     holdQueueGrid = [];
     nextQueueGrid = [];
     inDanger;
-    minoSize;
     texttimeouts = {};
-    justPlacedCoords = [];
-    justPlacedAlpha = 1;
 
     canvasField = document.getElementById("playingfield");
     canvasNext = document.getElementById("next");
@@ -55,7 +50,7 @@ export class Rendering {
         });
         this.divBoard.style.width = `${this.canvasField.width}px`;
         this.divBoard.style.height = `${this.canvasField.height / 2}px`;
-        this.minoSize = this.canvasField.width / 10;
+        this.game.boardrender.minoSize = this.canvasField.width / 10;
         this.boardWidth = this.canvasField.offsetWidth;
         this.boardHeight = this.canvasField.offsetHeight;
         this.nextWidth = this.canvasNext.offsetWidth;
@@ -77,7 +72,7 @@ export class Rendering {
                 .pieceToCoords(piece.shape1)
                 .forEach(([x, y]) => (this.nextQueueGrid[y + dy][x + dx] = "A " + pn));
         });
-        this.renderToCanvas(
+        this.game.boardrender.renderToCanvas(
             this.ctxN,
             this.nextQueueGrid,
             15,
@@ -106,9 +101,9 @@ export class Rendering {
         const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
         const coords = this.board.pieceToCoords(this.game.hold.piece.shape1);
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
-        const len = Math.round(this.minoSize / 2);
+        const len = Math.round(this.game.boardrender.minoSize / 2);
         const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
-        this.renderToCanvas(
+        this.game.boardrender.renderToCanvas(
             this.ctxH,
             this.holdQueueGrid,
             2,
@@ -131,7 +126,7 @@ export class Rendering {
             this.game.board.getMinos("S").some(c => c[1] > 16) &&
             this.game.settings.game.gamemode != 'combo';
         if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
-        this.game.boardEffects.toggleDangerBoard(condition)
+        this.game.boardeffects.toggleDangerBoard(condition)
         this.inDanger = condition;
     }
 
@@ -223,18 +218,18 @@ export class Rendering {
         if (this.game.settings.game.gamemode == 'lookahead') {
             const update = (type, amount) => {
                 if (this.game.stats.checkInvis()) {
-                    if (this[type] <= 0) {
-                        this[type] = 1;
+                    if (this.game.boardrender[type] <= 0) {
+                        this.game.boardrender[type] = 1;
                         this.updateNext();
                         this.updateHold();
                     }
                 } else {
-                    if (this[type] > 0) {
-                        this[type] += -amount / this.game.tickrate;
+                    if (this.game.boardrender[type] > 0) {
+                        this.game.boardrender[type] += -amount / this.game.tickrate;
                         this.updateNext();
                         this.updateHold();
                     }
-                    if (this[type] <= 0) this[type] = 0;
+                    if (this.game.boardrender[type] <= 0) this.game.boardrender[type] = 0;
                 }
             }
             update("boardAlpha", 3)
@@ -251,83 +246,17 @@ export class Rendering {
         })
     }
 
-    divlock = document.getElementById("lockTimer");
-    // board rendering
-    renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
-        cntx.globalAlpha = this.boardAlpha.toFixed(2);
-        cntx.clearRect(0, 0, width, height);
-        grid.forEach((row, y) => {
-            row.forEach((col, x) => {
-                const [posX, posY] = [x * this.minoSize, (yPosChange - y) * this.minoSize];
-                const cell = col.split(" ");
-                cntx.lineWidth = 1;
-                
-                if (cell.includes("A") || cell.includes("S")) { // active piece or stopped piece
-                    // opacity changes based on gamemode and lock timer
-                    if (this.divlock.value != 0 && cell.includes("A") && this.game.settings.game.gamemode != "lookahead") {
-                        cntx.globalAlpha = 1 - (this.divlock.value / 250);
-                    }
-                    this.justPlacedCoords.forEach(([placedX, placedY]) => {
-                        if (placedX == x && placedY == y && cntx == this.ctx) {
-                            cntx.globalAlpha = this.justPlacedAlpha.toFixed(2);
-                        }
-                    })
-
-                    cntx.fillStyle = cell.includes("G") // garbage piece
-                        ? "gray"
-                        : pieces.filter(p => p.name == cell[1])[0].colour;
-                    if (cntx == this.ctxH && this.game.hold.occured) {
-                        cntx.fillStyle = "gray";
-                    }
-                    cntx.fillRect(posX + dx, posY + dy, this.minoSize, this.minoSize);
-                    cntx.globalAlpha = this.boardAlpha.toFixed(2);
-                } else if (cell.includes("NP") && this.inDanger) {
-                    // next piece overlay
-                    cntx.fillStyle = "#ff000020";
-                    cntx.fillRect(posX, posY, this.minoSize, this.minoSize);
-                } else if (cell.includes("Sh")) {
-                    // shadow piece
-                    const colour = this.game.settings.display.colouredShadow
-                        ? this.game.falling.piece.colour
-                        : "#ffffff";
-                    cntx.fillStyle = colour + toHex(this.game.settings.display.shadowOpacity);
-                    cntx.fillRect(posX, posY, this.minoSize, this.minoSize);
-                } else if (y < 20 && this.game.settings.display.showGrid && cntx == this.ctx) {
-                    // grid
-                    cntx.strokeStyle = "#ffffff" + toHex(this.game.settings.display.gridopacity);
-                    cntx.beginPath();
-                    cntx.roundRect(
-                        posX,
-                        posY,
-                        this.minoSize - 1,
-                        this.minoSize - 1,
-                        this.minoSize / 4
-                    );
-                    cntx.stroke();
-                }
-            });
-        });
-    }
-
-    renderingLoop() {
-        this.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
-        this.game.boardEffects.move(0, 0);
-        this.game.boardEffects.rotate(0);
-        this.game.boardEffects.rainbowBoard();
-        requestAnimationFrame(this.renderingLoop.bind(this))
-    }
-
     bounceBoard(direction) {
         const force = Number(this.game.settings.display.boardBounce);
         switch (direction) {
             case "LEFT":
-                this.game.boardEffects.move(-force, 0);
+                this.game.boardeffects.move(-force, 0);
                 break;
             case "RIGHT":
-                this.game.boardEffects.move(force, 0);
+                this.game.boardeffects.move(force, 0);
                 break;
             case "DOWN":
-                this.game.boardEffects.move(0, force);
+                this.game.boardeffects.move(0, force);
                 break;
         }
     }
@@ -336,11 +265,18 @@ export class Rendering {
         const force = Number(this.game.settings.display.boardBounce) * 0.5;
         switch (type) {
             case "CW":
-                this.game.boardEffects.rotate(force);
+                this.game.boardeffects.rotate(force);
                 break;
             case "CCW":
-                this.game.boardEffects.rotate(-force);
+                this.game.boardeffects.rotate(-force);
                 break;
         }
+    }
+
+    renderingLoop() {
+        this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
+        this.game.boardeffects.move(0, 0);
+        this.game.boardeffects.rotate(0);
+        setTimeout(() => requestAnimationFrame(this.renderingLoop.bind(this)), 1);
     }
 }

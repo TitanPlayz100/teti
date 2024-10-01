@@ -6,9 +6,9 @@ import { Mechanics } from "./mechanics/mechanics.js";
 import { MenuActions } from "./display/menuactions.js";
 import { ModalActions } from "./display/modals.js";
 import { Movement } from "./movement/movement.js";
-import { Rendering } from "./display/rendering.js";
+import { Renderer } from "./display/renderer.js";
 import { Settings } from "./features/settings.js";
-import { Sounds } from "./features/sound.js";
+import { Sounds } from "./features/sounds.js";
 import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./features/stats.js";
 import { BoardEditor } from "./display/editboard.js";
@@ -16,6 +16,7 @@ import { History } from "./features/history.js";
 import { BoardEffects } from "./display/boardEffects.js";
 import { ProfileStats } from "./features/profileStats.js";
 import { Modes } from "./features/modes.js";
+import { BoardRenderer } from "./display/renderBoard.js";
 
 export class Game {
     started;
@@ -23,7 +24,7 @@ export class Game {
     gameTimer = 0; // id of timeout
     survivalTimer = 0; // id of timeout
     version = '1.2.4';
-    tickrate = 50;
+    tickrate = 60;
 
     elementReason = document.getElementById("reason");
     elementResult = document.getElementById("result");
@@ -31,7 +32,7 @@ export class Game {
 
 
     constructor() {
-        this.boardEffects = new BoardEffects(this);
+        this.boardeffects = new BoardEffects(this);
         this.profilestats = new ProfileStats(this);
         this.stats = new GameStats(this);
         this.falling = new Falling(this);
@@ -44,17 +45,18 @@ export class Game {
         this.menuactions = new MenuActions(this);
         this.modals = new ModalActions(this);
         this.movement = new Movement(this);
-        this.rendering = new Rendering(this);
+        this.renderer = new Renderer(this);
+        this.boardrender = new BoardRenderer(this);
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
         this.history = new History(this);
         this.modes = new Modes(this);
 
-        this.rendering.sizeCanvas();
-        this.rendering.setEditPieceColours();
+        this.renderer.sizeCanvas();
+        this.renderer.setEditPieceColours();
         this.sounds.initSounds();
         this.startGame();
-        this.rendering.renderingLoop();
+        this.renderer.renderingLoop();
         this.boardeditor.addListeners();
         this.menuactions.addRangeListener();
         this.versionChecker();
@@ -65,7 +67,7 @@ export class Game {
     startGame() {
         this.menuactions.loadSettings();
         this.resetState();
-        this.rendering.renderStyles();
+        this.renderer.renderStyles();
         this.mechanics.spawnPiece(this.bag.randomiser(), true);
         this.history.save();
     }
@@ -103,7 +105,8 @@ export class Game {
 
     resetState() { // todo maybe refactor this to each class
         this.bag.nextPieces = [[], []];
-        this.boardEffects.hasPace = true;
+        this.boardeffects.hasPace = true;
+        this.boardeffects.paceCooldown = 0;
         this.falling.location = [];
         this.falling.moved = false;
         this.falling.piece = null;
@@ -118,8 +121,8 @@ export class Game {
         this.mechanics.isMini = false;
         this.mechanics.isTspin = false;
         this.mechanics.spikeCounter = 0;
-        this.rendering.boardAlpha = 1;
-        this.rendering.inDanger = false;
+        this.boardrender.boardAlpha = 1;
+        this.renderer.inDanger = false;
 
         this.started = false;
         this.ended = false;
@@ -133,16 +136,18 @@ export class Game {
         })
         this.board.resetBoard();
         this.mechanics.locking.clearLockDelay();
-        this.rendering.renderDanger();
+        this.renderer.renderDanger();
         this.gameClock();
-        this.rendering.clearHold();
+        this.renderer.clearHold();
+        this.boardeffects.toggleRainbow(false);
     }
 
     gameClock() {
-        this.rendering.renderSidebar();
+        this.renderer.renderSidebar();
         this.modes.checkFinished();
         this.stats.updateStats();
-        this.rendering.updateAlpha();
+        this.renderer.updateAlpha();
+        this.boardeffects.rainbowBoard(); // todo maybe check performance
     }
 
     versionChecker() {

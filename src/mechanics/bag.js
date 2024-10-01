@@ -54,7 +54,7 @@ export class Bag {
             .split("")
             .filter(p => names.includes(p));
         this.shuffleRemainingPieces();
-        this.game.rendering.updateNext();
+        this.game.renderer.updateNext();
 
         this.game.mechanics.locking.clearLockDelay();
         this.game.board.MinoToNone("A");

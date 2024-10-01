@@ -1,5 +1,5 @@
 import { Game } from "../game.js";
-import { toExpValue } from "../util.js";
+import { toExpValue } from "./modals.js";
 
 export class MenuActions {
     bindingKey;
@@ -126,13 +126,13 @@ export class MenuActions {
     }
 
     toggleDialog() {
-        if (this.game.modals.open) {
-            document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
-            if (this.game.started && !this.game.ended) this.game.movement.firstMovement();
-
-        } else {
+        if (this.game.menuactions.bindingKey != undefined) return;
+        if (!this.game.modals.open) {
             this.menus.openModal("settingsPanel");
+            return;
         }
+        document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
+        if (this.game.started && !this.game.ended) this.game.movement.firstMovement();
     }
 
     checkValue(el, el2 = this.game.modals.selectedRangeElement) {
@@ -185,7 +185,7 @@ export class MenuActions {
         const { board, next, hold } = this.game.boardeditor.convertFromMap(input);
         this.game.board.boardState = board;
         this.game.bag.nextPieces = [next.split(","), []];
-        this.game.hold.piece = this.game.rendering.getPiece(hold);
+        this.game.hold.piece = this.game.renderer.getPiece(hold);
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
     }
 

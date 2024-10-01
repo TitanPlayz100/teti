@@ -36,8 +36,8 @@ export class Mechanics {
         if (this.game.ended) return;
         this.game.falling.spawn(piece);
         this.spawnOverlay();
-        this.game.rendering.updateNext();
-        this.game.rendering.updateHold();
+        this.game.renderer.updateNext();
+        this.game.renderer.updateHold();
         this.setShadow();
         this.locking.incrementLock();
         const rows =
@@ -130,8 +130,8 @@ export class Mechanics {
         }
         if (!this.game.settings.game.infiniteHold) this.game.hold.occured = true;
         this.game.sounds.playSound("hold");
-        this.game.rendering.renderDanger();
+        this.game.renderer.renderDanger();
         this.startGravity();
-        this.game.rendering.updateHold();
+        this.game.renderer.updateHold();
     }
 }

@@ -61,6 +61,13 @@ Things that I am working on based on other changes
 - customise stat sidebar
 
 ## Updates
+### v1.3.0
+- changed tick rate to 60 for consistency
+- seperated board rendering out to be more readable
+- tweaks to controls for readability and also hopefully performance 
+- removed util class
+- pb pace cooldown
+
 #### v1.2.4
 - added button to delete pbs
 - changed pb border effect to be based on better tracked stats (like apm for attacker)

@@ -11,11 +11,13 @@ export class Movement {
     }
 
     firstMovement() {
-        this.mechs.startGravity();
         this.game.started = true;
-        this.game.gameTimer = setInterval(() => this.game.gameClock(), (1000 / this.game.tickrate));
+        this.mechs.startGravity();
         this.game.modes.startSurvival();
         this.game.mechanics.locking.lockingResume();
+        this.game.gameTimer = setInterval(() =>
+            this.game.gameClock(), (1000 / this.game.tickrate)
+        );
     }
 
     checkCollision(coords, action, collider) {
@@ -94,7 +96,7 @@ export class Movement {
         if (this.game.settings.game.gravitySpeed == 0) this.mechs.startGravity();
         this.game.controls.startArr("current");
         this.game.controls.checkSD();
-        if (this.mechs.isTspin || this.mechs.isAllspin) this.game.rendering.rotateBoard(type);
+        if (this.mechs.isTspin || this.mechs.isAllspin) this.game.renderer.rotateBoard(type);
     }
 
     movePieceSide(direction, max = 1) {
@@ -103,7 +105,7 @@ export class Movement {
         let amount = 0;
         const check = dx => !this.checkCollision(minos.map(([x, y]) => [x + dx, y]), direction);
         while (check(amount) && Math.abs(amount) < max) direction == "RIGHT" ? amount++ : amount--;
-        if (!check(amount)) this.game.rendering.bounceBoard(direction);
+        if (!check(amount)) this.game.renderer.bounceBoard(direction);
         if (amount == 0) {
             this.game.controls.stopInterval("arr");
             return;
@@ -130,7 +132,7 @@ export class Movement {
         this.game.falling.updateLocation([0, -1]);
         if (this.checkCollision(this.game.board.getMinos("A"), "DOWN")) {
             this.game.mechanics.locking.scheduleLock();
-            this.game.rendering.bounceBoard("DOWN");
+            this.game.renderer.bounceBoard("DOWN");
             this.game.controls.startArr("current");
         }
         if (scoring && sonic) this.game.stats.score += 1;
@@ -150,7 +152,7 @@ export class Movement {
         this.game.falling.updateLocation([0, -amount]);
         this.game.stats.score += 2 * amount;
         this.game.sounds.playSound("harddrop");
-        this.game.rendering.bounceBoard('DOWN');
+        this.game.renderer.bounceBoard('DOWN');
         this.game.mechanics.locking.lockPiece();
     }
 }

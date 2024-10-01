@@ -1,5 +1,4 @@
 import { Game } from "../game.js";
-import { toExpValue, toLogValue } from "../util.js";
 
 export class ModalActions {
     open;
@@ -66,6 +65,59 @@ export class ModalActions {
         return type;
     }
 
+    closeModal(id) {
+        this.getOptions(id).forEach(setting => {
+            let settingType = this.getSettingType(id);
+            let val = setting.value;
+            if (setting.classList[1] == "number" && val == "") val = this.selectedRangeElement.min;
+            if (setting.classList[1] == "check") val = setting.checked;
+            if (setting.classList[1] == "keybind") {
+                val = setting.textContent.length > 1
+                    ? setting.textContent
+                    : setting.textContent.toLowerCase();
+            }
+            if (setting.classList[2] == "exp") val = toExpValue(val);
+            if (setting.id == "nextQueue") this.game.bag.setQueue(val, this.pieceNames);
+            if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
+            if (setting.id == "rowfillmode") this.game.boardeditor.fillRow = val;
+            if (setting.id == "override") this.game.boardeditor.override = val;
+
+            if (id == "changeRangeValue") {
+                this.selectedRangeElement.value = document.getElementById("rangeValue").value;
+                this.actions.sliderChange(this.selectedRangeElement);
+            }
+            if (setting.id == "audioLevel") this.game.sounds.setAudioLevel();
+
+            if (!this.game.settings.hasOwnProperty(settingType)) return;
+            this.game.settings[settingType][setting.id] = val;
+        });
+
+        this.closeDialog(document.getElementById(id));
+        if (id != 'changeRangeValue' && id != "frontdrop" && this.game.started && !this.game.ended)
+            this.game.movement.firstMovement();
+        this.actions.saveSettings();
+        if (id == "displayDialog") this.game.renderer.renderStyles();
+
+        const restartMenus = ["gameDialog", "gamemodeDialog", "gameEnd", "goalsDialog", "competitiveDialog"];
+        if (restartMenus.includes(id)) this.game.startGame();
+        if (id == "changeRangeValue") this.open = true;
+    }
+
+    closeDialog(element) {
+        this.closing = true //track if the closing animation is still ongoing
+        const closingAnimation = () => {
+            element.removeEventListener("animationend", closingAnimation);
+            element.classList.remove("closingAnimation");
+            element.close();
+            this.closing = false
+        };
+        this.open = false;
+        this.game.sounds.toggleSongMuffle(this.open);
+        element.classList.add("closingAnimation");
+        element.addEventListener("animationend", closingAnimation);
+    }
+
+    // GENERATE MENUS
     generateGamemodeMenu() {
         this.game.modes.getGamemodeNames().forEach(name => {
             const setting = this.game.modes.getGamemodeJSON(name);
@@ -152,56 +204,12 @@ export class ModalActions {
             this.statsStart.parentNode.insertBefore(statItem, this.statsStart);
         })
     }
+}
 
-    closeModal(id) {
-        this.getOptions(id).forEach(setting => {
-            let settingType = this.getSettingType(id);
-            let val = setting.value;
-            if (setting.classList[1] == "number" && val == "") val = this.selectedRangeElement.min;
-            if (setting.classList[1] == "check") val = setting.checked;
-            if (setting.classList[1] == "keybind") {
-                val = setting.textContent.length > 1
-                    ? setting.textContent
-                    : setting.textContent.toLowerCase();
-            }
-            if (setting.classList[2] == "exp") val = toExpValue(val);
-            if (setting.id == "nextQueue") this.game.bag.setQueue(val, this.pieceNames);
-            if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
-            if (setting.id == "rowfillmode") this.game.boardeditor.fillRow = val;
-            if (setting.id == "override") this.game.boardeditor.override = val;
+function toLogValue(y) {
+    return Math.round(Math.log2(y + 1) * 10);
+}
 
-            if (id == "changeRangeValue") {
-                this.selectedRangeElement.value = document.getElementById("rangeValue").value;
-                this.actions.sliderChange(this.selectedRangeElement);
-            }
-            if (setting.id == "audioLevel") this.game.sounds.setAudioLevel();
-
-            if (!this.game.settings.hasOwnProperty(settingType)) return;
-            this.game.settings[settingType][setting.id] = val;
-        });
-
-        this.closeDialog(document.getElementById(id));
-        if (id != 'changeRangeValue' && id != "frontdrop" && this.game.started && !this.game.ended)
-            this.game.movement.firstMovement();
-        this.actions.saveSettings();
-        if (id == "displayDialog") this.game.rendering.renderStyles();
-
-        const restartMenus = ["gameDialog", "gamemodeDialog", "gameEnd", "goalsDialog", "competitiveDialog"];
-        if (restartMenus.includes(id)) this.game.startGame();
-        if (id == "changeRangeValue") this.open = true;
-    }
-
-    closeDialog(element) {
-        this.closing = true //track if the closing animation is still ongoing
-        const closingAnimation = () => {
-            element.removeEventListener("animationend", closingAnimation);
-            element.classList.remove("closingAnimation");
-            element.close();
-            this.closing = false
-        };
-        this.open = false;
-        this.game.sounds.toggleSongMuffle(this.open);
-        element.classList.add("closingAnimation");
-        element.addEventListener("animationend", closingAnimation);
-    }
+export function toExpValue(x) {
+    return Math.round(Math.pow(2, 0.1 * x) - 1);
 }

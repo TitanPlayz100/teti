@@ -9,8 +9,13 @@ const elementSplashScreen = document.getElementById("splashScreen");
 const elementSplashText = document.getElementById("splashText");
 
 window.addEventListener("keydown", event => {
-    game.controls.onKeyDown(event);
-    game.controls.onKeyDownRepeat(event);
+    let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
+    if (event.altKey) key = "Alt+" + key;
+    if (event.ctrlKey) key = "Ctrl+" + key;
+    
+    game.controls.onKeyDownRepeat(event, key);
+    if (event.repeat) return;
+    game.controls.onKeyDown(event, key);
 })
 
 window.addEventListener("keyup", event => {

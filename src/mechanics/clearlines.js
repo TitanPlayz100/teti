@@ -29,7 +29,7 @@ export class ClearLines {
             this.mech.board.moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1);
         }
         this.game.modes.diggerAddGarbage(removedGarbage);
-        if (clearRows.length > 0) this.game.rendering.bounceBoard("DOWN");
+        if (clearRows.length > 0) this.game.renderer.bounceBoard("DOWN");
 
         clearCoords.forEach(([x, y]) => {
             if (clearRows.includes(y)) this.game.stats.clearCols[x]++;
@@ -92,7 +92,7 @@ export class ClearLines {
 
         this.manageGarbageSent(damage);
         if (this.mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
-        this.game.rendering.renderActionText(damagetype, isBTB, isPC, damage, linecount);
+        this.game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);
     }
 
     manageGarbageSent(damage) {
