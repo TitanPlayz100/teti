@@ -59,6 +59,8 @@ Feel free to contribute with features and issues.
 Things that I am working on based on other changes
 - view lifetime stats and legacy stats in pb menu
 - customise stat sidebar
+- particle options
+- customise skin and maybe audio as well
 
 ## Updates
 ### v1.3.0
@@ -67,6 +69,11 @@ Things that I am working on based on other changes
 - tweaks to controls for readability and also hopefully performance 
 - removed util class
 - pb pace cooldown
+- PIECE SKINS!
+    - will add way to custom add own skins
+- PARTICLES!!!
+    - feedback on performance would be nice
+    - will add particle options soon as well
 
 #### v1.2.4
 - added button to delete pbs

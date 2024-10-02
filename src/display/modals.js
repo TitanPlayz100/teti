@@ -144,7 +144,7 @@ export class ModalActions {
     }
 
     renderPBs() {
-        const previous = [...document.getElementsByClassName("pbbox")] ?? [];
+        const previous = [...document.getElementsByClassName("pbbox")];
         previous.forEach(el => el.remove());
 
         const pbs = this.game.profilestats.personalBests;
@@ -181,7 +181,7 @@ export class ModalActions {
     }
 
     displayStats() {
-        const previous = [...document.getElementsByClassName("statText")] ?? [];
+        const previous = [...document.getElementsByClassName("statText")];
         previous.forEach(el => el.remove());
 
         const stats = Object.getOwnPropertyNames(this.game.stats);

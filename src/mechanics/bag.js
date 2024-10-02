@@ -58,15 +58,16 @@ export class Bag {
 
         this.game.mechanics.locking.clearLockDelay();
         this.game.board.MinoToNone("A");
-        this.isTspin = false;
-        this.isAllspin = false;
-        this.isMini = false;
+        this.game.mechanics.isTspin = false;
+        this.game.mechanics.isAllspin = false;
+        this.game.mechanics.isMini = false;
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
         this.game.history.save();
     }
 
-    firstNextPiece() {
-        return this.nextPieces[0]
-            .concat(this.nextPieces[1])[0]
+    nextPiece() {
+        return pieces.filter(
+            p => p.name == this.nextPieces[0].concat(this.nextPieces[1])[0]
+        )[0];
     }
 }

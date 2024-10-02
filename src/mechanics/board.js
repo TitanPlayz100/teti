@@ -71,14 +71,14 @@ export class Board {
             .toReversed();
     }
 
-    getCoords(array, filter, [dx, dy]) { // todo optimise
+    getCoords(array, filter, [dx, dy]) {
         const coords = [];
         array.forEach((row, y) =>
             row.forEach((col, x) => {
-                if (filter(col)) coords.push([x, y]);
+                if (filter(col)) coords.push([x + dx, y + dy]);
             })
         );
-        return coords.map(([x, y]) => [x + dx, y + dy]);
+        return coords;
     }
 
     moveMinos(coords, dir, size, value = "") {

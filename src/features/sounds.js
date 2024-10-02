@@ -75,7 +75,6 @@ export class Sounds {
 
         // preload all sfx
         sfxobj.forEach(file => {
-            if (file.type == "dir") return;
             const name = file.name.split(".")[0];
             this.sfx[name] = new Audio(file.path);
         })

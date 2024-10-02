@@ -171,8 +171,6 @@ export class History {
     convertFromMapCompressed(string) {
         let [board, next, hold] = string.split("?");
         board = this.decompress(board);
-        if (board.length > 400) {
-        }
         board = board.match(/.{1,10}/g).toReversed().map(row => {
             return row.split("").map(col => {
                 col = col.replace("#", "G").replace("_", "")

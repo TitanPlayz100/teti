@@ -26,7 +26,7 @@ export class ProfileStats {
 
         if (!this.game.settings.game.competitiveMode) return;
 
-        if (isNaN(currentScore) || currentScore == undefined || (lower && score < currentScore) || (!lower && score > currentScore)) {
+        if (isNaN(currentScore) || (lower && score < currentScore) || (!lower && score > currentScore)) {
             let gameStatsKeys = Object.getOwnPropertyNames(this.game.stats)
             gameStatsKeys = gameStatsKeys.filter(key => key != 'game')
             const gameStats = {};

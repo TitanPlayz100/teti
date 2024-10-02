@@ -2,7 +2,7 @@ import pieces from "../data/pieces.json" with { type: "json" };
 import { Game } from "../game.js";
 
 export class BoardRenderer {
-    boardAlpha;
+    boardAlpha = 1;
     justPlacedCoords = [];
     justPlacedAlpha = 1;
     minoSize;
@@ -30,23 +30,31 @@ export class BoardRenderer {
         return 1;
     }
 
-    getPieceColour(name, cntx) {
-        if (cntx == this.game.renderer.ctxH && this.game.hold.occured) name = "G";
-        let colours = { "G": "gray" };
-        pieces.forEach(piece => colours[piece.name] = piece.colour)
-        return colours[name];
-    }
-
-    getShadowColour() {
-        let colour = "#ffffff";
-        if (this.game.settings.display.colouredShadow) colour = this.game.falling.piece.colour;
-        const hex = this.toHex(this.game.settings.display.shadowOpacity);
-        return colour + hex;
-    }
-
     toHex(num) {
         const hex = Math.round((+num * 255) / 100).toString(16);
         return hex.length > 1 ? hex : 0 + hex;
+    }
+
+    texture;
+    loadImage() {
+        this.texture = new Image(372, 30);
+        this.texture.src = '../assets/skins/tetrio.png';
+        this.texture.onload = () => {
+            this.game.renderer.updateNext();
+        }
+    }
+
+    getPiece(cntx, cell) {
+        return this.game.hold.occured && cntx == this.game.renderer.ctxH ? "hold" : cell;
+    }
+
+    getTexture(name) {
+        const pieces = ["z", "l", "o", "s", "i", "j", "t", "shadow", "hold", "g", "darkg", "topout"]
+        const x = pieces.indexOf(name.toLowerCase()) * 31;
+        const y = 0;
+        const width = 30;
+        const height = 30;
+        return { x, y, width, height };
     }
 
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
@@ -60,16 +68,19 @@ export class BoardRenderer {
 
                 if (cell.includes("A") || cell.includes("S")) { // active piece or stopped piece
                     cntx.globalAlpha = this.getOpacity(cell, cntx, x, y);
-                    cntx.fillStyle = this.getPieceColour(cell[1], cntx);
-                    cntx.fillRect(posX + dx, posY + dy, this.minoSize, this.minoSize);
+                    const p = this.getTexture(this.getPiece(cntx, cell[1]));
+                    cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
                 }
                 else if (cell.includes("NP") && this.game.renderer.inDanger) { // next piece overlay
-                    cntx.fillStyle = "#ff000020";
-                    cntx.fillRect(posX, posY, this.minoSize, this.minoSize);
+                    cntx.globalAlpha = 0.32;
+                    const p = this.getTexture("topout");
+                    cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
                 }
                 else if (cell.includes("Sh")) { // shadow piece
-                    cntx.fillStyle = this.getShadowColour();
-                    cntx.fillRect(posX, posY, this.minoSize, this.minoSize);
+                    cntx.globalAlpha = this.game.settings.display.shadowOpacity / 100
+                    const piece = this.game.settings.display.colouredShadow ? this.game.falling.piece.name : "shadow";
+                    const p = this.getTexture(piece);
+                    cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
                 }
                 else if (y < 20 && this.game.settings.display.showGrid && cntx == this.game.renderer.ctx) { // grid
                     cntx.strokeStyle = "#ffffff" + this.toHex(this.game.settings.display.gridopacity);

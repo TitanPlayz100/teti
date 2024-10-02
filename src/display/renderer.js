@@ -61,29 +61,19 @@ export class Renderer {
 
     updateNext() {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
-        const first5 = this.game.bag.getFirstFive();
-        first5.forEach((name, idx) => {
-            const piece = this.getPiece(name),
-                pn = piece.name;
-            let dx = 0,
-                dy = 3 * (4 - idx);
-            if (pn == "o") [dx, dy] = [dx + 1, dy + 1];
-            this.board
-                .pieceToCoords(piece.shape1)
-                .forEach(([x, y]) => (this.nextQueueGrid[y + dy][x + dx] = "A " + pn));
+
+        const next5 = this.game.bag.getFirstFive();
+        next5.forEach((name, idx) => {
+            const piece = this.getPiece(name);
+            let [dx, dy] = [0, 3 * (4 - idx)];
+            if (piece.name == "o") [dx, dy] = [dx + 1, dy + 1]; // shift o piece
+            const coords = this.board.pieceToCoords(piece.shape1);
+            coords.forEach(([x, y]) => (this.nextQueueGrid[y + dy][x + dx] = "A " + piece.name));
         });
-        this.game.boardrender.renderToCanvas(
-            this.ctxN,
-            this.nextQueueGrid,
-            15,
-            [0, 0],
-            this.nextWidth,
-            this.nextHeight
-        );
+
+        this.game.boardrender.renderToCanvas(this.ctxN, this.nextQueueGrid, 15, [0, 0], this.nextWidth, this.nextHeight);
         if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
-        this.canvasNext.style.outlineColor = pieces.filter(
-            e => e.name == first5[0]
-        )[0].colour;
+        this.canvasNext.style.outlineColor = this.game.bag.nextPiece().colour;
     }
 
     getPiece(name) {
@@ -93,26 +83,21 @@ export class Renderer {
 
     updateHold() {
         this.holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ""));
-        this.ctxH.clearRect(0, 0, this.canvasHold.offsetWidth + 10, this.canvasHold.offsetHeight);
+        this.clearHold();
         if (this.game.hold.piece == undefined) return;
+
         const name = this.game.hold.piece.name;
         const isO = name == "o",
             isI = name == "i";
         const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
         const coords = this.board.pieceToCoords(this.game.hold.piece.shape1);
+
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
         const len = Math.round(this.game.boardrender.minoSize / 2);
         const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
-        this.game.boardrender.renderToCanvas(
-            this.ctxH,
-            this.holdQueueGrid,
-            2,
-            [shiftX, shiftY],
-            this.holdWidth,
-            this.holdHeight
-        );
-        if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues)
-            return;
+
+        this.game.boardrender.renderToCanvas(this.ctxH, this.holdQueueGrid, 2, [shiftX, shiftY], this.holdWidth, this.holdHeight);
+        if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
         const colour = this.game.hold.occured ? "gray" : this.game.hold.piece.colour
         this.canvasHold.style.outline = `0.2vh solid ${colour}`;
     }
@@ -123,8 +108,8 @@ export class Renderer {
 
     renderDanger() {
         const condition =
-            this.game.board.getMinos("S").some(c => c[1] > 16) &&
-            this.game.settings.game.gamemode != 'combo';
+            this.game.board.getMinos("S").some(c => c[1] > 16) && // any mino if above row 16
+            this.game.settings.game.gamemode != 'combo'; // not combo mode
         if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
         this.game.boardeffects.toggleDangerBoard(condition)
         this.inDanger = condition;
@@ -143,6 +128,7 @@ export class Renderer {
         if (this.game.mechanics.spikeCounter >= 10) this.spikePattern("red", 1.1);
         if (this.game.mechanics.spikeCounter >= 20) this.spikePattern("lime", 1.2);
 
+        // audio
         if (isPC) this.game.sounds.playSound("allclear");
         if (this.game.stats.btbCount == 2 && isBTB) this.game.sounds.playSound("btb_1");
         if (linecount >= 4 && this.game.stats.btbCount > 0) {
@@ -158,10 +144,13 @@ export class Renderer {
         }
         if (this.game.mechanics.spikeCounter >= 15) this.game.sounds.playSound("thunder", false);
         if (this.game.stats.combo > 0)
-            this.game.sounds.playSound(
-                `combo_${this.game.stats.combo > 16 ? 16 : this.game.stats.combo
-                }`
-            );
+            this.game.sounds.playSound(`combo_${this.game.stats.combo > 16 ? 16 : this.game.stats.combo}`);
+    }
+
+    resetActionText() {
+        ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
+            document.getElementById(id).style.opacity = "0";
+        })
     }
 
     spikePattern(colour, size) {
@@ -169,7 +158,6 @@ export class Renderer {
         this.divLinesSent.style.textShadow = `0 0 1vh ${colour}`;
         this.divLinesSent.style.fontSize = `${3.5 * size}vh`;
     }
-
 
     setText(id, text, duration) {
         const textbox = document.getElementById(id);
@@ -206,7 +194,7 @@ export class Renderer {
 
         stats.forEach((stat, index) => {
             const displayStat = (Math.round(this.game.stats[stat] * 1000) / 1000).toFixed(fixedVal[index]);
-            this[`elementStats${index + 1}`].textContent = displayStat ?? 0;
+            this[`elementStats${index + 1}`].textContent = displayStat;
         })
 
         statsSecondary.forEach((stat, index) => {
@@ -248,35 +236,29 @@ export class Renderer {
 
     bounceBoard(direction) {
         const force = Number(this.game.settings.display.boardBounce);
-        switch (direction) {
-            case "LEFT":
-                this.game.boardeffects.move(-force, 0);
-                break;
-            case "RIGHT":
-                this.game.boardeffects.move(force, 0);
-                break;
-            case "DOWN":
-                this.game.boardeffects.move(0, force);
-                break;
-        }
+        const forces = { "LEFT": [-force, 0], "RIGHT": [force, 0], "DOWN": [0, force], };
+        this.game.boardeffects.move(forces[direction]);
     }
 
     rotateBoard(type) {
         const force = Number(this.game.settings.display.boardBounce) * 0.5;
-        switch (type) {
-            case "CW":
-                this.game.boardeffects.rotate(force);
-                break;
-            case "CCW":
-                this.game.boardeffects.rotate(-force);
-                break;
-        }
+        const forces = { "CW": force, "CCW": -force }
+        this.game.boardeffects.rotate(forces[type]);
     }
 
     renderingLoop() {
         this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
         this.game.boardeffects.move(0, 0);
         this.game.boardeffects.rotate(0);
-        setTimeout(() => requestAnimationFrame(this.renderingLoop.bind(this)), 1);
+        this.game.particles.update();
+        this.dangerParticles();
+        setTimeout(() =>
+            requestAnimationFrame(this.renderingLoop.bind(this)), 1);
+    }
+
+    dangerParticles() {
+        if (!this.inDanger) return;
+        this.game.particles.spawnParticles(0, 0, "dangerboard");
+        this.game.particles.spawnParticles(0, 20, "dangersides");
     }
 }

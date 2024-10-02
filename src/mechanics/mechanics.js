@@ -5,13 +5,11 @@ import pieces from "../data/pieces.json" with { type: "json" };
 
 export class Mechanics {
     board;
-    isTspin;
-    isAllspin;
-    isMini;
-    garbageQueue;
-    spikeCounter;
-    gravityTimer = 0;
-    
+    isTspin = false;
+    isAllspin = false;
+    isMini = false;
+    garbageQueue = 0;
+    spikeCounter = 0;
 
     /**
      * @param {Game} game
@@ -19,8 +17,8 @@ export class Mechanics {
     constructor(game) {
         this.game = game;
         this.board = game.board;
-        this.clear = new ClearLines(this, game); 
-        this.locking = new LockPiece(this, game);
+        this.clear = new ClearLines(game);
+        this.locking = new LockPiece(game);
     }
 
     checkDeath(coords, collider) {
@@ -40,12 +38,7 @@ export class Mechanics {
         this.game.renderer.updateHold();
         this.setShadow();
         this.locking.incrementLock();
-        const rows =
-            this.game.settings.game.requiredGarbage < 10
-                ? this.game.settings.game.requiredGarbage
-                : 10;
-        if (this.game.stats.getRemainingGarbage() > 0 && start && this.game.settings.game.gamemode == 'digger')
-            this.addGarbage(rows);
+        this.game.modes.diggerGarbageSet(start);
         this.game.modes.set4WCols(start);
         if (this.game.settings.game.preserveARR) this.game.controls.startArr("current");
         if (this.game.started) this.startGravity();
@@ -53,9 +46,7 @@ export class Mechanics {
 
     spawnOverlay() {
         this.board.MinoToNone("NP");
-        const next = pieces.filter(
-            p => p.name == this.game.bag.firstNextPiece()
-        )[0];
+        const next = this.game.bag.nextPiece();
         const x = next.name == "o" ? 4 : 3;
         const y = next.name == "o" ? 21 : next.name == "i" ? 19 : 20;
         this.board.pieceToCoords(next.shape1, [x, y]).forEach(([x, y]) => this.board.addValue([x, y], "NP"));
@@ -68,25 +59,20 @@ export class Mechanics {
         coords.forEach(([x, y]) => this.board.addValue([x, y], "Sh"));
         let count = 0;
         const shadow = this.board.getMinos("Sh");
-        while (
-            !this.game.movement.checkCollision(
-                shadow.map(c => [c[0], c[1] - count]),
-                "DOWN"
-            )
-        )
+        while (!this.game.movement.checkCollision(shadow.map(c => [c[0], c[1] - count]), "DOWN"))
             count++;
         this.board.moveMinos(shadow, "DOWN", count, "Sh");
     }
 
     startGravity() {
-        clearInterval(this.gravityTimer);
+        clearInterval(this.game.gravityTimer);
         if (this.game.settings.game.gravitySpeed > 1000) return;
         if (this.game.settings.game.gravitySpeed == 0) {
             this.game.movement.movePieceDown(true);
             return;
         }
         this.game.movement.movePieceDown(false);
-        this.gravityTimer = setInterval(
+        this.game.gravityTimer = setInterval(
             () => this.game.movement.movePieceDown(false),
             this.game.settings.game.gravitySpeed
         );

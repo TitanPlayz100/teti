@@ -1,7 +1,7 @@
 import { Bag } from "./mechanics/bag.js";
 import { Board } from "./mechanics/board.js";
 import { Controls } from "./movement/controls.js";
-import { Hold } from "./movement/hold.js";
+import { Hold } from "./mechanics/hold.js";
 import { Mechanics } from "./mechanics/mechanics.js";
 import { MenuActions } from "./display/menuactions.js";
 import { ModalActions } from "./display/modals.js";
@@ -17,12 +17,14 @@ import { BoardEffects } from "./display/boardEffects.js";
 import { ProfileStats } from "./features/profileStats.js";
 import { Modes } from "./features/modes.js";
 import { BoardRenderer } from "./display/renderBoard.js";
+import { Particles } from "./display/particles.js";
 
 export class Game {
     started;
     ended;
     gameTimer = 0; // id of timeout
     survivalTimer = 0; // id of timeout
+    gravityTimer = 0;
     version = '1.2.4';
     tickrate = 60;
 
@@ -47,21 +49,24 @@ export class Game {
         this.movement = new Movement(this);
         this.renderer = new Renderer(this);
         this.boardrender = new BoardRenderer(this);
+        this.particles = new Particles(this);
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
         this.history = new History(this);
         this.modes = new Modes(this);
 
+        this.boardrender.loadImage();
         this.renderer.sizeCanvas();
+        this.particles.initBoard();
         this.renderer.setEditPieceColours();
         this.sounds.initSounds();
         this.startGame();
         this.renderer.renderingLoop();
         this.boardeditor.addListeners();
         this.menuactions.addRangeListener();
-        this.versionChecker();
         this.profilestats.loadPBs();
         this.modals.generateGamemodeMenu();
+        this.versionChecker();
     }
 
     startGame() {
@@ -73,7 +78,7 @@ export class Game {
     }
 
     stopGameTimers() { //stop all the game's timers
-        clearInterval(this.mechanics.gravityTimer);
+        clearInterval(this.gravityTimer);
         clearInterval(this.gameTimer);
         clearInterval(this.survivalTimer);
         this.mechanics.locking.lockingPause();
@@ -103,43 +108,30 @@ export class Game {
         this.profilestats.saveSession();
     }
 
-    resetState() { // todo maybe refactor this to each class
-        this.bag.nextPieces = [[], []];
+    resetState() {
         this.boardeffects.hasPace = true;
         this.boardeffects.paceCooldown = 0;
-        this.falling.location = [];
-        this.falling.moved = false;
-        this.falling.piece = null;
-        this.falling.rotation = 1;
-        this.history.currentState = 0;
-        this.history.historyConnections = [];
-        this.history.historyStates = [];
-        this.hold.occured = false;
-        this.hold.piece = null;
-        this.mechanics.garbageQueue = 0;
-        this.mechanics.isAllspin = false;
-        this.mechanics.isMini = false;
-        this.mechanics.isTspin = false;
-        this.mechanics.spikeCounter = 0;
         this.boardrender.boardAlpha = 1;
         this.renderer.inDanger = false;
-
         this.started = false;
         this.ended = false;
-        this.stats = new GameStats(this);
 
-        this.stopGameTimers()
-
-        this.mechanics.clear.progressDamage.value = 0;
-        ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
-            document.getElementById(id).style.opacity = "0";
-        })
         this.board.resetBoard();
         this.mechanics.locking.clearLockDelay();
-        this.renderer.renderDanger();
-        this.gameClock();
-        this.renderer.clearHold();
         this.boardeffects.toggleRainbow(false);
+        this.renderer.resetActionText();
+        this.renderer.renderDanger();
+        this.renderer.clearHold();
+        this.stopGameTimers();
+
+        this.bag = new Bag(this);
+        this.mechanics = new Mechanics(this);
+        this.falling = new Falling(this);
+        this.hold = new Hold(this);
+        this.stats = new GameStats(this);
+        this.history = new History(this);
+
+        this.gameClock();
     }
 
     gameClock() {
@@ -147,7 +139,7 @@ export class Game {
         this.modes.checkFinished();
         this.stats.updateStats();
         this.renderer.updateAlpha();
-        this.boardeffects.rainbowBoard(); // todo maybe check performance
+        this.boardeffects.rainbowBoard();
     }
 
     versionChecker() {

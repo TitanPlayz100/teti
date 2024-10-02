@@ -23,9 +23,9 @@ window.addEventListener("keyup", event => {
 });
 
 document.onresize = () => {
-    game.rendering.sizeCanvas();
-    game.rendering.updateNext();
-    game.rendering.updateHold();
+    game.renderer.sizeCanvas();
+    game.renderer.updateNext();
+    game.renderer.updateHold();
 }
 
 window.addEventListener("DOMContentLoaded", () => {

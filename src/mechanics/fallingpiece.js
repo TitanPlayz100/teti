@@ -2,10 +2,10 @@ import { KickData, KickData180 } from "../data/kicks.js";
 import { Game } from "../game.js";
 
 export class Falling {
-    piece;
-    location;
-    moved; // if the current piece has moved
-    rotation;
+    piece = null;
+    location = [];
+    moved = false;
+    rotation = 1;
 
     /**
      * @param {Game} game
@@ -22,7 +22,6 @@ export class Falling {
         this.location = [dx, dy];
         this.piece = piece;
         this.rotation = 1;
-
     }
     
     getKickData(rotationType, shapeNo) {

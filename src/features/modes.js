@@ -22,6 +22,7 @@ export class Modes {
         // hardcoded objectives
         let combobreak = this.game.stats.combo == -1 && stats.clearlines >= 1 && this.modeJSON.target == 'combobreak';
         let gameend = this.game.ended && this.modeJSON.target == 'gameEnd';
+
         let stat = stats[this.modeJSON.goalStat]
         let goal = goals[this.modeJSON.target]
         let result = stats[this.modeJSON.result]
@@ -42,7 +43,7 @@ export class Modes {
         this.setObjectiveText(stat, goal);
     }
 
-    statText(stat, value, result, resultvalue) {
+    statText(stat, value, result, resultvalue) { // todo make more readable
         if (stat == "time") { // change ultra text
             stat = result;
             value = resultvalue
@@ -90,22 +91,6 @@ export class Modes {
         this.divObjectiveText.textContent = this.modeJSON.objectiveText;
     }
 
-    diggerAddGarbage(removed) {
-        if (this.game.stats.getRemainingGarbage() > 10 && this.game.settings.game.gamemode == 4)
-            this.game.mechanics.addGarbage(removed);
-    }
-
-    set4WCols(start) {
-        if (this.game.settings.game.gamemode == 'combo') this.game.board.setComboBoard(start);
-
-    }
-
-    startSurvival() {
-        const time = (60 * 1000) / this.game.settings.game.survivalRate;
-        if (this.game.settings.game.gamemode == 'survival')
-            this.game.survivalTimer = setInterval(() => this.game.mechanics.addGarbage(1), time);
-    }
-
     setGamemode(mode) {
         this.game.settings.game.gamemode = mode;
         const competitive = this.game.settings.game.competitiveMode;
@@ -148,5 +133,30 @@ export class Modes {
     getSuffix(mode) {
         const modeinfo = gamemodeJSON[mode];
         return resultSuffix[modeinfo.result] ?? " (old)";
+    }
+
+    diggerAddGarbage(removed) {
+        if (this.game.stats.getRemainingGarbage() > 10 && this.game.settings.game.gamemode == "digger")
+            this.game.mechanics.addGarbage(removed);
+    }
+
+    set4WCols(start) {
+        if (this.game.settings.game.gamemode == 'combo') this.game.board.setComboBoard(start);
+
+    }
+
+    startSurvival() {
+        const time = (60 * 1000) / this.game.settings.game.survivalRate;
+        if (this.game.settings.game.gamemode == 'survival')
+            this.game.survivalTimer = setInterval(() => this.game.mechanics.addGarbage(1), time);
+    }
+
+    diggerGarbageSet(start) {
+        const rows =
+            this.game.settings.game.requiredGarbage < 10
+                ? this.game.settings.game.requiredGarbage
+                : 10;
+        if (this.game.stats.getRemainingGarbage() > 0 && start && this.game.settings.game.gamemode == 'digger')
+            this.game.mechanics.addGarbage(rows);
     }
 }

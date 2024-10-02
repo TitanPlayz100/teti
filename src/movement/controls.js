@@ -24,11 +24,11 @@ export class Controls {
         if (event.key != this.menuKey && !this.game.started) this.moves.firstMovement();
         if (key == this.menuKey) this.game.menuactions.toggleDialog();
         else if (key == keys.editMenuKey) this.game.menuactions.openEditMenu();
-        else if (key == keys.resetKey) this.retry();
-
+        
         if (this.game.modals.open) return;
+        if (key == keys.resetKey) this.retry();
         if (this.game.ended) return;
-
+        
         if (key == keys.cwKey) this.moves.rotate("CW");
         else if (key == keys.ccwKey) this.moves.rotate("CCW");
         else if (key == keys.rotate180Key) this.moves.rotate("180");

@@ -1,5 +1,4 @@
 import { Game } from "../game.js";
-import { Mechanics } from "./mechanics.js";
 
 export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
@@ -10,27 +9,24 @@ export class LockPiece {
     startTime = 0;
     remaining = 0;
 
-
     /**
      * @param {Game} game
-     * @param {Mechanics} mechanics
      */
-    constructor(mechanics, game) {
-        this.mechanics = mechanics;
+    constructor(game) {
         this.game = game;
     }
 
     incrementLock() {
         if (this.timings.lockdelay != 0) {
             this.lockCount++;
-            this.mechanics.locking.clearLockDelay(false);
+            this.game.mechanics.locking.clearLockDelay(false);
             if (this.game.settings.game.maxLockMovements != 0 && this.game.settings.display.lockBar) {
                 const amountToAdd = 100 / this.game.settings.game.maxLockMovements;
                 this.divLockCounter.value += amountToAdd;
             }
         }
-        if (this.game.movement.checkCollision(this.mechanics.board.getMinos("A"), "DOWN")) {
-            this.mechanics.locking.scheduleLock();
+        if (this.game.movement.checkCollision(this.game.mechanics.board.getMinos("A"), "DOWN")) {
+            this.game.mechanics.locking.scheduleLock();
         }
     }
 
@@ -40,13 +36,10 @@ export class LockPiece {
                 ? Infinity
                 : this.game.settings.game.maxLockMovements;
         if (this.lockCount >= LockMoves) {
-            this.mechanics.locking.lockPiece();
+            this.game.mechanics.locking.lockPiece();
             return;
         }
-        if (this.game.settings.game.lockDelay == 0) {
-            // this.timings.lockdelay = 0;
-            return;
-        }
+        if (this.game.settings.game.lockDelay == 0) return;
 
         this.lockDelayStart(this.game.settings.game.lockDelay);
     }
@@ -56,9 +49,8 @@ export class LockPiece {
         clearInterval(this.timings.lockingTimer);
         this.startTime = Date.now();
         this.timings.lockdelay = setTimeout(
-            () => this.mechanics.locking.lockPiece(),
-            delay
-        );
+            () => this.game.mechanics.locking.lockPiece(),
+            delay);
         this.timings.lockingTimer = setInterval(() => {
             const amountToAdd = 1000 / this.game.settings.game.lockDelay;
             if (this.game.settings.display.lockBar) this.divLockTimer.value += amountToAdd;
@@ -78,30 +70,30 @@ export class LockPiece {
     }
 
     lockPiece() {
-        const lockCoords = this.mechanics.board.getMinos("A");
+        const lockCoords = this.game.mechanics.board.getMinos("A");
         this.game.boardrender.justPlacedCoords = lockCoords;
         this.game.boardrender.justPlacedAlpha = 1;
-        this.mechanics.board.getMinos("A").forEach(([x, y]) => {
-            this.mechanics.board.rmValue([x, y], "A");
-            this.mechanics.board.addValFront([x, y], "S");
+        this.game.mechanics.board.getMinos("A").forEach(([x, y]) => {
+            this.game.mechanics.board.rmValue([x, y], "A");
+            this.game.mechanics.board.addValFront([x, y], "S");
         });
         this.game.endGame(
-            this.mechanics.checkDeath(
-                this.mechanics.board.getMinos("S"),
-                this.mechanics.board.getMinos("NP")
+            this.game.mechanics.checkDeath(
+                this.game.mechanics.board.getMinos("S"),
+                this.game.mechanics.board.getMinos("NP")
             )
         );
-        this.mechanics.locking.clearLockDelay();
-        clearInterval(this.mechanics.gravityTimer);
-        this.mechanics.clear.clearLines(lockCoords);
+        this.game.mechanics.locking.clearLockDelay();
+        clearInterval(this.game.gravityTimer);
+        this.game.mechanics.clear.clearLines(lockCoords);
         this.game.stats.pieceCount++;
         this.game.hold.occured = false;
-        this.mechanics.isTspin = false;
-        this.mechanics.isAllspin = false;
-        this.mechanics.isMini = false;
+        this.game.mechanics.isTspin = false;
+        this.game.mechanics.isAllspin = false;
+        this.game.mechanics.isMini = false;
         this.game.falling.moved = false;
-        if(this.game.stats.level % 100 != 99 && this.game.stats.level != this.game.settings.game.raceTarget - 1 )  this.game.stats.level++;
-        this.mechanics.spawnPiece(this.game.bag.randomiser());
+        if (this.game.stats.level % 100 != 99 && this.game.stats.level != this.game.settings.game.raceTarget - 1) this.game.stats.level++;
+        this.game.mechanics.spawnPiece(this.game.bag.randomiser());
         this.game.history.save();
         this.game.renderer.renderDanger();
     }
