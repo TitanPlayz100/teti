@@ -91,7 +91,7 @@ export class Modes {
     }
 
     diggerAddGarbage(removed) {
-        if (this.game.stats.getRemainingGarbage() > 10 && this.game.settings.game.gamemode == 4)
+        if (this.game.stats.getRemainingGarbage() > 10 && this.game.settings.game.gamemode == "digger")
             this.game.mechanics.addGarbage(removed);
     }
 
