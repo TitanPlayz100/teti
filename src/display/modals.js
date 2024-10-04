@@ -125,10 +125,10 @@ export class ModalActions {
             button.id = name;
             button.classList = "gamemodeSelect";
             button.textContent = setting.displayName;
-            button.onclick = () => {
+            button.addEventListener("click", () => {
                 menu.setGamemode(name);
                 modal.closeModal("gamemodeDialog");
-            }
+            });
             this.gamemodeStart.parentNode.insertBefore(button, this.gamemodeStart);
         })
         this.gamemodeStart.remove();

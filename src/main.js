@@ -28,6 +28,7 @@ document.onresize = () => {
     game.renderer.updateHold();
 }
 
+// splash menu
 window.addEventListener("DOMContentLoaded", () => {
     elementSplashText.textContent = "loading assets";
     document.getElementById("ignoreText").style.opacity = 0.5;

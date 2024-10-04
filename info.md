@@ -1,21 +1,26 @@
 ## Welcome!
-This is the official info page now, instead of the README. I'll add all update changes and future plans here as well.
 
-TETI (the name is in the works) is a modern tetris clone I've been working on for the past year or so, on and off. It's a moderately large project, and there's still many things I want to work on.
+[Jump to Changelog](#updates)
 
-This project started out as a learning experience, because surprisingly it was my first time actually using Javascript. For my year 12 major project (pseudohuman) I wanted to build a multiplayer web based game, and thus I made this to gain experience before starting. I had already programmed in Java, as well as some C# and Python, so I was not unfamiliar to programming, and I already knew frontend basics. Teti was able to combine my interest for tetris, and also challenge me to learn Javascript. Well after the project was over, I could truly improve the code and game to make an amazing experience
+[Jump to Feature Wishlist](#feature-wishlist)
+
+TETI (the name is in the works) is a singleplayer, modern block stacker, similar to the likes of Tetra Legends, Tetr.js and other web based stackers.
+
+I hope you enjoy Teti, and if you liked it a star would be appreciated. I want this to grow to a proper maintainable tetris web client, so feel free to contribute, and modify my own code.
 
 [Here is the trailer video](https://www.youtube.com/watch?v=Gf2dsPRf2uM)
 
-I hope you enjoy TETI, and give a star if you like it. The code is no longer 1000 lines, but I want this to grow to a proper maintainable tetris client.
+#### Backstory
+This project started out as a learning experience, because surprisingly it was my first time actually using Javascript. For my year 12 major project (pseudohuman) I wanted to build a multiplayer web based game, and thus I made this to gain experience before starting. I had already programmed in Java, as well as some C# and Python, so I was not unfamiliar to programming, and I already knew frontend basics. Teti was able to combine my interest for tetris, and also challenge me to learn Javascript. Well after the project was over, I could truly improve the code and game to make an amazing experience.
+
 
 ## Contributions
-Thank you [existancepy](https://github.com/existancepy) for all the fixes.  
-Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding the TGM Race mode.  
+Thanks [existancepy](https://github.com/existancepy) for all the fixes.  
+Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding TGM Race mode and other fixes.  
 Design inspired by [Strangelinx's 'blocks'.](https://strangelinx.github.io/blocks/)  
 Icons from [The Noun Project](https://thenounproject.com)
 
-Feel free to contribute with features and issues. 
+Feel free to contribute with features and fixes, and open issues. 
 
 #### Music
 [(Locked Girl ~ The Girl's Secret Room) - Cafe de Touhou 3](https://www.youtube.com/watch?v=7Q3c2vmXEyg)  
@@ -67,7 +72,8 @@ Things that I am working on based on other changes
 - changed tick rate to 60 for consistency
 - seperated board rendering out to be more readable
 - tweaks to controls for readability and also hopefully performance 
-- removed util class
+- refactored unreadable code, removed utils => may make a technical wiki someday
+- small changes to how backfire works
 - pb pace cooldown
 - PIECE SKINS!
     - will add way to custom add own skins
@@ -75,6 +81,7 @@ Things that I am working on based on other changes
     - feedback on performance would be nice
     - will add particle options soon as well
 
+***
 #### v1.2.4
 - added button to delete pbs
 - changed pb border effect to be based on better tracked stats (like apm for attacker)
@@ -130,6 +137,7 @@ Things that I am working on based on other changes
 - you get a glow when on pb pace
 - fixed danger glow outline
 
+***
 #### v1.1.2
 - added board bounce
 - custom mode has button for edit menu and a history display 
@@ -153,7 +161,7 @@ Things that I am working on based on other changes
 - The main menu is more organised, and each menu now organises a certain setting group for better code efficiency.
 - The settings object is changed to be a hashmap (js object) rather than an array, more closely matches tetrio setting.ttc files.
 
-
+***
 ## Feature Wishlist
 May or may not add these, kinda ordered by ease and desire for feature
 - more garbage settings

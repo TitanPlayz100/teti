@@ -11,7 +11,7 @@ import { Settings } from "./features/settings.js";
 import { Sounds } from "./features/sounds.js";
 import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./features/stats.js";
-import { BoardEditor } from "./display/editboard.js";
+import { BoardEditor } from "./features/editboard.js";
 import { History } from "./features/history.js";
 import { BoardEffects } from "./display/boardEffects.js";
 import { ProfileStats } from "./features/profileStats.js";
@@ -25,7 +25,7 @@ export class Game {
     gameTimer = 0; // id of timeout
     survivalTimer = 0; // id of timeout
     gravityTimer = 0;
-    version = '1.2.4';
+    version = '1.3.0';
     tickrate = 60;
 
     elementReason = document.getElementById("reason");

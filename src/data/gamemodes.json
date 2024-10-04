@@ -92,10 +92,14 @@
     },
     "combo": {
         "displayName": "4w / Combo",
-        "objectiveText": "Combo",
-        "goalStat": "combo",
+        "objectiveText": "Time",
+        "goalStat": "time",
         "target": "combobreak",
-        "result": "maxCombo"
+        "result": "maxCombo",
+        "settings": {
+            "allspin": true,
+            "allspinminis": false
+        }
     },
     "lookahead": {
         "displayName": "Lookahead",

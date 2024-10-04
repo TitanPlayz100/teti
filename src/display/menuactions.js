@@ -15,6 +15,7 @@ export class MenuActions {
         this.game = game;
     }
 
+    // sliders
     sliderChange(el) {
         const text = el.parentElement.children[0].textContent.split(":")[0];
         let value = el.value;
@@ -42,7 +43,15 @@ export class MenuActions {
         document.getElementById("frontdrop").showModal();
         this.bindingKey = el.id;
     }
+    
+    checkValue(el, el2 = this.game.modals.selectedRangeElement) {
+        this.game.modals.selectedRangeElement = el2;
+        if (el.value == "") return;
+        if (el.value < Number(el2.min)) el.value = Number(el2.min);
+        if (el.value > Number(el2.max)) el.value = Number(el2.max);
+    }
 
+    // keybinds
     checkKeybind(event) {
         if (!event.ctrlKey) this.controlUsed = false;
         if (!event.altKey) this.altUsed = false;
@@ -77,6 +86,7 @@ export class MenuActions {
         this.elementSelectKeyText.textContent = "Click to remove keybind";
     }
 
+    // settings
     saveSettings() {
         const data = this.game.settings.save();
         localStorage.setItem("settings", JSON.stringify(data));
@@ -118,13 +128,12 @@ export class MenuActions {
     }
 
     resetSettings(group) {
-        for (let setting in this.game.settings[group]) {
-            this.game.settings[group][setting] = "";
-        }
+        this.game.settings.reset(group);
         this.saveSettings();
         location.reload();
     }
 
+    // menu
     toggleDialog() {
         if (this.game.menuactions.bindingKey != undefined) return;
         if (!this.game.modals.open) {
@@ -135,16 +144,9 @@ export class MenuActions {
         if (this.game.started && !this.game.ended) this.game.movement.firstMovement();
     }
 
-    checkValue(el, el2 = this.game.modals.selectedRangeElement) {
-        this.game.modals.selectedRangeElement = el2;
-        if (el.value == "") return;
-        if (el.value < Number(el2.min)) el.value = Number(el2.min);
-        if (el.value > Number(el2.max)) el.value = Number(el2.max);
-    }
-
-    newGame(k, d) {
-        if (k == this.game.settings.control.resetKey) {
-            this.game.modals.closeModal(d);
+    newGame(key, modal) {
+        if (key == this.game.settings.control.resetKey) {
+            this.game.modals.closeModal(modal);
             this.game.startGame();
         }
     }
@@ -153,13 +155,13 @@ export class MenuActions {
         window.open("https://" + url, "blank_")
     }
 
+    // edit menu
     openEditMenu() {
         if (this.game.modals.open) {
             this.toggleDialog();
             return;
         }
         if (this.game.settings.game.gamemode != 'custom') return
-
         this.menus.openModal("editMenu");
     }
 
@@ -195,6 +197,7 @@ export class MenuActions {
         alert("TETR.IO Map String (copied to clipboard):\n" + exportstring)
     }
 
+    // stats
     exportStats() {
         let stats = {}
         Object.getOwnPropertyNames(this.game.stats).forEach(key => {

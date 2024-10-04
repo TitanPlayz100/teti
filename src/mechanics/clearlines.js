@@ -1,10 +1,9 @@
-import { cleartypes, scoringTable, levellingTable } from "../data/data.js";
+import { cleartypes, scoringTable } from "../data/data.js";
 import attackValues from "../data/attacktable.json" with { type: "json" };
 import { Game } from "../game.js";
 
 export class ClearLines {
     progressDamage = document.getElementById("garbageQueue");
-
 
     /**
      * @param {Game} game
@@ -13,7 +12,6 @@ export class ClearLines {
         this.game = game
         this.sounds = game.sounds;
         this.progressDamage.value = 0;
-
     }
 
     clearLines(clearCoords) {
@@ -30,12 +28,11 @@ export class ClearLines {
         }
 
         this.game.modes.diggerAddGarbage(removedGarbage);
-        if (clearRows.length > 0) this.game.renderer.bounceBoard("DOWN");
-
         clearCoords.forEach(([x, y]) => {
             if (clearRows.includes(y)) this.game.stats.clearCols[x]++;
         })
-
+        
+        if (clearRows.length > 0) this.game.renderer.bounceBoard("DOWN");
         this.game.particles.spawnParticles(0, Math.min(...clearRows), "clear")
         this.processLineClear(removedGarbage, clearRows);
     }
@@ -45,66 +42,37 @@ export class ClearLines {
         stopped.filter(c => c[1] == rowNumber)
             .forEach(([x, y]) => this.game.mechanics.board.setCoordEmpty([x, y]));
         const minos = stopped.filter(c => c[1] > rowNumber);
-        this.game.mechanics.board.moveMinos(minos,"DOWN",1);
+        this.game.mechanics.board.moveMinos(minos, "DOWN", 1);
     }
 
-    processLineClear(garbageCleared, clearRows) { // todo refactor
-        this.game.stats.cleargarbage += garbageCleared;
+    processLineClear(garbageCleared, clearRows) {
+        const mech = this.game.mechanics, stats = this.game.stats;
         const linecount = clearRows.length;
-        const isBTB =
-            (this.game.mechanics.isTspin
-                || this.game.mechanics.isMini
-                || linecount >= 4
-                || (this.game.mechanics.isAllspin && this.game.settings.game.allspin))
-            && linecount > 0;
-        const isPC = this.game.mechanics.board.getMinos("S").length == 0;
-        let damagetype =
-            ((this.game.mechanics.isTspin || (this.game.mechanics.isAllspin && this.game.settings.game.allspin)) ? "Tspin " : "") +
-            (this.game.mechanics.isMini ? "mini " : "") +
-            cleartypes[Math.min(linecount, 5)]; // limit to 5 line clear
-        this.game.stats.updateBTB(isBTB, linecount);
-        this.game.stats.combo = linecount == 0 ? -1 : this.game.stats.combo + 1;
-        if (this.game.stats.combo > this.game.stats.maxCombo) this.game.stats.maxCombo = this.game.stats.combo;
-        const damage = this.calcDamage(
-            this.game.stats.combo,
-            damagetype.toUpperCase().trim(),
-            isPC,
-            this.game.stats.btbCount,
-            isBTB
-        );
-        this.game.stats.score += this.calcScore(
-            damagetype,
-            isPC,
-            isBTB,
-            this.game.stats.combo
-        );
-        this.game.stats.clearlines += linecount;
-        this.game.stats.attack += damage;
-        this.game.mechanics.spikeCounter += damage;
-        this.game.stats.quads += linecount >= 4 ? 1 : 0;
-        this.game.stats.pcs += isPC ? 1 : 0;
-        if (this.game.mechanics.isTspin) this.game.stats.tspins[linecount]++;
-        this.game.stats.allspins += this.game.mechanics.isAllspin ? 1 : 0;
-        this.game.stats.level += levellingTable[linecount];
-        if (linecount > 0)
-            this.game.stats.clearPieces[this.game.falling.piece.name][linecount-1]++;
+        const isBTB = this.checkBTB(linecount);
+        const isPC = mech.board.getMinos("S").length == 0;
+        let damagetype = this.getDamageType(linecount);
 
+        this.game.stats.updateBTB(isBTB, linecount);
+        this.game.stats.updateCombo(linecount);
+        const damage = this.calcDamage(stats.combo, damagetype, isPC, stats.btbCount, isBTB);
+        const score = this.calcScore(damagetype, isPC, isBTB, stats.combo);
+        this.game.stats.incrementStats(score, linecount, damage, isPC, mech.isTspin, mech.isAllspin, garbageCleared);
+
+        mech.spikeCounter += damage;
         this.manageGarbageSent(damage);
-        if (this.game.mechanics.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
+
+        if (mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
         this.game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);
+
         if (isPC) this.game.particles.spawnParticles(0, 0, "pc");
-        if (damage > 10 || this.game.stats.combo > 10) this.game.particles.spawnParticles(0, 0, "spike");
+        if (damage > 10 || stats.combo > 10) this.game.particles.spawnParticles(0, 0, "spike");
     }
 
     manageGarbageSent(damage) {
         this.game.stats.sent += damage;
         const garb = damage * this.game.settings.game.backfireMulti;
-        this.game.mechanics.garbageQueue = // todo ugly dumb ternary
-            this.game.mechanics.garbageQueue == 0
-                ? garb
-                : this.game.mechanics.garbageQueue > garb
-                    ? this.game.mechanics.garbageQueue - garb
-                    : 0;
+        const sent = Math.abs(this.game.mechanics.garbageQueue - garb);
+        this.game.mechanics.garbageQueue = sent;
 
         if (this.game.settings.game.gamemode != 'backfire') return;
         if (garb > 0) this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
@@ -117,12 +85,26 @@ export class ClearLines {
         if (damage > 0) this.progressDamage.value = this.game.mechanics.garbageQueue;
     }
 
+    checkBTB(linecount) {
+        if (linecount == 0) return false;
+        if (this.game.mechanics.isAllspin && this.game.settings.game.allspin) return true;
+        return this.game.mechanics.isTspin || this.game.mechanics.isMini || linecount >= 4;
+    }
+
+    getDamageType(linecount) {
+        const isSpin = this.game.mechanics.isTspin || (this.game.mechanics.isAllspin && this.game.settings.game.allspin);
+        const isMini = this.game.mechanics.isMini;
+        const type = cleartypes[Math.min(linecount, 5)] // limit to 5 line clear
+        return (isSpin ? "Tspin " : "") + (isMini ? "mini " : "") + type;
+    }
+
     calcDamage(combo, type, isPC, btb, isBTB) {
+        type = type.toUpperCase().trim();
         const btbdamage = () => {
             const x = Math.log1p(btb * 0.8);
             return ~~(Math.floor(x + 1) + (1 + (x % 1)) / 3);
         };
-        if (!attackValues.hasOwnProperty(type)) return 0;
+        if (!attackValues.hasOwnProperty(type)) return 0; // if type not real
         return (
             attackValues[type][combo > 20 ? 20 : combo < 0 ? 0 : combo] +
             (isPC ? attackValues["ALL CLEAR"] : 0) +

@@ -54,6 +54,21 @@ export const spinChecks = [
     ],
 ];
 
+export const gameoverText = {
+    clearlines: "Cleared _ lines",
+    attack: "Sent _ damage",
+    cleargarbage: "Dug _ lines",
+    ended: "Survived _ lines",
+    level: "Reached level _",
+    time: "Spent _ seconds",
+}
+
+export const gameoverResultText = {
+    time: " in _ seconds",
+    score: " to score _ points",
+    maxCombo: " to get _ combo",
+}
+
 export const lowerIsBetter = {
     time: true,
     score: false,
@@ -68,7 +83,6 @@ export const pbTrackingStat = {
     combo: "maxCombo",
     level: "pps"
 }
-
 
 export const resultSuffix = {
     time: 's',

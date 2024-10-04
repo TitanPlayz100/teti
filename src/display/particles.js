@@ -62,7 +62,7 @@ export class Particles {
         this.minosize = this.game.boardrender.minoSize;
     }
 
-    spawnParticles(posX, posY, type, pieceWidth = 1, cw = false, colour = "white") { // todo add danger particles
+    spawnParticles(posX, posY, type, pieceWidth = 1, cw = false, colour = "white") {
         const dx = (type == "place" || type == "spin") ? 1 : 0
         const [x, y] = [(posX + dx) * this.minosize, (40 - posY) * this.minosize];
         if (type == "place") this.createPlaceParticles(x, y, colour, this.minosize * pieceWidth, -this.boardHeight);

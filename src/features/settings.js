@@ -64,4 +64,10 @@ export class Settings {
 
         return { display, game, control, handling, volume };
     }
+
+    reset(group) {
+        for (let setting in this[group]) {
+            this[group][setting] = "";
+        }
+    }
 }

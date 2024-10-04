@@ -86,15 +86,14 @@ export class Movement {
         this.game.stats.rotates++;
         this.game.sounds.playSound("rotate");
         this.game.mechanics.setShadow();
-        if (this.game.mechanics.isTspin) this.game.sounds.playSound("spin");
-        if (this.game.mechanics.isAllspin && this.game.settings.game.allspin) this.game.sounds.playSound("spin");
         if (this.game.settings.game.gravitySpeed == 0) this.game.mechanics.startGravity();
         this.game.controls.startArr("current");
         this.game.controls.checkSD();
-        if (this.game.mechanics.isTspin || this.game.mechanics.isAllspin) {
+        if (this.game.mechanics.isTspin || (this.game.mechanics.isAllspin && this.game.settings.game.allspin)) {
             this.game.renderer.rotateBoard(type);
             this.game.particles.spawnParticles(this.game.falling.location[0], this.game.falling.location[1] + 2,
                 "spin", 5, type == "CW", this.game.falling.piece.colour);
+                this.game.sounds.playSound("spin");
         }
     }
 

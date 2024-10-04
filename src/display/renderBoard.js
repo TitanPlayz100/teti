@@ -1,4 +1,3 @@
-import pieces from "../data/pieces.json" with { type: "json" };
 import { Game } from "../game.js";
 
 export class BoardRenderer {
@@ -22,12 +21,12 @@ export class BoardRenderer {
         if (this.divlock.value != 0 && cell.includes("A") && this.game.settings.game.gamemode != "lookahead") {
             return 1 - (this.divlock.value / 250);
         }
-        this.justPlacedCoords.forEach(([placedX, placedY]) => {
-            if (placedX == x && placedY == y && cntx == this.game.renderer.ctx) {
+        for (let [posX, posY] of this.justPlacedCoords) {
+            if (posX == x && posY == y && cntx == this.game.renderer.ctx) {
                 return this.justPlacedAlpha.toFixed(2);
             }
-        })
-        return 1;
+        }
+        return this.boardAlpha.toFixed(2);
     }
 
     toHex(num) {
@@ -57,6 +56,12 @@ export class BoardRenderer {
         return { x, y, width, height };
     }
 
+    getShadowOpacity() {
+        const opacity = this.game.settings.display.shadowOpacity / 100;
+        if (this.game.settings.game.gamemode == "lookahead") return opacity * this.boardAlpha.toFixed(2);
+        return opacity;
+    }
+
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
         cntx.clearRect(0, 0, width, height);
         grid.forEach((row, y) => {
@@ -68,6 +73,7 @@ export class BoardRenderer {
 
                 if (cell.includes("A") || cell.includes("S")) { // active piece or stopped piece
                     cntx.globalAlpha = this.getOpacity(cell, cntx, x, y);
+                    if (cntx.globalAlpha > 0) console.log(cntx.globalAlpha)
                     const p = this.getTexture(this.getPiece(cntx, cell[1]));
                     cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
                 }
@@ -77,7 +83,7 @@ export class BoardRenderer {
                     cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
                 }
                 else if (cell.includes("Sh")) { // shadow piece
-                    cntx.globalAlpha = this.game.settings.display.shadowOpacity / 100
+                    cntx.globalAlpha = this.getShadowOpacity();
                     const piece = this.game.settings.display.colouredShadow ? this.game.falling.piece.name : "shadow";
                     const p = this.getTexture(piece);
                     cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);

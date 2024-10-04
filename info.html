@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/chota@latest">
     <script type="module" src="https://cdn.jsdelivr.net/npm/zero-md@3?register"></script>
-
     <title>Teti - Info</title>
 </head>
 
@@ -23,13 +22,12 @@
     #background {
         background-image: url("./assets/peakpx.jpg");
         background-size: cover;
-        background-repeat: repeat;
         background-position: 0 -70vh;
         width: 100vw;
         height: 200vh;
         position: fixed;
         z-index: -1;
-        top: 0vh;
+        top: 0;
         left: 0;
         filter: blur(6px) brightness(0.3);
     }
@@ -52,7 +50,7 @@
     <div id="background"></div>
     <nav id="title">
         <h1 style="font-size: 8em; margin-bottom: 0;">TETI</h1>
-        <p>Made By TitanPlayz100</p>
+        <p>Modern Stacker By TitanPlayz100</p>
     </nav>
     <hr style="margin-top: 70vh;">
     <a class="button outline primary pull-right" href="index.html">Back to teti</a>
@@ -64,6 +62,7 @@
             <style>
                 h2 {
                     margin-top: 4vh;
+                    font-weight: bold;
                 }
             </style>
         </template>
@@ -72,7 +71,7 @@
     <hr>
     <p class="text-right">css using <a href="https://jenil.github.io/chota/">chota</a></p>
     <p class="text-right">md renderer with <a href="https://zerodevx.github.io/zero-md/">zero-md</a></p>
-    <div id="bottom"></div>
+    <a class="button outline secondary pull-right" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">Top of Page</a>
 </body>
 
 <script defer>
