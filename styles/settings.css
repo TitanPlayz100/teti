@@ -89,9 +89,9 @@
 }
 
 .settingRow:hover {
-    transition: all 0.1s ease;
     outline-offset: calc(-1*var(--t));
     animation: jump 1.5s infinite ease;
+    transition: outline-offset 0.1s, scale 0.6s;
 }
 
 .settingRow>p {

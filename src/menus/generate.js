@@ -2,6 +2,11 @@ import { Game } from "../game.js";
 
 
 export class GenerateMenus {
+    gamemodeStart = document.getElementById("startGamemodeList");
+    
+    settingDialogs = [...document.getElementsByClassName("settingsBox")];
+    settings = [...document.getElementsByClassName("settingRow")];
+
     /**
      * @param {Game} game 
      */
@@ -112,7 +117,7 @@ export class GenerateMenus {
             let newpos = 1 - (position - window.innerHeight * 0.47) / totalHeight
             if (newpos > 1) newpos = newpos - 2 * (newpos - 1);
 
-            setting.style.scale = newpos < 0.7 ? 0.5 : 1
+            setting.style.scale = newpos < 0.7 ? 0.9 : 1
             setting.style.opacity = newpos < 0.7 ? 0.3 : 1
         })
     }

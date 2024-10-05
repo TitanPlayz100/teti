@@ -9,10 +9,8 @@ export class ModalActions {
 
     settingPanel = document.getElementById("settingsPanel");
     pblistStart = document.getElementById("PBlist");
-    gamemodeStart = document.getElementById("startGamemodeList");
     statsStart = document.getElementById("startStatsList");
-    settingDialogs = [...document.getElementsByClassName("settingsBox")];
-    settings = [...document.getElementsByClassName("settingRow")];
+
 
     /**
      * @param {Game} game
@@ -29,7 +27,6 @@ export class ModalActions {
         if (id == "settingsPanel" && this.closing) return;
         if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
         this.game.stopGameTimers()
-        console.log(id, this.getOptions(id))
         this.getOptions(id).forEach(setting => {
             let settingType = this.getSettingType(id);
             let newval;
@@ -59,15 +56,16 @@ export class ModalActions {
         // temp to init settings
         if (id == "displayDialog") {
             const box = document.getElementById("displayDialog").children[1];
-            const boxsettings = this.settings.filter(item => item.parentElement.parentElement.id == box.parentElement.id);
+            const boxsettings = this.generate.settings.filter(item => item.parentElement.parentElement.id == box.parentElement.id);
             this.generate.updateSizes(box, boxsettings);
         }
 
     }
 
     getOptions(id) {
+        
         const options = [...document.getElementsByClassName("option")];
-        const set = this.settings.map(i => i.children[1]);
+        const set = this.generate.settings.map(i => i.children[1]);
         const filt = options.filter(item => item.parentElement.parentElement.id == id)
         const filt2 = set.filter(item => item.parentElement.parentElement.parentElement.id == id)
         return [...filt, ...filt2];
