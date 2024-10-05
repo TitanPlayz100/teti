@@ -1,14 +1,7 @@
 import { Game } from "../game.js";
 import defaultSettings from "../data/defaultSettings.json" with { type: "json" };
 
-
 export class Settings {
-    handling;
-    volume;
-    display;
-    game;
-    control;
-
     /**
      * @param {Game} game
      */
@@ -21,6 +14,14 @@ export class Settings {
         Object.keys(defaultSettings).forEach(type => {
             this[type] = defaultSettings[type];
         })
+
+        // this is for type checking lmao
+        return;
+        this.game = defaultSettings.game;
+        this.display = defaultSettings.display;
+        this.control = defaultSettings.control;
+        this.handling = defaultSettings.handling;
+        this.volume = defaultSettings.volume;
     }
 
     load(data) {

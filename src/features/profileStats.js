@@ -12,11 +12,6 @@ export class ProfileStats {
         this.game = game;
     }
 
-    /**
-     * @param {Boolean} lower 
-     * Lower is used depending on objective type e.g. lower time is better thus lower is true
-     */
-
     setPB(score) {
         this.game.elementGameEndTitle.textContent = 'GAME ENDED';
         const gamemode = this.game.settings.game.gamemode

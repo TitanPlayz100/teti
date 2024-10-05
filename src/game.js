@@ -4,7 +4,7 @@ import { Controls } from "./movement/controls.js";
 import { Hold } from "./mechanics/hold.js";
 import { Mechanics } from "./mechanics/mechanics.js";
 import { MenuActions } from "./display/menuactions.js";
-import { ModalActions } from "./display/modals.js";
+import { ModalActions } from "./menus/modals.js";
 import { Movement } from "./movement/movement.js";
 import { Renderer } from "./display/renderer.js";
 import { Settings } from "./features/settings.js";
@@ -64,6 +64,7 @@ export class Game {
         this.renderer.renderingLoop();
         this.boardeditor.addListeners();
         this.menuactions.addRangeListener();
+        this.modals.generate.addScrollListeners();
         this.profilestats.loadPBs();
         this.modals.generateGamemodeMenu();
         this.versionChecker();

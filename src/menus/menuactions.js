@@ -141,6 +141,7 @@ export class MenuActions {
             return;
         }
         document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
+        document.querySelectorAll("scrollSettings[open]").forEach(e => this.menus.closeDialog(e));
         if (this.game.started && !this.game.ended) this.game.movement.firstMovement();
     }
 

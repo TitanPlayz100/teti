@@ -50,7 +50,7 @@ export class Modes {
     }
 
     setObjectiveText(statValue, resultValue) {
-        statValue = Math.round(statValue * 1000) / 1000
+        if (statValue != undefined) statValue = Math.round(statValue * 1000) / 1000
         let modetext = (statValue == undefined ? '' : statValue)
             + (resultValue == undefined ? '' : `/${resultValue}`)
         this.elementobjectives.textContent = modetext;

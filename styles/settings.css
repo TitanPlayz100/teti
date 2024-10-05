@@ -1,0 +1,181 @@
+/* dialog */
+.scrollSettings {
+    font-family: "Montserrat", sans-serif;
+    height: 90vh;
+    aspect-ratio: 7/10;
+    background-color: var(--almost-invis);
+    padding: 0.5vmin;
+    color: white;
+    user-select: none;
+    outline: none;
+    text-shadow: 0 0 5vh var(--vl-gray);
+    border: 0.5vmin solid transparent;
+    animation: zoomin 0.3s forwards ease;
+    background-clip: padding-box;
+    overflow: hidden;
+}
+
+/* border effect */
+.scrollSettings::before,
+.scrollSettings::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0.3vmin;
+    background: linear-gradient(to bottom, transparent, white 35%, white 65%, transparent);
+    box-sizing: border-box;
+}
+
+.scrollSettings::before {
+    left: 0;
+}
+
+.scrollSettings::after {
+    right: 0;
+}
+
+.scrollSettings.closingAnimation {
+    animation: zoomout 0.3s forwards ease;
+}
+
+.scrollSettings::backdrop {
+    background-color: #000000b5;
+    backdrop-filter: blur(5px);
+    animation: fadein 0.4s forwards ease;
+}
+
+.scrollSettings.closingAnimation::backdrop {
+    animation: fadeout 0.4s forwards ease;
+}
+
+.settingsTop {
+    font-size: 1.5em;
+    text-align: center;
+    height: 10%;
+    width: 100%;
+}
+
+/* settings list */
+.settingsBox {
+    height: 70%;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    font-size: 1.1em;
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding-top: 8vh;
+    padding-bottom: 10vh;
+}
+
+.settingRow {
+    display: flex;
+    align-items: center;
+    height: 4.2vh;
+    --s: 2vmin;
+    --t: 0.3vmin;
+    --g: 1vmin;
+
+    padding: calc(var(--g) + var(--t));
+    outline: var(--t) solid #ffffff;
+    outline-offset: calc(var(--g)/-1);
+    mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0/calc(100% - var(--s)) calc(100% - var(--s)),
+        linear-gradient(#000 0 0) content-box;
+    transition: scale 0.6s, opacity 0.6s, outline-offset 0.3s;
+}
+
+.settingRow:hover {
+    transition: all 0.1s ease;
+    outline-offset: calc(-1*var(--t));
+    animation: jump 1.5s infinite ease;
+}
+
+.settingRow>p {
+    width: 50%;
+    display: flex;
+    justify-content: flex-end;
+    text-align: right;
+    padding-right: 3vw;
+}
+
+.settingRow>.option {
+    position: unset;
+    display: flex;
+    justify-content: flex-start;
+    transform: none;
+}
+
+/* footer */
+.settingsFooter {
+    height: 20%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1vh;
+}
+
+.settingsFooter>p {
+    margin: 0;
+    font-size: 0.8em;
+    opacity: 0.4;
+    width: 100%;
+    text-align: center;
+
+}
+
+.closeDialogButton {
+    height: auto;
+    padding: 1.5vmin;
+    bottom: 2%;
+    background-color: var(--invis);
+    border: 0.2vh solid var(--gray);
+    border-radius: 1vh;
+    font-size: 1.3em;
+    color: var(--cl-blue);
+    transition: all 0.4s ease;
+}
+
+.settingsReset {
+    position: absolute;
+    padding-top: 0.8vh;
+    right: 1vw;
+    bottom: 1vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 4vh;
+    aspect-ratio: 1/1;
+    border: 0.2vh solid var(--gray);
+    border-radius: 1vh;
+    background-color: var(--invis);
+    transition: all 0.4s ease;
+    outline: none;
+}
+
+.closeDialogButton:hover,
+.settingsReset:hover {
+    color: white;
+    border-color: white;
+    transition: all 0.1s ease;
+}
+
+
+@keyframes jump {
+    0% {
+        transform: translateY(0vmin);
+    }
+
+    50% {
+        transform: translateY(0.2vmin);
+    }
+
+    100% {
+        transform: translateY(0vmin);
+    }
+}

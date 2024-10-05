@@ -58,7 +58,7 @@ export class BoardRenderer {
 
     getShadowOpacity() {
         const opacity = this.game.settings.display.shadowOpacity / 100;
-        if (this.game.settings.game.gamemode == "lookahead") return opacity * this.boardAlpha.toFixed(2);
+        if (this.game.settings.game.gamemode == "lookahead") return (opacity * this.boardAlpha).toFixed(2);
         return opacity;
     }
 
@@ -73,7 +73,6 @@ export class BoardRenderer {
 
                 if (cell.includes("A") || cell.includes("S")) { // active piece or stopped piece
                     cntx.globalAlpha = this.getOpacity(cell, cntx, x, y);
-                    if (cntx.globalAlpha > 0) console.log(cntx.globalAlpha)
                     const p = this.getTexture(this.getPiece(cntx, cell[1]));
                     cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
                 }

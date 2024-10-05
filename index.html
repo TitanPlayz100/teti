@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./styles/style.css">
     <link rel="stylesheet" href="./styles/boards.css">
     <link rel="stylesheet" href="./styles/menus.css">
+    <link rel="stylesheet" href="./styles/settings.css">
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
@@ -129,25 +130,33 @@
         </div>
     </dialog>
 
-    <dialog id="displayDialog" class="dialog">
-        <h1>User Settings</h1>
-        <button title="Reset settings in this section" class="resetIcon" onclick="menu.resetSettings('display')">
+    <dialog id="displayDialog" class="scrollSettings">
+        <div class="settingsTop">
+            <h1>DISPLAY</h1>
+        </div>
+
+        <div class="settingsBox">
+            <div class="settingRow"><p>BG hex</p> <input class="option textInput" type="text" id="background" /></div>
+            <div class="settingRow"><p>Board Opacity</p> <input class="option range" type="range" id="boardOpacity" oninput="menu.sliderChange(this)" min="0" max="100" step="1"/></div>
+            <div class="settingRow"><p>Board Size</p> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="boardHeight" min="0" max="100" step="1" /></div>
+            <div class="settingRow"><p>Enable Grid</p> <input class="option check" type="checkbox" id="showGrid" /></div>
+            <div class="settingRow"><p>Grid opacity</p> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
+            <div class="settingRow"><p>Shadow opacity</p> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
+            <div class="settingRow"><p>Board Bounciness</p> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="boardBounce" min="-5" max="20" step="0.1" /></div>
+            <div class="settingRow"><p>Coloured Shadow</p> <input class="option check" type="checkbox" id="colouredShadow" /></div>
+            <div class="settingRow"><p>Coloured Borders</p> <input class="option check" type="checkbox" id="colouredQueues" /></div>
+            <div class="settingRow"><p>Rainbow effect on fast pace</p> <input class="option check" type="checkbox" id="rainbowPB" /></div>
+            <div class="settingRow"><p>Show Lock Bar</p> <input class="option check" type="checkbox" id="lockBar" /></div>
+            <div class="settingRow"><p>Show out of focus text</p> <input class="option check" type="checkbox" id="outoffocus" /></div>
+        </div>
+
+        <div class="settingsFooter">
+            <p>Press Esc to close without saving</p>
+            <button class="closeDialogButton" onclick="modal.closeModal('displayDialog')">Save and close</button>
+        </div>
+        <button title="Reset settings in this section" class="settingsReset" onclick="menu.resetSettings('display')">
             <img src="./assets/icons/reset.svg" alt="reset" height="100%">
         </button>
-        <div class="settingLayout"><label>BG hex</label> <input class="option textInput" type="text" id="background" /></div>
-        <div class="settingLayout"><label>Board Opacity</label> <input class="option range" type="range" id="boardOpacity" oninput="menu.sliderChange(this)" min="0" max="100" step="1"/></div>
-        <div class="settingLayout"><label>Board Size</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="boardHeight" min="0" max="100" step="1" /></div>
-        <div class="settingLayout"><label>Enable Grid</label> <input class="option check" type="checkbox" id="showGrid" /></div>
-        <div class="settingLayout"><label>Grid opacity</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
-        <div class="settingLayout"><label>Shadow opacity</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
-        <div class="settingLayout"><label>Board Bounciness</label> <input class="option range" oninput="menu.sliderChange(this)" type="range" id="boardBounce" min="-5" max="20" step="0.1" /></div>
-        <div class="settingLayout"><label>Coloured Shadow</label> <input class="option check" type="checkbox" id="colouredShadow" /></div>
-        <div class="settingLayout"><label>Coloured Borders</label> <input class="option check" type="checkbox" id="colouredQueues" /></div>
-        <div class="settingLayout"><label>Rainbow effect on fast pace</label> <input class="option check" type="checkbox" id="rainbowPB" /></div>
-        <div class="settingLayout"><label>Show Lock Bar</label> <input class="option check" type="checkbox" id="lockBar" /></div>
-        <div class="settingLayout"><label>Show out of focus text</label> <input class="option check" type="checkbox" id="outoffocus" /></div>
-        <p class="smalltextdialog">Press Esc to close without saving</p>
-        <button class="closeDialog" onclick="modal.closeModal('displayDialog')">Save and close</button>
     </dialog>
 
     <dialog id="gameDialog" class="dialog">
