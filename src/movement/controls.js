@@ -8,6 +8,7 @@ export class Controls {
     directionState = { RIGHT: false, LEFT: false, DOWN: false };
     timings = { arr: 0, das: 0, sd: 0 }; // timeout and interval ids
     menuKey = "Escape";
+    cursorVisible = true;
 
     /**
      * @param {Game} game
@@ -38,6 +39,7 @@ export class Controls {
         else if (key == keys.leftKey) this.startDas("LEFT");
         else if (key == keys.sdKey) this.startArrSD();
 
+        this.toggleCursor(false);
         this.game.stats.inputs++;
     }
 
@@ -62,7 +64,7 @@ export class Controls {
         this.stopTimeout("das");
         this.stopInterval("arr");
         this.timings.das = setTimeout(() =>
-            this.startArr(direction),
+            Promise.resolve().then(() => this.startArr(direction)), // feels faster with promise but idk
             this.game.settings.handling.das
         );
     }
@@ -145,5 +147,11 @@ export class Controls {
     retry() {
         this.game.sounds.playSound("retry");
         this.game.startGame();
+    }
+
+    toggleCursor(enable) {
+        if (!(this.cursorVisible ^ enable)) return;
+        this.cursorVisible = enable;
+        document.body.style.cursor = enable ? 'auto' : 'none';
     }
 }

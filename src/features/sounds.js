@@ -21,6 +21,14 @@ export class Sounds {
         this.game = game;
     }
 
+    /**
+     * 
+     * @param {string} audioName 
+     * Name of audio as specified in sfxlist.json
+     * @param {Boolean} replace
+     * If true, stops currently playing audio and starts new one
+     * If false, skips if audio is already playing
+     */
     playSound(audioName, replace = true, silent = false) {
         if (this.sfx[audioName] == undefined) return;
         this.sfx[audioName].muted = silent;

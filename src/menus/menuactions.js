@@ -43,7 +43,7 @@ export class MenuActions {
         document.getElementById("frontdrop").showModal();
         this.bindingKey = el.id;
     }
-    
+
     checkValue(el, el2 = this.game.modals.selectedRangeElement) {
         this.game.modals.selectedRangeElement = el2;
         if (el.value == "") return;
@@ -159,6 +159,7 @@ export class MenuActions {
     // edit menu
     openEditMenu() {
         if (this.game.modals.open) {
+            if (document.querySelectorAll("#editMenu[open]").length == 0) return;
             this.toggleDialog();
             return;
         }

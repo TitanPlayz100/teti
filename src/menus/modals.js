@@ -8,10 +8,7 @@ export class ModalActions {
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
 
     settingPanel = document.getElementById("settingsPanel");
-    pblistStart = document.getElementById("PBlist");
-    statsStart = document.getElementById("startStatsList");
-
-
+    
     /**
      * @param {Game} game
      */
@@ -52,23 +49,12 @@ export class ModalActions {
         if (id != "settingsPanel" && this.settingPanel.open) this.closeDialog(this.settingPanel);
         this.open = true;
         this.game.sounds.toggleSongMuffle(this.open);
-
-        // temp to init settings
-        if (id == "displayDialog") {
-            const box = document.getElementById("displayDialog").children[1];
-            const boxsettings = this.generate.settings.filter(item => item.parentElement.parentElement.id == box.parentElement.id);
-            this.generate.updateSizes(box, boxsettings);
-        }
-
     }
 
     getOptions(id) {
-        
-        const options = [...document.getElementsByClassName("option")];
         const set = this.generate.settings.map(i => i.children[1]);
-        const filt = options.filter(item => item.parentElement.parentElement.id == id)
         const filt2 = set.filter(item => item.parentElement.parentElement.parentElement.id == id)
-        return [...filt, ...filt2];
+        return filt2;
     }
 
     getSettingType(id) {

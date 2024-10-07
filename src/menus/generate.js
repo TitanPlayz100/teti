@@ -3,7 +3,9 @@ import { Game } from "../game.js";
 
 export class GenerateMenus {
     gamemodeStart = document.getElementById("startGamemodeList");
-    
+    pblistStart = document.getElementById("PBlist");
+    statsStart = document.getElementById("startStatsList");
+
     settingDialogs = [...document.getElementsByClassName("settingsBox")];
     settings = [...document.getElementsByClassName("settingRow")];
 
@@ -71,7 +73,8 @@ export class GenerateMenus {
                 document.body.removeChild(el);
             })
 
-            pbbox.classList.add( "pbbox settingLayout");
+            pbbox.classList.add("pbbox");
+
             this.pblistStart.parentNode.insertBefore(pbbox, this.pblistStart);
         })
     }
@@ -101,24 +104,50 @@ export class GenerateMenus {
         })
     }
 
-    addScrollListeners() {
+    updateSizes(box, settings) {
+        const totalHeight = box.scrollHeight;
+        settings.forEach(setting => {
+            const position = setting.getBoundingClientRect().top
+            let newpos = 1 - (position - window.innerHeight * 0.46) / totalHeight
+            if (newpos > 1) newpos = newpos - 2 * (newpos - 1);
+
+            setting.style.scale = newpos < 0.7 ? 0.9 : 1
+            setting.style.opacity = newpos < 0.7 ? 0.3 : 1
+        })
+    }
+
+    addMenuListeners() {
         this.settingDialogs.forEach(box => {
             const boxsettings = this.settings.filter(item => item.parentElement.parentElement.id == box.parentElement.id);
             box.addEventListener("scroll", () => {
                 this.updateSizes(box, boxsettings);
             })
         })
-    }
 
-    updateSizes(box, settings) {
-        const totalHeight = box.scrollHeight;
-        settings.forEach(setting => {
-            const position = setting.getBoundingClientRect().top
-            let newpos = 1 - (position - window.innerHeight * 0.47) / totalHeight
-            if (newpos > 1) newpos = newpos - 2 * (newpos - 1);
+        const selectKeys = [...document.getElementsByClassName("keybind")];
+        selectKeys.forEach(key => {
+            key.parentElement.addEventListener("click", () => {
+                menu.buttonInput(key);
+            })
+        })
 
-            setting.style.scale = newpos < 0.7 ? 0.9 : 1
-            setting.style.opacity = newpos < 0.7 ? 0.3 : 1
+        const sliders = [...document.getElementsByClassName("range")];
+        sliders.forEach(slider => {
+            slider.addEventListener("input", () => {
+                menu.sliderChange(slider);
+            })
+        })
+
+        const limiter = document.getElementById("limiter");
+        const limiter2 = document.getElementById("limiter2");
+        const numberInput = [...document.getElementsByClassName("number")];
+
+        numberInput.forEach(input => {
+            input.addEventListener("input", () => {
+                if (input.id == "backfireMulti") { menu.checkValue(input, limiter2) }
+                else if (input.id == "rangeValue") { menu.checkValue(input) }
+                else { menu.checkValue(input, limiter); }
+            })
         })
     }
 }

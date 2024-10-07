@@ -73,19 +73,25 @@ export class LockPiece {
         const lockCoords = this.game.mechanics.board.getMinos("A");
         this.game.boardrender.justPlacedCoords = lockCoords;
         this.game.boardrender.justPlacedAlpha = 1;
-        this.game.mechanics.board.getMinos("A").forEach(([x, y]) => {
+        lockCoords.forEach(([x, y]) => {
             this.game.mechanics.board.rmValue([x, y], "A");
             this.game.mechanics.board.addValFront([x, y], "S");
         });
+        this.game.mechanics.locking.clearLockDelay();
+        clearInterval(this.game.gravityTimer);
+        this.game.mechanics.clear.clearLines(lockCoords);
         this.game.endGame(
             this.game.mechanics.checkDeath(
                 this.game.mechanics.board.getMinos("S"),
                 this.game.mechanics.board.getMinos("NP")
             )
         );
-        this.game.mechanics.locking.clearLockDelay();
-        clearInterval(this.game.gravityTimer);
-        this.game.mechanics.clear.clearLines(lockCoords);
+        this.game.endGame(
+            this.game.mechanics.checkDeath(
+                lockCoords,
+                this.game.mechanics.board.getMinos("NP")
+            )
+        );
         this.game.stats.pieceCount++;
         this.game.hold.occured = false;
         this.game.mechanics.isTspin = false;

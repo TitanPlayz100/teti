@@ -9,6 +9,7 @@ export class Mechanics {
     isMini = false;
     garbageQueue = 0;
     spikeCounter = 0;
+    toppingOut = false;
 
     /**
      * @param {Game} game
@@ -21,12 +22,28 @@ export class Mechanics {
     }
 
     checkDeath(coords, collider) {
+        if (coords.length == 0) return;
         const collision = coords.every(c => this.game.movement.checkCollision([c], "PLACE", []));
         const collision2 = this.game.movement.checkCollision(coords, "SPAWN", collider);
         const isGarbage = collider.some(c => this.board.checkMino(c, "G"));
         if (collision && this.game.settings.game.allowLockout) return "Lockout";
         if (collision2 && isGarbage) return "Topout";
         if (collision2) return "Blockout";
+    }
+
+    deathAlert() {
+        const check = this.checkDeath(this.board.getMinos('Sh'), this.board.getMinos('NP'));
+        const check2 = this.checkDeath(this.board.getMinos('G'), this.board.getMinos('NP'));
+        const warn = document.getElementById('warningText');
+        if (!!(check || check2)) {
+            if (this.toppingOut) return;
+            this.game.sounds.playSound('hyperalert'); 
+            this.toppingOut = true; 
+            warn.classList.toggle('warn', true);
+        } else {
+            this.toppingOut = false;
+            warn.classList.toggle('warn', false);
+        }
     }
 
     spawnPiece(piece, start = false) {
@@ -61,6 +78,7 @@ export class Mechanics {
         while (!this.game.movement.checkCollision(shadow.map(c => [c[0], c[1] - count]), "DOWN"))
             count++;
         this.board.moveMinos(shadow, "DOWN", count, "Sh");
+        this.deathAlert();
     }
 
     startGravity() {
@@ -81,7 +99,7 @@ export class Mechanics {
         let randCol = Math.floor(Math.random() * 10);
         for (let i = 0; i < lines; i++) {
             if (this.game.movement.checkCollision(this.board.getMinos("A"), "DOWN")) {
-                if (this.locking.timings.lockdelay == -1) this.locking.incrementLock();
+                if (this.locking.timings.lockdelay == 0) this.locking.scheduleLock();
                 this.board.moveMinos(this.board.getMinos("A"), "UP", 1);
             }
             this.board.moveMinos(this.board.getMinos("S"), "UP", 1);

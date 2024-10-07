@@ -64,9 +64,9 @@ export class Game {
         this.renderer.renderingLoop();
         this.boardeditor.addListeners();
         this.menuactions.addRangeListener();
-        this.modals.generate.addScrollListeners();
-        this.profilestats.loadPBs();
+        this.modals.generate.addMenuListeners();
         this.modals.generate.generateGamemodeMenu();
+        this.profilestats.loadPBs();
         this.versionChecker();
     }
 
@@ -122,6 +122,7 @@ export class Game {
         this.boardeffects.toggleRainbow(false);
         this.renderer.resetActionText();
         this.renderer.renderDanger();
+        this.particles.clearParticles();
         this.renderer.clearHold();
         this.stopGameTimers();
 

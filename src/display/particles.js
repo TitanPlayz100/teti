@@ -1,4 +1,3 @@
-//@ts-check
 import { Game } from "../game.js";
 
 class Point {
@@ -180,6 +179,10 @@ export class Particles {
             const particle = new Point(spikeParticle, this.ctx);
             this.particles.push(particle);
         }
+    }
+
+    clearParticles() {
+        this.particles = [];
     }
 
     update() {

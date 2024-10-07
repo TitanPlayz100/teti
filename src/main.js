@@ -22,6 +22,10 @@ window.addEventListener("keyup", event => {
     game.controls.onKeyUp(event);
 });
 
+window.addEventListener('mousemove', () => {
+    game.controls.toggleCursor(true);
+})
+
 document.onresize = () => {
     game.renderer.sizeCanvas();
     game.renderer.updateNext();
@@ -45,11 +49,11 @@ window.finishLoad = () => {
     elementSplashScreen.style.display = "none";
 }
 
-window.addEventListener("focus", function(){ 
+window.addEventListener("focus", function () {
     document.getElementById("nofocus").style.display = "none";
 });
 
-window.addEventListener("blur", function(){ 
+window.addEventListener("blur", function () {
     if (!game.settings.display.outoffocus) return
     document.getElementById("nofocus").style.display = "block";
 });

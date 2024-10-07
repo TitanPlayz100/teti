@@ -19,9 +19,9 @@
 body {
     color: var(--cl-blue);
     font-family: "Major Mono Display", monospace;
+    margin: 0;
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
     background: var(--night);
 }
 
@@ -94,6 +94,7 @@ body {
     user-select: none;
 }
 
+/* scrollbars */
 ::-webkit-scrollbar {
     width: 0.3vw;
 }
@@ -113,4 +114,99 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: white;
     transition: all 0.2s ease;
+}
+
+/* sliders */
+.range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.5vh;
+    height: 2.5vh;
+    background: white;
+    cursor: pointer;
+}
+
+.range::-webkit-slider-thumb:hover {
+    background: var(--p-green);
+}
+
+/* remove number arrows */
+.number::-webkit-outer-spin-button,
+.number::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* animations */
+@keyframes jump {
+    0% {
+        transform: translateY(0vmin);
+    }
+
+    50% {
+        transform: translateY(0.2vmin);
+    }
+
+    100% {
+        transform: translateY(0vmin);
+    }
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+@keyframes zoomin {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes zoomout {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.75;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }

@@ -5,7 +5,10 @@ Hosted on github pages [here](https://titanplayz100.github.io/teti/)
 The info page can be found [here](https://titanplayz100.github.io/teti/info.html)
 
 ## Desktop App
-All the information is in the tauri branch, can download in releases
+All the information is in the tauri branch 
+
+> [!WARNING]
+> Releases are **NOT** up to date
 
 
 ## Data Formats
@@ -29,3 +32,17 @@ gamemodes = {
     }
 }
 ```
+
+Add functionality mainly in `featuers/modes.js`.  
+You can modify existing modules as well from other files
+
+### Adding Audio (sfxlist.json)
+```json
+{
+    {
+        "name": "<name used in code>",
+        "path": "assets/sfx/<file path / name>.<ext>"
+    }
+}
+```
+Use with `this.game.sounds.playSound("<name>", ...)`

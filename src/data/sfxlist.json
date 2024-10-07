@@ -162,5 +162,9 @@
     {
         "name": "combo_9.mp3",
         "path": "assets/sfx/combo/combo_9.mp3"
+    },
+    {
+        "name": "hyperalert",
+        "path": "assets/sfx/hyperalert.mp3"
     }
 ]

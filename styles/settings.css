@@ -2,7 +2,7 @@
 .scrollSettings {
     font-family: "Montserrat", sans-serif;
     height: 90vh;
-    aspect-ratio: 7/10;
+    aspect-ratio: 2/3;
     background-color: var(--almost-invis);
     padding: 0.5vmin;
     color: white;
@@ -15,7 +15,21 @@
     overflow: hidden;
 }
 
-/* border effect */
+.scrollSettings.closingAnimation {
+    animation: zoomout 0.3s forwards ease;
+}
+
+.scrollSettings::backdrop {
+    background-color: #000000b5;
+    backdrop-filter: blur(5px);
+    animation: fadein 0.4s forwards ease;
+}
+
+.scrollSettings.closingAnimation::backdrop {
+    animation: fadeout 0.4s forwards ease;
+}
+
+/* border */
 .scrollSettings::before,
 .scrollSettings::after {
     content: '';
@@ -35,20 +49,7 @@
     right: 0;
 }
 
-.scrollSettings.closingAnimation {
-    animation: zoomout 0.3s forwards ease;
-}
-
-.scrollSettings::backdrop {
-    background-color: #000000b5;
-    backdrop-filter: blur(5px);
-    animation: fadein 0.4s forwards ease;
-}
-
-.scrollSettings.closingAnimation::backdrop {
-    animation: fadeout 0.4s forwards ease;
-}
-
+/* top */
 .settingsTop {
     font-size: 1.5em;
     text-align: center;
@@ -72,7 +73,10 @@
     padding-bottom: 10vh;
 }
 
-.settingRow {
+.settingRow,
+.closeDialogButton,
+.settingsReset,
+.gamemodeSelect {
     display: flex;
     align-items: center;
     height: 4.2vh;
@@ -88,9 +92,12 @@
     transition: scale 0.6s, opacity 0.6s, outline-offset 0.3s;
 }
 
-.settingRow:hover {
+.settingRow:hover,
+.closeDialogButton:hover,
+.settingsReset:hover,
+.gamemodeSelect:hover {
     outline-offset: calc(-1*var(--t));
-    animation: jump 1.5s infinite ease;
+    animation: jump 1.5s infinite ease 0.4s;
     transition: outline-offset 0.1s, scale 0.6s;
 }
 
@@ -99,7 +106,8 @@
     display: flex;
     justify-content: flex-end;
     text-align: right;
-    padding-right: 3vw;
+    padding-right: 1.5vw;
+    pointer-events: none;
 }
 
 .settingRow>.option {
@@ -129,53 +137,79 @@
 
 }
 
-.closeDialogButton {
+.closeDialogButton,
+.settingsReset {
     height: auto;
-    padding: 1.5vmin;
-    bottom: 2%;
     background-color: var(--invis);
-    border: 0.2vh solid var(--gray);
-    border-radius: 1vh;
-    font-size: 1.3em;
-    color: var(--cl-blue);
+    border: none;
+    padding: 2vh;
+    font-size: 1.4em;
+    color: white;
     transition: all 0.4s ease;
 }
 
+/* buttons and misc */
 .settingsReset {
     position: absolute;
-    padding-top: 0.8vh;
     right: 1vw;
     bottom: 1vh;
+    padding: 1vh;
+    padding-top: 1.5vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 4vh;
+    height: 6vh;
     aspect-ratio: 1/1;
-    border: 0.2vh solid var(--gray);
-    border-radius: 1vh;
+}
+
+#gamemodeDialog>.settingsBox {
+    align-items: center;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.gamemodeSelect {
+    height: 8vh;
+    width: 80%;
     background-color: var(--invis);
-    transition: all 0.4s ease;
-    outline: none;
-}
-
-.closeDialogButton:hover,
-.settingsReset:hover {
+    border: none;
+    padding: 1.3vh;
+    font-size: 1.3em;
     color: white;
-    border-color: white;
-    transition: all 0.1s ease;
+    transition: all 0.4s ease;
+    justify-content: center;
 }
 
+.gamemodeSelect:hover {
+    outline-color: var(--p-green);
+    color: var(--p-green);
+}
 
-@keyframes jump {
-    0% {
-        transform: translateY(0vmin);
-    }
+.gamemodeSelect.selected {
+    outline-color: var(--green);
+    color: var(--green);
+}
 
-    50% {
-        transform: translateY(0.2vmin);
-    }
+#editMenu>.settingsBox {
+    padding-top: 0;
+}
 
-    100% {
-        transform: translateY(0vmin);
-    }
+#gameStatsDialog>.settingsFooter {
+    flex-direction: row;
+    height: 15%;
+}
+
+#gameEnd>.settingsFooter {
+    position: absolute;
+    bottom: 10%;
+    width: 100%;
+    flex-direction: row;
+    height: auto;
+}
+
+#changeRangeValue>.settingsBox {
+    padding-top: 0;
+    padding-bottom: 0;
+    height: auto;
+    align-items: center;
 }
