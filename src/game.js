@@ -55,7 +55,6 @@ export class Game {
         this.history = new History(this);
         this.modes = new Modes(this);
 
-        this.boardrender.loadImage();
         this.renderer.sizeCanvas();
         this.particles.initBoard();
         this.renderer.setEditPieceColours();
@@ -66,6 +65,9 @@ export class Game {
         this.menuactions.addRangeListener();
         this.modals.generate.addMenuListeners();
         this.modals.generate.generateGamemodeMenu();
+        this.modals.generate.generateStatList();
+        this.modals.generate.generateSkinList();
+        this.sounds.addMenuSFX();
         this.profilestats.loadPBs();
         this.versionChecker();
     }
@@ -74,7 +76,7 @@ export class Game {
         this.menuactions.loadSettings();
         this.resetState();
         this.renderer.renderStyles();
-        this.mechanics.spawnPiece(this.bag.randomiser(), true);
+        this.mechanics.spawnPiece(this.bag.randomiser(true), true);
         this.history.save();
     }
 

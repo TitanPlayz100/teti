@@ -1,7 +1,3 @@
-body {
-    --background: black;
-}
-
 #board {
     position: fixed;
     top: 50%;
@@ -177,8 +173,20 @@ body {
     background-color: var(--invis);
 }
 
+#lockTimer::-moz-progress-bar,
+#lockCounter::-moz-progress-bar,
+#garbageQueue::-moz-progress-bar {
+    background-color: var(--invis);
+}
+
 #lockTimer::-webkit-progress-value,
 #lockCounter::-webkit-progress-value {
+    background-color: var(--cl-blue);
+    border-radius: 0.7vh;
+}
+
+#lockTimer::-moz-progress-value,
+#lockCounter::-moz-progress-value {
     background-color: var(--cl-blue);
     border-radius: 0.7vh;
 }
@@ -199,25 +207,9 @@ body {
     border-radius: 0.7vh;
 }
 
-.actiontext,
-.statstext {
-    position: fixed;
-    font-size: 3vh;
-    text-shadow: 0 0 3vh var(--vl-gray);
-    margin: 0;
-    text-align: right;
-    width: 200%;
-    user-select: none;
-    transition: all 0.2s ease;
-    right: 105%;
-}
-
-.actiontext {
-    opacity: 0;
-}
-
-.smalltext {
-    user-select: none;
+#garbageQueue::-moz-progress-value {
+    background-color: red;
+    border-radius: 0.7vh;
 }
 
 .text {
@@ -274,7 +266,6 @@ body {
     top: 100%;
     left: 110%;
     width: 40vw;
-    /* max-width: 40vw; */
     opacity: 0;
     pointer-events: none;
     transition: all 0.3s ease;

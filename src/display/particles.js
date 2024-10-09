@@ -51,8 +51,6 @@ export class Particles {
     constructor(game) {
         this.game = game;
         this.ctx = this.game.renderer.ctx;
-        this.volume = 60;
-        this.size = 1;
     }
 
     initBoard() {
@@ -62,6 +60,9 @@ export class Particles {
     }
 
     spawnParticles(posX, posY, type, pieceWidth = 1, cw = false, colour = "white") {
+        if (!this.game.settings.display.particles) return
+        this.volume = this.game.settings.display.particleVolume;
+        this.size = this.game.settings.display.particleSize;
         const dx = (type == "place" || type == "spin") ? 1 : 0
         const [x, y] = [(posX + dx) * this.minosize, (40 - posY) * this.minosize];
         if (type == "place") this.createPlaceParticles(x, y, colour, this.minosize * pieceWidth, -this.boardHeight);
@@ -71,6 +72,7 @@ export class Particles {
         if (type == "dangersides") this.createDangerSidesParticles(x, y, "red", this.boardWidth, 0, 1);
         if (type == "spin") this.createSpinParticles(x, y, colour, cw, this.minosize * pieceWidth, -this.minosize * pieceWidth);
         if (type == "spike") this.createSpikeParticles(x, this.boardHeight, colour, this.boardWidth, -this.boardHeight);
+        if (type == "BTB") this.createBTBParticle(x, y, "gold", this.boardWidth, 0, this.boardHeight);
     }
 
     createPlaceParticles(x, y, colour, len, height) {
@@ -177,6 +179,22 @@ export class Particles {
 
             const spikeParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, xF: 0.96, yF: 0.96, twinkle: true }
             const particle = new Point(spikeParticle, this.ctx);
+            this.particles.push(particle);
+        }
+    }
+
+    createBTBParticle(x, y, colour, width, len, height) {
+        for (let i = 0; i < this.volume*2; i++) {
+            const direction = Math.random() > 0.5;
+
+            const posX = (direction ? 0 : width) + x + Math.random() * len
+            const posY = y + Math.random() * height;
+            const life = Math.random() * 25 + 50;
+            const dx = (direction ? 1 : -1) * (Math.random() * 2);
+            const dy = Math.random() * 2 - 1;
+
+            const BTBParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, gravity: 0.15 }
+            const particle = new Point(BTBParticle, this.ctx);
             this.particles.push(particle);
         }
     }

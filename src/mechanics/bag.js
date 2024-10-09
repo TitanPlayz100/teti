@@ -15,13 +15,19 @@ export class Bag {
         this.game = game;
     }
 
-    randomiser() {
+    randomiser(start = false) {
         if (this.nextPieces[1].length == 0) this.shuffleRemainingPieces();
         if (this.nextPieces[0].length == 0) {
             this.nextPieces = [this.nextPieces[1], []];
             this.shuffleRemainingPieces();
         }
         const piece = this.nextPieces[0].splice(0, 1)[0];
+
+        if (["o", "s", "z"].includes(piece) && this.game.settings.game.stride) { // stride mode
+            this.nextPieces = [[], []];
+            return this.randomiser();
+        }
+
         return pieces.filter(element => {
             return element.name == piece;
         })[0];

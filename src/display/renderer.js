@@ -1,5 +1,6 @@
 import { Game } from "../game.js";
 import pieces from "../data/pieces.json" with { type: "json" };
+import { defaultSkins, statDecimals, statsSecondary as statsSecondaries } from "../data/data.js";
 
 export class Renderer {
     boardHeight;
@@ -13,23 +14,31 @@ export class Renderer {
     inDanger;
     texttimeouts = {};
 
+    sidebarStats;
+    sidebarFixed;
+    sidebarSecondary;
+    ctx;
+    ctxN;
+    ctxH;
+
     canvasField = document.getElementById("playingfield");
     canvasNext = document.getElementById("next");
     canvasHold = document.getElementById("hold");
     divBoard = document.getElementById("board");
     divBackboard = document.getElementById("backboard");
     divLinesSent = document.getElementById("linessent");
+    elementEditPieces = document.getElementById("editMenuPieces");
+
     elementStats1 = document.getElementById("stats1");
     elementStats2 = document.getElementById("stats2");
     elementStats3 = document.getElementById("stats3");
-    elementEditPieces = document.getElementById("editMenuPieces");
-
+    elementStatname1 = document.getElementById("statName1");
+    elementStatname2 = document.getElementById("statName2");
+    elementStatname3 = document.getElementById("statName3");
     elementSmallStat1 = document.getElementById("smallStat1");
     elementSmallStat2 = document.getElementById("smallStat2");
-    ctx;
-    ctxN;
-    ctxH;
-
+    elementSmallStat3 = document.getElementById("smallStat3");
+    
     /**
      * @param {Game} game
      */
@@ -178,28 +187,61 @@ export class Renderer {
     }
 
     renderStyles() {
-        document.body.style.background = this.game.settings.display.background;
+        // custom background
+        const bg = this.game.settings.display.background;
+        if (bg == "") bg = "#080B0C";
+        document.body.style.background = (bg[0] == "#") ? bg : `url("${bg}") no-repeat center center`
+        document.body.style.backgroundSize = "cover";
+
         const height = Number(this.game.settings.display.boardHeight) + 10;
         this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
         this.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
+
+        // board opacity
         const background = `rgba(0, 0, 0, ${Number(this.game.settings.display.boardOpacity) / 100})`;
         this.divBackboard.style.backgroundColor = background;
         document.body.style.setProperty('--background', background);
+
+        // skins
+        let skin = this.game.settings.display.skin;
+        if (defaultSkins.includes(skin)) skin = `../assets/skins/${skin}.png`;
+        this.game.boardrender.loadImage(skin);
+
+        // sidebar constants
+        this.sidebarStats = this.game.settings.game.sidebar;
+        this.sidebarFixed = this.sidebarStats.map(stat => this.createReverseLookup(statDecimals)[stat]);
+        this.sidebarSecondary = this.sidebarStats.map(stat => statsSecondaries[stat] ?? "None");
+
+        this.sidebarStats.forEach((stat, index) => {
+            if (stat == "None") stat = ""
+            this[`elementStatname${index + 1}`].textContent = stat;
+        })
     }
 
     renderSidebar() {
-        const stats = ['time', 'apm', 'pps'];
-        const fixedVal = [2, 1, 2];
-        const statsSecondary = ['attack', 'pieceCount'];
-
-        stats.forEach((stat, index) => {
-            const displayStat = (Math.round(this.game.stats[stat] * 1000) / 1000).toFixed(fixedVal[index]);
+        this.sidebarStats.forEach((stat, index) => {
+            if (stat == "None") {
+                this[`elementStats${index + 1}`].textContent = "";
+                return;
+            };
+            const displayStat = this.game.stats[stat].toFixed(this.sidebarFixed[index]);
             this[`elementStats${index + 1}`].textContent = displayStat;
+            
+            if (this.sidebarSecondary[index]) {
+                const displaySecond = this.game.stats[this.sidebarSecondary[index]]
+                this[`elementSmallStat${index + 1}`].textContent = displaySecond;
+            }
         })
+    }
 
-        statsSecondary.forEach((stat, index) => {
-            this[`elementSmallStat${index + 1}`].textContent = this.game.stats[stat];
-        })
+    createReverseLookup(obj) {
+        const reverseLookup = {}
+        for (const [key, array] of Object.entries(obj)) {
+            array.forEach(item => {
+                reverseLookup[item] = key;
+            });
+        }
+        return reverseLookup
     }
 
     updateAlpha() {

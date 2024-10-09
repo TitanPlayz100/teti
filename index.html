@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./styles/style.css">
     <link rel="stylesheet" href="./styles/boards.css">
     <link rel="stylesheet" href="./styles/menus.css">
-    <link rel="stylesheet" href="./styles/dialogs.css">
+    <link rel="stylesheet" href="./styles/miscmenus.css">
     <link rel="stylesheet" href="./styles/settings.css">
     <script defer src="./src/main.js" type="module"></script>
 </head>
@@ -47,11 +47,12 @@
             <p class="statstext" id="stats1" style="bottom: 5%;"></p>
             <p class="statstext" id="stats2" style="bottom: 15%;"></p>
             <p class="statstext" id="stats3" style="bottom: 25%;"></p>
-            <p class="smalltext" id="smallStat1" style="bottom: 12.5%"></p>
-            <p class="smalltext" id="smallStat2" style="bottom: 22.5%"></p>
-            <p class="smalltext" style="left: -15%; bottom: 20%;">pps</p>
-            <p class="smalltext" style="left: -15%; bottom: 10%;">apm</p>
-            <p class="smalltext" style="left: -15%; bottom: 0%;">sec</p>
+            <p class="smalltext" id="smallStat1" style="bottom: 2.5%"></p>
+            <p class="smalltext" id="smallStat2" style="bottom: 12.5%"></p>
+            <p class="smalltext" id="smallStat3" style="bottom: 22.5%"></p>
+            <p class="smalltext" id="statName1" style="bottom: 0%;"></p>
+            <p class="smalltext" id="statName2" style="bottom: 10%;"></p>
+            <p class="smalltext" id="statName3" style="bottom: 20%;"></p>
             <p class="text objectiveText" id="objective"></p>
             <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
             <p class="smalltext" id="history" style="left: 110%; bottom: 0%; width: 10vw; display: none;">history: 0</p>
@@ -91,21 +92,25 @@
 
         <!-- main row -->
         <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="User Settings - Graphics, board, and background"> 
-            <img src="./assets/icons/display.svg" style="transform: translateY(10%); height: 70%;">
+            <img src="./assets/icons/display.svg" style="transform: translateY(10%);">
+            <p>GRAPHICS</p>
         </button>
         <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - Gameplay features and mechanics">
-            <img src="./assets/icons/settings.svg" style="transform: translateY(10%); height: 90%;">
+            <img src="./assets/icons/settings.svg">
+            <p>GAME</p>
         </button>
         <button id="control" class="settingPanelButton" onclick="modal.openModal('controlDialog')" title="Controls - keybinds for different actions">
-            <img src="./assets/icons/joystick.svg" style="transform: translateY(0%); height: 75%;">
+            <img src="./assets/icons/joystick.svg">
+            <p>CONTROLS</p>
         </button>
         <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
-            <img src="./assets/icons/timer.svg" style="transform: translateY(10%); height: 90%;">
+            <img src="./assets/icons/timer.svg">
+            <p>GAMEMODE</p>
         </button>
         <br>
 
         <!-- bottom row -->
-        <p id='explanationText'><span class="spanright">Hover for info</span> | <span class="spanleft">Esc to close</span></p>
+        <p id='explanationText'><span class="spanleft">Hover for info</span> | <span class="spanright">Esc to close</span></p>
         <br>
         <p id='updatetext'>Check out the new update in the info button</p>
         <br>
@@ -136,18 +141,22 @@
     <dialog id="displayDialog" class="scrollSettings">
         <div class="settingsTop"><h1>DISPLAY</h1></div>
         <div class="settingsBox">
-            <div class="settingRow"><p>BG hex</p> <input class="option textInput" type="text" id="background" /></div>
+            <div class="settingRow"><p>Background URL/Hex</p> <input class="option textInput" type="text" id="background" /></div>
+            <div class="settingRow"><p>Block Skin URL/Name</p> <input class="option textInput" type="text" id="skin" list="options"/></div>
             <div class="settingRow"><p>Board Opacity</p> <input class="option range" type="range" id="boardOpacity" min="0" max="100" step="1"/></div>
             <div class="settingRow"><p>Board Size</p> <input class="option range" type="range" id="boardHeight" min="0" max="100" step="1" /></div>
+            <div class="settingRow"><p>Board Bounciness</p> <input class="option range" type="range" id="boardBounce" min="-5" max="20" step="0.1" /></div>
             <div class="settingRow"><p>Enable Grid</p> <input class="option check" type="checkbox" id="showGrid" /></div>
             <div class="settingRow"><p>Grid opacity</p> <input class="option range" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
             <div class="settingRow"><p>Shadow opacity</p> <input class="option range" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
-            <div class="settingRow"><p>Board Bounciness</p> <input class="option range" type="range" id="boardBounce" min="-5" max="20" step="0.1" /></div>
             <div class="settingRow"><p>Coloured Shadow</p> <input class="option check" type="checkbox" id="colouredShadow" /></div>
             <div class="settingRow"><p>Coloured Borders</p> <input class="option check" type="checkbox" id="colouredQueues" /></div>
             <div class="settingRow"><p>Rainbow effect on fast pace</p> <input class="option check" type="checkbox" id="rainbowPB" /></div>
             <div class="settingRow"><p>Show Lock Bar</p> <input class="option check" type="checkbox" id="lockBar" /></div>
             <div class="settingRow"><p>Show out of focus text</p> <input class="option check" type="checkbox" id="outoffocus" /></div>
+            <div class="settingRow"><p>Enable Particles</p> <input class="option check" type="checkbox" id="particles" /></div>
+            <div class="settingRow"><p>Particle Volume</p> <input class="option range" type="range" id="particleVolume" min="5" max="1000" step="5" /></div>
+            <div class="settingRow"><p>Particle Size</p> <input class="option range" type="range" id="particleSize" min="0.1" max="10" step="0.1" /></div>
         </div>
         <div class="settingsFooter">
             <p>Press Esc to close without saving</p>
@@ -173,6 +182,12 @@
             <div class="settingRow"><p>Allspin</p> <input class="option check" type="checkbox" id="allspin" /></div>
             <div class="settingRow"><p>Allspin's are mini</p> <input class="option check" type="checkbox" id="allspinminis" /></div>
             <div class="settingRow"><p>Allow history (undo/redo)</p> <input class="option check" type="checkbox" id="history" /></div>
+            <div class="settingRow"><p>Stride (no o, s, z start)</p> <input class="option check" type="checkbox" id="stride" /></div>
+            <div class="settingRow"><p>Sidebar Stats</p> 
+                <select class="option textInput statoption" id="statoption1"></select>
+                <select class="option textInput statoption" id="statoption2"></select>
+                <select class="option textInput statoption" id="statoption3"></select>
+            </div>
         </div>
         <div class="settingsFooter">
             <p>Press Esc to close without saving</p>
@@ -278,10 +293,11 @@
 
         <div class="settingsBox">
             <div class="settingRow"><p>Competitive Mode</p> <input class="option check" type="checkbox" id="competitiveMode" /></div>
+            <h3>Profile stats</h3>
+            <button class="closeDialogButton" onclick="menu.exportLifetime()">Export all lifetime stats and PBs</button>
             <h3>Personal Bests</h3>
+            <p style="margin-left: 1vw; ">Click to save PB</p>
             <div id="PBlist"></div>
-            <p style="margin-left: 1vw;">Click to save PB</p>
-            <p style="margin-left: 1vw;">Lifetime stats stored, display coming soon</p>
         </div>
 
         <div class="settingsFooter">

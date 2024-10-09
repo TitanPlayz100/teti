@@ -56,6 +56,10 @@
         "path": "assets/sfx/menutap.mp3"
     },
     {
+        "name": "menuclick.mp3",
+        "path": "assets/sfx/menuclick.mp3"
+    },
+    {
         "name": "move.mp3",
         "path": "assets/sfx/move.mp3"
     },

@@ -213,3 +213,14 @@
     height: auto;
     align-items: center;
 }
+
+.settingRow:has(.statoption) {
+    animation: none;
+}
+
+.statoption {
+    width: 20%;
+    margin: 1%;
+    background: black;
+    color: white;
+}

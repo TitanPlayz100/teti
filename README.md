@@ -4,6 +4,9 @@ Hosted on github pages [here](https://titanplayz100.github.io/teti/)
 
 The info page can be found [here](https://titanplayz100.github.io/teti/info.html)
 
+> [!WARNING]
+> Firefox is not supported (due to import assertions)
+
 ## Desktop App
 All the information is in the tauri branch 
 
@@ -23,12 +26,11 @@ gamemodes = {
         target: "", // target (valid target in settings)
         result: "", // displayed as result (another valid stat in stats class)
         
-        music: "", // to be implemented, custom song that can play 
-        pbmusic: "", // to be implemented, custom song that played on pb pace
-        skin: "", // to be implemented
-        board: "", // to be implemented, starting board, tetrio map format
-        sidebar: [], // to be implemented, sidebar stats that are displayed
-        background: "", // to be implemented, custom background / effects
+        // TO BE ADDED LATER
+        music: "", // custom song that can play 
+        compmusic: "", // custom song that played on pb pace
+        startBoard: "", // starting board, tetrio map format
+        effects: "", // custom background / effects
     }
 }
 ```

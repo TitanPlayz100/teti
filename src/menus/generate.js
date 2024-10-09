@@ -1,3 +1,4 @@
+import { defaultSkins } from "../data/data.js";
 import { Game } from "../game.js";
 
 
@@ -38,6 +39,34 @@ export class GenerateMenus {
             setting.classList.remove("selected");
             if (setting.id == this.game.settings.game.gamemode)
                 setting.classList.add("selected");
+        });
+    }
+
+    generateSkinList() {
+        const el = document.getElementById("skin").parentElement;
+        const list = document.createElement("datalist");
+        list.id = "options";
+        defaultSkins.forEach(skin => {
+            const option = document.createElement("option");
+            option.value = skin;
+            list.appendChild(option);
+        })
+        el.appendChild(list);
+    }
+
+    generateStatList() {
+        const statoptions = [...document.getElementsByClassName("statoption")];
+        const options = Object.getOwnPropertyNames(this.game.stats);
+        options.unshift("None");
+
+        statoptions.forEach(setting => {
+            options.forEach(stat => {
+                const skip = ['clearCols', 'clearPieces', 'game', 'tspins'];
+                if (skip.includes(stat)) return;
+                const option = document.createElement("option");
+                option.textContent = stat;
+                setting.appendChild(option);
+            });
         });
     }
 
@@ -93,10 +122,10 @@ export class GenerateMenus {
             statItem.classList = "statText";
 
             const text1 = document.createElement("span")
-            text1.classList = "spanright"
+            text1.classList = "spanleft"
             text1.textContent = stat + ":"
             const text2 = document.createElement("span")
-            text2.classList = "spanleft"
+            text2.classList = "spanright"
             text2.textContent = Math.round(score * 1000) / 1000
             statItem.appendChild(text1);
             statItem.appendChild(text2);

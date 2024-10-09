@@ -46,10 +46,10 @@ export class GameStats {
 
     // input stats
     inputs = 0;
-    kps = 0;
-    kpp = 0;
     holds = 0;
     rotates = 0;
+    kps = 0;
+    kpp = 0;
 
     clearCols = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // amount cleared in a col = clearCols[col - 1]
     clearPieces = { // lineclears by piece = clearPieces[piece][line_count - 1]

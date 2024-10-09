@@ -9,7 +9,7 @@ export class Sounds {
     curSongIdx = 0;
     elSongProgress = document.getElementById("songProgress");
     elSongText = document.getElementById("songText");
-    
+
     lowpassfilter;
     audioContext;
 
@@ -67,14 +67,22 @@ export class Sounds {
         }
     }
 
-    async initSounds() {
-        let menuSFX = (e, sfx) => {
-            document.querySelectorAll(e)
-                .forEach(el => (el.onmouseenter = () => this.game.sounds.playSound(sfx)));
+    addMenuSFX() {
+        let hoverSFX = (e) => {
+            document.querySelectorAll(e).forEach(el => (el.addEventListener("mouseenter", () => this.game.sounds.playSound("menutap"))));
         };
-        menuSFX(".settingLayout", "menutap");
-        menuSFX(".gamemodeSelect", "menutap");
+        let clickSFX = (e) => {
+            document.querySelectorAll(e).forEach(el => (el.addEventListener("click", () => this.game.sounds.playSound("menuclick"))));
+        };
+        hoverSFX(".settingRow");
+        hoverSFX(".closeDialogButton");
+        hoverSFX(".gamemodeSelect");
+        hoverSFX(".settingPanelButton");
+        clickSFX(".settingPanelButton");
+        clickSFX(".closeDialogButton");
+    }
 
+    async initSounds() {
         setInterval(() => {
             if (this.songs[this.curSongIdx].currentTime == 0) return;
             this.elSongProgress.value =
@@ -111,7 +119,7 @@ export class Sounds {
     toggleSongMuffle(muffled) {
         const currentTime = this.audioContext.currentTime;
         this.lowpassfilter.frequency.cancelScheduledValues(currentTime);
-        this.lowpassfilter.frequency.setValueAtTime(this.lowpassfilter.frequency.value, currentTime);  
-        this.lowpassfilter.frequency.exponentialRampToValueAtTime(muffled ? 300 : 20000, currentTime + 1);  
+        this.lowpassfilter.frequency.setValueAtTime(this.lowpassfilter.frequency.value, currentTime);
+        this.lowpassfilter.frequency.exponentialRampToValueAtTime(muffled ? 300 : 20000, currentTime + 1);
     }
 }

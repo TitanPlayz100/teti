@@ -11,7 +11,11 @@
         "lockBar": true,
         "rainbowPB": true,
         "boardBounce": 1,
-        "outoffocus": true
+        "outoffocus": true,
+        "particles":true,
+        "particleVolume": 60,
+        "particleSize":1,
+        "skin":"tetrio"
     },
     "game": {
         "gravitySpeed": 950,
@@ -35,7 +39,9 @@
         "allspin": true,
         "allspinminis": true,
         "history": true,
-        "competitiveMode": false
+        "competitiveMode": false,
+        "sidebar": ["time", "apm", "pps"],
+        "stride": false
     },
     "control": {
         "rightKey": "ArrowRight",

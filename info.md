@@ -59,19 +59,31 @@ Feel free to contribute with features and fixes, and open issues.
 - custom menu to import/export board states, and edit garbage
 - undo and redo with non linear branches
 - pbs are saved, as well as lifetime stats
+- can edit piece skins
+- cool particles
 
 ## TODO list
-Things that I am working on based on other changes *(omg this will never end)*
-- view lifetime stats and legacy stats in pb menu
-- customise stat sidebar
-- particle options
-- customise skin and maybe audio as well
-- piece flash, menu sfx proper, dotted vs rounded grid, setting type option, small text under each menu option, firefox css support
+Things that I am working on based on other changes
+- piece flash, dotted vs rounded grid
 - ready set go start option
-- stride mode queues (no szo starts)
-- custom url backgrounds
+- better loading screen with toast popup when assets load instead
 
 ## Updates
+#### v1.3.1
+- backgrounds can be custom using url
+- Skin can now be customised and comes with some defaults as well
+    - can either use: tetrio, jstris, plain
+    - can insert url with image (372x30 using tetrio format) such as you.have.fail skins
+- text under main menu options
+- fixed menu sfx volume
+- made most css work on firefox now
+    - update: i installed firefox and actually nothing works because import assertions are not supported yet (import ... **with** json)
+- sidebar text is now customisable in game settings
+    - use "None" for no text
+- stride setting
+    - no o, s, z starts
+- added btb particles after btb 8
+
 ### v1.3.0 => VISUALS
 - PIECE SKINS!
     - will add way to custom add own skins
@@ -81,6 +93,7 @@ Things that I am working on based on other changes *(omg this will never end)*
 - NEW MENUS!!!
     - allows for scrolling, more animations
     - consistent and more modern look
+    - images light up on hover
 - changed tick rate to 60 for consistency
 - tweaks to movement for hopefully performance 
 - refactored board rendering to be more readable
@@ -176,22 +189,19 @@ Things that I am working on based on other changes *(omg this will never end)*
 ***
 ## Feature Wishlist
 Future wants for game, kinda ordered by ease and desire for feature
-- more garbage settings
 - finesse detection
-- better loading screen with toast popup when assets load instead
 - cooler action text
 - allow importing tetrio settings and custom game files
-- show info when hovering over settings
 - small guide on essential things for game
+    - show info when hovering over settings
+    - WIKI for technical docs about project
+    - glossary of useful terms
 - more rotation systems (ars, trs, srs/srsX, none)
-- custom mino skins and music
 - replay functionality (either save gamestate or save keystrokes idk yet)
 - more unique gamemodes (techmino styled)
     - misdrop remover mode
     - holdless and next queueless gamemode kinda like qp2 cards
     - colourblind gamemode
-- WIKI for technical docs about project
-    - glossary of useful terms
 - guide like progression thing? using custom boards (kinda like tetris tres bien)
     - achievements, progression tree
 - maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats

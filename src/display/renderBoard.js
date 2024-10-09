@@ -5,6 +5,7 @@ export class BoardRenderer {
     justPlacedCoords = [];
     justPlacedAlpha = 1;
     minoSize;
+    texture;
 
     divlock = document.getElementById("lockTimer");
 
@@ -34,10 +35,9 @@ export class BoardRenderer {
         return hex.length > 1 ? hex : 0 + hex;
     }
 
-    texture;
-    loadImage() {
+    loadImage(src) {
         this.texture = new Image(372, 30);
-        this.texture.src = '../assets/skins/tetrio.png';
+        this.texture.src = src;
         this.texture.onload = () => {
             this.game.renderer.updateNext();
         }

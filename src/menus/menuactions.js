@@ -219,4 +219,17 @@ export class MenuActions {
         this.menus.closeDialog(document.getElementById("gameStatsDialog"));
         this.game.modals.open = true;
     }
+
+    exportLifetime() {
+        this.game.profilestats.saveSession();
+        const data = localStorage.getItem("stats");
+        const day = (new Date()).toLocaleDateString().replace("/", "-");
+
+        let el = document.createElement("a");
+        el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(data)));
+        el.setAttribute("download", `teti_stats_${day}.json`);
+        document.body.appendChild(el);
+        el.click();
+        document.body.removeChild(el);
+    }
 }

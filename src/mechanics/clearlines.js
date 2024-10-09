@@ -65,6 +65,7 @@ export class ClearLines {
         this.game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);
 
         if (isPC) this.game.particles.spawnParticles(0, 0, "pc");
+        if (stats.btbCount > 7 && isBTB) this.game.particles.spawnParticles(0, 20, "BTB");
         if (damage > 10 || stats.combo > 10) this.game.particles.spawnParticles(0, 0, "spike");
     }
 

@@ -12,19 +12,18 @@
             "allowQueueModify": false,
             "allspin": false,
             "allspinminis": false,
-            "history": false
+            "history": false,
+            "sidebar": ["time", "apm", "pps"]
         },
         "displayName": "Unset",
         "objectiveText": "",
         "goalStat": "",
         "target": "",
         "result": "",
-        
         "music": "",
         "compmusic": "",
         "skin": "",
         "board": "",
-        "sidebar": [],
         "background": ""
     },
     "custom": {
@@ -72,7 +71,7 @@
     },
     "survival": {
         "displayName": "Survival",
-        "objectiveText": "Lines survived",
+        "objectiveText": "received",
         "goalStat": "clearlines",
         "target": "gameEnd",
         "result": "time",

@@ -1,5 +1,7 @@
 export const cleartypes = { 0: "", 1: "Single", 2: "Double", 3: "Triple", 4: "Quad", 5: "Teti-tris" };
 
+export const defaultSkins = ['tetrio', 'jstris', 'plain'];
+
 export const scoringTable = {
     "": 0,
     TSPIN: 400,
@@ -88,6 +90,30 @@ export const resultSuffix = {
     time: 's',
     score: ' Points',
     maxCombo: ' Combo'
+}
+
+// todo add
+export const statDecimals = {
+    0: ["clearlines", "pieceCount", "score", "pcs", "quads", "allspins", "level", "attack", "cleargarbage", "sent", "recieved", "combo", "maxCombo", "btbCount", "maxBTB", "tpE", "ipE", "inputs", "holds", "rotates", "ppb",],    
+    1: ["time", "vs", "chzind", "garbeff",],
+    2: ["pps", "apm", "lpm", "app", "apl", "appw", "dss", "dsp", "vsOnApm", "kps", "kpp"]
+}
+
+// todo add
+export const statsSecondary = {
+    pps: "pieceCount",
+    apm: "attack",
+    lpm: "clearlines",
+    app: "attack",
+    apl: "attack",
+    appw: "attack",
+    dss: "cleargarbage",
+    dsp: "cleargarbage",
+    kps: "inputs",
+    kpp: "inputs",
+    tpE: "tspins",
+    ipE: "quads",
+    ppb: "score"
 }
 
 

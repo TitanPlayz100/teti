@@ -8,6 +8,8 @@ export class ModalActions {
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
 
     settingPanel = document.getElementById("settingsPanel");
+    options = [...document.getElementsByClassName("option")];
+
     
     /**
      * @param {Game} game
@@ -29,6 +31,7 @@ export class ModalActions {
             let newval;
             if (this.game.settings.hasOwnProperty(settingType)) newval = this.game.settings[settingType][setting.id]
             if (setting.classList[2] == "exp") newval = toLogValue(newval);
+            if (setting.classList[2] == "statoption") newval = this.game.settings.game.sidebar[setting.id[10]-1]; 
             if (setting.id == "nextQueue") newval = this.game.bag.getQueue();
             if (setting.id == "holdQueue") newval = this.game.hold.getHold();
             if (setting.id == "rowfillmode") newval = this.game.boardeditor.fillRow;
@@ -52,9 +55,8 @@ export class ModalActions {
     }
 
     getOptions(id) {
-        const set = this.generate.settings.map(i => i.children[1]);
-        const filt2 = set.filter(item => item.parentElement.parentElement.parentElement.id == id)
-        return filt2;
+        const settings = [...this.options].filter(item => item.parentElement.parentElement.parentElement.id == id)
+        return settings;
     }
 
     getSettingType(id) {
@@ -75,6 +77,7 @@ export class ModalActions {
                     : setting.textContent.toLowerCase();
             }
             if (setting.classList[2] == "exp") val = toExpValue(val);
+            if (setting.classList[2] == "statoption") this.game.settings.game.sidebar[setting.id[10]-1] = val;
             if (setting.id == "nextQueue") this.game.bag.setQueue(val, this.pieceNames);
             if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
             if (setting.id == "rowfillmode") this.game.boardeditor.fillRow = val;

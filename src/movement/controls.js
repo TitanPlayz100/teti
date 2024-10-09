@@ -45,6 +45,8 @@ export class Controls {
 
     onKeyDownRepeat(event, key) { // allows for repeating
         const keys = this.game.settings.control;
+        if (event.key == this.menuKey) event.preventDefault();
+
         if (key == keys.undoKey) this.game.history.undo();
         else if (key == keys.redoKey) this.game.history.redo()
     }
