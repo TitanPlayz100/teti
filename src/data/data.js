@@ -92,14 +92,12 @@ export const resultSuffix = {
     maxCombo: ' Combo'
 }
 
-// todo add
 export const statDecimals = {
     0: ["clearlines", "pieceCount", "score", "pcs", "quads", "allspins", "level", "attack", "cleargarbage", "sent", "recieved", "combo", "maxCombo", "btbCount", "maxBTB", "tpE", "ipE", "inputs", "holds", "rotates", "ppb",],    
     1: ["time", "vs", "chzind", "garbeff",],
     2: ["pps", "apm", "lpm", "app", "apl", "appw", "dss", "dsp", "vsOnApm", "kps", "kpp"]
 }
 
-// todo add
 export const statsSecondary = {
     pps: "pieceCount",
     apm: "attack",

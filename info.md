@@ -64,11 +64,14 @@ Feel free to contribute with features and fixes, and open issues.
 
 ## TODO list
 Things that I am working on based on other changes
-- piece flash, dotted vs rounded grid
+- piece flash
+- dotted vs rounded grid
 - ready set go start option
 - better loading screen with toast popup when assets load instead
 
 ## Updates
+#### v1.3.2
+
 #### v1.3.1
 - backgrounds can be custom using url
 - Skin can now be customised and comes with some defaults as well
