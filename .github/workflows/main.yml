@@ -25,15 +25,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
-
-      - run: |
-          mkdir -p tauri/src
-          cp index.html tauri/src/
-          cp -r assets/ tauri/src/
-          cp -r styles/ tauri/src/
-          cp -r src/ tauri/src/
-          cd tauri
-                
+    
       - name: setup node
         uses: actions/setup-node@v4
         with:
@@ -53,8 +45,15 @@ jobs:
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
-      - name: install frontend dependencies
-        run: npm install # change this to npm, pnpm or bun depending on which one you use.
+
+      - run: |
+          mkdir -p tauri/src
+          cp index.html tauri/src/
+          cp -r assets/ tauri/src/
+          cp -r styles/ tauri/src/
+          cp -r src/ tauri/src/
+          cd tauri
+          npm install
 
       - uses: tauri-apps/tauri-action@v0
         env:
