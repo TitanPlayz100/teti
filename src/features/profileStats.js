@@ -30,6 +30,8 @@ export class ProfileStats {
             this.personalBests[gamemode] = { score, pbstats: gameStats, version: this.game.version, ts };
             this.game.elementGameEndTitle.textContent = 'NEW PB!';
             setTimeout(() => this.game.sounds.playSound("personalbest"), 1000);
+
+            this.game.modals.generate.notif("PB Saved", `PB on ${gamemode} saved`, "success");
         }
     }
 

@@ -67,17 +67,21 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 
 ## TODO list
 Things that I am working on based on other changes
-- piece flash
-- dotted vs rounded grid
-- ready set go start option
-- better loading screen with toast popup when assets load instead
+- wow finished
+
 
 ## Updates
 #### v1.3.2
-- added a reset animation
+- reset animation
     - toggles with stride mode
 - fixed timer when menu was open
 - competitive modes now have custom sidebars
+- added piece dropping particles and piece flash (tetrio style)
+- added notifications
+    - displays errors
+    - shows export and import messages
+- removed assets loading screen, cause it was unecessary
+- added different grid patterns
 
 #### v1.3.1
 - backgrounds can be custom using url
@@ -199,8 +203,9 @@ Things that I am working on based on other changes
 ***
 ## Feature Wishlist
 Future wants for game, kinda ordered by ease and desire for feature
-- finesse detection
+- ready set go start option
 - cooler action text
+- finesse detection
 - allow importing tetrio settings and custom game files
 - small guide on essential things for game
     - show info when hovering over settings

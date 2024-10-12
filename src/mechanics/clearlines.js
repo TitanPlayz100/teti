@@ -17,14 +17,15 @@ export class ClearLines {
     clearLines(clearCoords) {
         const clearRows = this.game.mechanics.board.getFullRows();
         let removedGarbage = 0;
-
-        // clear rows and count garbage
+        
         for (let row of clearRows) {
             const stopped = this.game.mechanics.board.getMinos("S");
-            if (stopped.filter(c => c[1] == row).some(([x, y]) => this.game.mechanics.board.checkMino([x, y], "G")))
+            if (stopped.filter(c => c[1] == row).some(([x, y]) => this.game.mechanics.board.checkMino([x, y], "G"))) // count garbage
                 removedGarbage++;
-            stopped.filter(c => c[1] == row)
-                .forEach(([x, y]) => this.game.mechanics.board.setCoordEmpty([x, y]));
+            stopped.filter(c => c[1] == row).forEach(([x, y]) => { // clear rows
+                this.game.mechanics.board.setCoordEmpty([x, y]);
+                this.game.boardrender.removeCoords([x, y]);
+            });
             this.game.mechanics.board.moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1);
         }
 
@@ -32,7 +33,7 @@ export class ClearLines {
         clearCoords.forEach(([x, y]) => { // stats
             if (clearRows.includes(y)) this.game.stats.clearCols[x]++;
         })
-        
+
         if (clearRows.length > 0) this.game.renderer.bounceBoard("DOWN");
         this.game.particles.spawnParticles(0, Math.min(...clearRows), "clear")
         this.processLineClear(removedGarbage, clearRows);
@@ -81,7 +82,7 @@ export class ClearLines {
 
         if (this.game.settings.game.gamemode != 'backfire') return;
         if (garb > 0) this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
-        
+
         if (this.game.stats.combo == -1 && this.game.mechanics.garbageQueue > 0) {
             this.game.mechanics.addGarbage(this.game.mechanics.garbageQueue, 0);
             this.game.stats.recieved += this.game.mechanics.garbageQueue;

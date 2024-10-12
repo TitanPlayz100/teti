@@ -7,6 +7,7 @@ export class BoardRenderer {
     justPlacedAlpha = 1;
     minoSize;
     texture;
+    flashTimes = [];
 
     divlock = document.getElementById("lockTimer");
 
@@ -24,12 +25,38 @@ export class BoardRenderer {
         if (this.divlock.value != 0 && cell.includes("A") && this.game.settings.game.gamemode != "lookahead") {
             return 1 - (this.divlock.value / 250);
         }
-        for (let [posX, posY] of this.justPlacedCoords) {
-            if (posX == x && posY == y && cntx == this.game.renderer.ctx) {
-                return Math.max(this.justPlacedAlpha, this.boardAlpha).toFixed(2);
+        if (this.game.settings.game.gamemode == "lookahead") {
+            for (let [posX, posY] of this.justPlacedCoords) {
+                if (posX == x && posY == y && cntx == this.game.renderer.ctx) {
+                    return Math.max(this.justPlacedAlpha, this.boardAlpha).toFixed(2);
+                }
             }
         }
+
         return this.boardAlpha.toFixed(2);
+    }
+
+    setMinoFlash(cntx, x, y, posX, posY) {
+        if (cntx != this.game.renderer.ctx) return;
+        for (let { c, t } of this.flashTimes) {
+            if (c[0] == x && c[1] == y) {
+                const dx = (t / 15) * this.minoSize;
+                posX = posX + this.minoSize;
+                posY = posY + this.minoSize;
+                this.drawTriangle(posX, posY, posX - dx, posY - dx, cntx);
+            }
+        }
+    }
+
+    drawTriangle(posX, posY, x, y, cntx) {
+        cntx.globalAlpha = 0.4;
+        cntx.fillStyle = "#ffffff"
+        cntx.beginPath();
+        cntx.moveTo(posX, posY);
+        cntx.lineTo(posX, y);
+        cntx.lineTo(x, posY);
+        cntx.lineTo(posX, posY);
+        cntx.fill();
     }
 
     toHex(num) {
@@ -64,11 +91,38 @@ export class BoardRenderer {
         return opacity;
     }
 
+    removeCoords([x, y]) {
+        this.justPlacedCoords = this.justPlacedCoords.filter(c => !(c[0] == x && c[1] == y));
+        this.flashTimes = this.flashTimes.filter(({ c, t }) => !(c[0] == x && c[1] == y));
+    }
+
+    renderBorder(ctx, x, y) {
+        const type = this.game.settings.display.gridType;
+        if (type == "round") {
+            ctx.beginPath();
+            ctx.roundRect(x, y, this.minoSize - 1, this.minoSize - 1, this.minoSize / 4);
+            ctx.stroke();
+        } else if (type == "square") {
+            ctx.beginPath();
+            ctx.strokeRect(x, y, this.minoSize - 1, this.minoSize - 1, this.minoSize / 4);
+            ctx.stroke();
+        } else if (type == "dot") {
+            ctx.beginPath();
+            ctx.arc(x + this.minoSize, y + this.minoSize, 1, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x, y, 1, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+    }
+
+    /**
+     * @param {CanvasRenderingContext2D} cntx 
+     */
     renderToCanvas(cntx, grid, yPosChange, [dx, dy] = [0, 0], width, height) {
         cntx.clearRect(0, 0, width, height);
         grid.forEach((row, y) => {
             row.forEach((col, x) => {
-                // cntx.globalAlpha = cntx == this.game.renderer.ctx ? this.boardAlpha.toFixed(2) : this.queueAlpha.toFixed(2);
                 const [posX, posY] = [x * this.minoSize, (yPosChange - y) * this.minoSize];
                 const cell = col.split(" ");
                 cntx.lineWidth = 1;
@@ -77,6 +131,7 @@ export class BoardRenderer {
                     cntx.globalAlpha = this.getOpacity(cell, cntx, x, y) ?? this.queueAlpha.toFixed(2);
                     const p = this.getTexture(this.getPiece(cntx, cell[1]));
                     cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
+                    this.setMinoFlash(cntx, x, y, posX + dx, posY + dy);
                 }
                 else if (cell.includes("NP") && this.game.renderer.inDanger) { // next piece overlay
                     cntx.globalAlpha = 0.32;
@@ -90,12 +145,16 @@ export class BoardRenderer {
                     cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
                 }
                 else if (y < 20 && this.game.settings.display.showGrid && cntx == this.game.renderer.ctx) { // grid
+                    cntx.globalAlpha = 1
                     cntx.strokeStyle = "#ffffff" + this.toHex(this.game.settings.display.gridopacity);
-                    cntx.beginPath();
-                    cntx.roundRect(posX, posY, this.minoSize - 1, this.minoSize - 1, this.minoSize / 4);
-                    cntx.stroke();
+                    this.renderBorder(cntx, posX, posY);
                 }
             });
         });
+
+        // flash
+        this.flashTimes = this.flashTimes
+            .filter(({ c, t }) => t > 0)
+            .map(({ c, t }) => { return { c, t: t - 1 }; });
     }
 }

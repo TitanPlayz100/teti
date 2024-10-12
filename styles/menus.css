@@ -192,6 +192,7 @@ button>img {
 }
 
 .textInput,
+.dropdown,
 .number {
     padding: 0.6vh;
     background-color: var(--almost-invis);
@@ -208,6 +209,8 @@ button>img {
 
 .textInput:hover,
 .textInput:focus,
+.dropdown:hover,
+.dropdown:focus,
 .number:hover,
 .number:focus {
     border-radius: 0;

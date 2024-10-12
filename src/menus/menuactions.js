@@ -124,6 +124,7 @@ export class MenuActions {
         reader.onload = () => {
             localStorage.setItem("settings", reader.result.toString());
             this.loadSettings();
+            this.game.modals.generate.notif("Settings Loaded", "User settings have successfully loaded", "message");
         };
     }
 
@@ -131,6 +132,7 @@ export class MenuActions {
         this.game.settings.reset(group);
         this.saveSettings();
         location.reload();
+        this.game.modals.generate.notif("Settings Reset", `${group} settings have been reset to default`, "message");
     }
 
     // menu
@@ -190,12 +192,14 @@ export class MenuActions {
         this.game.bag.nextPieces = [next.split(","), []];
         this.game.hold.piece = this.game.renderer.getPiece(hold);
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
+        this.game.modals.generate.notif("Map Loaded", "Custom map has successfully loaded", "message");
     }
 
     getBoardString() {
         const exportstring = this.game.boardeditor.convertToMap();
         navigator.clipboard.writeText(exportstring)
-        alert("TETR.IO Map String (copied to clipboard):\n" + exportstring)
+        this.game.modals.generate.notif("Map Exported", "Custom map has been copied to your clipboard", "message");
+        alert("TETR.IO Map String:\n" + exportstring)
     }
 
     // stats
@@ -212,6 +216,7 @@ export class MenuActions {
         document.body.appendChild(el);
         el.click();
         document.body.removeChild(el);
+        this.game.modals.generate.notif("Stats Exported", "The current game's stats have been exported.", "message");
     }
 
     closeStats() {
@@ -230,5 +235,6 @@ export class MenuActions {
         document.body.appendChild(el);
         el.click();
         document.body.removeChild(el);
+        this.game.modals.generate.notif("Lifetime Stats Exported", "All your lifetime stats and PBs have been exported. Enjoy the many stats you can analyse!", "success");
     }
 }

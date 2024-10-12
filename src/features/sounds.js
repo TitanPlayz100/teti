@@ -33,7 +33,6 @@ export class Sounds {
         if (this.sfx[audioName] == undefined) return;
         this.sfx[audioName].muted = silent;
         this.sfx[audioName].volume = this.game.settings.volume.sfxLevel / 1000;
-        if (this.game.started == false) return;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
         this.sfx[audioName].currentTime = 0;
         this.sfx[audioName].play();
@@ -59,7 +58,7 @@ export class Sounds {
     pauseSong() {
         if (this.songs[this.curSongIdx].paused) {
             this.songs[this.curSongIdx].play();
-            this.elSongText.textContent = `Now Playing ${this.songNames[this.curSongIdx]}`;
+            this.elSongText.textContent = `Playing ${this.songNames[this.curSongIdx]}`;
         } else {
             this.songs[this.curSongIdx].pause();
             this.elSongText.textContent = `Not Playing`;
@@ -82,7 +81,7 @@ export class Sounds {
         clickSFX(".closeDialogButton");
     }
 
-    async initSounds() {
+    initSounds() {
         setInterval(() => {
             if (this.songs[this.curSongIdx].currentTime == 0) return;
             this.elSongProgress.value =
@@ -92,8 +91,11 @@ export class Sounds {
         // preload all sfx
         sfxobj.forEach(file => {
             const name = file.name.split(".")[0];
-            this.sfx[name] = new Audio(file.path);
+            const a = new Audio(file.path);
+            this.sfx[name] = a;
+            this.playSound(name, false, true);
         })
+
 
         this.audioContext = new window.AudioContext();
         this.lowpassfilter = this.audioContext.createBiquadFilter();

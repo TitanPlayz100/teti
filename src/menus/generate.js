@@ -6,6 +6,7 @@ export class GenerateMenus {
     gamemodeStart = document.getElementById("startGamemodeList");
     pblistStart = document.getElementById("PBlist");
     statsStart = document.getElementById("startStatsList");
+    notifStack = document.getElementById("notifications");
 
     settingDialogs = [...document.getElementsByClassName("settingsBox")];
     settings = [...document.getElementsByClassName("settingRow")];
@@ -59,7 +60,7 @@ export class GenerateMenus {
         const options = Object.getOwnPropertyNames(this.game.stats);
         options.sort();
         options.unshift("None");
-        
+
         statoptions.forEach(setting => {
             options.forEach(stat => {
                 const skip = ['clearCols', 'clearPieces', 'game', 'tspins'];
@@ -179,5 +180,38 @@ export class GenerateMenus {
                 else { menu.checkValue(input, limiter); }
             })
         })
+
+        const gridType = document.getElementById("gridType");
+        const types = ["round", "square", "dot"];
+        types.forEach(type => {
+            const option = document.createElement("option");
+            option.textContent = type;
+            gridType.appendChild(option);
+        })
+    }
+
+    notif(heading, message, type) {
+        const types = { "message": "white", "success": "lightgreen", "error": "red", }
+        const notif = document.createElement("div"); // notif box
+        notif.classList.add("notif");
+        notif.style.setProperty("--color", types[type]);
+        const title = document.createElement("p"); // heading
+        title.classList.add("notif_title");
+        title.textContent = heading;
+        notif.appendChild(title);
+        const text = document.createElement("p");
+        text.classList.add("notif_text");
+        text.textContent = message;
+        notif.appendChild(text); // text
+        this.notifStack.appendChild(notif);
+
+        const remove = () => {
+            notif.style.animation = "fadeout 0.5s forwards";
+            setTimeout(() => notif.remove(), 1000)
+        }
+
+        setTimeout(() => remove(), 10 * 1000)
+        notif.addEventListener("click", () => remove())
+
     }
 }

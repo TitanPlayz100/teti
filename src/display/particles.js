@@ -63,9 +63,9 @@ export class Particles {
         if (!this.game.settings.display.particles) return
         this.volume = this.game.settings.display.particleVolume;
         this.size = this.game.settings.display.particleSize;
-        const dx = (type == "place" || type == "spin") ? 1 : 0
-        const [x, y] = [(posX + dx) * this.minosize, (40 - posY) * this.minosize];
-        if (type == "place") this.createPlaceParticles(x, y, colour, this.minosize * pieceWidth, -this.boardHeight);
+        const [x, y] = [posX * this.minosize, (40 - posY) * this.minosize];
+        if (type == "drop") this.creatDropParticles(x, y, colour, this.minosize * pieceWidth, -this.boardHeight);
+        if (type == "lock") this.createLockParticles(x, y, colour, this.minosize * pieceWidth, 10);
         if (type == "clear") this.createClearParticles(x, y, colour, this.boardWidth, -10);
         if (type == "pc") this.createPCParticles(x, y, this.boardWidth, 10);
         if (type == "dangerboard") this.createDangerBoardParticles(x, this.boardHeight, colour, this.boardWidth, 10);
@@ -75,7 +75,7 @@ export class Particles {
         if (type == "BTB") this.createBTBParticle(x, y, "gold", this.boardWidth, 0, this.boardHeight);
     }
 
-    createPlaceParticles(x, y, colour, len, height) {
+    creatDropParticles(x, y, colour, len, height) {
         for (let i = 0; i < this.volume / 3; i++) {
             const posX = x + Math.random() * len - len / 2;
             const posY = y + Math.random() * height / 2;
@@ -86,6 +86,20 @@ export class Particles {
 
             const placeParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, sway, xF: 0.95, yF: 0.95, swayF: 0.96 }
             const particle = new Point(placeParticle, this.ctx);
+            this.particles.push(particle);
+        }
+    }
+
+    createLockParticles(x, y, colour, len, height) {
+        for (let i = 0; i < this.volume / 4; i++) {
+            const posX = x + Math.random() * len - len / 2;
+            const posY = y + Math.random() * height;
+            const life = Math.random() * 15 + 30;
+            const dx = Math.random() * 1 - 0.5 + (posX - x) / 50;
+            const dy = Math.random() * -0.7 - 1.4;
+
+            const clearParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, xF: 0.96, yF: 0.96, gravity: 0.05 }
+            const particle = new Point(clearParticle, this.ctx);
             this.particles.push(particle);
         }
     }
@@ -184,7 +198,7 @@ export class Particles {
     }
 
     createBTBParticle(x, y, colour, width, len, height) {
-        for (let i = 0; i < this.volume*2; i++) {
+        for (let i = 0; i < this.volume * 2; i++) {
             const direction = Math.random() > 0.5;
 
             const posX = (direction ? 0 : width) + x + Math.random() * len

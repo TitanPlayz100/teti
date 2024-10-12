@@ -148,6 +148,7 @@
             <div class="settingRow"><p>Board Bounciness</p> <input class="option range" type="range" id="boardBounce" min="-5" max="20" step="0.1" /></div>
             <div class="settingRow"><p>Enable Grid</p> <input class="option check" type="checkbox" id="showGrid" /></div>
             <div class="settingRow"><p>Grid opacity</p> <input class="option range" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
+            <div class="settingRow"><p>Grid Type</p> <select class="option dropdown" id="gridType"></select></div>
             <div class="settingRow"><p>Shadow opacity</p> <input class="option range" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
             <div class="settingRow"><p>Coloured Shadow</p> <input class="option check" type="checkbox" id="colouredShadow" /></div>
             <div class="settingRow"><p>Coloured Borders</p> <input class="option check" type="checkbox" id="colouredQueues" /></div>
@@ -184,9 +185,9 @@
             <div class="settingRow"><p>Allow history (undo/redo)</p> <input class="option check" type="checkbox" id="history" /></div>
             <div class="settingRow"><p>Stride (better queue)</p> <input class="option check" type="checkbox" id="stride" /></div>
             <div class="settingRow"><p>Sidebar Stats</p> 
-                <select class="option textInput statoption" id="statoption1"></select>
-                <select class="option textInput statoption" id="statoption2"></select>
-                <select class="option textInput statoption" id="statoption3"></select>
+                <select class="option dropdown statoption" id="statoption1"></select>
+                <select class="option dropdown statoption" id="statoption2"></select>
+                <select class="option dropdown statoption" id="statoption3"></select>
             </div>
         </div>
         <div class="settingsFooter">
@@ -371,6 +372,7 @@
     <dialog id="gameStatsDialog" class="scrollSettings">
         <div class="settingsTop"><h1>STATS</h1></div>
         <div class="settingsBox">
+            <p style="text-align: center; opacity: 0.5;">(Some stats cannot be displayed)</p>
             <div id="startStatsList"></div>
         </div>
         <div class="settingsFooter">
@@ -388,5 +390,7 @@
             <button class="closeDialogButton" onclick="modal.closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
         </div>
     </dialog>
+
+    <div id="notifications"></div>
 </body>
 </html>

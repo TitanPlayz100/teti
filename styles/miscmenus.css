@@ -96,3 +96,51 @@
     width: 100%;
     content: ' ';
 }
+
+/* notifications */
+#notifications {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.notif {
+    font-family: "Montserrat", sans-serif;
+    animation: error 0.6s forwards;
+    background-color: black;
+    color: white;
+    border-left-color: var(--color);
+    border-left-width: 0.3vw;
+    border-left-style: solid;
+    padding: 1vmin;
+    border-radius: 1vh;
+    margin: 2vmin;
+    width: 30vw;
+    cursor: pointer;
+    transition: opacity 1s ease;
+    z-index: 10;
+}
+
+@keyframes error {
+    from {
+        opacity: 0;
+        transform: translate(10vw);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(0);
+    }
+}
+
+.notif_title {
+    margin: 0.5vmin;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.notif_text {
+    margin: 0.3vmin;
+    font-size: 0.8em;
+    opacity: 0.8;
+}

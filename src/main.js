@@ -39,20 +39,12 @@ document.onresize = () => {
 
 // splash menu
 window.addEventListener("DOMContentLoaded", () => {
-    elementSplashText.textContent = "loading assets";
-    document.getElementById("ignoreText").style.opacity = 0.5;
-})
-
-window.addEventListener("load", () => {
-    elementSplashText.textContent = "loaded";
-    finishLoad()
-});
-
-window.finishLoad = () => {
+    elementSplashText.textContent = "Ready";
     elementSplashScreen.style.opacity = 0;
     elementSplashScreen.style.scale = 1.2;
     elementSplashScreen.style.display = "none";
-}
+    document.getElementById("ignoreText").style.opacity = 0.5;
+})
 
 window.addEventListener("focus", function () {
     document.getElementById("nofocus").style.display = "none";
@@ -62,3 +54,7 @@ window.addEventListener("blur", function () {
     if (!game.settings.display.outoffocus) return
     document.getElementById("nofocus").style.display = "block";
 });
+
+window.onerror = (msg, url, lineNo, columnNo, error) => {
+    game.modals.generate.generateNotif(error, msg + ". ln "+ lineNo, "error");
+}

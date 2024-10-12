@@ -73,7 +73,9 @@ export class LockPiece {
         const lockCoords = this.game.mechanics.board.getMinos("A");
         this.game.boardrender.justPlacedCoords = lockCoords;
         this.game.boardrender.justPlacedAlpha = 1;
+        
         lockCoords.forEach(([x, y]) => {
+            this.game.boardrender.flashTimes.push({ c:[x, y], t: 15 })
             this.game.mechanics.board.rmValue([x, y], "A");
             this.game.mechanics.board.addValFront([x, y], "S");
         });
@@ -99,6 +101,9 @@ export class LockPiece {
         this.game.mechanics.isMini = false;
         this.game.falling.moved = false;
         if (this.game.stats.level % 100 != 99 && this.game.stats.level != this.game.settings.game.raceTarget - 1) this.game.stats.level++;
+        const xvals = [...new Set(lockCoords.map(([x, y]) => x))];
+        const yval = Math.min(...lockCoords.map(([x, y]) => y));
+        this.game.particles.spawnParticles(Math.min(...xvals) + 1, yval, "lock", xvals.length);
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
         this.game.history.save();
         this.game.renderer.renderDanger();

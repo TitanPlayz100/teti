@@ -70,10 +70,11 @@ export class Modes {
         this.game.settings.game.gamemode = mode;
         const competitive = this.game.settings.game.competitiveMode;
         const custom = JSON.parse(localStorage.getItem('customGame'));
-        
+
         if (competitive) {
-            if (custom == null)
+            if (custom == null) {
                 localStorage.setItem('customGame', JSON.stringify(this.game.settings.game));
+            }
             this.modeJSON = this.getGamemodeJSON(mode);
             this.game.settings.game = { ...this.game.settings.game, ...this.modeJSON.settings };
         } else {

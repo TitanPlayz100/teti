@@ -54,6 +54,16 @@ export class Renderer {
         this.ctxH = this.canvasHold.getContext("2d");
     }
 
+    renderingLoop() {
+        this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
+        this.game.boardeffects.move(0, 0);
+        this.game.boardeffects.rotate(0);
+        this.game.particles.update();
+        this.dangerParticles();
+        this.resetAnimation();
+        setTimeout(() => requestAnimationFrame(this.renderingLoop.bind(this)), 1);
+    }
+
     sizeCanvas() {
         this.renderStyles();
         [this.canvasField, this.canvasNext, this.canvasHold].forEach(c => {
@@ -122,7 +132,11 @@ export class Renderer {
         const condition =
             this.game.board.getMinos("S").some(c => c[1] > 16) && // any mino if above row 16
             this.game.settings.game.gamemode != 'combo'; // not combo mode
-        if (condition && !this.inDanger) this.game.sounds.playSound("damage_alert");
+        if (condition && !this.inDanger) {
+            this.game.sounds.playSound("damage_alert");
+            this.game.modals.generate.notif("WARNING!", "You gameplay is detected as peepee poopoo", "error"); // todo remove lmao
+
+        }
         this.game.boardeffects.toggleDangerBoard(condition)
         this.inDanger = condition;
     }
@@ -283,23 +297,13 @@ export class Renderer {
     bounceBoard(direction) {
         const force = Number(this.game.settings.display.boardBounce);
         const forces = { "LEFT": [-force, 0], "RIGHT": [force, 0], "DOWN": [0, force], };
-        this.game.boardeffects.move(forces[direction]);
+        this.game.boardeffects.move(...forces[direction]);
     }
 
     rotateBoard(type) {
         const force = Number(this.game.settings.display.boardBounce) * 0.5;
         const forces = { "CW": force, "CCW": -force }
         this.game.boardeffects.rotate(forces[type]);
-    }
-
-    renderingLoop() {
-        this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
-        this.game.boardeffects.move(0, 0);
-        this.game.boardeffects.rotate(0);
-        this.game.particles.update();
-        this.dangerParticles();
-        this.resetAnimation();
-        setTimeout(() => requestAnimationFrame(this.renderingLoop.bind(this)), 1);
     }
 
     dangerParticles() {
@@ -309,7 +313,7 @@ export class Renderer {
     }
 
     resetAnimation() {
-        if (this.resetAnimCurrent >= this.resetAnimLength*2) return;
+        if (this.resetAnimCurrent >= this.resetAnimLength * 2) return;
         this.resetAnimCurrent++;
         if (this.game.boardrender.boardAlpha < 0.99) this.game.boardrender.boardAlpha += 2 / this.resetAnimLength;
         if (this.resetAnimCurrent > this.resetAnimLength) return;
@@ -324,7 +328,7 @@ export class Renderer {
             this.ctx.globalAlpha = 1;
             this.ctx.fillStyle = colour;
             this.ctx.beginPath();
-            this.ctx.moveTo(0, startY - dy * p); // todo make 4w board not clear sides
+            this.ctx.moveTo(0, startY - dy * p);
             this.ctx.lineTo(dy * p, startY);
             this.ctx.lineTo(0, startY + dy * p);
             this.ctx.lineTo(0, 0);

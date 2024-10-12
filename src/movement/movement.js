@@ -153,7 +153,7 @@ export class Movement {
         this.game.sounds.playSound("harddrop");
         this.game.renderer.bounceBoard('DOWN');
         const xvals = [...new Set(minos.map(([x, y]) => x))];
-        this.game.particles.spawnParticles(Math.min(...xvals), this.game.falling.location[1], "place", xvals.length);
+        this.game.particles.spawnParticles(Math.min(...xvals)+1, this.game.falling.location[1], "drop", xvals.length);
         this.game.mechanics.locking.lockPiece();
     }
 }

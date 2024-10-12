@@ -25,7 +25,7 @@ export class Game {
     gameTimer = 0; // id of timeout
     survivalTimer = 0; // id of timeout
     gravityTimer = 0;
-    version = '1.3.1';
+    version = '1.3.2';
     tickrate = 60;
 
     elementReason = document.getElementById("reason");
