@@ -148,7 +148,6 @@ export class MenuActions {
     newGame(key, modal) {
         if (key == this.game.settings.control.resetKey) {
             this.game.modals.closeModal(modal);
-            this.game.startGame();
         }
     }
 

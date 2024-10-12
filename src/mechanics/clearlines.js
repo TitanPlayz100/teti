@@ -18,6 +18,7 @@ export class ClearLines {
         const clearRows = this.game.mechanics.board.getFullRows();
         let removedGarbage = 0;
 
+        // clear rows and count garbage
         for (let row of clearRows) {
             const stopped = this.game.mechanics.board.getMinos("S");
             if (stopped.filter(c => c[1] == row).some(([x, y]) => this.game.mechanics.board.checkMino([x, y], "G")))
@@ -27,8 +28,8 @@ export class ClearLines {
             this.game.mechanics.board.moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1);
         }
 
-        this.game.modes.diggerAddGarbage(removedGarbage);
-        clearCoords.forEach(([x, y]) => {
+        this.game.modes.diggerAddGarbage(removedGarbage); // add garbage
+        clearCoords.forEach(([x, y]) => { // stats
             if (clearRows.includes(y)) this.game.stats.clearCols[x]++;
         })
         
@@ -52,6 +53,7 @@ export class ClearLines {
         const isPC = mech.board.getMinos("S").length == 0;
         let damagetype = this.getDamageType(linecount);
 
+        // update stats
         this.game.stats.updateBTB(isBTB, linecount);
         this.game.stats.updateCombo(linecount);
         const damage = this.calcDamage(stats.combo, damagetype, isPC, stats.btbCount, isBTB);
@@ -61,9 +63,11 @@ export class ClearLines {
         mech.spikeCounter += damage;
         this.manageGarbageSent(damage);
 
+        // render action text
         if (mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
         this.game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);
 
+        // particles
         if (isPC) this.game.particles.spawnParticles(0, 0, "pc");
         if (stats.btbCount > 7 && isBTB) this.game.particles.spawnParticles(0, 20, "BTB");
         if (damage > 10 || stats.combo > 10) this.game.particles.spawnParticles(0, 0, "spike");
@@ -77,6 +81,7 @@ export class ClearLines {
 
         if (this.game.settings.game.gamemode != 'backfire') return;
         if (garb > 0) this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
+        
         if (this.game.stats.combo == -1 && this.game.mechanics.garbageQueue > 0) {
             this.game.mechanics.addGarbage(this.game.mechanics.garbageQueue, 0);
             this.game.stats.recieved += this.game.mechanics.garbageQueue;

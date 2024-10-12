@@ -13,10 +13,13 @@ export class Renderer {
     nextQueueGrid = [];
     inDanger;
     texttimeouts = {};
+    resetAnimLength = 30;
+    resetAnimCurrent = 30;
 
     sidebarStats;
     sidebarFixed;
     sidebarSecondary;
+    /** @type {CanvasRenderingContext2D} */
     ctx;
     ctxN;
     ctxH;
@@ -38,7 +41,7 @@ export class Renderer {
     elementSmallStat1 = document.getElementById("smallStat1");
     elementSmallStat2 = document.getElementById("smallStat2");
     elementSmallStat3 = document.getElementById("smallStat3");
-    
+
     /**
      * @param {Game} game
      */
@@ -220,13 +223,13 @@ export class Renderer {
 
     renderSidebar() {
         this.sidebarStats.forEach((stat, index) => {
-            if (stat == "None") {
+            if (stat == "None") { // no stat
                 this[`elementStats${index + 1}`].textContent = "";
                 return;
             };
             const displayStat = this.game.stats[stat].toFixed(this.sidebarFixed[index]);
             this[`elementStats${index + 1}`].textContent = displayStat;
-            
+
             if (this.sidebarSecondary[index]) {
                 const displaySecond = this.game.stats[this.sidebarSecondary[index]]
                 this[`elementSmallStat${index + 1}`].textContent = displaySecond;
@@ -245,26 +248,27 @@ export class Renderer {
     }
 
     updateAlpha() {
-        if (this.game.settings.game.gamemode == 'lookahead') {
-            const update = (type, amount) => {
-                if (this.game.stats.checkInvis()) {
-                    if (this.game.boardrender[type] <= 0) {
-                        this.game.boardrender[type] = 1;
-                        this.updateNext();
-                        this.updateHold();
-                    }
+        if (this.game.settings.game.gamemode != 'lookahead') return;
+        const update = (type, amount) => {
+            if (this.game.stats.checkInvis()) {
+                if (this.game.boardrender[type] <= 0) {
+                    this.game.boardrender[type] = 1;
+                    this.updateNext();
+                    this.updateHold();
+                }
+            } else {
+                if (this.game.boardrender[type] > 0) {
+                    this.game.boardrender[type] += -amount / this.game.tickrate;
+                    this.updateNext();
+                    this.updateHold();
                 } else {
-                    if (this.game.boardrender[type] > 0) {
-                        this.game.boardrender[type] += -amount / this.game.tickrate;
-                        this.updateNext();
-                        this.updateHold();
-                    }
-                    if (this.game.boardrender[type] <= 0) this.game.boardrender[type] = 0;
+                    this.game.boardrender[type] = 0;
                 }
             }
-            update("boardAlpha", 3)
-            update("justPlacedAlpha", 6)
         }
+        update("boardAlpha", 3)
+        update("queueAlpha", 3)
+        update("justPlacedAlpha", 6)
 
     }
 
@@ -294,13 +298,55 @@ export class Renderer {
         this.game.boardeffects.rotate(0);
         this.game.particles.update();
         this.dangerParticles();
-        setTimeout(() =>
-            requestAnimationFrame(this.renderingLoop.bind(this)), 1);
+        this.resetAnimation();
+        setTimeout(() => requestAnimationFrame(this.renderingLoop.bind(this)), 1);
     }
 
     dangerParticles() {
         if (!this.inDanger) return;
         this.game.particles.spawnParticles(0, 0, "dangerboard");
         this.game.particles.spawnParticles(0, 20, "dangersides");
+    }
+
+    resetAnimation() {
+        if (this.resetAnimCurrent >= this.resetAnimLength*2) return;
+        this.resetAnimCurrent++;
+        if (this.game.boardrender.boardAlpha < 0.99) this.game.boardrender.boardAlpha += 2 / this.resetAnimLength;
+        if (this.resetAnimCurrent > this.resetAnimLength) return;
+
+
+        const progress = this.resetAnimCurrent / this.resetAnimLength;
+        const startY = this.boardHeight / 2;
+        const dx = this.boardWidth;
+        const dy = dx + this.boardHeight / 2;
+
+        const fillTriangle = (p, colour) => {
+            this.ctx.globalAlpha = 1;
+            this.ctx.fillStyle = colour;
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, startY - dy * p); // todo make 4w board not clear sides
+            this.ctx.lineTo(dy * p, startY);
+            this.ctx.lineTo(0, startY + dy * p);
+            this.ctx.lineTo(0, 0);
+            this.ctx.fill();
+        }
+        // fill triangle
+        const progress1 = this.easeInOutCubic(progress);
+        fillTriangle(progress1, 'white');
+
+        // clear smaller triangle
+        const progress2 = this.easeInOutCubic(progress - 0.1);
+        fillTriangle(progress2, 'black');
+
+
+        if (this.resetAnimCurrent == this.resetAnimLength) { // finished
+            this.game.startGame();
+            this.game.controls.resetting = false;
+            this.game.boardrender.boardAlpha = 0;
+        }
+    }
+
+    easeInOutCubic(x) {
+        return -(Math.cos(Math.PI * x) - 1) / 2;
     }
 }

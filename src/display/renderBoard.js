@@ -2,6 +2,7 @@ import { Game } from "../game.js";
 
 export class BoardRenderer {
     boardAlpha = 1;
+    queueAlpha = 1;
     justPlacedCoords = [];
     justPlacedAlpha = 1;
     minoSize;
@@ -19,12 +20,13 @@ export class BoardRenderer {
 
     // board rendering
     getOpacity(cell, cntx, x, y) {
+        if (cntx != this.game.renderer.ctx) return;
         if (this.divlock.value != 0 && cell.includes("A") && this.game.settings.game.gamemode != "lookahead") {
             return 1 - (this.divlock.value / 250);
         }
         for (let [posX, posY] of this.justPlacedCoords) {
             if (posX == x && posY == y && cntx == this.game.renderer.ctx) {
-                return this.justPlacedAlpha.toFixed(2);
+                return Math.max(this.justPlacedAlpha, this.boardAlpha).toFixed(2);
             }
         }
         return this.boardAlpha.toFixed(2);
@@ -66,13 +68,13 @@ export class BoardRenderer {
         cntx.clearRect(0, 0, width, height);
         grid.forEach((row, y) => {
             row.forEach((col, x) => {
-                cntx.globalAlpha = this.boardAlpha.toFixed(2);
+                // cntx.globalAlpha = cntx == this.game.renderer.ctx ? this.boardAlpha.toFixed(2) : this.queueAlpha.toFixed(2);
                 const [posX, posY] = [x * this.minoSize, (yPosChange - y) * this.minoSize];
                 const cell = col.split(" ");
                 cntx.lineWidth = 1;
 
                 if (cell.includes("A") || cell.includes("S")) { // active piece or stopped piece
-                    cntx.globalAlpha = this.getOpacity(cell, cntx, x, y);
+                    cntx.globalAlpha = this.getOpacity(cell, cntx, x, y) ?? this.queueAlpha.toFixed(2);
                     const p = this.getTexture(this.getPiece(cntx, cell[1]));
                     cntx.drawImage(this.texture, p.x, p.y, p.width, p.height, posX + dx, posY + dy, this.minoSize, this.minoSize);
                 }

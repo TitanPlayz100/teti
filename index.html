@@ -121,10 +121,10 @@
         <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
             <img src="./assets/icons/download.svg" style="transform: translateY(10%); height: 90%;">
         </button>
-        <span id="uploadSettings" class="settingPanelButton smallPanelButton" style="height: 4.5vh; " onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
+        <div id="uploadSettings" class="settingPanelButton smallPanelButton" style="box-sizing: border-box;" onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
             <input type="file" id="fileUpload" onchange="menu.uploadSettings(this)" hidden accept=".teti">
             <img src="./assets/icons/upload.svg" style="transform: translateY(10%); height: 90%;">
-        </span>
+        </div>
         <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="See the github page, star if you like it">
             <img src="./assets/icons/github.svg" style="transform: translateY(-14%); height: 200%;">
         </button>
@@ -182,7 +182,7 @@
             <div class="settingRow"><p>Allspin</p> <input class="option check" type="checkbox" id="allspin" /></div>
             <div class="settingRow"><p>Allspin's are mini</p> <input class="option check" type="checkbox" id="allspinminis" /></div>
             <div class="settingRow"><p>Allow history (undo/redo)</p> <input class="option check" type="checkbox" id="history" /></div>
-            <div class="settingRow"><p>Stride (no o, s, z start)</p> <input class="option check" type="checkbox" id="stride" /></div>
+            <div class="settingRow"><p>Stride (better queue)</p> <input class="option check" type="checkbox" id="stride" /></div>
             <div class="settingRow"><p>Sidebar Stats</p> 
                 <select class="option textInput statoption" id="statoption1"></select>
                 <select class="option textInput statoption" id="statoption2"></select>

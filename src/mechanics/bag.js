@@ -23,7 +23,7 @@ export class Bag {
         }
         const piece = this.nextPieces[0].splice(0, 1)[0];
 
-        if (["o", "s", "z"].includes(piece) && this.game.settings.game.stride) { // stride mode
+        if (["o", "s", "z"].includes(piece) && this.game.settings.game.stride && start) { // stride mode
             this.nextPieces = [[], []];
             return this.randomiser();
         }

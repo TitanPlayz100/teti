@@ -115,6 +115,7 @@ export class Game {
         this.boardeffects.hasPace = true;
         this.boardeffects.paceCooldown = 0;
         this.boardrender.boardAlpha = 1;
+        this.boardrender.queueAlpha = 1;
         this.renderer.inDanger = false;
         this.started = false;
         this.ended = false;
@@ -135,7 +136,11 @@ export class Game {
         this.stats = new GameStats(this);
         this.history = new History(this);
 
-        this.gameClock();
+        this.renderer.renderSidebar();
+        this.modes.checkFinished();
+        this.stats.updateStats();
+        this.renderer.updateAlpha();
+        this.boardeffects.rainbowBoard();
     }
 
     gameClock() {

@@ -108,23 +108,20 @@ export class Board {
                 if (x < 3 || x > 6) this.addMinos("S G", [[x, y]], [0, 0]);
             })
         );
-        if (start) {
-            const validCoords = [[[0, 0], [1, 0], [2, 0], [3, 0]], [[0, 1], [1, 1], [2, 1], [3, 1]]];
-            const garbAmount = (Math.random() > 0.5) ? 3 : 6;
-            const garbCoords = [];
-            for (let i = 0; i < garbAmount; i++) {
-                const y = Math.random() > 0.5 ? 0 : 1;
-                if (validCoords[y].length == 1) { i--; continue; }
-                const coord = validCoords[y].splice(Math.floor(Math.random() * validCoords[y].length), 1);
-                garbCoords.push(coord[0]);
-            }
 
-            this.addMinos(
-                "S G",
-                garbCoords.map(([x, y]) => [x + 3, y]),
-                [0, 0]
-            );
-            this.game.mechanics.setShadow();
+        if (!start) return;
+        // garbage pattern
+        const validCoords = [[[0, 0], [1, 0], [2, 0], [3, 0]], [[0, 1], [1, 1], [2, 1], [3, 1]]];
+        const garbAmount = Math.random() > 0.5 ? 3 : 6;
+        const garbCoords = [];
+        for (let i = 0; i < garbAmount; i++) {
+            const y = Math.random() > 0.5 ? 0 : 1;
+            if (validCoords[y].length == 1) { i--; continue; }
+            const coord = validCoords[y].splice(Math.floor(Math.random() * validCoords[y].length), 1);
+            garbCoords.push(coord[0]);
         }
+
+        this.addMinos("S G", garbCoords.map(([x, y]) => [x + 3, y]), [0, 0]);
+        this.game.mechanics.setShadow();
     }
 }

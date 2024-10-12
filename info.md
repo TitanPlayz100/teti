@@ -14,13 +14,16 @@ I hope you enjoy Teti, and if you liked it a star would be appreciated. I want t
 This project started out as a learning experience, because surprisingly it was my first time actually using Javascript. For my high school project (pseudohuman) I wanted to build a multiplayer web based game, and thus I made this to gain experience before starting. I had already programmed in Java, as well as some C# and Python, so I was not unfamiliar to programming, and I already knew frontend basics. Teti was able to combine my interest for tetris, and also challenge me to learn Javascript. After the project was over, I could truly improve the game to make an amazing experience.
 
 
-## Contributions
+## Acknowledgements
 Thanks [existancepy](https://github.com/existancepy) for all the fixes.  
 Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding TGM Race mode and other fixes.  
-Design inspired by [Strangelinx's 'blocks'.](https://strangelinx.github.io/blocks/)  
-Icons from [The Noun Project](https://thenounproject.com)
 
-Feel free to contribute with features and fixes, and open issues. 
+Feel free to contribute with features and fixes, and open issues.  
+
+Design inspired by [Strangelinx's 'blocks'](https://strangelinx.github.io/blocks/) and [Tetra Legends.](https://tetralegend.app)  
+Icons from [The Noun Project.](https://thenounproject.com)  
+Sound effects from [TETR.IO.](https://tetr.io)  
+Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)  
 
 #### Music
 [(Locked Girl ~ The Girl's Secret Room) - Cafe de Touhou 3](https://www.youtube.com/watch?v=7Q3c2vmXEyg)  
@@ -71,6 +74,10 @@ Things that I am working on based on other changes
 
 ## Updates
 #### v1.3.2
+- added a reset animation
+    - toggles with stride mode
+- fixed timer when menu was open
+- competitive modes now have custom sidebars
 
 #### v1.3.1
 - backgrounds can be custom using url

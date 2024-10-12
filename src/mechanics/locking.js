@@ -80,13 +80,13 @@ export class LockPiece {
         this.game.mechanics.locking.clearLockDelay();
         clearInterval(this.game.gravityTimer);
         this.game.mechanics.clear.clearLines(lockCoords);
-        this.game.endGame(
+        this.game.endGame( // stopped overlap next
             this.game.mechanics.checkDeath(
                 this.game.mechanics.board.getMinos("S"),
                 this.game.mechanics.board.getMinos("NP")
             )
         );
-        this.game.endGame(
+        this.game.endGame( // check lockout
             this.game.mechanics.checkDeath(
                 lockCoords,
                 this.game.mechanics.board.getMinos("NP")

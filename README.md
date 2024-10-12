@@ -14,7 +14,7 @@ All the information is in the tauri branch
 > Releases are **NOT** up to date
 
 
-## Data Formats
+## Data Formats (for my convenience)
 ### Gamemode Structure (gamemodes.json)
 ```js
 gamemodes = {
@@ -30,12 +30,12 @@ gamemodes = {
         music: "", // custom song that can play 
         compmusic: "", // custom song that played on pb pace
         startBoard: "", // starting board, tetrio map format
-        effects: "", // custom background / effects
+        effects: [], // custom background / effects
     }
 }
 ```
 
-Add functionality mainly in `featuers/modes.js`.  
+Add functionality mainly in `features/modes.js`.  
 You can modify existing modules as well from other files
 
 ### Adding Audio (sfxlist.json)
@@ -47,4 +47,4 @@ You can modify existing modules as well from other files
     }
 }
 ```
-Use with `this.game.sounds.playSound("<name>", ...)`
+Use with `this.game.sounds.playSound(<name>)`

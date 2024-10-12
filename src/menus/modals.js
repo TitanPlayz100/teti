@@ -100,7 +100,7 @@ export class ModalActions {
         if (id == "displayDialog") this.game.renderer.renderStyles();
 
         const restartMenus = ["gameDialog", "gamemodeDialog", "gameEnd", "goalsDialog", "competitiveDialog"];
-        if (restartMenus.includes(id)) this.game.startGame();
+        if (restartMenus.includes(id)) this.game.controls.retry(false);
         if (id == "changeRangeValue") this.open = true;
     }
 

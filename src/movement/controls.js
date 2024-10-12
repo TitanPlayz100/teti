@@ -7,7 +7,7 @@ export class Controls {
      */
     directionState = { RIGHT: false, LEFT: false, DOWN: false };
     timings = { arr: 0, das: 0, sd: 0 }; // timeout and interval ids
-    menuKey = "Escape";
+    menuKey = "Escape"; // html modals close using escape
     cursorVisible = true;
 
     /**
@@ -22,14 +22,14 @@ export class Controls {
         const keys = this.game.settings.control;
         if (disabledKeys.includes(event.key)) event.preventDefault();
 
-        if (event.key != this.menuKey && !this.game.started) this.moves.firstMovement();
         if (key == this.menuKey) this.game.menuactions.toggleDialog();
         else if (key == keys.editMenuKey) this.game.menuactions.openEditMenu();
-        
-        if (this.game.modals.open) return;
-        if (key == keys.resetKey) this.retry();
+
+        if (this.game.modals.open || this.game.modals.closing) return;
+        if (event.key != this.menuKey && !this.game.started) this.moves.firstMovement();
+        if (key == keys.resetKey) this.retry(true);
         if (this.game.ended) return;
-        
+
         if (key == keys.cwKey) this.moves.rotate("CW");
         else if (key == keys.ccwKey) this.moves.rotate("CCW");
         else if (key == keys.rotate180Key) this.moves.rotate("180");
@@ -43,7 +43,7 @@ export class Controls {
         this.game.stats.inputs++;
     }
 
-    onKeyDownRepeat(event, key) { // allows for repeating
+    onKeyDownRepeat(event, key) { // allows for arr undo/redo
         const keys = this.game.settings.control;
         if (event.key == this.menuKey) event.preventDefault();
 
@@ -51,9 +51,8 @@ export class Controls {
         else if (key == keys.redoKey) this.game.history.redo()
     }
 
-    onKeyUp(event) {
+    onKeyUp(event, key) {
         this.keys = this.game.settings.control;
-        const key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
 
         if (key == this.keys.rightKey) this.endDasArr("RIGHT");
         if (key == this.keys.leftKey) this.endDasArr("LEFT");
@@ -146,13 +145,25 @@ export class Controls {
         this.timings[name] = 0;
     }
 
-    retry() {
+    resetting = false;
+
+    retry(animation) {
+        if (this.resetting) return; // no overlap
+        this.game.ended = true;
         this.game.sounds.playSound("retry");
-        this.game.startGame();
+
+        if (!animation || this.game.settings.game.stride) {
+            this.game.startGame();
+            return;
+        }
+
+        this.game.stopGameTimers()
+        this.resetting = true;
+        this.game.renderer.resetAnimCurrent = 0; // start animation
     }
 
     toggleCursor(enable) {
-        if (!(this.cursorVisible ^ enable)) return;
+        if (!(this.cursorVisible ^ enable)) return; // only toggle when they are different
         this.cursorVisible = enable;
         document.body.style.cursor = enable ? 'auto' : 'none';
     }

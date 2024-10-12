@@ -2,15 +2,17 @@ import { Game } from "./game.js";
 
 const game = new Game();
 
+// allow html to access functions
 window["menu"] = game.menuactions;
 window["modal"] = game.modals;
 window["songs"] = game.sounds;
+
 const elementSplashScreen = document.getElementById("splashScreen");
 const elementSplashText = document.getElementById("splashText");
 
 window.addEventListener("keydown", event => {
     if (event.key == undefined) return;
-    let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
+    let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // 1 letter words are lowercase
     if (event.altKey) key = "Alt+" + key;
     if (event.ctrlKey) key = "Ctrl+" + key;
 
@@ -21,7 +23,8 @@ window.addEventListener("keydown", event => {
 
 window.addEventListener("keyup", event => {
     if (event.key == undefined) return;
-    game.controls.onKeyUp(event);
+    let key = event.key.length > 1 ? event.key : event.key.toLowerCase();
+    game.controls.onKeyUp(event, key);
 });
 
 window.addEventListener('mousemove', () => {

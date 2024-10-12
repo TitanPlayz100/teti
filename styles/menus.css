@@ -65,7 +65,7 @@ button>img {
 .smallPanelButton,
 .smallerPanelButton {
     height: 6vh;
-    aspect-ratio: 1/1;
+    width: 6vh;
     border-radius: 1vmin;
     display: flex;
     align-items: center;
@@ -76,6 +76,7 @@ button>img {
 
 .smallerPanelButton {
     height: 4vh;
+    width: 4vh;
     border-radius: 0.7vh;
     border-width: 0.2vh;
 }

@@ -57,8 +57,9 @@ export class GenerateMenus {
     generateStatList() {
         const statoptions = [...document.getElementsByClassName("statoption")];
         const options = Object.getOwnPropertyNames(this.game.stats);
+        options.sort();
         options.unshift("None");
-
+        
         statoptions.forEach(setting => {
             options.forEach(stat => {
                 const skip = ['clearCols', 'clearPieces', 'game', 'tspins'];
