@@ -12,7 +12,7 @@ export class Zenith {
 
         climbPoints = 0;
         isLastRankChangePromote = !0;
-        isHyperspeed = !0;
+        isHyperspeed = true;
         rankLock = 0;
         promotionFatigue = 0;
         rankLock = 0;
@@ -95,6 +95,14 @@ export class Zenith {
                         this.game.sounds.playSound("zenith_levelup")
                         this.game.rendering.renderTimeLeft("FLOOR " + this.game.stats.floor)
                     }
+                    const n = this.SpeedrunReq[this.game.stats.floor]
+                    this.isHyperspeed = t >= n
+
+                    while(this.isHyperspeed){
+                        if(this.game.stats.climbSpeed <= 5){
+                            this.isHyperspeed = false
+                        }
+                    }
 
                     this.game.stats.altitude = Math.floor(this.tempAltitude)
                     this.tickPass++
@@ -104,7 +112,7 @@ export class Zenith {
         }
 
         drawClimbSpeedBar(speed, point, require){
-            const color = ["var(--invis)", "red", "orange", "green", "blue", "purple", "tan", "lime", "lightblue", "pink", "white"]
+            const color = ["var(--invis)", "red", "orange", "green", "blue", "#FF1493", "tan", "lightgreen", "lightblue", "pink", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white"]
             const climbSpeedBar = document.getElementById("climbSpeedBar")
 
             climbSpeedBar.value = point
