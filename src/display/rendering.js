@@ -219,6 +219,15 @@ export class Rendering {
         })
     }
 
+    renderTimeLeft(text){
+        const e = document.getElementById("timeLeftText")
+        e.textContent = text
+        e.classList.add("warn")
+        setTimeout(()=>
+            e.classList.remove("warn")
+        , 3000)
+    }
+
     updateAlpha() {
         if (this.game.settings.game.gamemode == 'lookahead') {
             const update = (type, amount) => {
@@ -314,6 +323,8 @@ export class Rendering {
         this.game.boardEffects.move(0, 0);
         this.game.boardEffects.rotate(0);
         this.game.boardEffects.rainbowBoard();
+        if(this.game.settings.game.gamemode == "ultra" && this.game.stats.time == 60.00000000000378) this.renderTimeLeft("60S LEFT")
+        if(this.game.settings.game.gamemode == "ultra" && this.game.stats.time == 90.01999999999923) this.renderTimeLeft("30S LEFT")
         requestAnimationFrame(this.renderingLoop.bind(this))
     }
 

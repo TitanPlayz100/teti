@@ -12,6 +12,7 @@ export class Movement {
 
     firstMovement() {
         this.mechs.startGravity();
+        this.game.zenith.startZenithMode();
         this.game.started = true;
         this.game.gameTimer = setInterval(() => this.game.gameClock(), (1000 / this.game.tickrate));
         this.game.modes.startSurvival();

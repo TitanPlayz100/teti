@@ -16,6 +16,7 @@ import { History } from "./features/history.js";
 import { BoardEffects } from "./display/boardEffects.js";
 import { ProfileStats } from "./features/profileStats.js";
 import { Modes } from "./features/modes.js";
+import { Zenith } from "./mechanics/zenith.js";
 
 export class Game {
     started;
@@ -49,6 +50,7 @@ export class Game {
         this.controls = new Controls(this);
         this.history = new History(this);
         this.modes = new Modes(this);
+        this.zenith = new Zenith(this)
 
         this.rendering.sizeCanvas();
         this.rendering.setEditPieceColours();
@@ -68,12 +70,14 @@ export class Game {
         this.rendering.renderStyles();
         this.mechanics.spawnPiece(this.bag.randomiser(), true);
         this.history.save();
+        if(this.settings.game.gamemode == "zenith") this.rendering.renderTimeLeft("FLOOR 1")
     }
 
     stopGameTimers() { //stop all the game's timers
         clearInterval(this.mechanics.gravityTimer);
         clearInterval(this.gameTimer);
         clearInterval(this.survivalTimer);
+        clearInterval(this.mechanics.zenithTimer)
         this.mechanics.locking.lockingPause();
     }
 
@@ -124,6 +128,7 @@ export class Game {
         this.started = false;
         this.ended = false;
         this.stats = new GameStats(this);
+        this.zenith = new Zenith(this);
 
         this.stopGameTimers()
 

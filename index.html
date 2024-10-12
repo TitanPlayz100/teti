@@ -26,11 +26,13 @@
         <canvas id="next" onclick="modal.openModal('queueModify')"></canvas>
         <canvas id="hold" onclick="modal.openModal('queueModify')"></canvas>
         <canvas id="playingfield"></canvas>
+        <p class="text" id="timeLeftText">60S LEFT</p>
         <div id="clickareas"></div>
 
         <progress id="garbageQueue" max="40" value="0"></progress>
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
+        <progress id="climbSpeedBar" max="100" value="0"></progress>
         
         <div>
             <p class="text nextText">Next</p>
@@ -241,6 +243,7 @@
         <div class="settingLayout"><label>Multiplier (backfire)</label> <input class="option number" type="number" id="backfireMulti" oninput="menu.checkValue(this, document.getElementById('limiter2'))" /></div>
         <div class="settingLayout"><label>Look ahead pieces</label> <input class="option number" type="number" id="lookAheadPieces"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
         <div class="settingLayout"><label>Race Target</label> <input class="option number" type="number" id="raceTarget"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
+        <div class="settingLayout"><label>Required Altitude (Climb)</label> <input class="option number" type="number" id="requiredAltitude"oninput="menu.checkValue(this, document.getElementById('limiter'))" /></div>
 
         <button class="closeDialog" onclick="modal.closeModal('goalsDialog')">Save and Close</button>
     </dialog>

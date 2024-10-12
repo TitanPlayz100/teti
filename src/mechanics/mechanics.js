@@ -11,7 +11,7 @@ export class Mechanics {
     garbageQueue;
     spikeCounter;
     gravityTimer = 0;
-    
+    zenithTimer = 0;
 
     /**
      * @param {Game} game

@@ -32,6 +32,7 @@
         "allowQueueModify": true,
         "lookAheadPieces": 3,
         "raceTarget": 500,
+        "requiredAltitude": 1650,
         "allspin": true,
         "allspinminis": true,
         "history": true,

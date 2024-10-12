@@ -11,6 +11,9 @@ export class GameStats {
     tspins = [0, 0, 0, 0];
     allspins = 0;
     level = 0;
+    altitude = 0;
+    floor = 1;
+    climbSpeed = 1;
 
     // garbage stats
     attack = 0;

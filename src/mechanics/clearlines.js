@@ -63,6 +63,7 @@ export class ClearLines {
             ((this.mech.isTspin || (this.mech.isAllspin && this.game.settings.game.allspin)) ? "Tspin " : "") +
             (this.mech.isMini ? "mini " : "") +
             cleartypes[Math.min(linecount, 5)]; // limit to 5 line clear
+        if (!isBTB && linecount > 0) this.game.zenith.AwardLines(Math.max(0, this.game.stats.btbCount))    
         this.game.stats.updateBTB(isBTB, linecount);
         this.game.stats.combo = linecount == 0 ? -1 : this.game.stats.combo + 1;
         if (this.game.stats.combo > this.game.stats.maxCombo) this.game.stats.maxCombo = this.game.stats.combo;
@@ -91,6 +92,7 @@ export class ClearLines {
             this.game.stats.clearPieces[this.game.falling.piece.name][linecount-1]++;
 
         this.manageGarbageSent(damage);
+        this.game.zenith.AwardLines(damage);
         if (this.mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
         this.game.rendering.renderActionText(damagetype, isBTB, isPC, damage, linecount);
     }
