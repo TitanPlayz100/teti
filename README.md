@@ -1,5 +1,8 @@
 # Teti README
 
+> [!NOTE]
+> This fork is for testing purposes, the original game is [here](https://titanplayz100.github.io/teti/)
+
 Hosted on github pages [here](https://titanplayz100.github.io/teti/)
 
 The info page can be found [here](https://titanplayz100.github.io/teti/info.html)
