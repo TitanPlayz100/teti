@@ -61,7 +61,8 @@ export class Renderer {
         this.game.particles.update();
         this.dangerParticles();
         this.resetAnimation();
-        setTimeout(() => requestAnimationFrame(this.renderingLoop.bind(this)), 1);
+        requestAnimationFrame(this.renderingLoop.bind(this))
+        // setTimeout(() => , 1);
     }
 
     sizeCanvas() {

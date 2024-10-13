@@ -8,11 +8,11 @@ The info page can be found [here](https://titanplayz100.github.io/teti/info.html
 > Firefox is not supported (due to import assertions)
 
 ## Desktop App
-All the information is in the tauri branch 
+### NEW!
 
-> [!WARNING]
-> Releases are **NOT** up to date
+Releases are now run through a workflow. They are **up to date** and contain all the latest features.
 
+App build using Tauri, feel free to open issues and PRs.
 
 ## Data Formats (for my convenience)
 ### Gamemode Structure (gamemodes.json)

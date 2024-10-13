@@ -56,5 +56,5 @@ window.addEventListener("blur", function () {
 });
 
 window.onerror = (msg, url, lineNo, columnNo, error) => {
-    game.modals.generate.generateNotif(error, msg + ". ln "+ lineNo, "error");
+    game.modals.generate.notif(error, msg + ". ln "+ lineNo, "error");
 }

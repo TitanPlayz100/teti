@@ -25,7 +25,7 @@ export class Bag {
 
         if (["o", "s", "z"].includes(piece) && this.game.settings.game.stride && start) { // stride mode
             this.nextPieces = [[], []];
-            return this.randomiser();
+            return this.randomiser(start);
         }
 
         return pieces.filter(element => {
