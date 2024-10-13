@@ -63,6 +63,7 @@ export const gameoverText = {
     ended: "Survived _ lines",
     level: "Reached level _",
     time: "Spent _ seconds",
+    altitude: "Climbed _ meters",
 }
 
 export const gameoverResultText = {

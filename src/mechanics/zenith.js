@@ -17,7 +17,7 @@ export class Zenith {
         promotionFatigue = 0;
         rankLock = 0;
         tickPass = 0;
-
+        tempAltitude = 0
 
         FloorDistance = [0, 50, 150, 300, 450, 650, 850, 1100, 1350, 1650, 1 / 0];
         SpeedrunReq = [7, 8, 8, 9, 9, 10, 0, 0, 0, 0, 0];
@@ -46,8 +46,6 @@ export class Zenith {
         GiveClimbPts(e) {
             this.climbPoints += e
         }
-
-        tempAltitude = 0
 
         startZenithMode() {
             clearInterval(this.game.mechanics.zenithTimer);
@@ -93,7 +91,7 @@ export class Zenith {
                         this.startZenithMode()
                         this.game.stats.floor = this.GetFloorLevel(this.tempAltitude)
                         this.game.sounds.playSound("zenith_levelup")
-                        this.game.rendering.renderTimeLeft("FLOOR " + this.game.stats.floor)
+                        this.game.renderer.renderTimeLeft("FLOOR " + this.game.stats.floor)
                     }
 
                     this.game.stats.altitude = Math.floor(this.tempAltitude)
