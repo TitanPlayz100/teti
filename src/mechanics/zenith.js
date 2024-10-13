@@ -49,7 +49,9 @@ export class Zenith {
 
         startZenithMode() {
             clearInterval(this.game.mechanics.zenithTimer);
+            document.getElementById("climbSpeedBar").style.display = "none"
             if(this.game.settings.game.gamemode != "zenith") return
+            document.getElementById("climbSpeedBar").style.display = "block"
             this.game.mechanics.zenithTimer = setInterval(
                 () => {
                         let t = Math.floor(this.game.stats.climbSpeed),
@@ -107,8 +109,8 @@ export class Zenith {
 
             climbSpeedBar.value = point
             climbSpeedBar.max = require
-            document.styleSheets[1].cssRules[25].style.backgroundColor = color[speed - 1]
-            document.styleSheets[1].cssRules[24].style.backgroundColor = color[speed]
+            document.styleSheets[1].cssRules[24].style.backgroundColor = color[speed - 1]
+            document.styleSheets[1].cssRules[23].style.backgroundColor = color[speed]
         }
  
 }
