@@ -10,7 +10,6 @@ export class Mechanics {
     garbageQueue = 0;
     spikeCounter = 0;
     toppingOut = false; 
-    zenithTimer = 0;
 
     /**
      * @param {Game} game

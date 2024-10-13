@@ -11,9 +11,10 @@ export class GameStats {
     quads = 0;
     tspins = [0, 0, 0, 0];
     allspins = 0;
-    level = 0;
+    tgm_level = 0;
     altitude = 0;
     floor = 1;
+    grade = "9";
     climbSpeed = 1;
 
     // garbage stats
@@ -74,6 +75,7 @@ export class GameStats {
 
     updateStats() {
         this.time += 1 / this.game.tickrate;
+        this.game.grandmaster.sectionTime += 1 / this.game.tickrate;
 
         this.pps = this.pieceCount / this.time;
         this.apm = this.attack * 60 / this.time;
@@ -127,7 +129,8 @@ export class GameStats {
 
         if (isTspin) this.tspins[count]++;
         this.allspins += isAllspin ? 1 : 0;
-        this.level += levellingTable[count];
+        this.tgm_level += levellingTable[count];
+        this.game.grandmaster.addGrade(count, this.combo, this.tgm_level)
         if (count > 0) this.clearPieces[this.game.falling.piece.name][count - 1]++;
     }
 
