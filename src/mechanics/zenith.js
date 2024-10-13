@@ -49,7 +49,9 @@ export class Zenith {
 
         startZenithMode() {
             clearInterval(this.game.mechanics.zenithTimer);
+            document.getElementById("climbSpeedBar").style.display = "none"
             if(this.game.settings.game.gamemode != "zenith") return
+            document.getElementById("climbSpeedBar").style.display = "block"
             this.game.mechanics.zenithTimer = setInterval(
                 () => {
                         let t = Math.floor(this.game.stats.climbSpeed),
