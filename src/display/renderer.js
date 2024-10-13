@@ -62,8 +62,8 @@ export class Renderer {
         this.dangerParticles();
         this.resetAnimation();
         requestAnimationFrame(this.renderingLoop.bind(this))
-        if(this.game.settings.game.gamemode == "ultra" && Math.round(this.game.stats.time) == 60) this.renderTimeLeft("60S LEFT")
-        if(this.game.settings.game.gamemode == "ultra" && Math.round(this.game.stats.time) == 90) this.renderTimeLeft("30S LEFT")
+        if(this.game.settings.game.gamemode == "ultra" && Math.floor(this.game.stats.time) == 60) this.renderTimeLeft("60S LEFT")
+        if(this.game.settings.game.gamemode == "ultra" && Math.floor(this.game.stats.time) == 90) this.renderTimeLeft("30S LEFT")
     }
 
     sizeCanvas() {
