@@ -128,7 +128,9 @@
         "result": "time",
         "settings": {
             "requiredAltitude": 1650,
-            "gravitySpeed": 950
+            "gravitySpeed": 950,
+            "allspin": true,
+            "allspinminis": true
         }
     }
 }

@@ -95,14 +95,6 @@ export class Zenith {
                         this.game.sounds.playSound("zenith_levelup")
                         this.game.rendering.renderTimeLeft("FLOOR " + this.game.stats.floor)
                     }
-                    const n = this.SpeedrunReq[this.game.stats.floor]
-                    this.isHyperspeed = t >= n
-
-                    while(this.isHyperspeed){
-                        if(this.game.stats.climbSpeed <= 5){
-                            this.isHyperspeed = false
-                        }
-                    }
 
                     this.game.stats.altitude = Math.floor(this.tempAltitude)
                     this.tickPass++

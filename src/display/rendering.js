@@ -221,11 +221,15 @@ export class Rendering {
 
     renderTimeLeft(text){
         const e = document.getElementById("timeLeftText")
+        if (this.texttimeouts["timeLeft"] != 0){
+            this.stopTimeout("timeLeft");
+            e.classList.remove("warn");
+        } 
         e.textContent = text
         e.classList.add("warn")
-        setTimeout(()=>
-            e.classList.remove("warn")
-        , 3000)
+        this.texttimeouts["timeLeft"] = setTimeout(() => {
+            e.classList.remove("warn");
+        }, 3000);
     }
 
     updateAlpha() {

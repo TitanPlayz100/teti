@@ -70,7 +70,6 @@ export class Game {
         this.rendering.renderStyles();
         this.mechanics.spawnPiece(this.bag.randomiser(), true);
         this.history.save();
-        if(this.settings.game.gamemode == "zenith") this.rendering.renderTimeLeft("FLOOR 1")
     }
 
     stopGameTimers() { //stop all the game's timers
