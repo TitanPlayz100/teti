@@ -220,7 +220,7 @@ export class Renderer {
 
         // skins
         let skin = this.game.settings.display.skin;
-        if (defaultSkins.includes(skin)) skin = `../assets/skins/${skin}.png`;
+        if (defaultSkins.includes(skin)) skin = `./assets/skins/${skin}.png`;
         this.game.boardrender.loadImage(skin);
 
         // sidebar constants
