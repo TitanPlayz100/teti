@@ -191,6 +191,142 @@
     border-radius: 0.7vh;
 }
 
+#climbSpeedBar {
+    position: absolute;
+    width: 32vh;
+    height: 1vh;
+    border-radius: 0.5vh;
+    transform-origin: 0 0;
+    left: -2%;
+    bottom: -5%;
+}
+
+#climbSpeedBar::-webkit-progress-value {
+    background-color: red;
+    border-radius: 0.7vh;
+}
+
+#climbSpeedBar::-webkit-progress-bar {
+    background-color: var(--invis);
+}
+
+#timeLeftText {
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+    color: gold;
+    font-size: 1em;
+    width: 100%;
+    text-align: center;
+    bottom: 75%;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+#timeLeftText.warn {
+    animation: timeLeft 3s;
+}
+
+@keyframes timeLeft {
+    0% {
+        opacity: 1;
+        letter-spacing: 0px;
+        color: gold;
+    }
+
+    5%{
+        color: red;
+    }
+
+    10%{
+        color: gold;
+
+    }
+
+    15%{
+        color: red;
+    }
+
+    20%{
+        color: gold;
+
+    }
+
+    25%{
+        color: red;
+    }
+
+    30%{
+        color: gold;
+
+    }
+
+    35%{
+        color: red;
+    }
+
+    40%{
+        color: gold;
+
+    }
+
+    45%{
+        color: red;
+    }
+
+    50%{
+        color: gold;
+
+    }
+
+    55%{
+        color: red;
+    }
+
+    60%{
+        color: gold;
+
+    }
+
+    65%{
+        color: red;
+    }
+
+    70% {
+        opacity: 1;
+        color:gold
+    }
+
+    75%{
+        color: red;
+    }
+
+    80%{
+        color: gold;
+
+    }
+
+    85%{
+        color: red;
+    }
+
+    90%{
+        color: gold;
+
+    }
+
+    95%{
+        color: red;
+    }
+
+
+    100% {
+        opacity: 0;
+        letter-spacing: 5px;
+        color: gold;
+    }
+}
+
+
 #garbageQueue {
     position: absolute;
     width: 122vh;

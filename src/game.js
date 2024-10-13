@@ -18,6 +18,7 @@ import { ProfileStats } from "./features/profileStats.js";
 import { Modes } from "./features/modes.js";
 import { BoardRenderer } from "./display/renderBoard.js";
 import { Particles } from "./display/particles.js";
+import { Zenith } from "./mechanics/zenith.js";
 
 export class Game {
     started;
@@ -54,6 +55,7 @@ export class Game {
         this.controls = new Controls(this);
         this.history = new History(this);
         this.modes = new Modes(this);
+        this.zenith = new Zenith(this)
 
         this.renderer.sizeCanvas();
         this.particles.initBoard();
@@ -84,6 +86,7 @@ export class Game {
         clearInterval(this.gravityTimer);
         clearInterval(this.gameTimer);
         clearInterval(this.survivalTimer);
+        clearInterval(this.mechanics.zenithTimer)
         this.mechanics.locking.lockingPause();
     }
 
@@ -135,6 +138,7 @@ export class Game {
         this.hold = new Hold(this);
         this.stats = new GameStats(this);
         this.history = new History(this);
+        this.zenith = new Zenith(this);
 
         this.renderer.renderSidebar();
         this.modes.checkFinished();

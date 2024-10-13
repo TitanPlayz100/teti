@@ -104,6 +104,26 @@
         "path": "assets/sfx/pbend.mp3"
     },
     {
+        "name": "speed_up.mp3",
+        "path": "assets/sfx/speed_up.mp3",
+        "type": "file"
+    },
+    {
+        "name": "speed_down.mp3",
+        "path": "assets/sfx/speed_down.mp3",
+        "type": "file"
+    },
+    {
+        "name": "levelup.mp3",
+        "path": "assets/sfx/levelup.mp3",
+        "type": "file"
+    },
+    {
+        "name": "zenith_levelup.mp3",
+        "path": "assets/sfx/zenith_levelup.mp3",
+        "type": "file"
+    },
+    {
         "name": "combo_1.mp3",
         "path": "assets/sfx/combo/combo_1.mp3"
     },

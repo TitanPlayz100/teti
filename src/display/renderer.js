@@ -62,7 +62,8 @@ export class Renderer {
         this.dangerParticles();
         this.resetAnimation();
         requestAnimationFrame(this.renderingLoop.bind(this))
-        // setTimeout(() => , 1);
+        if(this.game.settings.game.gamemode == "ultra" && this.game.stats.time == 60.00000000000378) this.renderTimeLeft("60S LEFT")
+        if(this.game.settings.game.gamemode == "ultra" && this.game.stats.time == 90.01999999999923) this.renderTimeLeft("30S LEFT")
     }
 
     sizeCanvas() {
@@ -248,6 +249,19 @@ export class Renderer {
                 this[`elementSmallStat${index + 1}`].textContent = displaySecond;
             }
         })
+    }
+
+    renderTimeLeft(text){
+        const e = document.getElementById("timeLeftText")
+        if (this.texttimeouts["timeLeft"] != 0){
+            this.stopTimeout("timeLeft");
+            e.classList.remove("warn");
+        } 
+        e.textContent = text
+        e.classList.add("warn")
+        this.texttimeouts["timeLeft"] = setTimeout(() => {
+            e.classList.remove("warn");
+        }, 3000);
     }
 
     createReverseLookup(obj) {

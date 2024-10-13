@@ -129,5 +129,18 @@
             "raceTarget": 500,
             "gravitySpeed": 0
         }
+    },
+    "zenith": {
+        "displayName": "Climb",
+        "objectiveText": "Altitude",
+        "goalStat": "altitude",
+        "target": "requiredAltitude",
+        "result": "time",
+        "settings": {
+            "requiredAltitude": 1650,
+            "gravitySpeed": 950,
+            "allspin": true,
+            "allspinminis": true
+        }
     }
 }

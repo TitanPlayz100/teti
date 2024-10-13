@@ -30,11 +30,13 @@
         <canvas id="next" onclick="modal.openModal('queueModify')"></canvas>
         <canvas id="hold" onclick="modal.openModal('queueModify')"></canvas>
         <canvas id="playingfield"></canvas>
+        <p class="text" id="timeLeftText">60S LEFT</p>
         <div id="clickareas"></div>
 
         <progress id="garbageQueue" max="40" value="0"></progress>
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
+        <progress id="climbSpeedBar" max="100" value="0"></progress>
         
         <div>
             <p class="text nextText">Next</p>
@@ -280,6 +282,7 @@
             <div class="settingRow"><p>Multiplier (backfire)</p> <input class="option number" type="number" id="backfireMulti"/></div>
             <div class="settingRow"><p>Look ahead pieces</p> <input class="option number" type="number" id="lookAheadPieces" /></div>
             <div class="settingRow"><p>Race Target</p> <input class="option number" type="number" id="raceTarget" /></div>
+            <div class="settingRow"><p>Required Altitude (Climb)</p> <input class="option number" type="number" id="requiredAltitude" /></div>
         </div>
         <div class="settingsFooter">
             <p>Press Esc to close without saving</p>
