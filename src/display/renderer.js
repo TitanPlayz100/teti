@@ -134,8 +134,6 @@ export class Renderer {
             this.game.settings.game.gamemode != 'combo'; // not combo mode
         if (condition && !this.inDanger) {
             this.game.sounds.playSound("damage_alert");
-            this.game.modals.generate.notif("WARNING!", "You gameplay is detected as peepee poopoo", "error"); // todo remove lmao
-
         }
         this.game.boardeffects.toggleDangerBoard(condition)
         this.inDanger = condition;
