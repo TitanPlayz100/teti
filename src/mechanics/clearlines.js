@@ -55,6 +55,7 @@ export class ClearLines {
         let damagetype = this.getDamageType(linecount);
 
         // update stats
+        if (!isBTB && linecount > 0) this.game.zenith.AwardLines(Math.max(0, this.game.stats.btbCount))    
         this.game.stats.updateBTB(isBTB, linecount);
         this.game.stats.updateCombo(linecount);
         const damage = this.calcDamage(stats.combo, damagetype, isPC, stats.btbCount, isBTB);
@@ -64,6 +65,7 @@ export class ClearLines {
         mech.spikeCounter += damage;
         this.manageGarbageSent(damage);
 
+        this.game.zenith.AwardLines(damage);
         // render action text
         if (mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
         this.game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);

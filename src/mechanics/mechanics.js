@@ -9,7 +9,8 @@ export class Mechanics {
     isMini = false;
     garbageQueue = 0;
     spikeCounter = 0;
-    toppingOut = false;
+    toppingOut = false; 
+    zenithTimer = 0;
 
     /**
      * @param {Game} game
@@ -37,8 +38,8 @@ export class Mechanics {
         const warn = document.getElementById('warningText');
         if (!!(check || check2)) {
             if (this.toppingOut) return;
-            this.game.sounds.playSound('hyperalert'); 
-            this.toppingOut = true; 
+            this.game.sounds.playSound('hyperalert');
+            this.toppingOut = true;
             warn.classList.toggle('warn', true);
         } else {
             this.toppingOut = false;

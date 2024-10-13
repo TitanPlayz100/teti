@@ -10,6 +10,8 @@ export class Movement {
     }
 
     firstMovement() {
+        this.game.zenith.startZenithMode();
+        if(this.game.zenith.tickPass == 0 && this.game.settings.game.gamemode == "zenith") this.game.rendering.renderTimeLeft("FLOOR 1")
         this.game.started = true;
         this.game.mechanics.startGravity();
         this.game.modes.startSurvival();
