@@ -32,7 +32,7 @@ export class Hold {
         const validPiece = [val].filter(p => this.pieceNames.includes(p));
         this.piece = this.getPiece(validPiece);
         this.occured = false;
-        this.game.rendering.updateHold();
+        this.game.renderer.updateHold();
         this.game.history.save();
     }
 

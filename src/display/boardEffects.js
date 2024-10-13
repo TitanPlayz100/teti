@@ -15,7 +15,8 @@ export class BoardEffects {
     targetR = 0;
 
     hasPace = true;
-    
+    paceCooldown = 0;
+
     divBoard = document.getElementById("board");
     divDanger = document.getElementById("dangerOverlay");
     border = document.getElementById('backborder')
@@ -78,29 +79,30 @@ export class BoardEffects {
         const pbs = this.game.profilestats.personalBests;
         const gamemode = this.game.settings.game.gamemode;
 
-        const reset = () => { // todo dont fire this all the time
-            this.border.style.setProperty('--blur-size', `0vmin`)
-            this.border.style.setProperty('--blur-strength', '0')
-            this.backboard.style.setProperty('--blur-strength', '0')
-            this.hasPace = false
-        }
-
-        if (!this.game.settings.display.rainbowPB || !this.game.settings.game.competitiveMode) return;
-        if (stats.time < 0.5 || pbs[gamemode] == undefined) { reset(); return; }
+        if (!this.game.settings.display.rainbowPB ||
+            !this.game.settings.game.competitiveMode ||
+            stats.time < 0.5 || pbs[gamemode] == undefined) return;
+        if (this.paceCooldown > 0) { this.paceCooldown--; return; }
 
         const trackingStat = pbTrackingStat[this.game.modes.modeJSON.goalStat];
         const current = stats[trackingStat];
         const pbpace = pbs[gamemode].pbstats[trackingStat];
-        if (current < pbpace) {
-            if (this.hasPace) this.game.sounds.playSound("pbend")
-            reset()
-        } else {
-            this.border.style.setProperty('--blur-size', `0.3vmin`)
-            this.border.style.setProperty('--blur-strength', '0.7vmin')
-            this.backboard.style.setProperty('--blur-strength', '0.5vmin')
-            if (!this.hasPace) this.game.sounds.playSound("pbstart")
-            this.hasPace = true
+        if (current < pbpace && this.hasPace) {
+            this.game.sounds.playSound("pbend");
+            this.toggleRainbow(false);
+        } else if (current >= pbpace && !this.hasPace) {
+            this.game.sounds.playSound("pbstart");
+            this.toggleRainbow(true);
         }
+
+        this.paceCooldown = this.game.tickrate * 3;
+    }
+
+    toggleRainbow(pace) {
+        this.border.style.setProperty('--blur-size', pace ? `0.3vmin` : `0vmin`)
+        this.border.style.setProperty('--blur-strength', pace ? '0.7vmin' : '0')
+        this.backboard.style.setProperty('--blur-strength', pace ? '0.5vmin' : '0')
+        this.hasPace = pace;
     }
 
     toggleDangerBoard(inDanger) {

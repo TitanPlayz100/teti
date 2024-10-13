@@ -1,5 +1,7 @@
 export const cleartypes = { 0: "", 1: "Single", 2: "Double", 3: "Triple", 4: "Quad", 5: "Teti-tris" };
 
+export const defaultSkins = ['tetrio', 'jstris', 'plain'];
+
 export const scoringTable = {
     "": 0,
     TSPIN: 400,
@@ -54,6 +56,21 @@ export const spinChecks = [
     ],
 ];
 
+export const gameoverText = {
+    clearlines: "Cleared _ lines",
+    attack: "Sent _ damage",
+    cleargarbage: "Dug _ lines",
+    ended: "Survived _ lines",
+    level: "Reached level _",
+    time: "Spent _ seconds",
+}
+
+export const gameoverResultText = {
+    time: " in _ seconds",
+    score: " to score _ points",
+    maxCombo: " to get _ combo",
+}
+
 export const lowerIsBetter = {
     time: true,
     score: false,
@@ -69,17 +86,39 @@ export const pbTrackingStat = {
     level: "pps"
 }
 
-
 export const resultSuffix = {
     time: 's',
     score: ' Points',
     maxCombo: ' Combo'
 }
 
+export const statDecimals = {
+    0: ["clearlines", "pieceCount", "score", "pcs", "quads", "allspins", "level", "attack", "cleargarbage", "sent", "recieved", "combo", "maxCombo", "btbCount", "maxBTB", "tpE", "ipE", "inputs", "holds", "rotates", "ppb",],    
+    1: ["time", "vs", "chzind", "garbeff",],
+    2: ["pps", "apm", "lpm", "app", "apl", "appw", "dss", "dsp", "vsOnApm", "kps", "kpp"]
+}
+
+export const statsSecondary = {
+    pps: "pieceCount",
+    apm: "attack",
+    lpm: "clearlines",
+    app: "attack",
+    apl: "attack",
+    appw: "attack",
+    dss: "cleargarbage",
+    dsp: "cleargarbage",
+    kps: "inputs",
+    kpp: "inputs",
+    tpE: "tspins",
+    ipE: "quads",
+    ppb: "score"
+}
+
 
 // const sfx = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx")
 // const combo = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx/combo")
 // const songs = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/songs")
+// manually remove dirs
 export const songsobj = [
     {
         "name": "Cafe de Touhou 3 - The Girl's Secret Room.mp3",

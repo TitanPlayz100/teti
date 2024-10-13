@@ -9,7 +9,7 @@ export class Sounds {
     curSongIdx = 0;
     elSongProgress = document.getElementById("songProgress");
     elSongText = document.getElementById("songText");
-    
+
     lowpassfilter;
     audioContext;
 
@@ -21,11 +21,18 @@ export class Sounds {
         this.game = game;
     }
 
+    /**
+     * 
+     * @param {string} audioName 
+     * Name of audio as specified in sfxlist.json
+     * @param {Boolean} replace
+     * If true, stops currently playing audio and starts new one
+     * If false, skips if audio is already playing
+     */
     playSound(audioName, replace = true, silent = false) {
         if (this.sfx[audioName] == undefined) return;
         this.sfx[audioName].muted = silent;
         this.sfx[audioName].volume = this.game.settings.volume.sfxLevel / 1000;
-        if (this.game.started == false) return;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
         this.sfx[audioName].currentTime = 0;
         this.sfx[audioName].play();
@@ -51,7 +58,7 @@ export class Sounds {
     pauseSong() {
         if (this.songs[this.curSongIdx].paused) {
             this.songs[this.curSongIdx].play();
-            this.elSongText.textContent = `Now Playing ${this.songNames[this.curSongIdx]}`;
+            this.elSongText.textContent = `Playing ${this.songNames[this.curSongIdx]}`;
         } else {
             this.songs[this.curSongIdx].pause();
             this.elSongText.textContent = `Not Playing`;
@@ -59,14 +66,22 @@ export class Sounds {
         }
     }
 
-    async initSounds() {
-        let menuSFX = (e, sfx) => {
-            document.querySelectorAll(e)
-                .forEach(el => (el.onmouseenter = () => this.game.sounds.playSound(sfx)));
+    addMenuSFX() {
+        let hoverSFX = (e) => {
+            document.querySelectorAll(e).forEach(el => (el.addEventListener("mouseenter", () => this.game.sounds.playSound("menutap"))));
         };
-        menuSFX(".settingLayout", "menutap");
-        menuSFX(".gamemodeSelect", "menutap");
+        let clickSFX = (e) => {
+            document.querySelectorAll(e).forEach(el => (el.addEventListener("click", () => this.game.sounds.playSound("menuclick"))));
+        };
+        hoverSFX(".settingRow");
+        hoverSFX(".closeDialogButton");
+        hoverSFX(".gamemodeSelect");
+        hoverSFX(".settingPanelButton");
+        clickSFX(".settingPanelButton");
+        clickSFX(".closeDialogButton");
+    }
 
+    initSounds() {
         setInterval(() => {
             if (this.songs[this.curSongIdx].currentTime == 0) return;
             this.elSongProgress.value =
@@ -75,10 +90,12 @@ export class Sounds {
 
         // preload all sfx
         sfxobj.forEach(file => {
-            if (file.type == "dir") return;
             const name = file.name.split(".")[0];
-            this.sfx[name] = new Audio(file.path);
+            const a = new Audio(file.path);
+            this.sfx[name] = a;
+            this.playSound(name, false, true);
         })
+
 
         this.audioContext = new window.AudioContext();
         this.lowpassfilter = this.audioContext.createBiquadFilter();
@@ -104,7 +121,7 @@ export class Sounds {
     toggleSongMuffle(muffled) {
         const currentTime = this.audioContext.currentTime;
         this.lowpassfilter.frequency.cancelScheduledValues(currentTime);
-        this.lowpassfilter.frequency.setValueAtTime(this.lowpassfilter.frequency.value, currentTime);  
-        this.lowpassfilter.frequency.exponentialRampToValueAtTime(muffled ? 300 : 20000, currentTime + 1);  
+        this.lowpassfilter.frequency.setValueAtTime(this.lowpassfilter.frequency.value, currentTime);
+        this.lowpassfilter.frequency.exponentialRampToValueAtTime(muffled ? 300 : 20000, currentTime + 1);
     }
 }

@@ -1,0 +1,146 @@
+.dialog {
+    font-family: "Montserrat", sans-serif;
+    text-align: center;
+    height: 35vh;
+    aspect-ratio: 1.3/1;
+    background-color: var(--almost-invis);
+    color: white;
+    user-select: none;
+    animation: zoomin 0.3s forwards ease;
+    border-radius: 2vh;
+    border: 0.3vh solid var(--vl-gray);
+    padding: 0;
+    outline: none;
+}
+
+.dialog.closingAnimation {
+    animation: zoomout 0.3s forwards ease;
+}
+
+.dialog::backdrop {
+    background-color: #000000b5;
+    backdrop-filter: blur(5px);
+    animation: fadein 0.4s forwards ease;
+}
+
+.dialog.closingAnimation::backdrop {
+    animation: fadeout 0.4s forwards ease;
+}
+
+/* pbs */
+.pbbox {
+    display: grid;
+    margin: 1vmin;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 2vw;
+    padding: 1vmin;
+    border: 0.1vh solid white;
+}
+
+.pbbox:hover {
+    border: 0.1vh solid var(--p-green);
+}
+
+.pbbox>h2 {
+    margin: 0;
+    pointer-events: none;
+}
+
+.pbbox>button {
+    height: 4vh;
+    aspect-ratio: 1/1;
+    border: 0.3vh solid var(--l-gray);
+    color: var(--cl-blue);
+    border-radius: 1vmin;
+    transition: all 0.1s ease-out;
+    background-color: var(--invis);
+    padding: 0.5vh;
+    outline: none;
+}
+
+.pbbox>button:hover {
+    border: 0.3vh solid var(--cl-blue);
+}
+
+
+/* edit menu */
+.pieceselection {
+    height: 5vmin;
+    aspect-ratio: 1/1;
+    margin: 0.3vw;
+    border: none;
+    outline: none;
+    transition: all 0.3s ease;
+    margin-bottom: 2vh;
+}
+
+.pieceselection:hover {
+    transform: scale(1.1);
+}
+
+.pieceselection:active {
+    transform: scale(0.9);
+}
+
+#editbuttons {
+    display: flex;
+    gap: 1vw;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 3vh;
+}
+
+#editbuttons>br {
+    width: 100%;
+    content: ' ';
+}
+
+/* notifications */
+#notifications {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.notif {
+    font-family: "Montserrat", sans-serif;
+    animation: error 0.6s forwards;
+    background-color: black;
+    color: white;
+    border-left-color: var(--color);
+    border-left-width: 0.3vw;
+    border-left-style: solid;
+    padding: 1vmin;
+    border-radius: 1vh;
+    margin: 2vmin;
+    width: 30vw;
+    cursor: pointer;
+    transition: opacity 1s ease;
+    z-index: 10;
+}
+
+@keyframes error {
+    from {
+        opacity: 0;
+        transform: translate(10vw);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(0);
+    }
+}
+
+.notif_title {
+    margin: 0.5vmin;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.notif_text {
+    margin: 0.3vmin;
+    font-size: 0.8em;
+    opacity: 0.8;
+}

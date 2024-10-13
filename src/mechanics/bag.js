@@ -15,13 +15,19 @@ export class Bag {
         this.game = game;
     }
 
-    randomiser() {
+    randomiser(start = false) {
         if (this.nextPieces[1].length == 0) this.shuffleRemainingPieces();
         if (this.nextPieces[0].length == 0) {
             this.nextPieces = [this.nextPieces[1], []];
             this.shuffleRemainingPieces();
         }
         const piece = this.nextPieces[0].splice(0, 1)[0];
+
+        if (["o", "s", "z"].includes(piece) && this.game.settings.game.stride && start) { // stride mode
+            this.nextPieces = [[], []];
+            return this.randomiser();
+        }
+
         return pieces.filter(element => {
             return element.name == piece;
         })[0];
@@ -54,19 +60,20 @@ export class Bag {
             .split("")
             .filter(p => names.includes(p));
         this.shuffleRemainingPieces();
-        this.game.rendering.updateNext();
+        this.game.renderer.updateNext();
 
         this.game.mechanics.locking.clearLockDelay();
         this.game.board.MinoToNone("A");
-        this.isTspin = false;
-        this.isAllspin = false;
-        this.isMini = false;
+        this.game.mechanics.isTspin = false;
+        this.game.mechanics.isAllspin = false;
+        this.game.mechanics.isMini = false;
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
         this.game.history.save();
     }
 
-    firstNextPiece() {
-        return this.nextPieces[0]
-            .concat(this.nextPieces[1])[0]
+    nextPiece() {
+        return pieces.filter(
+            p => p.name == this.nextPieces[0].concat(this.nextPieces[1])[0]
+        )[0];
     }
 }

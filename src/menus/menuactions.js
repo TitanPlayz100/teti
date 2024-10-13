@@ -1,5 +1,5 @@
 import { Game } from "../game.js";
-import { toExpValue } from "../util.js";
+import { toExpValue } from "./modals.js";
 
 export class MenuActions {
     bindingKey;
@@ -15,6 +15,7 @@ export class MenuActions {
         this.game = game;
     }
 
+    // sliders
     sliderChange(el) {
         const text = el.parentElement.children[0].textContent.split(":")[0];
         let value = el.value;
@@ -43,6 +44,14 @@ export class MenuActions {
         this.bindingKey = el.id;
     }
 
+    checkValue(el, el2 = this.game.modals.selectedRangeElement) {
+        this.game.modals.selectedRangeElement = el2;
+        if (el.value == "") return;
+        if (el.value < Number(el2.min)) el.value = Number(el2.min);
+        if (el.value > Number(el2.max)) el.value = Number(el2.max);
+    }
+
+    // keybinds
     checkKeybind(event) {
         if (!event.ctrlKey) this.controlUsed = false;
         if (!event.altKey) this.altUsed = false;
@@ -77,6 +86,7 @@ export class MenuActions {
         this.elementSelectKeyText.textContent = "Click to remove keybind";
     }
 
+    // settings
     saveSettings() {
         const data = this.game.settings.save();
         localStorage.setItem("settings", JSON.stringify(data));
@@ -114,38 +124,32 @@ export class MenuActions {
         reader.onload = () => {
             localStorage.setItem("settings", reader.result.toString());
             this.loadSettings();
+            this.game.modals.generate.notif("Settings Loaded", "User settings have successfully loaded", "message");
         };
     }
 
     resetSettings(group) {
-        for (let setting in this.game.settings[group]) {
-            this.game.settings[group][setting] = "";
-        }
+        this.game.settings.reset(group);
         this.saveSettings();
         location.reload();
+        this.game.modals.generate.notif("Settings Reset", `${group} settings have been reset to default`, "message");
     }
 
+    // menu
     toggleDialog() {
-        if (this.game.modals.open) {
-            document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
-            if (this.game.started && !this.game.ended) this.game.movement.firstMovement();
-
-        } else {
+        if (this.game.menuactions.bindingKey != undefined) return;
+        if (!this.game.modals.open) {
             this.menus.openModal("settingsPanel");
+            return;
         }
+        document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
+        document.querySelectorAll("scrollSettings[open]").forEach(e => this.menus.closeDialog(e));
+        if (this.game.started && !this.game.ended) this.game.movement.firstMovement();
     }
 
-    checkValue(el, el2 = this.game.modals.selectedRangeElement) {
-        this.game.modals.selectedRangeElement = el2;
-        if (el.value == "") return;
-        if (el.value < Number(el2.min)) el.value = Number(el2.min);
-        if (el.value > Number(el2.max)) el.value = Number(el2.max);
-    }
-
-    newGame(k, d) {
-        if (k == this.game.settings.control.resetKey) {
-            this.game.modals.closeModal(d);
-            this.game.startGame();
+    newGame(key, modal) {
+        if (key == this.game.settings.control.resetKey) {
+            this.game.modals.closeModal(modal);
         }
     }
 
@@ -153,13 +157,14 @@ export class MenuActions {
         window.open("https://" + url, "blank_")
     }
 
+    // edit menu
     openEditMenu() {
         if (this.game.modals.open) {
+            if (document.querySelectorAll("#editMenu[open]").length == 0) return;
             this.toggleDialog();
             return;
         }
         if (this.game.settings.game.gamemode != 'custom') return
-
         this.menus.openModal("editMenu");
     }
 
@@ -185,16 +190,19 @@ export class MenuActions {
         const { board, next, hold } = this.game.boardeditor.convertFromMap(input);
         this.game.board.boardState = board;
         this.game.bag.nextPieces = [next.split(","), []];
-        this.game.hold.piece = this.game.rendering.getPiece(hold);
+        this.game.hold.piece = this.game.renderer.getPiece(hold);
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
+        this.game.modals.generate.notif("Map Loaded", "Custom map has successfully loaded", "message");
     }
 
     getBoardString() {
         const exportstring = this.game.boardeditor.convertToMap();
         navigator.clipboard.writeText(exportstring)
-        alert("TETR.IO Map String (copied to clipboard):\n" + exportstring)
+        this.game.modals.generate.notif("Map Exported", "Custom map has been copied to your clipboard", "message");
+        alert("TETR.IO Map String:\n" + exportstring)
     }
 
+    // stats
     exportStats() {
         let stats = {}
         Object.getOwnPropertyNames(this.game.stats).forEach(key => {
@@ -208,10 +216,25 @@ export class MenuActions {
         document.body.appendChild(el);
         el.click();
         document.body.removeChild(el);
+        this.game.modals.generate.notif("Stats Exported", "The current game's stats have been exported.", "message");
     }
 
     closeStats() {
         this.menus.closeDialog(document.getElementById("gameStatsDialog"));
         this.game.modals.open = true;
+    }
+
+    exportLifetime() {
+        this.game.profilestats.saveSession();
+        const data = localStorage.getItem("stats");
+        const day = (new Date()).toLocaleDateString().replace("/", "-");
+
+        let el = document.createElement("a");
+        el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(data)));
+        el.setAttribute("download", `teti_stats_${day}.json`);
+        document.body.appendChild(el);
+        el.click();
+        document.body.removeChild(el);
+        this.game.modals.generate.notif("Lifetime Stats Exported", "All your lifetime stats and PBs have been exported. Enjoy the many stats you can analyse!", "success");
     }
 }

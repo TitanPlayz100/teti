@@ -19,10 +19,12 @@
 body {
     color: var(--cl-blue);
     font-family: "Major Mono Display", monospace;
+    margin: 0;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
     background: var(--night);
+    --background: black;
 }
 
 #splashScreen {
@@ -58,18 +60,19 @@ body {
 #editButton {
     top: 5%;
     position: fixed;
-    left: 126%;
+    left: 127%;
     display: flex;
     justify-content: right;
     padding-right: 3%;
     align-items: center;
     height: 8%;
     width: 24%;
-    border: 0.2vh solid var(--l-gray);
+    border: 0.2vh solid white;
     border-radius: 0 1.5vh 1.5vh 0;
     transition: all 0.5s ease-out;
     background-color: var(--invis);
     outline: none;
+    opacity: 0.6;
 }
 
 #editButton {
@@ -79,13 +82,12 @@ body {
 #openSettingsButton:hover,
 #editButton:hover {
     left: 133%;
-    border: 0.2vh solid var(--cl-blue);
+    opacity: 1;
     transition: all 0.2s ease;
 }
 
 #openSettingsButton>img {
-    transform: translateY(10%);
-    height: 90%;
+    height: 70%;
     user-select: none;
 }
 
@@ -94,8 +96,20 @@ body {
     user-select: none;
 }
 
+.dialog img,
+.scrollSettings img {
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.dialog>*:hover img,
+.scrollSettings img:hover {
+    opacity: 1;
+}
+
+/* scrollbars */
 ::-webkit-scrollbar {
-    width: 0.3vw;
+    width: 0.4vw;
 }
 
 ::-webkit-scrollbar-track {
@@ -113,4 +127,115 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: white;
     transition: all 0.2s ease;
+}
+
+@-moz-document url-prefix() {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--vl-gray) var(--invis);
+    }
+}
+
+/* sliders */
+.range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.5vh;
+    height: 2.5vh;
+    background: white;
+    cursor: pointer;
+}
+
+.range::-moz-range-thumb {
+    -moz-appearance: none;
+    appearance: none;
+    width: 1.5vh;
+    height: 2.5vh;
+    background: white;
+    cursor: pointer;
+}
+
+.range::-webkit-slider-thumb:hover {
+    background: var(--p-green);
+}
+
+/* remove number arrows */
+.number::-webkit-outer-spin-button,
+.number::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* animations */
+@keyframes jump {
+    0% {
+        transform: translateY(0vmin);
+    }
+
+    50% {
+        transform: translateY(0.2vmin);
+    }
+
+    100% {
+        transform: translateY(0vmin);
+    }
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+@keyframes zoomin {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes zoomout {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.75;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }

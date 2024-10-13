@@ -1,3 +1,4 @@
+import { levellingTable } from "../data/data.js";
 import { Game } from "../game.js";
 
 export class GameStats {
@@ -45,10 +46,10 @@ export class GameStats {
 
     // input stats
     inputs = 0;
-    kps = 0;
-    kpp = 0;
     holds = 0;
     rotates = 0;
+    kps = 0;
+    kpp = 0;
 
     clearCols = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // amount cleared in a col = clearCols[col - 1]
     clearPieces = { // lineclears by piece = clearPieces[piece][line_count - 1]
@@ -106,6 +107,25 @@ export class GameStats {
             this.btbCount + 1 :
             count == 0 ? this.btbCount : -1;
         if (this.btbCount > this.maxBTB) this.maxBTB = this.btbCount;
+    }
+
+    updateCombo(count) {
+        this.combo = count == 0 ? -1 : this.combo + 1;
+        if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+    }
+
+    incrementStats(score, count, damage, isPC, isTspin, isAllspin, garb) {
+        this.score += score;
+        this.clearlines += count;
+        this.attack += damage;
+        this.quads += count >= 4 ? 1 : 0;
+        this.pcs += isPC ? 1 : 0;
+        this.cleargarbage += garb;
+
+        if (isTspin) this.tspins[count]++;
+        this.allspins += isAllspin ? 1 : 0;
+        this.level += levellingTable[count];
+        if (count > 0) this.clearPieces[this.game.falling.piece.name][count - 1]++;
     }
 
 }

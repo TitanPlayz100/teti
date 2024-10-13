@@ -1,17 +1,15 @@
 import { Game } from "../game.js";
 import { ClearLines } from "./clearlines.js";
 import { LockPiece } from "./locking.js";
-import pieces from "../data/pieces.json" with { type: "json" };
 
 export class Mechanics {
     board;
-    isTspin;
-    isAllspin;
-    isMini;
-    garbageQueue;
-    spikeCounter;
-    gravityTimer = 0;
-    
+    isTspin = false;
+    isAllspin = false;
+    isMini = false;
+    garbageQueue = 0;
+    spikeCounter = 0;
+    toppingOut = false;
 
     /**
      * @param {Game} game
@@ -19,11 +17,12 @@ export class Mechanics {
     constructor(game) {
         this.game = game;
         this.board = game.board;
-        this.clear = new ClearLines(this, game); 
-        this.locking = new LockPiece(this, game);
+        this.clear = new ClearLines(game);
+        this.locking = new LockPiece(game);
     }
 
     checkDeath(coords, collider) {
+        if (coords.length == 0) return;
         const collision = coords.every(c => this.game.movement.checkCollision([c], "PLACE", []));
         const collision2 = this.game.movement.checkCollision(coords, "SPAWN", collider);
         const isGarbage = collider.some(c => this.board.checkMino(c, "G"));
@@ -32,20 +31,30 @@ export class Mechanics {
         if (collision2) return "Blockout";
     }
 
+    deathAlert() {
+        const check = this.checkDeath(this.board.getMinos('Sh'), this.board.getMinos('NP'));
+        const check2 = this.checkDeath(this.board.getMinos('G'), this.board.getMinos('NP'));
+        const warn = document.getElementById('warningText');
+        if (!!(check || check2)) {
+            if (this.toppingOut) return;
+            this.game.sounds.playSound('hyperalert'); 
+            this.toppingOut = true; 
+            warn.classList.toggle('warn', true);
+        } else {
+            this.toppingOut = false;
+            warn.classList.toggle('warn', false);
+        }
+    }
+
     spawnPiece(piece, start = false) {
         if (this.game.ended) return;
         this.game.falling.spawn(piece);
         this.spawnOverlay();
-        this.game.rendering.updateNext();
-        this.game.rendering.updateHold();
+        this.game.renderer.updateNext();
+        this.game.renderer.updateHold();
         this.setShadow();
         this.locking.incrementLock();
-        const rows =
-            this.game.settings.game.requiredGarbage < 10
-                ? this.game.settings.game.requiredGarbage
-                : 10;
-        if (this.game.stats.getRemainingGarbage() > 0 && start && this.game.settings.game.gamemode == 'digger')
-            this.addGarbage(rows);
+        this.game.modes.diggerGarbageSet(start);
         this.game.modes.set4WCols(start);
         if (this.game.settings.game.preserveARR) this.game.controls.startArr("current");
         if (this.game.started) this.startGravity();
@@ -53,9 +62,7 @@ export class Mechanics {
 
     spawnOverlay() {
         this.board.MinoToNone("NP");
-        const next = pieces.filter(
-            p => p.name == this.game.bag.firstNextPiece()
-        )[0];
+        const next = this.game.bag.nextPiece();
         const x = next.name == "o" ? 4 : 3;
         const y = next.name == "o" ? 21 : next.name == "i" ? 19 : 20;
         this.board.pieceToCoords(next.shape1, [x, y]).forEach(([x, y]) => this.board.addValue([x, y], "NP"));
@@ -68,25 +75,21 @@ export class Mechanics {
         coords.forEach(([x, y]) => this.board.addValue([x, y], "Sh"));
         let count = 0;
         const shadow = this.board.getMinos("Sh");
-        while (
-            !this.game.movement.checkCollision(
-                shadow.map(c => [c[0], c[1] - count]),
-                "DOWN"
-            )
-        )
+        while (!this.game.movement.checkCollision(shadow.map(c => [c[0], c[1] - count]), "DOWN"))
             count++;
         this.board.moveMinos(shadow, "DOWN", count, "Sh");
+        this.deathAlert();
     }
 
     startGravity() {
-        clearInterval(this.gravityTimer);
+        clearInterval(this.game.gravityTimer);
         if (this.game.settings.game.gravitySpeed > 1000) return;
         if (this.game.settings.game.gravitySpeed == 0) {
             this.game.movement.movePieceDown(true);
             return;
         }
         this.game.movement.movePieceDown(false);
-        this.gravityTimer = setInterval(
+        this.game.gravityTimer = setInterval(
             () => this.game.movement.movePieceDown(false),
             this.game.settings.game.gravitySpeed
         );
@@ -96,7 +99,7 @@ export class Mechanics {
         let randCol = Math.floor(Math.random() * 10);
         for (let i = 0; i < lines; i++) {
             if (this.game.movement.checkCollision(this.board.getMinos("A"), "DOWN")) {
-                if (this.locking.timings.lockdelay == -1) this.locking.incrementLock();
+                if (this.locking.timings.lockdelay == 0) this.locking.scheduleLock();
                 this.board.moveMinos(this.board.getMinos("A"), "UP", 1);
             }
             this.board.moveMinos(this.board.getMinos("S"), "UP", 1);
@@ -130,8 +133,8 @@ export class Mechanics {
         }
         if (!this.game.settings.game.infiniteHold) this.game.hold.occured = true;
         this.game.sounds.playSound("hold");
-        this.game.rendering.renderDanger();
+        this.game.renderer.renderDanger();
         this.startGravity();
-        this.game.rendering.updateHold();
+        this.game.renderer.updateHold();
     }
 }

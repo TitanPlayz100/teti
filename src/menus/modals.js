@@ -1,5 +1,5 @@
 import { Game } from "../game.js";
-import { toExpValue, toLogValue } from "../util.js";
+import { GenerateMenus } from "./generate.js";
 
 export class ModalActions {
     open;
@@ -8,10 +8,9 @@ export class ModalActions {
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
 
     settingPanel = document.getElementById("settingsPanel");
-    pblistStart = document.getElementById("PBlist");
-    gamemodeStart = document.getElementById("startGamemodeList");
-    statsStart = document.getElementById("startStatsList");
+    options = [...document.getElementsByClassName("option")];
 
+    
     /**
      * @param {Game} game
      */
@@ -19,6 +18,7 @@ export class ModalActions {
         this.game = game;
         this.actions = this.game.menuactions;
         game.menuactions.menus = this;
+        this.generate = new GenerateMenus(game);
     }
 
     openModal(id) {
@@ -26,12 +26,12 @@ export class ModalActions {
         if (id == "settingsPanel" && this.closing) return;
         if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
         this.game.stopGameTimers()
-
         this.getOptions(id).forEach(setting => {
             let settingType = this.getSettingType(id);
             let newval;
             if (this.game.settings.hasOwnProperty(settingType)) newval = this.game.settings[settingType][setting.id]
             if (setting.classList[2] == "exp") newval = toLogValue(newval);
+            if (setting.classList[2] == "statoption") newval = this.game.settings.game.sidebar[setting.id[10]-1]; 
             if (setting.id == "nextQueue") newval = this.game.bag.getQueue();
             if (setting.id == "holdQueue") newval = this.game.hold.getHold();
             if (setting.id == "rowfillmode") newval = this.game.boardeditor.fillRow;
@@ -46,111 +46,23 @@ export class ModalActions {
 
         document.getElementById(id).showModal();
 
-        if (id == "gameStatsDialog") this.displayStats();
-        if (id == "gamemodeDialog") this.highlightGamemodeInMenu();
-        if (id == "competitiveDialog") this.renderPBs();
+        if (id == "gameStatsDialog") this.generate.displayStats();
+        if (id == "gamemodeDialog") this.generate.highlightGamemodeInMenu();
+        if (id == "competitiveDialog") this.generate.renderPBs();
         if (id != "settingsPanel" && this.settingPanel.open) this.closeDialog(this.settingPanel);
         this.open = true;
         this.game.sounds.toggleSongMuffle(this.open);
-
     }
 
     getOptions(id) {
-        const options = [...document.getElementsByClassName("option")];
-        return options.filter(item => item.parentElement.parentElement.id == id)
+        const settings = [...this.options].filter(item => item.parentElement.parentElement.parentElement.id == id)
+        return settings;
     }
 
     getSettingType(id) {
         let type = id.replace("Dialog", "");
         if (id == "gamemodeDialog" || id == "goalsDialog" || id == "competitiveDialog") type = "game";
         return type;
-    }
-
-    generateGamemodeMenu() {
-        this.game.modes.getGamemodeNames().forEach(name => {
-            const setting = this.game.modes.getGamemodeJSON(name);
-            const button = document.createElement("button");
-            button.id = name;
-            button.classList = "gamemodeSelect";
-            button.textContent = setting.displayName;
-            button.onclick = () => {
-                menu.setGamemode(name);
-                modal.closeModal("gamemodeDialog");
-            }
-            this.gamemodeStart.parentNode.insertBefore(button, this.gamemodeStart);
-        })
-        this.gamemodeStart.remove();
-    }
-
-    highlightGamemodeInMenu() {
-        const gamemodeSelect = [...document.getElementsByClassName("gamemodeSelect")];
-        gamemodeSelect.forEach(setting => {
-            setting.classList.remove("selected");
-            if (setting.id == this.game.settings.game.gamemode)
-                setting.classList.add("selected");
-        });
-    }
-
-    renderPBs() {
-        const previous = [...document.getElementsByClassName("pbbox")] ?? [];
-        previous.forEach(el => el.remove());
-
-        const pbs = this.game.profilestats.personalBests;
-        Object.keys(pbs).forEach(mode => {
-            const score = pbs[mode].score
-            const pbbox = document.createElement("div");
-
-            const text1 = document.createElement("h2")
-            text1.textContent = mode[0].toUpperCase() + mode.slice(1) + ': ';
-            const text2 = document.createElement("h2")
-            text2.textContent = score + this.game.modes.getSuffix(mode);
-            const clearbutton = document.createElement("button");
-            clearbutton.textContent = "X";
-            clearbutton.addEventListener("click", (event) => {
-                event.stopPropagation();
-                this.game.profilestats.removePB(mode);
-                pbbox.remove()
-            });
-            pbbox.appendChild(text1);
-            pbbox.appendChild(text2);
-            pbbox.appendChild(clearbutton);
-            pbbox.addEventListener("click", () => {
-                let el = document.createElement("a");
-                el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(pbs[mode])));
-                el.setAttribute("download", `${mode}_pb.json`);
-                document.body.appendChild(el);
-                el.click();
-                document.body.removeChild(el);
-            })
-
-            pbbox.classList = "pbbox settingLayout";
-            this.pblistStart.parentNode.insertBefore(pbbox, this.pblistStart);
-        })
-    }
-
-    displayStats() {
-        const previous = [...document.getElementsByClassName("statText")] ?? [];
-        previous.forEach(el => el.remove());
-
-        const stats = Object.getOwnPropertyNames(this.game.stats);
-        const skip = ['clearCols', 'clearPieces', 'game']
-        stats.forEach(stat => {
-            if (skip.includes(stat)) return;
-            let score = this.game.stats[stat]
-            if (stat == "tspins") score = score.reduce((a, b) => a + b, 0)
-            const statItem = document.createElement("p");
-            statItem.classList = "statText";
-
-            const text1 = document.createElement("span")
-            text1.classList = "spanright"
-            text1.textContent = stat + ":"
-            const text2 = document.createElement("span")
-            text2.classList = "spanleft"
-            text2.textContent = Math.round(score * 1000) / 1000
-            statItem.appendChild(text1);
-            statItem.appendChild(text2);
-            this.statsStart.parentNode.insertBefore(statItem, this.statsStart);
-        })
     }
 
     closeModal(id) {
@@ -165,6 +77,7 @@ export class ModalActions {
                     : setting.textContent.toLowerCase();
             }
             if (setting.classList[2] == "exp") val = toExpValue(val);
+            if (setting.classList[2] == "statoption") this.game.settings.game.sidebar[setting.id[10]-1] = val;
             if (setting.id == "nextQueue") this.game.bag.setQueue(val, this.pieceNames);
             if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
             if (setting.id == "rowfillmode") this.game.boardeditor.fillRow = val;
@@ -184,10 +97,10 @@ export class ModalActions {
         if (id != 'changeRangeValue' && id != "frontdrop" && this.game.started && !this.game.ended)
             this.game.movement.firstMovement();
         this.actions.saveSettings();
-        if (id == "displayDialog") this.game.rendering.renderStyles();
+        if (id == "displayDialog") this.game.renderer.renderStyles();
 
         const restartMenus = ["gameDialog", "gamemodeDialog", "gameEnd", "goalsDialog", "competitiveDialog"];
-        if (restartMenus.includes(id)) this.game.startGame();
+        if (restartMenus.includes(id)) this.game.controls.retry(false);
         if (id == "changeRangeValue") this.open = true;
     }
 
@@ -204,4 +117,12 @@ export class ModalActions {
         element.classList.add("closingAnimation");
         element.addEventListener("animationend", closingAnimation);
     }
+}
+
+function toLogValue(y) {
+    return Math.round(Math.log2(y + 1) * 10);
+}
+
+export function toExpValue(x) {
+    return Math.round(Math.pow(2, 0.1 * x) - 1);
 }

@@ -1,212 +1,174 @@
 [
     {
         "name": "allclear.mp3",
-        "path": "assets/sfx/allclear.mp3",
-        "type": "file"
+        "path": "assets/sfx/allclear.mp3"
     },
     {
         "name": "btb_1.mp3",
-        "path": "assets/sfx/btb_1.mp3",
-        "type": "file"
+        "path": "assets/sfx/btb_1.mp3"
     },
     {
         "name": "clearbtb.mp3",
-        "path": "assets/sfx/clearbtb.mp3",
-        "type": "file"
+        "path": "assets/sfx/clearbtb.mp3"
     },
     {
         "name": "clearline.mp3",
-        "path": "assets/sfx/clearline.mp3",
-        "type": "file"
+        "path": "assets/sfx/clearline.mp3"
     },
     {
         "name": "clearquad.mp3",
-        "path": "assets/sfx/clearquad.mp3",
-        "type": "file"
+        "path": "assets/sfx/clearquad.mp3"
     },
     {
         "name": "clearspin.mp3",
-        "path": "assets/sfx/clearspin.mp3",
-        "type": "file"
-    },
-    {
-        "name": "combo",
-        "path": "assets/sfx/combo",
-        "type": "dir"
+        "path": "assets/sfx/clearspin.mp3"
     },
     {
         "name": "damage_alert.mp3",
-        "path": "assets/sfx/damage_alert.mp3",
-        "type": "file"
+        "path": "assets/sfx/damage_alert.mp3"
     },
     {
         "name": "failure.mp3",
-        "path": "assets/sfx/failure.mp3",
-        "type": "file"
+        "path": "assets/sfx/failure.mp3"
     },
     {
         "name": "finish.mp3",
-        "path": "assets/sfx/finish.mp3",
-        "type": "file"
+        "path": "assets/sfx/finish.mp3"
     },
     {
         "name": "garbage_in_large.mp3",
-        "path": "assets/sfx/garbage_in_large.mp3",
-        "type": "file"
+        "path": "assets/sfx/garbage_in_large.mp3"
     },
     {
         "name": "garbage_in_small.mp3",
-        "path": "assets/sfx/garbage_in_small.mp3",
-        "type": "file"
+        "path": "assets/sfx/garbage_in_small.mp3"
     },
     {
         "name": "harddrop.mp3",
-        "path": "assets/sfx/harddrop.mp3",
-        "type": "file"
+        "path": "assets/sfx/harddrop.mp3"
     },
     {
         "name": "hold.mp3",
-        "path": "assets/sfx/hold.mp3",
-        "type": "file"
+        "path": "assets/sfx/hold.mp3"
     },
     {
         "name": "menutap.mp3",
-        "path": "assets/sfx/menutap.mp3",
-        "type": "file"
+        "path": "assets/sfx/menutap.mp3"
+    },
+    {
+        "name": "menuclick.mp3",
+        "path": "assets/sfx/menuclick.mp3"
     },
     {
         "name": "move.mp3",
-        "path": "assets/sfx/move.mp3",
-        "type": "file"
+        "path": "assets/sfx/move.mp3"
     },
     {
         "name": "retry.mp3",
-        "path": "assets/sfx/retry.mp3",
-        "type": "file"
+        "path": "assets/sfx/retry.mp3"
     },
     {
         "name": "rotate.mp3",
-        "path": "assets/sfx/rotate.mp3",
-        "type": "file"
+        "path": "assets/sfx/rotate.mp3"
     },
     {
         "name": "spin.mp3",
-        "path": "assets/sfx/spin.mp3",
-        "type": "file"
+        "path": "assets/sfx/spin.mp3"
     },
     {
         "name": "thunder.mp3",
-        "path": "assets/sfx/thunder.mp3",
-        "type": "file"
+        "path": "assets/sfx/thunder.mp3"
     },
     {
         "name": "topout.mp3",
-        "path": "assets/sfx/topout.mp3",
-        "type": "file"
+        "path": "assets/sfx/topout.mp3"
     },
     {
         "name": "undo.mp3",
-        "path": "assets/sfx/undo.mp3",
-        "type": "file"
+        "path": "assets/sfx/undo.mp3"
     },
     {
         "name": "redo.mp3",
-        "path": "assets/sfx/redo.mp3",
-        "type": "file"
+        "path": "assets/sfx/redo.mp3"
     },
     {
         "name": "personalbest.mp3",
-        "path": "assets/sfx/personalbest.mp3",
-        "type": "file"
+        "path": "assets/sfx/personalbest.mp3"
     },
     {
         "name": "pbstart.mp3",
-        "path": "assets/sfx/pbstart.mp3",
-        "type": "file"
+        "path": "assets/sfx/pbstart.mp3"
     },
     {
         "name": "pbend.mp3",
-        "path": "assets/sfx/pbend.mp3",
-        "type": "file"
+        "path": "assets/sfx/pbend.mp3"
     },
     {
         "name": "combo_1.mp3",
-        "path": "assets/sfx/combo/combo_1.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_1.mp3"
     },
     {
         "name": "combo_10.mp3",
-        "path": "assets/sfx/combo/combo_10.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_10.mp3"
     },
     {
         "name": "combo_11.mp3",
-        "path": "assets/sfx/combo/combo_11.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_11.mp3"
     },
     {
         "name": "combo_12.mp3",
-        "path": "assets/sfx/combo/combo_12.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_12.mp3"
     },
     {
         "name": "combo_13.mp3",
-        "path": "assets/sfx/combo/combo_13.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_13.mp3"
     },
     {
         "name": "combo_14.mp3",
-        "path": "assets/sfx/combo/combo_14.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_14.mp3"
     },
     {
         "name": "combo_15.mp3",
-        "path": "assets/sfx/combo/combo_15.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_15.mp3"
     },
     {
         "name": "combo_16.mp3",
-        "path": "assets/sfx/combo/combo_16.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_16.mp3"
     },
     {
         "name": "combo_2.mp3",
-        "path": "assets/sfx/combo/combo_2.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_2.mp3"
     },
     {
         "name": "combo_3.mp3",
-        "path": "assets/sfx/combo/combo_3.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_3.mp3"
     },
     {
         "name": "combo_4.mp3",
-        "path": "assets/sfx/combo/combo_4.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_4.mp3"
     },
     {
         "name": "combo_5.mp3",
-        "path": "assets/sfx/combo/combo_5.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_5.mp3"
     },
     {
         "name": "combo_6.mp3",
-        "path": "assets/sfx/combo/combo_6.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_6.mp3"
     },
     {
         "name": "combo_7.mp3",
-        "path": "assets/sfx/combo/combo_7.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_7.mp3"
     },
     {
         "name": "combo_8.mp3",
-        "path": "assets/sfx/combo/combo_8.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_8.mp3"
     },
     {
         "name": "combo_9.mp3",
-        "path": "assets/sfx/combo/combo_9.mp3",
-        "type": "file"
+        "path": "assets/sfx/combo/combo_9.mp3"
+    },
+    {
+        "name": "hyperalert",
+        "path": "assets/sfx/hyperalert.mp3"
     }
 ]

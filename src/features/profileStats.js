@@ -12,11 +12,6 @@ export class ProfileStats {
         this.game = game;
     }
 
-    /**
-     * @param {Boolean} lower 
-     * Lower is used depending on objective type e.g. lower time is better thus lower is true
-     */
-
     setPB(score) {
         this.game.elementGameEndTitle.textContent = 'GAME ENDED';
         const gamemode = this.game.settings.game.gamemode
@@ -26,7 +21,7 @@ export class ProfileStats {
 
         if (!this.game.settings.game.competitiveMode) return;
 
-        if (isNaN(currentScore) || currentScore == undefined || (lower && score < currentScore) || (!lower && score > currentScore)) {
+        if (isNaN(currentScore) || (lower && score < currentScore) || (!lower && score > currentScore)) {
             let gameStatsKeys = Object.getOwnPropertyNames(this.game.stats)
             gameStatsKeys = gameStatsKeys.filter(key => key != 'game')
             const gameStats = {};
@@ -35,6 +30,8 @@ export class ProfileStats {
             this.personalBests[gamemode] = { score, pbstats: gameStats, version: this.game.version, ts };
             this.game.elementGameEndTitle.textContent = 'NEW PB!';
             setTimeout(() => this.game.sounds.playSound("personalbest"), 1000);
+
+            this.game.modals.generate.notif("PB Saved", `PB on ${gamemode} saved`, "success");
         }
     }
 

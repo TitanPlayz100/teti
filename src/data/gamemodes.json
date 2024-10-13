@@ -12,7 +12,9 @@
             "allowQueueModify": false,
             "allspin": false,
             "allspinminis": false,
-            "history": false
+            "history": false,
+            "sidebar": ["time", "apm", "pps"],
+            "stride": false
         },
         "displayName": "Unset",
         "objectiveText": "",
@@ -20,11 +22,9 @@
         "target": "",
         "result": "",
         "music": "",
-        "pbmusic": "",
-        "skin": "",
-        "board": "",
-        "sidebar": [],
-        "background": ""
+        "compmusic": "",
+        "startBoard": "",
+        "effects": []
     },
     "custom": {
         "displayName": "Zen / Custom"
@@ -36,7 +36,8 @@
         "target": "requiredLines",
         "result": "time",
         "settings": {
-            "requiredLines": 40
+            "requiredLines": 40,
+            "stride":true
         }
     },
     "ultra": {
@@ -46,7 +47,8 @@
         "target": "timeLimit",
         "result": "score",
         "settings": {
-            "timeLimit": 120
+            "timeLimit": 120,
+            "sidebar": ["time", "score", "pps"]
         }
     },
     "attacker": {
@@ -66,17 +68,19 @@
         "target": "requiredGarbage",
         "result": "time",
         "settings": {
-            "requiredGarbage": 100
+            "requiredGarbage": 100,
+            "sidebar": ["time", "dss", "pps"]
         }
     },
     "survival": {
         "displayName": "Survival",
-        "objectiveText": "Lines survived",
+        "objectiveText": "received",
         "goalStat": "clearlines",
         "target": "gameEnd",
         "result": "time",
         "settings": {
-            "survivalRate": 60
+            "survivalRate": 60,
+            "sidebar": ["time", "lpm", "pps"]
         }
     },
     "backfire": {
@@ -92,10 +96,15 @@
     },
     "combo": {
         "displayName": "4w / Combo",
-        "objectiveText": "Combo",
-        "goalStat": "combo",
+        "objectiveText": "Time",
+        "goalStat": "time",
         "target": "combobreak",
-        "result": "maxCombo"
+        "result": "maxCombo",
+        "settings": {
+            "allspin": true,
+            "allspinminis": false,
+            "sidebar": ["combo", "pps"]
+        }
     },
     "lookahead": {
         "displayName": "Lookahead",
@@ -106,7 +115,8 @@
         "settings": {
             "requiredLines": 40,
             "lookAheadPieces": 3,
-            "gravitySpeed": 1001
+            "gravitySpeed": 1001,
+            "sidebar": ["time", "kpp", "pps"]
         }
     },
     "race": {

@@ -1,26 +1,35 @@
 ## Welcome!
-This is the official info page now, instead of the README. I'll add all update changes and future plans here as well.
 
-TETI (the name is in the works) is a modern tetris clone I've been working on for the past year or so, on and off. It's a moderately large project, and there's still many things I want to work on.
+[Jump to Changelog](#updates)
 
-This project started out as a learning experience, because surprisingly it was my first time actually using Javascript. For my year 12 major project (pseudohuman) I wanted to build a multiplayer web based game, and thus I made this to gain experience before starting. I had already programmed in Java, as well as some C# and Python, so I was not unfamiliar to programming, and I already knew frontend basics. Teti was able to combine my interest for tetris, and also challenge me to learn Javascript. Well after the project was over, I could truly improve the code and game to make an amazing experience
+[Jump to Feature Wishlist](#feature-wishlist)
+
+TETI is a singleplayer, modern block stacker, similar to the likes of Tetra Legends, Tetr.js, Blocks, and other web based stackers.
+
+I hope you enjoy Teti, and if you liked it a star would be appreciated. I want this to grow to a proper maintainable tetris web client, so feel free to contribute, and modify my own code.
 
 [Here is the trailer video](https://www.youtube.com/watch?v=Gf2dsPRf2uM)
 
-I hope you enjoy TETI, and give a star if you like it. The code is no longer 1000 lines, but I want this to grow to a proper maintainable tetris client.
+#### Backstory
+This project started out as a learning experience, because surprisingly it was my first time actually using Javascript. For my high school project (pseudohuman) I wanted to build a multiplayer web based game, and thus I made this to gain experience before starting. I had already programmed in Java, as well as some C# and Python, so I was not unfamiliar to programming, and I already knew frontend basics. Teti was able to combine my interest for tetris, and also challenge me to learn Javascript. After the project was over, I could truly improve the game to make an amazing experience.
 
-## Contributions
-Thank you [existancepy](https://github.com/existancepy) for all the fixes.  
-Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding the TGM Race mode.  
-Design inspired by [Strangelinx's 'blocks'.](https://strangelinx.github.io/blocks/)  
-Icons from [The Noun Project](https://thenounproject.com)
 
-Feel free to contribute with features and issues. 
+## Acknowledgements
+Thanks [existancepy](https://github.com/existancepy) for all the fixes.  
+Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding TGM Race mode and other fixes.  
+
+Feel free to contribute with features and fixes, and open issues.  
+
+Design inspired by [Strangelinx's 'blocks'](https://strangelinx.github.io/blocks/) and [Tetra Legends.](https://tetralegend.app)  
+Icons from [The Noun Project.](https://thenounproject.com)  
+Sound effects from [TETR.IO.](https://tetr.io)  
+Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)  
 
 #### Music
 [(Locked Girl ~ The Girl's Secret Room) - Cafe de Touhou 3](https://www.youtube.com/watch?v=7Q3c2vmXEyg)  
 [ShibayanRecords - Acoustic Image](https://www.youtube.com/watch?v=4RC2hrMFIMQ)  
 [ShibayanRecords - Close to your mind](https://www.youtube.com/watch?v=kPIyxq9K-Yw)
+
 
 ## Features
 - modern guideline (customisable)
@@ -34,13 +43,11 @@ Feel free to contribute with features and issues.
     - tspins and allspins
     - locking with indicator
 - stats sidebar
-- customisable game settings
-- customisable controls, handling
-- customisable display
+- customisable display, game, controls, and handling settings
 - tetrio sfx
-- touhou jazz music (funny)
+- touhou jazz music
     - can play/pause, skip song
-- technically responsive
+- responsive design
 - many modes
     - 40l, blitz, custom
     - attacker (reach certain attack amount)
@@ -48,19 +55,72 @@ Feel free to contribute with features and issues.
     - semi invis mode
     - 4W
     - Race (TGM style)
-- clean modern animated menus
+- clean, modern, and animated menus
 - import/export settings
 - customise queues
 - edit and draw on board (custom game)
+- custom menu to import/export board states, and edit garbage
 - undo and redo with non linear branches
-- pbs are recorded, as well as lifetime stats
+- pbs are saved, as well as lifetime stats
+- can edit piece skins
+- cool particles
 
 ## TODO list
 Things that I am working on based on other changes
-- view lifetime stats and legacy stats in pb menu
-- customise stat sidebar
+- wow finished
+
 
 ## Updates
+#### v1.3.2
+- reset animation
+    - toggles with stride mode
+- fixed timer when menu was open
+- competitive modes now have custom sidebars
+- added piece dropping particles and piece flash (tetrio style)
+- added notifications
+    - displays errors
+    - shows export and import messages
+- removed assets loading screen, cause it was unecessary
+- added different grid patterns
+
+#### v1.3.1
+- backgrounds can be custom using url
+- Skin can now be customised and comes with some defaults as well
+    - can either use: tetrio, jstris, plain
+    - can insert url with image (372x30 using tetrio format) such as you.have.fail skins
+- text under main menu options
+- fixed menu sfx volume
+- made most css work on firefox now
+    - update: i installed firefox and actually nothing works because import assertions are not supported yet (import ... **with** json)
+- sidebar text is now customisable in game settings
+    - use "None" for no text
+- stride setting
+    - no o, s, z starts
+- added btb particles after btb 8
+
+### v1.3.0 => VISUALS
+- PIECE SKINS!
+    - will add way to custom add own skins
+- PARTICLES!!
+    - feedback on performance would be nice
+    - will add particle options soon as well
+- NEW MENUS!!!
+    - allows for scrolling, more animations
+    - consistent and more modern look
+    - images light up on hover
+- changed tick rate to 60 for consistency
+- tweaks to movement for hopefully performance 
+- refactored board rendering to be more readable
+- refactored unreadable code, removed utils => may make a technical wiki someday
+- small changes to how backfire works
+    - excess garbage used for cancelling sent back to player like tetrio
+- pb effects has 3s cooldown
+- cursor vanishes while ingame
+- fixed bug with toping out when garbage rises
+- fixed lockout not working
+- hyperalert {!} is back with a 'go down' message
+
+***
 #### v1.2.4
 - added button to delete pbs
 - changed pb border effect to be based on better tracked stats (like apm for attacker)
@@ -88,12 +148,12 @@ Things that I am working on based on other changes
     - all are stored part of each game and added to lifetime stats
     - in the future these will be accessible and visible
 
-#### v1.2.1.1
+#### v1.2.1.2
 - fixed edit modal breaking when main menu open
 - fixed flashing being too fast in lookahead mode
 - fixed setting snot properly saving with competitive mode active
 
-#### v1.2.1
+#### v1.2.1.1
 - fun with parallax effect in info page
 - changed gamemodes to be stored using JSON instead of in code
 - can easily add custom gamemodes now using gamemodes JSON
@@ -103,7 +163,7 @@ Things that I am working on based on other changes
 - seperated goals into its own menu
 - view pbs in competitive mode menu
 
-### v1.2.0
+### v1.2.0 => COMPETITIVE MODE
 - added key modifiers
     - you can make undo (or any key) ctrl+z now
     - modifiers are ctrl and alt (no shift)
@@ -116,6 +176,7 @@ Things that I am working on based on other changes
 - you get a glow when on pb pace
 - fixed danger glow outline
 
+***
 #### v1.1.2
 - added board bounce
 - custom mode has button for edit menu and a history display 
@@ -131,7 +192,7 @@ Things that I am working on based on other changes
 - non linear timeline: branches can be made and navigated, much like a git tree
 - preloaded all sfx and songs
 
-### v1.0.0
+### v1.0.0 => THE REWRITE
 - I should probably start numbering these versions huh.
 - Reorganised all the code into very managable classes that can now be more easily changed.
 - You can now draw on your board in custom game.
@@ -139,29 +200,26 @@ Things that I am working on based on other changes
 - The main menu is more organised, and each menu now organises a certain setting group for better code efficiency.
 - The settings object is changed to be a hashmap (js object) rather than an array, more closely matches tetrio setting.ttc files.
 
-
+***
 ## Feature Wishlist
-May or may not add these, kinda ordered by ease and desire for feature
-- more garbage settings
+Future wants for game, kinda ordered by ease and desire for feature
+- ready set go start option
+- cooler action text
 - finesse detection
-- ui button animations and better scrolling menus
-- better loading screen with toast popup when assets load instead
 - allow importing tetrio settings and custom game files
-- show info when hovering over settings
 - small guide on essential things for game
+    - show info when hovering over settings
+    - WIKI for technical docs about project
+    - glossary of useful terms
 - more rotation systems (ars, trs, srs/srsX, none)
-- custom mino skins and music
 - replay functionality (either save gamestate or save keystrokes idk yet)
 - more unique gamemodes (techmino styled)
     - misdrop remover mode
-- WIKI for technical docs about project
+    - holdless and next queueless gamemode kinda like qp2 cards
+    - colourblind gamemode
 - guide like progression thing? using custom boards (kinda like tetris tres bien)
+    - achievements, progression tree
 - maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats
 - touch settings
-- cooler graphics (maybe using a library like pixijs)
 - bot to play against
 - statistics graph
-- colourblind gamemode
-- holdless and next queueless gamemode - kinda like qp2 cards
-- achievements, progression tree
-- glossary of useful terms

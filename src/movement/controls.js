@@ -6,9 +6,9 @@ export class Controls {
      * @type {{RIGHT: boolean|string, LEFT: boolean|string, DOWN: boolean|string}}
      */
     directionState = { RIGHT: false, LEFT: false, DOWN: false };
-
     timings = { arr: 0, das: 0, sd: 0 }; // timeout and interval ids
-
+    menuKey = "Escape"; // html modals close using escape
+    cursorVisible = true;
 
     /**
      * @param {Game} game
@@ -18,52 +18,41 @@ export class Controls {
         this.moves = game.movement;
     }
 
-    onKeyDown(event) {
-        this.keys = this.game.settings.control;
-        let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
-        if (event.altKey) key = "Alt+" + key;
-        if (event.ctrlKey) key = "Ctrl+" + key;
-
-        if (event.repeat) return;
-        if (event.key == "Escape") event.preventDefault();
-        if (event.key == "Escape" && this.game.menuactions.bindingKey == undefined) {
-            this.game.menuactions.toggleDialog();
-        }
-        if (event.key == this.keys.editMenuKey) this.game.menuactions.openEditMenu();
-        if (this.game.modals.open) return;
+    onKeyDown(event, key) {
+        const keys = this.game.settings.control;
         if (disabledKeys.includes(event.key)) event.preventDefault();
-        if (!this.game.started && event.key != "Escape") this.moves.firstMovement();
 
-        if (key == this.keys.resetKey) {
-            this.game.sounds.playSound("retry");
-            this.game.startGame();
-        }
+        if (key == this.menuKey) this.game.menuactions.toggleDialog();
+        else if (key == keys.editMenuKey) this.game.menuactions.openEditMenu();
+
+        if (this.game.modals.open || this.game.modals.closing) return;
+        if (event.key != this.menuKey && !this.game.started) this.moves.firstMovement();
+        if (key == keys.resetKey) this.retry(true);
         if (this.game.ended) return;
 
+        if (key == keys.cwKey) this.moves.rotate("CW");
+        else if (key == keys.ccwKey) this.moves.rotate("CCW");
+        else if (key == keys.rotate180Key) this.moves.rotate("180");
+        else if (key == keys.hdKey) this.moves.harddrop();
+        else if (key == keys.holdKey) this.game.mechanics.switchHold();
+        else if (key == keys.rightKey) this.startDas("RIGHT");
+        else if (key == keys.leftKey) this.startDas("LEFT");
+        else if (key == keys.sdKey) this.startArrSD();
+
+        this.toggleCursor(false);
         this.game.stats.inputs++;
-        if (key == this.keys.cwKey) this.moves.rotate("CW");
-        if (key == this.keys.ccwKey) this.moves.rotate("CCW");
-        if (key == this.keys.rotate180Key) this.moves.rotate("180");
-        if (key == this.keys.hdKey) this.moves.harddrop();
-        if (key == this.keys.holdKey) this.game.mechanics.switchHold();
-        if (key == this.keys.rightKey) this.startDas("RIGHT");
-        if (key == this.keys.leftKey) this.startDas("LEFT");
-        if (key == this.keys.sdKey) this.startArrSD();
     }
 
-    onKeyDownRepeat(event) { // allows for repeating
-        this.keys = this.game.settings.control;
-        let key = event.key.length > 1 ? event.key : event.key.toLowerCase();
-        if (event.altKey) key = "Alt+" + key;
-        if (event.ctrlKey) key = "Ctrl+" + key;
+    onKeyDownRepeat(event, key) { // allows for arr undo/redo
+        const keys = this.game.settings.control;
+        if (event.key == this.menuKey) event.preventDefault();
 
-        if (key == this.keys.undoKey) this.game.history.undo();
-        if (key == this.keys.redoKey) this.game.history.redo()
+        if (key == keys.undoKey) this.game.history.undo();
+        else if (key == keys.redoKey) this.game.history.redo()
     }
 
-    onKeyUp(event) {
+    onKeyUp(event, key) {
         this.keys = this.game.settings.control;
-        const key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // only characters are lowercase
 
         if (key == this.keys.rightKey) this.endDasArr("RIGHT");
         if (key == this.keys.leftKey) this.endDasArr("LEFT");
@@ -76,7 +65,7 @@ export class Controls {
         this.stopTimeout("das");
         this.stopInterval("arr");
         this.timings.das = setTimeout(() =>
-            Promise.resolve().then(() => this.startArr(direction)),
+            Promise.resolve().then(() => this.startArr(direction)), // feels faster with promise but idk
             this.game.settings.handling.das
         );
     }
@@ -156,6 +145,26 @@ export class Controls {
         this.timings[name] = 0;
     }
 
+    resetting = false;
 
+    retry(animation) {
+        if (this.resetting) return; // no overlap
+        this.game.ended = true;
+        this.game.sounds.playSound("retry");
 
+        if (!animation || this.game.settings.game.stride) {
+            this.game.startGame();
+            return;
+        }
+
+        this.game.stopGameTimers()
+        this.resetting = true;
+        this.game.renderer.resetAnimCurrent = 0; // start animation
+    }
+
+    toggleCursor(enable) {
+        if (!(this.cursorVisible ^ enable)) return; // only toggle when they are different
+        this.cursorVisible = enable;
+        document.body.style.cursor = enable ? 'auto' : 'none';
+    }
 }
