@@ -145,6 +145,10 @@ export class Game {
         this.stats.updateStats();
         this.renderer.updateAlpha();
         this.boardeffects.rainbowBoard();
+        this.zenith.drawClimbSpeedBar(1, 0, 4)
+        this.zenith.hideFloorTime()
+        this.zenith.resetAllBox()
+        this.zenith.setBox(1, "focus")
     }
 
     gameClock() {

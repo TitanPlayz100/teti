@@ -140,7 +140,8 @@
             "requiredAltitude": 1650,
             "gravitySpeed": 950,
             "allspin": true,
-            "allspinminis": true
+            "allspinminis": true,
+            "sidebar": ["time", "floor", "pps"]
         }
     }
 }

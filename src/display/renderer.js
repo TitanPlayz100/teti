@@ -261,7 +261,7 @@ export class Renderer {
         e.classList.add("warn")
         this.texttimeouts["timeLeft"] = setTimeout(() => {
             e.classList.remove("warn");
-        }, 3000);
+        }, 5000);
     }
 
     createReverseLookup(obj) {
