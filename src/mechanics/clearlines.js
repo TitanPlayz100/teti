@@ -37,6 +37,7 @@ export class ClearLines {
         if (clearRows.length > 0) this.game.renderer.bounceBoard("DOWN");
         this.game.particles.spawnParticles(0, Math.min(...clearRows), "clear")
         this.processLineClear(removedGarbage, clearRows);
+        return clearRows.length;
     }
 
     clearRow(rowNumber) {
@@ -66,6 +67,7 @@ export class ClearLines {
         this.manageGarbageSent(damage);
 
         this.game.zenith.AwardLines(damage);
+        if (linecount == 1) this.game.zenith.AwardLines(1);
         // render action text
         if (mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
         this.game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);

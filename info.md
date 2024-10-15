@@ -16,11 +16,11 @@ This project started out as a learning experience, because surprisingly it was m
 
 ## Acknowledgements
 Thanks [existancepy](https://github.com/existancepy) for all the fixes.  
-Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding TGM Race mode and other fixes.  
+Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding many modes and fixes.  
 
 Feel free to contribute with features and fixes, and open issues.  
 
-Design inspired by [Strangelinx's 'blocks'](https://strangelinx.github.io/blocks/) and [Tetra Legends.](https://tetralegend.app)  
+Design inspired by [Strangelinx's 'blocks'](https://strangelinx.github.io/blocks/) and [Tetra Legends.](https://tetralegends.app)  
 Icons from [The Noun Project.](https://thenounproject.com)  
 Sound effects from [TETR.IO.](https://tetr.io)  
 Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)  
@@ -67,10 +67,28 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 
 ## TODO list
 Things that I am working on based on other changes
-- wow finished
+- ready set go start option
+- arcade mode
 
+Maybe:
+- cooler action text (maybe if i switch to pixijs then i can make text better)
+
+Future thoughts (honestly only if i have time):
+- I honestly might want to break my rule and start using a framework for rendering.
+    - (turns out pixijs is much better for games than canvas 2d, and howler for audio)
+- I have mixed feelings, because this would make the project technically no longer purely made by me (though the info page is a bit iffy)
+- Maybe I don't care and will switch anyway, and maybe in the end it will pay off. 
+- this would make my most recent changes irrelivent 
+    - such as piece flash and reset animation cause i have to redo them in pixi
+    - in the future itll probably pay off
+
+***
 
 ## Updates
+#### v1.3.3
+- Thanks to itzblack for the Zenith Tower mode
+- added option for line clear delay
+
 #### v1.3.2
 - reset animation
     - toggles with stride mode
@@ -80,7 +98,7 @@ Things that I am working on based on other changes
 - added notifications
     - displays errors
     - shows export and import messages
-- removed assets loading screen, cause it was unecessary
+- removed assets loading screen, cause it was unnecessary
 - added different grid patterns
 
 #### v1.3.1
@@ -159,8 +177,8 @@ Things that I am working on based on other changes
 - can easily add custom gamemodes now using gamemodes JSON
 - competitive mode 
     - sets certain gamerules, disables custom game settings
-    - PBs are onyl saved when used
-- seperated goals into its own menu
+    - PBs are only saved when used
+- separated goals into its own menu
 - view pbs in competitive mode menu
 
 ### v1.2.0 => COMPETITIVE MODE
@@ -203,8 +221,6 @@ Things that I am working on based on other changes
 ***
 ## Feature Wishlist
 Future wants for game, kinda ordered by ease and desire for feature
-- ready set go start option
-- cooler action text
 - finesse detection
 - allow importing tetrio settings and custom game files
 - small guide on essential things for game
@@ -212,14 +228,20 @@ Future wants for game, kinda ordered by ease and desire for feature
     - WIKI for technical docs about project
     - glossary of useful terms
 - more rotation systems (ars, trs, srs/srsX, none)
+- more bag systems (pure random, nes random, 14 bag, 7+2 bag)
 - replay functionality (either save gamestate or save keystrokes idk yet)
+    - statistics graph
 - more unique gamemodes (techmino styled)
     - misdrop remover mode
     - holdless and next queueless gamemode kinda like qp2 cards
     - colourblind gamemode
-- guide like progression thing? using custom boards (kinda like tetris tres bien)
+- guide like progression using custom maps
+    - maybe like tetris tres bien
     - achievements, progression tree
-- maybe play around with server api stuff, like adding a leaderboard or connecting tetrio stats
+    - the jstris map creator looks really nice
+    - could have user made maps section as well
+- maybe play around with api stuff
+    - leaderboards
+    - connecting tetrio stats
 - touch settings
 - bot to play against
-- statistics graph

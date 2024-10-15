@@ -1,6 +1,6 @@
 export const cleartypes = { 0: "", 1: "Single", 2: "Double", 3: "Triple", 4: "Quad", 5: "Teti-tris" };
 
-export const defaultSkins = ['tetrio', 'jstris', 'plain'];
+export const defaultSkins = ['tetrio', 'jstris', 'plain', 'tgm_c', 'tgm_w'];
 
 export const scoringTable = {
     "": 0,
@@ -61,7 +61,7 @@ export const gameoverText = {
     attack: "Sent _ damage",
     cleargarbage: "Dug _ lines",
     ended: "Survived _ lines",
-    level: "Reached level _",
+    tgm_level: "Reached level _",
     time: "Spent _ seconds",
     altitude: "Climbed _ meters",
 }
@@ -70,6 +70,7 @@ export const gameoverResultText = {
     time: " in _ seconds",
     score: " to score _ points",
     maxCombo: " to get _ combo",
+    grade: " to get grade _"
 }
 
 export const lowerIsBetter = {
@@ -90,7 +91,8 @@ export const pbTrackingStat = {
 export const resultSuffix = {
     time: 's',
     score: ' Points',
-    maxCombo: ' Combo'
+    maxCombo: ' Combo',
+    grade: ""
 }
 
 export const statDecimals = {

@@ -18,7 +18,7 @@ import { ProfileStats } from "./features/profileStats.js";
 import { Modes } from "./features/modes.js";
 import { BoardRenderer } from "./display/renderBoard.js";
 import { Particles } from "./display/particles.js";
-import { Zenith } from "./mechanics/zenith.js";
+import { Zenith, Grandmaster } from "./mechanics/gamemode_extended.js";
 
 export class Game {
     started;
@@ -26,6 +26,8 @@ export class Game {
     gameTimer = 0; // id of timeout
     survivalTimer = 0; // id of timeout
     gravityTimer = 0;
+    zenithTimer = 0;
+    grandmasterTimer = 0;
     version = '1.3.2';
     tickrate = 60;
 
@@ -55,7 +57,8 @@ export class Game {
         this.controls = new Controls(this);
         this.history = new History(this);
         this.modes = new Modes(this);
-        this.zenith = new Zenith(this)
+        this.zenith = new Zenith(this);
+        this.grandmaster = new Grandmaster(this);
 
         this.renderer.sizeCanvas();
         this.particles.initBoard();
@@ -86,7 +89,8 @@ export class Game {
         clearInterval(this.gravityTimer);
         clearInterval(this.gameTimer);
         clearInterval(this.survivalTimer);
-        clearInterval(this.mechanics.zenithTimer)
+        clearInterval(this.zenithTimer);
+        clearInterval(this.grandmasterTimer);
         this.mechanics.locking.lockingPause();
     }
 
@@ -139,6 +143,8 @@ export class Game {
         this.stats = new GameStats(this);
         this.history = new History(this);
         this.zenith = new Zenith(this);
+        this.grandmaster = new Grandmaster(this);
+
 
         this.renderer.renderSidebar();
         this.modes.checkFinished();

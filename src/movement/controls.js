@@ -25,7 +25,7 @@ export class Controls {
         if (key == this.menuKey) this.game.menuactions.toggleDialog();
         else if (key == keys.editMenuKey) this.game.menuactions.openEditMenu();
 
-        if (this.game.modals.open || this.game.modals.closing) return;
+        if (this.game.modals.open || this.game.modals.closing || this.game.mechanics.locking.timings.clearDelay != 0) return;
         if (event.key != this.menuKey && !this.game.started) this.moves.firstMovement();
         if (key == keys.resetKey) this.retry(true);
         if (this.game.ended) return;

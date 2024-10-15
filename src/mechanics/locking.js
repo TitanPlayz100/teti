@@ -4,7 +4,7 @@ export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
     divLockCounter = document.getElementById("lockCounter");
     lockCount;
-    timings = { lockdelay: 0, lockingTimer: 0 }
+    timings = { lockdelay: 0, lockingTimer: 0, clearDelay: 0 }
 
     startTime = 0;
     remaining = 0;
@@ -73,16 +73,18 @@ export class LockPiece {
         const lockCoords = this.game.mechanics.board.getMinos("A");
         this.game.boardrender.justPlacedCoords = lockCoords;
         this.game.boardrender.justPlacedAlpha = 1;
-        
+
         lockCoords.forEach(([x, y]) => {
-            this.game.boardrender.flashTimes.push({ c:[x, y], t: 15 })
+            this.game.boardrender.flashTimes.push({ c: [x, y], t: 15 })
             this.game.mechanics.board.rmValue([x, y], "A");
             this.game.mechanics.board.addValFront([x, y], "S");
         });
+
         this.game.mechanics.locking.clearLockDelay();
         clearInterval(this.game.gravityTimer);
-        this.game.mechanics.clear.clearLines(lockCoords);
-        this.game.endGame( // stopped overlap next
+        const cleared = this.game.mechanics.clear.clearLines(lockCoords);
+        
+        this.game.endGame( // check stopped overlap next
             this.game.mechanics.checkDeath(
                 this.game.mechanics.board.getMinos("S"),
                 this.game.mechanics.board.getMinos("NP")
@@ -100,13 +102,19 @@ export class LockPiece {
         this.game.mechanics.isAllspin = false;
         this.game.mechanics.isMini = false;
         this.game.falling.moved = false;
-        if (this.game.stats.level % 100 != 99 && this.game.stats.level != this.game.settings.game.raceTarget - 1) this.game.stats.level++;
+        if (this.game.stats.tgm_level % 100 != 99 && this.game.stats.tgm_level != this.game.settings.game.raceTarget - 1) this.game.stats.tgm_level++;
+
         const xvals = [...new Set(lockCoords.map(([x, y]) => x))];
         const yval = Math.min(...lockCoords.map(([x, y]) => y));
         this.game.particles.spawnParticles(Math.min(...xvals) + 1, yval, "lock", xvals.length);
-        this.game.mechanics.spawnPiece(this.game.bag.randomiser());
-        this.game.history.save();
         this.game.renderer.renderDanger();
+
+        const delay = (cleared > 0) ? this.game.settings.game.clearDelay : 0;
+        this.timings.clearDelay = setTimeout(() => {
+            this.game.mechanics.spawnPiece(this.game.bag.randomiser());
+            this.game.history.save();
+            this.timings.clearDelay = 0;
+        }, delay);
     }
 
     clearLockDelay(clearCount = true) {
