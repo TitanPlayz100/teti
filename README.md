@@ -1,5 +1,5 @@
 > [!NOTE]
-> This fork is for testing purposes, have my custom gamemodes and more errors.
+> This fork is for testing purposes, have my custom gamemodes and more errors. <br>
 > The original game is [here](https://titanplayz100.github.io/teti/)
 
 # Teti README
