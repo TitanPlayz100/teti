@@ -319,7 +319,6 @@
     }
 }
 
-
 #garbageQueue {
     position: absolute;
     width: 122vh;
@@ -344,9 +343,9 @@
 #speedrunTime{
     display:flex;
     position: absolute;
-    width: 340%;
+    width: 350%;
     height: 10%;
-    left: -120%;
+    left: -125%;
     bottom: -40%;
 }
 
@@ -368,6 +367,8 @@
 }
 
 #speedrunTime>div{
+    font-family: montserrat;
+    font-weight: bold;
     text-align: center;
     text-shadow: 0 0 #000000;
     background-color: var(--slight-invis);
