@@ -363,7 +363,7 @@
 
 #speedrunTime.finish{
     bottom: 20%;
-    animation: finishSpeedrun 5s;
+    animation: finishSpeedrun 4s;
     opacity: 0;
 }
 
@@ -413,7 +413,7 @@
         bottom: -20%
     }
     100%{
-        bottom: 20%;
+        bottom: 5%;
         opacity: 0;
     }
 }

@@ -88,7 +88,7 @@ export class Zenith {
                         this.promotionFatigue++;
                     }
 
-                    const n = this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)]
+                    const n = this.SpeedrunReq[Math.min(this.GetFloorLevel(this.tempAltitude), 5)]
 
                     this.isHyperspeed = t >= n
 
@@ -96,16 +96,16 @@ export class Zenith {
                         this.game.sounds.playSound("zenith_speedrun_start")
                         this.isHyperspeedSeen = true;
                         this.game.boardeffects.toggleRainbow("true");
-                        this.showFloorTime()
+                        this.showSpeedrunTime()
                         this.setAllFloorTimes(this.game.stats.floor)
 
                     }
 
                     if(this.isHyperspeedSeen && t < 6){
-                        this.game.sounds.playSound("zenith_speedrun_end");
                         this.isHyperspeedSeen = false;
+                        this.game.sounds.playSound("zenith_speedrun_end");
                         this.game.boardeffects.toggleRainbow();
-                        this.hideFloorTime()
+                        this.hideSpeedrunTime()
                     }
 
                     this.game.stats.climbSpeed = t + this.climbPoints / (4 * t);
@@ -123,20 +123,28 @@ export class Zenith {
                         }
                         
                         
-                        this.FloorTime[this.game.stats.floor] = this.tickPass / 50
-                        document.getElementById("speedrunSegment " + this.game.stats.floor).textContent = this.FloorTime[this.game.stats.floor]
-
-
+                        this.FloorTime[this.game.stats.floor] = this.game.stats.time.toFixed(2)
                         this.game.stats.floor = this.GetFloorLevel(this.tempAltitude)
                         this.game.sounds.playSound("zenith_levelup")
                         this.setBox(this.game.stats.floor, "focus")
                         this.game.renderer.renderTimeLeft("FLOOR " + this.game.stats.floor)
+
+                        if(this.game.stats.floor == 10){
+                            const element = document.getElementById("speedrunTime")
+                            element.classList = "finish"
+                            this.game.boardeffects.toggleRainbow();              
+                        }
                         
                     }
 
+                    
                     this.game.stats.altitude = Math.floor(this.tempAltitude)
                     this.tickPass++
                     this.drawClimbSpeedBar(Math.floor(this.game.stats.climbSpeed), this.climbPoints, s)
+                    if(this.game.stats.floor != 10){
+                        const element = document.getElementById("speedrunSegment " + this.game.stats.floor)
+                        element.innerText = this.game.stats.time.toFixed(2)
+                    }
         }
                 , 1000 / this.game.tickrate);
         }
@@ -151,12 +159,17 @@ export class Zenith {
             document.styleSheets[1].cssRules[23].style.backgroundColor = color[speed]
         }
 
-        showFloorTime(){
+        showSpeedrunTime(){
             const element = document.getElementById("speedrunTime")
             element.classList = "show"
         }
 
-        hideFloorTime(){
+        hideSpeedrunTime(){
+            const element = document.getElementById("speedrunTime")
+            element.classList = "hide"
+        }
+
+        completeSpeedrunTime(){
             const element = document.getElementById("speedrunTime")
             element.classList = "hide"
         }
@@ -183,8 +196,20 @@ export class Zenith {
                 document.getElementById("speedrunSegment " + i).classList = ""
             }
         }
-
         setBox(boxNum, stat){
+            if(boxNum > 9) return
             document.getElementById("speedrunSegment " + boxNum).classList = stat
         }
+}
+
+export class Grandmaster {
+    /**
+     * @param {Game} game
+     */
+
+    constructor(game) {
+        this.game = game
+    }
+
+    calcGrade(){}
 }
