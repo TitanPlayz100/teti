@@ -19,6 +19,7 @@ import { Modes } from "./features/modes.js";
 import { BoardRenderer } from "./display/renderBoard.js";
 import { Particles } from "./display/particles.js";
 import { Zenith } from "./mechanics/zenith.js";
+import { pixiRender } from "./display/pixirender.js";
 
 export class Game {
     started;
@@ -55,7 +56,8 @@ export class Game {
         this.controls = new Controls(this);
         this.history = new History(this);
         this.modes = new Modes(this);
-        this.zenith = new Zenith(this)
+        this.zenith = new Zenith(this);
+        this.pixi = new pixiRender(this);
 
         this.renderer.sizeCanvas();
         this.particles.initBoard();
@@ -72,6 +74,7 @@ export class Game {
         this.sounds.addMenuSFX();
         this.profilestats.loadPBs();
         this.versionChecker();
+        this.pixi.init();
     }
 
     startGame() {

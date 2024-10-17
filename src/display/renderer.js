@@ -55,7 +55,7 @@ export class Renderer {
     }
 
     renderingLoop() {
-        this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
+        // this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
         this.game.boardeffects.move(0, 0);
         this.game.boardeffects.rotate(0);
         this.game.particles.update();
@@ -223,6 +223,8 @@ export class Renderer {
         let skin = this.game.settings.display.skin;
         if (defaultSkins.includes(skin)) skin = `./assets/skins/${skin}.png`;
         this.game.boardrender.loadImage(skin);
+
+        this.game.pixi.generateTextures(skin);
 
         // sidebar constants
         this.sidebarStats = this.game.settings.game.sidebar;
