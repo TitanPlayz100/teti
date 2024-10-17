@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./styles/menus.css">
     <link rel="stylesheet" href="./styles/miscmenus.css">
     <link rel="stylesheet" href="./styles/settings.css">
+    <script src="https://pixijs.download/release/pixi.min.js"></script>
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
@@ -18,7 +19,7 @@
         <div id="backboard"></div>
         <p class="text" id="warningText">⚠ GO DOWN</p>
 
-        <div id="backborder"></div>
+        <div id="backborder"></div> 
         <div id="dangerOverlay"></div>
         <button id="openSettingsButton" onclick="modal.openModal('settingsPanel')">
             <img src="./assets/icons/settings.svg">
@@ -146,7 +147,7 @@
             <div class="settingRow"><p>Background URL/Hex</p> <input class="option textInput" type="text" id="background" /></div>
             <div class="settingRow"><p>Block Skin URL/Name</p> <input class="option textInput" type="text" id="skin" list="options"/></div>
             <div class="settingRow"><p>Board Opacity</p> <input class="option range" type="range" id="boardOpacity" min="0" max="100" step="1"/></div>
-            <div class="settingRow"><p>Board Size</p> <input class="option range" type="range" id="boardHeight" min="0" max="100" step="1" /></div>
+            <div class="settingRow"><p>Board Size</p> <input class="option range" type="range" id="boardHeight" min="0" max="130" step="1" /></div>
             <div class="settingRow"><p>Board Bounciness</p> <input class="option range" type="range" id="boardBounce" min="-5" max="20" step="0.1" /></div>
             <div class="settingRow"><p>Enable Grid</p> <input class="option check" type="checkbox" id="showGrid" /></div>
             <div class="settingRow"><p>Grid opacity</p> <input class="option range" type="range" id="gridopacity" min="0" max="100" step="2" /></div>

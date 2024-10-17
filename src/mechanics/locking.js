@@ -71,11 +71,11 @@ export class LockPiece {
 
     lockPiece() {
         const lockCoords = this.game.mechanics.board.getMinos("A");
-        this.game.boardrender.justPlacedCoords = lockCoords;
-        this.game.boardrender.justPlacedAlpha = 1;
+        this.game.pixi.justPlacedCoords = lockCoords;
+        this.game.pixi.justPlacedAlpha = 1;
 
         lockCoords.forEach(([x, y]) => {
-            this.game.boardrender.flashTimes.push({ c: [x, y], t: 15 })
+            this.game.pixi.flashTimes.push({ c: [x, y], t: 15 })
             this.game.mechanics.board.rmValue([x, y], "A");
             this.game.mechanics.board.addValFront([x, y], "S");
         });
@@ -106,7 +106,7 @@ export class LockPiece {
 
         const xvals = [...new Set(lockCoords.map(([x, y]) => x))];
         const yval = Math.min(...lockCoords.map(([x, y]) => y));
-        this.game.particles.spawnParticles(Math.min(...xvals) + 1, yval, "lock", xvals.length);
+        this.game.particles.spawnParticles(Math.min(...xvals), yval, "lock", xvals.length);
         this.game.renderer.renderDanger();
 
         const delay = (cleared > 0) ? this.game.settings.game.clearDelay : 0;

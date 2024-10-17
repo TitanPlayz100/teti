@@ -31,11 +31,13 @@ window.addEventListener('mousemove', () => {
     game.controls.toggleCursor(true);
 })
 
-document.onresize = () => {
-    game.renderer.sizeCanvas();
-    game.renderer.updateNext();
-    game.renderer.updateHold();
-}
+window.addEventListener("resize", () => {
+    setTimeout(() => {
+        game.pixi.resize();
+        game.renderer.updateNext();
+        game.renderer.updateHold();
+    }, 0);
+})
 
 // splash menu
 window.addEventListener("DOMContentLoaded", () => {
@@ -56,5 +58,11 @@ window.addEventListener("blur", function () {
 });
 
 window.onerror = (msg, url, lineNo, columnNo, error) => {
-    game.modals.generate.notif(error, msg + ". ln "+ lineNo, "error");
+    game.modals.generate.notif(error, msg + ". ln " + lineNo, "error");
 }
+
+document.getElementById("playingfield").style.display = 'none'
+document.getElementById("next").style.display = 'none'
+document.getElementById("hold").style.display = 'none'
+document.getElementById("backboard").style.display = 'none'
+document.getElementById("backborder").style.display = 'none'

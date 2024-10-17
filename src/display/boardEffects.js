@@ -6,8 +6,8 @@ export class BoardEffects {
     Y = 0;
     dX = 0;
     dY = 0;
-    friction = 0.75;
-    springConstant = 0.02;
+    friction = 0.7;
+    springConstant = 0.015;
     targetX = 0;
     targetY = 0;
     R = 0;
@@ -51,6 +51,7 @@ export class BoardEffects {
 
         if (this.X != 0 || this.Y != 0) {
             this.divBoard.style.translate = `${this.X}px ${this.Y}px`
+            this.game.pixi.app.canvas.style.translate = `${this.X}px ${this.Y}px`
         }
     }
 
@@ -66,6 +67,7 @@ export class BoardEffects {
 
         if (this.R != 0) {
             this.divBoard.style.rotate = `${this.R}deg`
+            this.game.pixi.app.canvas.style.rotate = `${this.R}deg`
         }
     }
 

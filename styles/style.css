@@ -20,8 +20,8 @@ body {
     color: var(--cl-blue);
     font-family: "Major Mono Display", monospace;
     margin: 0;
-    height: 100vh;
-    width: 100vw;
+    /* height: 100vh; */
+    /* width: 100vw; */
     overflow: hidden;
     background: var(--night);
     --background: black;

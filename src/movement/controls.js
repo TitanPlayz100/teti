@@ -9,6 +9,7 @@ export class Controls {
     timings = { arr: 0, das: 0, sd: 0 }; // timeout and interval ids
     menuKey = "Escape"; // html modals close using escape
     cursorVisible = true;
+    resetting = false;
 
     /**
      * @param {Game} game
@@ -145,8 +146,6 @@ export class Controls {
         this.timings[name] = 0;
     }
 
-    resetting = false;
-
     retry(animation) {
         if (this.resetting) return; // no overlap
         this.game.ended = true;
@@ -157,9 +156,7 @@ export class Controls {
             return;
         }
 
-        this.game.stopGameTimers()
-        this.resetting = true;
-        this.game.renderer.resetAnimCurrent = 0; // start animation
+        this.game.pixi.startResetAnimation()
     }
 
     toggleCursor(enable) {

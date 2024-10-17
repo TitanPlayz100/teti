@@ -69,22 +69,21 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 Things that I am working on based on other changes
 - ready set go start option
 - arcade mode
-
-Maybe:
-- cooler action text (maybe if i switch to pixijs then i can make text better)
-
-Future thoughts (honestly only if i have time):
-- I honestly might want to break my rule and start using a framework for rendering.
-    - (turns out pixijs is much better for games than canvas 2d, and howler for audio)
-- I have mixed feelings, because this would make the project technically no longer purely made by me (though the info page is a bit iffy)
-- Maybe I don't care and will switch anyway, and maybe in the end it will pay off. 
-- this would make my most recent changes irrelivent 
-    - such as piece flash and reset animation cause i have to redo them in pixi
-    - in the future itll probably pay off
+- cooler action text
 
 ***
 
 ## Updates
+#### v1.3.4 => PIXIjs
+- COMPLETE REWRITE OF ALL GRAPHICS
+- Everything is now rendered through pixijs
+    - this includes the board, next queue, hold queue, and particles
+    - ye turns out there is a high learning curve with pixi (i lost it several times)
+    - everything should now be much more performant and smooth yay
+
+- some things were changed due to this
+    - need to add border colour back
+
 #### v1.3.3
 - Thanks to itzblack for the Zenith Tower mode
 - added option for line clear delay

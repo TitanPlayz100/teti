@@ -97,7 +97,7 @@ export class ModalActions {
         if (id != 'changeRangeValue' && id != "frontdrop" && this.game.started && !this.game.ended)
             this.game.movement.firstMovement();
         this.actions.saveSettings();
-        if (id == "displayDialog") this.game.renderer.renderStyles();
+        if (id == "displayDialog") this.game.renderer.renderStyles(true);
 
         const restartMenus = ["gameDialog", "gamemodeDialog", "gameEnd", "goalsDialog", "competitiveDialog"];
         if (restartMenus.includes(id)) this.game.controls.retry(false);

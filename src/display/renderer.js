@@ -1,32 +1,17 @@
 import { Game } from "../game.js";
 import pieces from "../data/pieces.json" with { type: "json" };
-import { defaultSkins, statDecimals, statsSecondary as statsSecondaries } from "../data/data.js";
+import { statDecimals, statsSecondary as statsSecondaries } from "../data/data.js";
 
 export class Renderer {
-    boardHeight;
-    boardWidth;
-    holdHeight;
-    holdWidth;
-    nextHeight;
-    nextWidth;
     holdQueueGrid = [];
     nextQueueGrid = [];
     inDanger;
     texttimeouts = {};
-    resetAnimLength = 30;
-    resetAnimCurrent = 30;
-
+    
     sidebarStats;
     sidebarFixed;
     sidebarSecondary;
-    /** @type {CanvasRenderingContext2D} */
-    ctx;
-    ctxN;
-    ctxH;
 
-    canvasField = document.getElementById("playingfield");
-    canvasNext = document.getElementById("next");
-    canvasHold = document.getElementById("hold");
     divBoard = document.getElementById("board");
     divBackboard = document.getElementById("backboard");
     divLinesSent = document.getElementById("linessent");
@@ -48,39 +33,6 @@ export class Renderer {
     constructor(game) {
         this.game = game;
         this.board = game.board;
-
-        this.ctx = this.canvasField.getContext("2d");
-        this.ctxN = this.canvasNext.getContext("2d");
-        this.ctxH = this.canvasHold.getContext("2d");
-    }
-
-    renderingLoop() {
-        this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
-        this.game.boardeffects.move(0, 0);
-        this.game.boardeffects.rotate(0);
-        this.game.particles.update();
-        this.dangerParticles();
-        this.resetAnimation();
-        requestAnimationFrame(this.renderingLoop.bind(this))
-        if(this.game.settings.game.gamemode == "ultra" && Math.floor(this.game.stats.time) == 60) this.renderTimeLeft("60S LEFT")
-        if(this.game.settings.game.gamemode == "ultra" && Math.floor(this.game.stats.time) == 90) this.renderTimeLeft("30S LEFT")
-    }
-
-    sizeCanvas() {
-        this.renderStyles();
-        [this.canvasField, this.canvasNext, this.canvasHold].forEach(c => {
-            c.width = Math.round(c.offsetWidth / 10) * 10;
-            c.height = Math.round(c.offsetHeight / 40) * 40;
-        });
-        this.divBoard.style.width = `${this.canvasField.width}px`;
-        this.divBoard.style.height = `${this.canvasField.height / 2}px`;
-        this.game.boardrender.minoSize = this.canvasField.width / 10;
-        this.boardWidth = this.canvasField.offsetWidth;
-        this.boardHeight = this.canvasField.offsetHeight;
-        this.nextWidth = this.canvasNext.offsetWidth;
-        this.nextHeight = this.canvasNext.offsetHeight;
-        this.holdWidth = this.canvasHold.offsetWidth;
-        this.holdHeight = this.canvasHold.offsetHeight;
     }
 
     updateNext() {
@@ -95,9 +47,9 @@ export class Renderer {
             coords.forEach(([x, y]) => (this.nextQueueGrid[y + dy][x + dx] = "A " + piece.name));
         });
 
-        this.game.boardrender.renderToCanvas(this.ctxN, this.nextQueueGrid, 15, [0, 0], this.nextWidth, this.nextHeight);
-        if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
-        this.canvasNext.style.outlineColor = this.game.bag.nextPiece().colour;
+        this.game.pixi.render("next", this.nextQueueGrid);
+        // if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
+        // this.canvasNext.style.outlineColor = this.game.bag.nextPiece().colour;
     }
 
     getPiece(name) {
@@ -117,17 +69,17 @@ export class Renderer {
         const coords = this.board.pieceToCoords(this.game.hold.piece.shape1);
 
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
-        const len = Math.round(this.game.boardrender.minoSize / 2);
+        const len = Math.round(this.game.pixi.minoSize / 2);
         const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
 
-        this.game.boardrender.renderToCanvas(this.ctxH, this.holdQueueGrid, 2, [shiftX, shiftY], this.holdWidth, this.holdHeight);
-        if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
-        const colour = this.game.hold.occured ? "gray" : this.game.hold.piece.colour
-        this.canvasHold.style.outline = `0.2vh solid ${colour}`;
+        this.game.pixi.render("hold", this.holdQueueGrid);
+        // if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
+        // const colour = this.game.hold.occured ? "gray" : this.game.hold.piece.colour
+        // this.canvasHold.style.outline = `0.2vh solid ${colour}`;
     }
 
     clearHold() {
-        this.ctxH.clearRect(0, 0, this.canvasHold.offsetWidth + 10, this.canvasHold.offsetHeight);
+        this.game.pixi.render("hold", this.holdQueueGrid);
     }
 
     renderDanger() {
@@ -203,26 +155,21 @@ export class Renderer {
         this.texttimeouts[name] = 0;
     }
 
-    renderStyles() {
+    renderStyles(settings = false) {
         // custom background
         const bg = this.game.settings.display.background;
         if (bg == "") bg = "#080B0C";
         document.body.style.background = (bg[0] == "#") ? bg : `url("${bg}") no-repeat center center`
         document.body.style.backgroundSize = "cover";
 
-        const height = Number(this.game.settings.display.boardHeight) + 10;
+        const height = Number(this.game.settings.display.boardHeight);
         this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
-        this.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
+        // this.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
 
         // board opacity
         const background = `rgba(0, 0, 0, ${Number(this.game.settings.display.boardOpacity) / 100})`;
         this.divBackboard.style.backgroundColor = background;
         document.body.style.setProperty('--background', background);
-
-        // skins
-        let skin = this.game.settings.display.skin;
-        if (defaultSkins.includes(skin)) skin = `./assets/skins/${skin}.png`;
-        this.game.boardrender.loadImage(skin);
 
         // sidebar constants
         this.sidebarStats = this.game.settings.game.sidebar;
@@ -233,6 +180,8 @@ export class Renderer {
             if (stat == "None") stat = ""
             this[`elementStatname${index + 1}`].textContent = stat;
         })
+
+        if (settings) this.game.pixi.resize();
     }
 
     renderSidebar() {
@@ -241,6 +190,7 @@ export class Renderer {
                 this[`elementStats${index + 1}`].textContent = "";
                 return;
             };
+
             const displayStat = this.game.stats[stat].toFixed(this.sidebarFixed[index]);
             this[`elementStats${index + 1}`].textContent = displayStat;
 
@@ -274,31 +224,6 @@ export class Renderer {
         return reverseLookup
     }
 
-    updateAlpha() {
-        if (this.game.settings.game.gamemode != 'lookahead') return;
-        const update = (type, amount) => {
-            if (this.game.stats.checkInvis()) {
-                if (this.game.boardrender[type] <= 0) {
-                    this.game.boardrender[type] = 1;
-                    this.updateNext();
-                    this.updateHold();
-                }
-            } else {
-                if (this.game.boardrender[type] > 0) {
-                    this.game.boardrender[type] += -amount / this.game.tickrate;
-                    this.updateNext();
-                    this.updateHold();
-                } else {
-                    this.game.boardrender[type] = 0;
-                }
-            }
-        }
-        update("boardAlpha", 3)
-        update("queueAlpha", 3)
-        update("justPlacedAlpha", 6)
-
-    }
-
     setEditPieceColours() {
         const elPieces = [...this.elementEditPieces.children];
         elPieces.forEach(elpiece => {
@@ -325,45 +250,4 @@ export class Renderer {
         this.game.particles.spawnParticles(0, 20, "dangersides");
     }
 
-    resetAnimation() {
-        if (this.resetAnimCurrent >= this.resetAnimLength * 2) return;
-        this.resetAnimCurrent++;
-        if (this.game.boardrender.boardAlpha < 0.99) this.game.boardrender.boardAlpha += 2 / this.resetAnimLength;
-        if (this.resetAnimCurrent > this.resetAnimLength) return;
-
-
-        const progress = this.resetAnimCurrent / this.resetAnimLength;
-        const startY = this.boardHeight / 2;
-        const dx = this.boardWidth;
-        const dy = dx + this.boardHeight / 2;
-
-        const fillTriangle = (p, colour) => {
-            this.ctx.globalAlpha = 1;
-            this.ctx.fillStyle = colour;
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, startY - dy * p);
-            this.ctx.lineTo(dy * p, startY);
-            this.ctx.lineTo(0, startY + dy * p);
-            this.ctx.lineTo(0, 0);
-            this.ctx.fill();
-        }
-        // fill triangle
-        const progress1 = this.easeInOutCubic(progress);
-        fillTriangle(progress1, 'white');
-
-        // clear smaller triangle
-        const progress2 = this.easeInOutCubic(progress - 0.1);
-        fillTriangle(progress2, 'black');
-
-
-        if (this.resetAnimCurrent == this.resetAnimLength) { // finished
-            this.game.startGame();
-            this.game.controls.resetting = false;
-            this.game.boardrender.boardAlpha = 0;
-        }
-    }
-
-    easeInOutCubic(x) {
-        return -(Math.cos(Math.PI * x) - 1) / 2;
-    }
 }
