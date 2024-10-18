@@ -19,6 +19,8 @@ export class pixiRender {
         await this.app.init({ backgroundAlpha: 0, resizeTo: window });
         document.body.appendChild(this.app.canvas);
 
+        this.app.ticker.maxFPS = 90;
+
         // grid
         const grid = new PIXI.Container();
         this.app.stage.addChild(grid);
@@ -38,30 +40,16 @@ export class pixiRender {
         grid.label = "grid";
 
         // particles
-        // const particles = new ParticleContainer();
-        // const texture = Texture.from('path/to/bunny.png');
+        const particles = new PIXI.Container();
+        this.app.stage.addChild(particles);
 
-        // for (let i = 0; i < 100000; ++i) {
-        //     let particle = new Particle({
-        //         texture,
-        //         x: Math.random() * 800,
-        //         y: Math.random() * 600,
-        //     });
+        particles.scale.set(newScale)
 
-        //     container.addParticle(particle);
-        // }
-
-        // const particlesrect = new PIXI.Graphics()
-        //     .rect(0, 0, this.game.renderer.boardWidth, this.game.renderer.boardHeight / 2)
-
-        // particlesrect.scale.set(newScale)
-        // particles.addChild(particlesrect);
-
-        // particles.x = this.app.screen.width / 2;
-        // particles.y = this.app.screen.height / 2;
-        // particles.pivot.x = particles.width / 2;
-        // particles.pivot.y = particles.height / 2;
-        // particles.label = "particles";
+        particles.x = this.app.screen.width / 2;
+        particles.y = this.app.screen.height / 2 ;
+        particles.pivot.x = this.game.renderer.boardWidth / 2;
+        particles.pivot.y = this.game.renderer.boardHeight / 2 + this.game.renderer.boardHeight / 4
+        particles.label = "particles";
 
         // board
         const board = new PIXI.Container();
@@ -79,16 +67,14 @@ export class pixiRender {
         board.pivot.x = board.width / 2;
         board.pivot.y = board.height / 2;
         board.label = "board";
+        this.game.particles.initBoard();
 
         this.app.ticker.add((time) => this.tick(time));
     }
 
     tick(time) {
-        this.testRender()
-    }
-
-    testRender() {
         this.render("board", this.game.board.boardState, 39, [0, 0]);
+        this.game.particles.update();
     }
 
     async generateTextures(url) {
@@ -125,7 +111,7 @@ export class pixiRender {
                 let sprite;
 
                 if (cell.includes("A") || cell.includes("S")) { // active or stopped piece
-                    sprite = new PIXI.Sprite(this.textures[this.getPiece(type, cell[1])]);
+                    sprite = new PIXI.Sprite(this.textures[this.getPiece(type, cell[1].toLowerCase())]);
                     sprite.alpha = this.getOpacity(cell, type, x, y) ?? this.game.boardrender.queueAlpha;
                     // todo set mino flash
                 } else if (cell.includes("NP") && this.game.renderer.inDanger) { // next piece overlay

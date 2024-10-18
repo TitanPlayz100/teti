@@ -1,7 +1,8 @@
 import { Game } from "../game.js";
+import * as PIXI from '../../lib/pixi.min.mjs'
 
 class Point {
-    constructor(particleInfo, ctx) {
+    constructor(particleInfo, particleInstance) {
         const { x, y, colour, size, life, dx, dy, sway, xF, yF, swayF, gravity, twinkle, twinkleTime } = particleInfo;
         this.x = x;
         this.y = y;
@@ -19,15 +20,25 @@ class Point {
         this.twinkle = twinkle ?? false;
         this.twinkleTime = twinkleTime ?? this.life;
 
-        this.ctx = ctx;
+        const graphic = new PIXI.Graphics()
+            .circle(0, 0, 1)
+            .fill(colour);
+        // const circleTexture = particleInstance.game.pixi.app.renderer.generateTexture(graphic);
+        // this.particle = new PIXI.Sprite(circleTexture);
+        this.particle = graphic;
+        particleInstance.container.addChild(graphic);
+        particleInstance.particles.push(this);
     }
 
     draw() {
-        this.ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
-        this.ctx.fillStyle = this.colour;
-        this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        this.ctx.fill();
+        // this.ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
+        // this.ctx.fillStyle = this.colour;
+        // this.ctx.beginPath();
+        // this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        // this.ctx.fill();
+        this.particle.alpha = Math.max(0, this.life / this.maxLife);
+        this.particle.x = this.x;
+        this.particle.y = this.y;
     }
 
     update() {
@@ -43,6 +54,7 @@ class Point {
 }
 
 export class Particles {
+    /** @type {Point[]} */
     particles = [];
 
     /**
@@ -57,6 +69,8 @@ export class Particles {
         this.boardWidth = this.game.renderer.boardWidth;
         this.boardHeight = this.game.renderer.boardHeight;
         this.minosize = this.game.boardrender.minoSize;
+
+        this.container = this.game.pixi.app.stage.getChildByLabel("particles");
     }
 
     spawnParticles(posX, posY, type, pieceWidth = 1, cw = false, colour = "white") {
@@ -85,8 +99,7 @@ export class Particles {
             const sway = Math.random() * 0.04 - 0.02;
 
             const placeParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, sway, xF: 0.95, yF: 0.95, swayF: 0.96 }
-            const particle = new Point(placeParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(placeParticle, this);
         }
     }
 
@@ -99,8 +112,7 @@ export class Particles {
             const dy = Math.random() * -0.7 - 1.4;
 
             const clearParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, xF: 0.96, yF: 0.96, gravity: 0.05 }
-            const particle = new Point(clearParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(clearParticle, this);
         }
     }
 
@@ -113,8 +125,7 @@ export class Particles {
             const dy = Math.random() * -0.8 - 1.5;
 
             const clearParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, yF: 0.99, gravity: 0.1 }
-            const particle = new Point(clearParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(clearParticle, this);
         }
     }
 
@@ -128,8 +139,7 @@ export class Particles {
             const colour = `hsl(${Math.random() * 360}, 80%, 60%)`
 
             const pcParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, xF: 0.98, yF: 0.98, twinkle: true, twinkleTime: 130 }
-            const particle = new Point(pcParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(pcParticle, this);
         }
     }
 
@@ -144,8 +154,7 @@ export class Particles {
             const sway = Math.random() * 0.005 - 0.0025;
 
             const dangerParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, sway, swayF: 0.98 }
-            const particle = new Point(dangerParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(dangerParticle, this);
         }
     }
 
@@ -161,8 +170,7 @@ export class Particles {
             const dy = Math.random() * 2 - 1;
 
             const dangerSideParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, gravity: 0.05 }
-            const particle = new Point(dangerSideParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(dangerSideParticle, this);
         }
     }
 
@@ -178,8 +186,7 @@ export class Particles {
             if (cw) { dx *= -1 } else { dy *= -1 }
 
             const spinParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, xF: 0.98, yF: 0.98 }
-            const particle = new Point(spinParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(spinParticle, this);
         }
     }
 
@@ -192,8 +199,7 @@ export class Particles {
             const dy = Math.random() * 1 - 0.5;
 
             const spikeParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, xF: 0.96, yF: 0.96, twinkle: true }
-            const particle = new Point(spikeParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(spikeParticle, this);
         }
     }
 
@@ -208,16 +214,19 @@ export class Particles {
             const dy = Math.random() * 2 - 1;
 
             const BTBParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, gravity: 0.15 }
-            const particle = new Point(BTBParticle, this.ctx);
-            this.particles.push(particle);
+            new Point(BTBParticle, this);
         }
     }
 
     clearParticles() {
+        this.particles.forEach(particle => this.container.removeChild(particle.particle));
         this.particles = [];
     }
 
     update() {
+        this.particles.forEach(particle => {
+            if (particle.life <= 0) { this.container.removeChild(particle.particle) }
+        })
         this.particles = this.particles.filter(p => p.life > 0);
         this.particles.forEach(particle => {
             particle.update();

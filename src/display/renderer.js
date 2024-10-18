@@ -58,7 +58,7 @@ export class Renderer {
         // this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
         this.game.boardeffects.move(0, 0);
         this.game.boardeffects.rotate(0);
-        this.game.particles.update();
+        // this.game.particles.update();
         this.dangerParticles();
         this.resetAnimation();
         requestAnimationFrame(this.renderingLoop.bind(this))

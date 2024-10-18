@@ -60,7 +60,6 @@ export class Game {
         this.pixi = new pixiRender(this);
 
         this.renderer.sizeCanvas();
-        this.particles.initBoard();
         this.renderer.setEditPieceColours();
         this.sounds.initSounds();
         this.startGame();
@@ -73,8 +72,9 @@ export class Game {
         this.modals.generate.generateSkinList();
         this.sounds.addMenuSFX();
         this.profilestats.loadPBs();
-        this.versionChecker();
         this.pixi.init();
+        this.versionChecker();
+
     }
 
     startGame() {
