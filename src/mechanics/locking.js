@@ -106,7 +106,7 @@ export class LockPiece {
 
         const xvals = [...new Set(lockCoords.map(([x, y]) => x))];
         const yval = Math.min(...lockCoords.map(([x, y]) => y));
-        this.game.particles.spawnParticles(Math.min(...xvals) + 1, yval, "lock", xvals.length);
+        this.game.particles.spawnParticles(Math.min(...xvals), yval, "lock", xvals.length);
         this.game.renderer.renderDanger();
 
         const delay = (cleared > 0) ? this.game.settings.game.clearDelay : 0;

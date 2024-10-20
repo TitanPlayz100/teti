@@ -93,7 +93,7 @@ export class Movement {
         this.game.controls.checkSD();
         if (this.game.mechanics.isTspin || (this.game.mechanics.isAllspin && this.game.settings.game.allspin)) {
             this.game.renderer.rotateBoard(type);
-            this.game.particles.spawnParticles(this.game.falling.location[0], this.game.falling.location[1] + 2,
+            this.game.particles.spawnParticles(...this.game.falling.location,
                 "spin", 5, type == "CW", this.game.falling.piece.colour);
                 this.game.sounds.playSound("spin");
         }
@@ -155,7 +155,7 @@ export class Movement {
         this.game.sounds.playSound("harddrop");
         this.game.renderer.bounceBoard('DOWN');
         const xvals = [...new Set(minos.map(([x, y]) => x))];
-        this.game.particles.spawnParticles(Math.min(...xvals)+1, this.game.falling.location[1], "drop", xvals.length);
+        this.game.particles.spawnParticles(Math.min(...xvals), this.game.falling.location[1], "drop", xvals.length);
         this.game.mechanics.locking.lockPiece();
     }
 }

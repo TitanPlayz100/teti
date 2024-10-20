@@ -54,35 +54,6 @@ export class Renderer {
         this.ctxH = this.canvasHold.getContext("2d");
     }
 
-    renderingLoop() {
-        // this.game.boardrender.renderToCanvas(this.ctx, this.game.board.boardState, 39, [0, 0], this.boardWidth, this.boardHeight);
-        this.game.boardeffects.move(0, 0);
-        this.game.boardeffects.rotate(0);
-        // this.game.particles.update();
-        this.dangerParticles();
-        this.resetAnimation();
-        requestAnimationFrame(this.renderingLoop.bind(this))
-        if(this.game.settings.game.gamemode == "ultra" && Math.floor(this.game.stats.time) == 60) this.renderTimeLeft("60S LEFT")
-        if(this.game.settings.game.gamemode == "ultra" && Math.floor(this.game.stats.time) == 90) this.renderTimeLeft("30S LEFT")
-    }
-
-    sizeCanvas() {
-        this.renderStyles();
-        [this.canvasField, this.canvasNext, this.canvasHold].forEach(c => {
-            c.width = Math.round(c.offsetWidth / 10) * 10;
-            c.height = Math.round(c.offsetHeight / 40) * 40;
-        });
-        this.divBoard.style.width = `${this.canvasField.width}px`;
-        this.divBoard.style.height = `${this.canvasField.height / 2}px`;
-        this.game.boardrender.minoSize = this.canvasField.width / 10;
-        this.boardWidth = this.canvasField.offsetWidth;
-        this.boardHeight = this.canvasField.offsetHeight;
-        this.nextWidth = this.canvasNext.offsetWidth;
-        this.nextHeight = this.canvasNext.offsetHeight;
-        this.holdWidth = this.canvasHold.offsetWidth;
-        this.holdHeight = this.canvasHold.offsetHeight;
-    }
-
     updateNext() {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
 
@@ -95,7 +66,7 @@ export class Renderer {
             coords.forEach(([x, y]) => (this.nextQueueGrid[y + dy][x + dx] = "A " + piece.name));
         });
 
-        this.game.boardrender.renderToCanvas(this.ctxN, this.nextQueueGrid, 15, [0, 0], this.nextWidth, this.nextHeight);
+        this.game.pixi.render("next", this.nextQueueGrid, 15, [0, 0]);
         if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
         this.canvasNext.style.outlineColor = this.game.bag.nextPiece().colour;
     }
@@ -117,10 +88,10 @@ export class Renderer {
         const coords = this.board.pieceToCoords(this.game.hold.piece.shape1);
 
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
-        const len = Math.round(this.game.boardrender.minoSize / 2);
+        const len = Math.round(this.game.pixi.minoSize / 2);
         const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
 
-        this.game.boardrender.renderToCanvas(this.ctxH, this.holdQueueGrid, 2, [shiftX, shiftY], this.holdWidth, this.holdHeight);
+        this.game.pixi.render("hold", this.holdQueueGrid, 2, [shiftX, shiftY]);
         if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
         const colour = this.game.hold.occured ? "gray" : this.game.hold.piece.colour
         this.canvasHold.style.outline = `0.2vh solid ${colour}`;
@@ -128,6 +99,7 @@ export class Renderer {
 
     clearHold() {
         this.ctxH.clearRect(0, 0, this.canvasHold.offsetWidth + 10, this.canvasHold.offsetHeight);
+        this.game.pixi.render("hold", this.holdQueueGrid, 2, [0, 0]);
     }
 
     renderDanger() {
@@ -210,7 +182,7 @@ export class Renderer {
         document.body.style.background = (bg[0] == "#") ? bg : `url("${bg}") no-repeat center center`
         document.body.style.backgroundSize = "cover";
 
-        const height = Number(this.game.settings.display.boardHeight) + 10;
+        const height = Number(this.game.settings.display.boardHeight);
         this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
         this.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
 
@@ -219,12 +191,11 @@ export class Renderer {
         this.divBackboard.style.backgroundColor = background;
         document.body.style.setProperty('--background', background);
 
-        // skins
-        let skin = this.game.settings.display.skin;
-        if (defaultSkins.includes(skin)) skin = `./assets/skins/${skin}.png`;
-        this.game.boardrender.loadImage(skin);
+        // // skins
+        // let skin = this.game.settings.display.skin;
+        // if (defaultSkins.includes(skin)) skin = `./assets/skins/${skin}.png`;
+        // this.game.boardrender.loadImage(skin);
 
-        this.game.pixi.generateTextures(skin);
 
         // sidebar constants
         this.sidebarStats = this.game.settings.game.sidebar;

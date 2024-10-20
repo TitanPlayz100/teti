@@ -20,22 +20,13 @@ class Point {
         this.twinkle = twinkle ?? false;
         this.twinkleTime = twinkleTime ?? this.life;
 
-        const graphic = new PIXI.Graphics()
-            .circle(0, 0, 1)
-            .fill(colour);
-        // const circleTexture = particleInstance.game.pixi.app.renderer.generateTexture(graphic);
-        // this.particle = new PIXI.Sprite(circleTexture);
+        const graphic = new PIXI.Graphics().circle(0, 0, 1).fill(colour);
         this.particle = graphic;
         particleInstance.container.addChild(graphic);
         particleInstance.particles.push(this);
     }
 
     draw() {
-        // this.ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
-        // this.ctx.fillStyle = this.colour;
-        // this.ctx.beginPath();
-        // this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        // this.ctx.fill();
         this.particle.alpha = Math.max(0, this.life / this.maxLife);
         this.particle.x = this.x;
         this.particle.y = this.y;
@@ -66,49 +57,49 @@ export class Particles {
     }
 
     initBoard() {
-        this.boardWidth = this.game.renderer.boardWidth;
-        this.boardHeight = this.game.renderer.boardHeight;
-        this.minosize = this.game.boardrender.minoSize;
-
         this.container = this.game.pixi.app.stage.getChildByLabel("particles");
     }
 
     spawnParticles(posX, posY, type, pieceWidth = 1, cw = false, colour = "white") {
-        if (!this.game.settings.display.particles) return
+        if (!this.game.settings.display.particles) return;
+
+        const boardWidth = this.game.pixi.width;
+        const boardHeight = this.game.pixi.height * 2;
+        const minosize = this.game.pixi.minoSize;
+        const [x, y] = [posX * minosize, (40 - posY) * minosize];
         this.volume = this.game.settings.display.particleVolume;
         this.size = this.game.settings.display.particleSize;
-        const [x, y] = [posX * this.minosize, (40 - posY) * this.minosize];
-        if (type == "drop") this.creatDropParticles(x, y, colour, this.minosize * pieceWidth, -this.boardHeight);
-        if (type == "lock") this.createLockParticles(x, y, colour, this.minosize * pieceWidth, 10);
-        if (type == "clear") this.createClearParticles(x, y, colour, this.boardWidth, -10);
-        if (type == "pc") this.createPCParticles(x, y, this.boardWidth, 10);
-        if (type == "dangerboard") this.createDangerBoardParticles(x, this.boardHeight, colour, this.boardWidth, 10);
-        if (type == "dangersides") this.createDangerSidesParticles(x, y, "red", this.boardWidth, 0, 1);
-        if (type == "spin") this.createSpinParticles(x, y, colour, cw, this.minosize * pieceWidth, -this.minosize * pieceWidth);
-        if (type == "spike") this.createSpikeParticles(x, this.boardHeight, colour, this.boardWidth, -this.boardHeight);
-        if (type == "BTB") this.createBTBParticle(x, y, "gold", this.boardWidth, 0, this.boardHeight);
+        if (type == "drop") this.creatDropParticles(x, y, colour, minosize * pieceWidth, -boardHeight);
+        if (type == "lock") this.createLockParticles(x, y, colour, minosize * pieceWidth, 10);
+        if (type == "clear") this.createClearParticles(x, y, colour, boardWidth, -10);
+        if (type == "pc") this.createPCParticles(x, y, boardWidth, 10);
+        if (type == "dangerboard") this.createDangerBoardParticles(x, boardHeight, colour, boardWidth, 10);
+        if (type == "dangersides") this.createDangerSidesParticles(x, y, "red", boardWidth, 0, 1);
+        if (type == "spin") this.createSpinParticles(x, y, colour, cw, minosize * pieceWidth, -minosize * pieceWidth);
+        if (type == "spike") this.createSpikeParticles(x, boardHeight, colour, boardWidth, -boardHeight);
+        if (type == "BTB") this.createBTBParticle(x, y, "gold", boardWidth, 0, boardHeight);
     }
 
     creatDropParticles(x, y, colour, len, height) {
         for (let i = 0; i < this.volume / 3; i++) {
-            const posX = x + Math.random() * len - len / 2;
+            const posX = x + Math.random() * len 
             const posY = y + Math.random() * height / 2;
             const life = Math.random() * 35 + 70;
-            const dx = Math.random() * 1 - 0.5;
+            const dx = Math.random() * 0.8 - 0.2;
             const dy = Math.random() * -1.2 - 2.4;
             const sway = Math.random() * 0.04 - 0.02;
 
-            const placeParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, sway, xF: 0.95, yF: 0.95, swayF: 0.96 }
+            const placeParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, sway, xF: 0.93, yF: 0.93, swayF: 0.93 }
             new Point(placeParticle, this);
         }
     }
 
     createLockParticles(x, y, colour, len, height) {
         for (let i = 0; i < this.volume / 4; i++) {
-            const posX = x + Math.random() * len - len / 2;
+            const posX = x + Math.random() * len;
             const posY = y + Math.random() * height;
             const life = Math.random() * 15 + 30;
-            const dx = Math.random() * 1 - 0.5 + (posX - x) / 50;
+            const dx = Math.random() * 1 - 0.5 + (posX - x - len/2) / 30
             const dy = Math.random() * -0.7 - 1.4;
 
             const clearParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, xF: 0.96, yF: 0.96, gravity: 0.05 }
@@ -121,7 +112,7 @@ export class Particles {
             const posX = x + Math.random() * len
             const posY = y + Math.random() * height;
             const life = Math.random() * 20 + 40;
-            const dx = Math.random() * 1.5 - 0.75 + (posX - x) / 200;
+            const dx = Math.random() * 1.5 - 0.75 + (posX - x - len/2) / 150;
             const dy = Math.random() * -0.8 - 1.5;
 
             const clearParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, yF: 0.99, gravity: 0.1 }
@@ -177,12 +168,12 @@ export class Particles {
     createSpinParticles(x, y, colour, cw, len, height) {
         len *= 0.5;
         height *= 0.5;
-        for (let i = 0; i < this.volume / 3; i++) {
-            const posX = x + Math.random() * len - len / 2
-            const posY = y + Math.random() * height - height / 2;
+        for (let i = 0; i < this.volume / 5; i++) {
+            const posX = x + Math.random() * len 
+            const posY = y + Math.random() * height
             const life = Math.random() * 35 + 70;
-            let dx = Math.random() * 1 - 0.5 + (posY - y) / 30;
-            let dy = Math.random() * 1 - 0.5 + (posX - x) / 30;
+            let dx = Math.random() * 1 - 0.5 + (posY - y) / 50;
+            let dy = Math.random() * 1 - 0.5 + (posX - x) / 50;
             if (cw) { dx *= -1 } else { dy *= -1 }
 
             const spinParticle = { x: posX, y: posY, colour, size: this.size, life, dx, dy, xF: 0.98, yF: 0.98 }
@@ -218,14 +209,19 @@ export class Particles {
         }
     }
 
-    clearParticles() {
-        this.particles.forEach(particle => this.container.removeChild(particle.particle));
-        this.particles = [];
+    clearParticles() { // there was a memory leak... so i fixed it
+        if (this.container == undefined) return;
+        const c = [...this.container.children]
+        c.forEach(child => { child.destroy(); this.container.removeChild(child); });
+        this.particles = new Array();
     }
 
     update() {
         this.particles.forEach(particle => {
-            if (particle.life <= 0) { this.container.removeChild(particle.particle) }
+            if (particle.life <= 0) { // something here worked to fix memory leak
+                this.container.removeChild(particle.particle); 
+                particle.particle.destroy();
+            }
         })
         this.particles = this.particles.filter(p => p.life > 0);
         this.particles.forEach(particle => {

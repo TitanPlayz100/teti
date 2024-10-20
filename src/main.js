@@ -31,11 +31,13 @@ window.addEventListener('mousemove', () => {
     game.controls.toggleCursor(true);
 })
 
-document.onresize = () => {
-    game.renderer.sizeCanvas();
-    game.renderer.updateNext();
-    game.renderer.updateHold();
-}
+window.addEventListener("resize", () => {
+    setTimeout(() => {
+        game.pixi.resize();
+        game.renderer.updateNext();
+        game.renderer.updateHold();
+    }, 0);
+})
 
 // splash menu
 window.addEventListener("DOMContentLoaded", () => {
@@ -60,5 +62,7 @@ window.onerror = (msg, url, lineNo, columnNo, error) => {
 }
 
 document.getElementById("playingfield").style.display = 'none'
+document.getElementById("next").style.display = 'none'
+document.getElementById("hold").style.display = 'none'
 document.getElementById("backboard").style.display = 'none'
 document.getElementById("backborder").style.display = 'none'
