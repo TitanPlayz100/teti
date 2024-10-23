@@ -103,7 +103,7 @@ export class Zenith {
                 , 1000 / this.game.tickrate);
         }
 
-        drawClimbSpeedBar(speed, point, require){ // todo: drawing polygons (paralellogram) cus idk
+        drawClimbSpeedBar(speed, point, require){ // todo: drawing polygons (parallelogram) cus idk
             const color = ["var(--invis)", "red", "orange", "green", "blue", "#FF1493", "tan", "lightgreen", "lightblue", "pink", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white"]
             const climbSpeedBar = document.getElementById("climbSpeedBar")
 
