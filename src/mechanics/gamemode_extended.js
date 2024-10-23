@@ -255,6 +255,10 @@ export class Grandmaster {
         if(this.game.stats.tgm_level >= this.sectionTarget){
             this.game.renderer.renderTimeLeft("SECTION " + this.sectionTarget / 100 + " CLEAR");
             this.game.sounds.playSound("levelup");
+            if(this.sectionTime >= this.regretTable[(this.sectionTarget / 100) - 1]){
+                this.game.renderer.renderTimeLeft("REGRET");
+                this.regretsCount++;
+            }
             this.sectionTime = 0;
             this.isCoolCheck = false;
             this.sectionTarget = Math.min(this.sectionTarget + 100, this.game.settings.game[this.game.modes.modeJSON.target])
