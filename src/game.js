@@ -89,7 +89,8 @@ export class Game {
         clearInterval(this.gravityTimer);
         clearInterval(this.gameTimer);
         clearInterval(this.survivalTimer);
-        clearInterval(this.mechanics.zenithTimer)
+        clearInterval(this.zenithTimer);
+        clearInterval(this.grandmasterTimer);
         this.mechanics.locking.lockingPause();
     }
 
