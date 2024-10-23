@@ -226,10 +226,11 @@ export class Grandmaster {
         if(this.game.settings.game.gamemode != "race") return
         this.checkSectionCleared();
         this.checkCool();
+        this.game.stats.grade = this.grades[this.gradeBoost + this.coolsCount - this.regretsCount];
         if (row<1) return;
 
         const pts = this.gradePointBonus[this.internalGrade][row - 1];
-        const cmb_mult = this.mult[Math.max(9, cmb)][row - 1];
+        const cmb_mult = this.mult[Math.min(9, cmb)][row - 1];
         const lvl_mult = Math.floor(lvl / 250) + 1;
 
         this.gradePoint += pts*cmb_mult*lvl_mult;
@@ -238,7 +239,6 @@ export class Grandmaster {
             this.gradePoint = 0;
             this.internalGrade++;
             this.gradeBoost = this.gradeBoostTable[this.internalGrade];
-            this.game.stats.grade = this.grades[this.gradeBoost + this.coolsCount - this.regretsCount];
             this.startGrandmasterTimer(this.gradePointDecay[this.internalGrade]);
         };
     }
