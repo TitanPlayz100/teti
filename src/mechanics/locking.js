@@ -102,7 +102,7 @@ export class LockPiece {
         this.game.mechanics.isAllspin = false;
         this.game.mechanics.isMini = false;
         this.game.falling.moved = false;
-        if (this.game.stats.level % 100 != 99 && this.game.stats.level != this.game.settings.game.raceTarget - 1) this.game.stats.level++;
+        if (this.game.stats.tgm_level % 100 != 99 && this.game.stats.tgm_level != this.game.settings.game.raceTarget - 1) this.game.stats.tgm_level++;
 
         const xvals = [...new Set(lockCoords.map(([x, y]) => x))];
         const yval = Math.min(...lockCoords.map(([x, y]) => y));

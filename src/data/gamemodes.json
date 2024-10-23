@@ -122,12 +122,13 @@
     "race": {
         "displayName": "Race",
         "objectiveText": "Level",
-        "goalStat": "level",
+        "goalStat": "tgm_level",
         "target": "raceTarget",
-        "result": "time",
+        "result": "grade",
         "settings": {
-            "raceTarget": 500,
-            "gravitySpeed": 0
+            "raceTarget": 10,
+            "gravitySpeed": 0,
+            "clearDelay": 420
         }
     },
     "zenith": {
@@ -140,8 +141,7 @@
             "requiredAltitude": 1650,
             "gravitySpeed": 950,
             "allspin": true,
-            "allspinminis": true,
-            "sidebar": ["time", "floor", "pps"]
+            "allspinminis": true
         }
     }
 }

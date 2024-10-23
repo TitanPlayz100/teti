@@ -124,16 +124,6 @@
         "type": "file"
     },
     {
-        "name": "zenith_speedrun_start.mp3",
-        "path": "assets/sfx/zenith_speedrun_start.mp3",
-        "type": "file"
-    },
-    {
-        "name": "zenith_speedrun_end.mp3",
-        "path": "assets/sfx/zenith_speedrun_end.mp3",
-        "type": "file"
-    },
-    {
         "name": "combo_1.mp3",
         "path": "assets/sfx/combo/combo_1.mp3"
     },

@@ -81,7 +81,6 @@ export class BoardEffects {
 
         if (!this.game.settings.display.rainbowPB ||
             !this.game.settings.game.competitiveMode ||
-            // gamemode == "zenith" ||
             stats.time < 0.5 || pbs[gamemode] == undefined) return;
         if (this.paceCooldown > 0) { this.paceCooldown--; return; }
 
