@@ -126,7 +126,7 @@
         "target": "raceTarget",
         "result": "grade",
         "settings": {
-            "raceTarget": 10,
+            "raceTarget": 999,
             "gravitySpeed": 0,
             "clearDelay": 420
         }
