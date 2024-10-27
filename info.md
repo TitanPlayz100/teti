@@ -69,18 +69,53 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 Things that I am working on based on other changes
 - ready set go start option
 - arcade mode
-- cooler action text
+
+Zenith mode additions
+- add fatigue:
+8:00 - 2 permanent garbage
+9:00 - receive 25% more garbage
+10:00 - 3 more permanent garbage (5 total)
+11:00 - debuff increased to 50% more garbage
+12:00 - 5 more permanent garbage (10 total)
+
+- maybe add a "currently in hyperspeed" graphic
+- simulated garbage recieving option
+    - amount of garbage sent to player increases with floor
+    - garbage is random bursts
+    - attacks 8 or larger split using {!!} thing (0.5s gap)
+- option for expert mode style
+
+- update climb bar colours:
+Red (#e43921)
+Yellow (#ffb400)
+Green (#82fc40)
+Blue (#3ca6ff)
+Magenta (#ff46da)
+Khaki (#ffc48e)
+"Teal Green" (#99ffc6)
+"Cyan Blue" (#00f7ff)
+"Soft Pink" (#ffbbea)
+White (#ffffff)
+
 
 ***
 
 ## Updates
-#### v1.3.4 => PIXIjs
+#### v1.3.5
+- New board design inspired from [this reddit post](https://www.reddit.com/r/Tetris/comments/1g80adg/tetris_ui_concept/)
+- added continue button in menu, and changed ingame buttons to use pixijs now
+- experimenting with animation library called gsap
+- changed action text and stats text to use pixi now
+- changed PC text to be more TETR.IO-like
+- changed spike text to show in the middle of the board (like techmino)
+- RIP coloured queues
+
+#### v1.3.4 => PIXI.js
 - COMPLETE REWRITE OF ALL GRAPHICS
 - Everything is now rendered through pixijs
     - this includes the board, next queue, hold queue, and particles
     - ye turns out there is a high learning curve with pixi (i lost it several times)
     - everything should now be much more performant and smooth yay
-
 - some things were changed due to this
     - need to add border colour back
 

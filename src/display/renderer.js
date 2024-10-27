@@ -13,26 +13,15 @@ export class Renderer {
     sidebarSecondary;
 
     divBoard = document.getElementById("board");
-    divBackboard = document.getElementById("backboard");
-    divLinesSent = document.getElementById("linessent");
     elementEditPieces = document.getElementById("editMenuPieces");
-
-    elementStats1 = document.getElementById("stats1");
-    elementStats2 = document.getElementById("stats2");
-    elementStats3 = document.getElementById("stats3");
-    elementStatname1 = document.getElementById("statName1");
-    elementStatname2 = document.getElementById("statName2");
-    elementStatname3 = document.getElementById("statName3");
-    elementSmallStat1 = document.getElementById("smallStat1");
-    elementSmallStat2 = document.getElementById("smallStat2");
-    elementSmallStat3 = document.getElementById("smallStat3");
-
     /**
      * @param {Game} game
      */
     constructor(game) {
         this.game = game;
         this.board = game.board;
+        this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
+        this.holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ""));
     }
 
     updateNext() {
@@ -48,8 +37,6 @@ export class Renderer {
         });
 
         this.game.pixi.render("next", this.nextQueueGrid);
-        // if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
-        // this.canvasNext.style.outlineColor = this.game.bag.nextPiece().colour;
     }
 
     getPiece(name) {
@@ -67,15 +54,9 @@ export class Renderer {
             isI = name == "i";
         const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
         const coords = this.board.pieceToCoords(this.game.hold.piece.shape1);
-
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
-        const len = Math.round(this.game.pixi.minoSize / 2);
-        const [shiftX, shiftY] = [isO || isI ? 0 : len, isI ? 0 : len];
 
         this.game.pixi.render("hold", this.holdQueueGrid);
-        // if (this.game.settings.game.gamemode == 'lookahead' || !this.game.settings.display.colouredQueues) return;
-        // const colour = this.game.hold.occured ? "gray" : this.game.hold.piece.colour
-        // this.canvasHold.style.outline = `0.2vh solid ${colour}`;
     }
 
     clearHold() {
@@ -89,22 +70,16 @@ export class Renderer {
         if (condition && !this.inDanger) {
             this.game.sounds.playSound("damage_alert");
         }
-        this.game.boardeffects.toggleDangerBoard(condition)
+        this.game.pixi.toggleDangerBG(condition);
         this.inDanger = condition;
     }
 
     renderActionText(damagetype, isBTB, isPC, damage, linecount) {
-        if (damagetype != "") this.setText("cleartext", damagetype, 2000);
-        if (this.game.stats.combo > 0)
-            this.setText("combotext", `Combo ${this.game.stats.combo}`, 2000);
-        if (isBTB && this.game.stats.btbCount > 0)
-            this.setText("btbtext", `BTB ${this.game.stats.btbCount} `, 2000);
-        if (isPC) this.setText("pctext", "Perfect Clear", 2000);
-        if (damage > 0) this.setText("linessent", `${this.game.mechanics.spikeCounter}`, 1500);
-
-        if (this.game.mechanics.spikeCounter > 0) this.spikePattern("white", 1);
-        if (this.game.mechanics.spikeCounter >= 10) this.spikePattern("red", 1.1);
-        if (this.game.mechanics.spikeCounter >= 20) this.spikePattern("lime", 1.2);
+        if (damagetype != "") this.game.pixi.showActionText("cleartext", damagetype);
+        if (this.game.stats.combo > 0) this.game.pixi.showActionText("combotext", `Combo ${this.game.stats.combo}`);
+        if (isBTB && this.game.stats.btbCount > 0) this.game.pixi.showActionText("btbtext", `btb ${this.game.stats.btbCount} `);
+        if (this.game.mechanics.spikeCounter > 4) this.game.pixi.showSpikeText(`${this.game.mechanics.spikeCounter}`);
+        if (isPC) this.game.pixi.showPCText();
 
         // audio
         if (isPC) this.game.sounds.playSound("allclear");
@@ -125,31 +100,6 @@ export class Renderer {
             this.game.sounds.playSound(`combo_${this.game.stats.combo > 16 ? 16 : this.game.stats.combo}`);
     }
 
-    resetActionText() {
-        ['btbtext', 'cleartext', 'combotext', 'pctext', 'linessent'].forEach(id => {
-            document.getElementById(id).style.opacity = "0";
-        })
-    }
-
-    spikePattern(colour, size) {
-        this.divLinesSent.style.color = colour;
-        this.divLinesSent.style.textShadow = `0 0 1vh ${colour}`;
-        this.divLinesSent.style.fontSize = `${3.5 * size}vh`;
-    }
-
-    setText(id, text, duration) {
-        const textbox = document.getElementById(id);
-        textbox.textContent = text;
-        textbox.style.transform = "translateX(-2%)";
-        textbox.style.opacity = "1";
-        if (this.texttimeouts[id] != 0) this.stopTimeout(id);
-        this.texttimeouts[id] = setTimeout(() => {
-            textbox.style.opacity = "0";
-            textbox.style.transform = "translateX(2%)";
-            this.game.mechanics.spikeCounter = 0;
-        }, duration);
-    }
-
     stopTimeout(name) {
         clearTimeout(this.texttimeouts[name]);
         this.texttimeouts[name] = 0;
@@ -164,12 +114,11 @@ export class Renderer {
 
         const height = Number(this.game.settings.display.boardHeight);
         this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
-        // this.canvasHold.style.outline = `0.2vh solid #dbeaf3`;
 
         // board opacity
-        const background = `rgba(0, 0, 0, ${Number(this.game.settings.display.boardOpacity) / 100})`;
-        this.divBackboard.style.backgroundColor = background;
-        document.body.style.setProperty('--background', background);
+        // const background = `rgba(0, 0, 0, ${Number(this.game.settings.display.boardOpacity) / 100})`;
+        // this.divBackboard.style.backgroundColor = background;
+        // document.body.style.setProperty('--background', background);
 
         // sidebar constants
         this.sidebarStats = this.game.settings.game.sidebar;
@@ -178,7 +127,7 @@ export class Renderer {
 
         this.sidebarStats.forEach((stat, index) => {
             if (stat == "None") stat = ""
-            this[`elementStatname${index + 1}`].textContent = stat;
+            this.game.pixi.statTexts[index].statText.text = stat.toUpperCase();
         })
 
         if (settings) this.game.pixi.resize();
@@ -187,18 +136,35 @@ export class Renderer {
     renderSidebar() {
         this.sidebarStats.forEach((stat, index) => {
             if (stat == "None") { // no stat
-                this[`elementStats${index + 1}`].textContent = "";
+                this.game.pixi.statTexts[index].stat.text = "";
                 return;
             };
 
-            const displayStat = this.game.stats[stat].toFixed(this.sidebarFixed[index]);
-            this[`elementStats${index + 1}`].textContent = displayStat;
+            let displayStat = this.game.stats[stat].toFixed(this.sidebarFixed[index]) ?? "";
+            if (stat == "time") displayStat = this.formatTime(Number(displayStat), this.sidebarFixed[index]); // reformat time
+            this.game.pixi.statTexts[index].stat.text = displayStat;
 
             if (this.sidebarSecondary[index]) {
-                const displaySecond = this.game.stats[this.sidebarSecondary[index]]
-                this[`elementSmallStat${index + 1}`].textContent = displaySecond;
+                const displaySecond = this.game.stats[this.sidebarSecondary[index]] ?? ""
+                this.game.pixi.statTexts[index].statSecondary.text = displaySecond;
             }
         })
+    }
+
+    createReverseLookup(obj) {
+        const reverseLookup = {}
+        for (const [key, array] of Object.entries(obj)) {
+            array.forEach(item => {
+                reverseLookup[item] = key;
+            });
+        }
+        return reverseLookup
+    }
+
+    formatTime(s, d) {
+        const minutes = Math.floor(s / 60);
+        const seconds = (s - minutes * 60).toFixed(d)
+        return `${minutes>0?minutes:""}:${seconds < 10 ? "0" : ""}${seconds}`
     }
 
     renderTimeLeft(text){
@@ -212,16 +178,6 @@ export class Renderer {
         this.texttimeouts["timeLeft"] = setTimeout(() => {
             e.classList.remove("warn");
         }, 3000);
-    }
-
-    createReverseLookup(obj) {
-        const reverseLookup = {}
-        for (const [key, array] of Object.entries(obj)) {
-            array.forEach(item => {
-                reverseLookup[item] = key;
-            });
-        }
-        return reverseLookup
     }
 
     setEditPieceColours() {
@@ -249,5 +205,4 @@ export class Renderer {
         this.game.particles.spawnParticles(0, 0, "dangerboard");
         this.game.particles.spawnParticles(0, 20, "dangersides");
     }
-
 }

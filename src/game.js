@@ -56,13 +56,19 @@ export class Game {
         this.modes = new Modes(this);
         this.zenith = new Zenith(this);
         this.pixi = new PixiRender(this);
+        this.init();
+    }
 
+    async init() {
+        this.menuactions.loadSettings();
+        this.board.resetBoard();
+        await this.pixi.init();
+        this.modes.loadModes();
         this.renderer.renderStyles();
         this.renderer.setEditPieceColours();
         this.sounds.initSounds();
         this.startGame();
-        this.pixi.init();
-        this.boardeditor.addListeners();
+        // this.boardeditor.addListeners();
         this.menuactions.addRangeListener();
         this.modals.generate.addMenuListeners();
         this.modals.generate.generateGamemodeMenu();
@@ -75,6 +81,7 @@ export class Game {
 
     startGame() {
         this.menuactions.loadSettings();
+        this.modes.loadModes();
         this.resetState();
         this.renderer.renderStyles();
         this.mechanics.spawnPiece(this.bag.randomiser(true), true);
@@ -125,7 +132,6 @@ export class Game {
         this.board.resetBoard();
         this.mechanics.locking.clearLockDelay();
         this.boardeffects.toggleRainbow(false);
-        this.renderer.resetActionText();
         this.renderer.renderDanger();
         this.particles.clearParticles();
         this.renderer.clearHold();

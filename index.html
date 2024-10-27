@@ -10,58 +10,25 @@
     <link rel="stylesheet" href="./styles/menus.css">
     <link rel="stylesheet" href="./styles/miscmenus.css">
     <link rel="stylesheet" href="./styles/settings.css">
-    <script src="https://pixijs.download/release/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/PixiPlugin.min.js"></script>
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
     <!-- BOARD -->
     <div id="board">
-        <div id="backboard"></div>
         <p class="text" id="warningText">⚠ GO DOWN</p>
-
-        <div id="backborder"></div> 
-        <div id="dangerOverlay"></div>
-        <button id="openSettingsButton" onclick="modal.openModal('settingsPanel')">
-            <img src="./assets/icons/settings.svg">
-        </button>
-        <button id="editButton" onclick="modal.openModal('editMenu')">
-            <img src="./assets/icons/edit.svg">
-        </button>
-        
-        <canvas id="next" onclick="modal.openModal('queueModify')"></canvas>
-        <canvas id="hold" onclick="modal.openModal('queueModify')"></canvas>
-        <canvas id="playingfield"></canvas>
         <p class="text" id="timeLeftText">60S LEFT</p>
-        <div id="clickareas"></div>
+        <!-- <div id="clickareas"></div> todo add back -->
 
         <progress id="garbageQueue" max="40" value="0"></progress>
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
         <progress id="climbSpeedBar" max="100" value="0"></progress>
-        
-        <div>
-            <p class="text nextText">Next</p>
-            <p class="text holdText">Hold</p>
-            <p class="actiontext" id="cleartext" style="top: 25%;"></p>
-            <p class="actiontext" id="combotext" style="top: 35%;"></p>
-            <p class="actiontext" id="btbtext" style="top: 40%;"></p>
-            <p class="actiontext" id="pctext" style="top: 50%;"></p>
-            <p class="actiontext" id="linessent" style="right: 120%; top: 17%;"></p>
-            <p class="statstext" id="stats1" style="bottom: 5%;"></p>
-            <p class="statstext" id="stats2" style="bottom: 15%;"></p>
-            <p class="statstext" id="stats3" style="bottom: 25%;"></p>
-            <p class="smalltext" id="smallStat1" style="bottom: 2.5%"></p>
-            <p class="smalltext" id="smallStat2" style="bottom: 12.5%"></p>
-            <p class="smalltext" id="smallStat3" style="bottom: 22.5%"></p>
-            <p class="smalltext" id="statName1" style="bottom: 0%;"></p>
-            <p class="smalltext" id="statName2" style="bottom: 10%;"></p>
-            <p class="smalltext" id="statName3" style="bottom: 20%;"></p>
-            <p class="text objectiveText" id="objective"></p>
-            <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
-            <p class="smalltext" id="history" style="left: 110%; bottom: 0%; width: 10vw; display: none;">history: 0</p>
-        </div>
-
+        <p class="smalltext" id="history" style="left: 110%; bottom: 0%; width: 10vw; display: none;">history: 0</p>
         <div id="redochoices">
+            <!-- todo add back as well -->
             <button class="redochoice selected">1</button>
             <button class="redochoice">2</button>
         </div>
@@ -79,6 +46,9 @@
     <!-- MAIN MENU -->
     <dialog id="settingsPanel" class="dialog">
         <!-- top row -->
+        <button id="closeSettings" class="settingPanelButton smallPanelButton" onclick="menu.toggleDialog()" title="Continue playing">
+            <img src="./assets/icons/play.svg" style="transform: translateY(-15%); height: 200%;">
+        </button>
         <button id="handling" class="settingPanelButton smallPanelButton" onclick="modal.openModal('handlingDialog')" title="Change handling/tuning">
             <img src="./assets/icons/handling.svg" style="transform: translateY(10%); height: 90%;">
         </button>
@@ -154,7 +124,6 @@
             <div class="settingRow"><p>Grid Type</p> <select class="option dropdown" id="gridType"></select></div>
             <div class="settingRow"><p>Shadow opacity</p> <input class="option range" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
             <div class="settingRow"><p>Coloured Shadow</p> <input class="option check" type="checkbox" id="colouredShadow" /></div>
-            <div class="settingRow"><p>Coloured Borders</p> <input class="option check" type="checkbox" id="colouredQueues" /></div>
             <div class="settingRow"><p>Rainbow effect on fast pace</p> <input class="option check" type="checkbox" id="rainbowPB" /></div>
             <div class="settingRow"><p>Show Lock Bar</p> <input class="option check" type="checkbox" id="lockBar" /></div>
             <div class="settingRow"><p>Show out of focus text</p> <input class="option check" type="checkbox" id="outoffocus" /></div>

@@ -56,46 +56,6 @@ body {
     transition: all 1s ease;
 }
 
-#openSettingsButton,
-#editButton {
-    top: 5%;
-    position: fixed;
-    left: 127%;
-    display: flex;
-    justify-content: right;
-    padding-right: 3%;
-    align-items: center;
-    height: 8%;
-    width: 24%;
-    border: 0.2vh solid white;
-    border-radius: 0 1.5vh 1.5vh 0;
-    transition: all 0.5s ease-out;
-    background-color: var(--invis);
-    outline: none;
-    opacity: 0.6;
-}
-
-#editButton {
-    top: 15%;
-}
-
-#openSettingsButton:hover,
-#editButton:hover {
-    left: 133%;
-    opacity: 1;
-    transition: all 0.2s ease;
-}
-
-#openSettingsButton>img {
-    height: 70%;
-    user-select: none;
-}
-
-#editButton>img {
-    height: 100%;
-    user-select: none;
-}
-
 .dialog img,
 .scrollSettings img {
     opacity: 0.6;

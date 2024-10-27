@@ -18,9 +18,8 @@ export class BoardEffects {
     paceCooldown = 0;
 
     divBoard = document.getElementById("board");
-    divDanger = document.getElementById("dangerOverlay");
-    border = document.getElementById('backborder')
-    backboard = document.getElementById('backboard')
+    // border = document.getElementById('backborder')
+    // backboard = document.getElementById('backboard')
 
     /**
      * 
@@ -101,14 +100,10 @@ export class BoardEffects {
     }
 
     toggleRainbow(pace) {
+        return;
         this.border.style.setProperty('--blur-size', pace ? `0.3vmin` : `0vmin`)
         this.border.style.setProperty('--blur-strength', pace ? '0.7vmin' : '0')
         this.backboard.style.setProperty('--blur-strength', pace ? '0.5vmin' : '0')
         this.hasPace = pace;
-    }
-
-    toggleDangerBoard(inDanger) {
-        this.border.classList.toggle("boardDanger", inDanger);
-        this.divDanger.style.opacity = inDanger ? "0.1" : "0";
     }
 }

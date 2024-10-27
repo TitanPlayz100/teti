@@ -75,10 +75,10 @@ export class LockPiece {
         this.game.pixi.justPlacedAlpha = 1;
 
         lockCoords.forEach(([x, y]) => {
-            this.game.pixi.flashTimes.push({ c: [x, y], t: 15 })
             this.game.mechanics.board.rmValue([x, y], "A");
             this.game.mechanics.board.addValFront([x, y], "S");
         });
+        this.game.pixi.flash(lockCoords);
 
         this.game.mechanics.locking.clearLockDelay();
         clearInterval(this.game.gravityTimer);

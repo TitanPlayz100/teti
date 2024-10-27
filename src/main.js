@@ -15,11 +15,12 @@ window.addEventListener("keydown", event => {
     let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // 1 letter words are lowercase
     if (event.altKey) key = "Alt+" + key;
     if (event.ctrlKey) key = "Ctrl+" + key;
-
+    
     game.controls.onKeyDownRepeat(event, key);
     if (event.repeat) return;
     game.controls.onKeyDown(event, key);
-})
+});
+
 
 window.addEventListener("keyup", event => {
     if (event.key == undefined) return;
@@ -39,14 +40,13 @@ window.addEventListener("resize", () => {
     }, 0);
 })
 
-// splash menu
-window.addEventListener("DOMContentLoaded", () => {
+export function clearSplash() {
     elementSplashText.textContent = "Ready";
     elementSplashScreen.style.opacity = 0;
     elementSplashScreen.style.scale = 1.2;
     elementSplashScreen.style.display = "none";
     document.getElementById("ignoreText").style.opacity = 0.5;
-})
+}
 
 window.addEventListener("focus", function () {
     document.getElementById("nofocus").style.display = "none";
@@ -60,9 +60,3 @@ window.addEventListener("blur", function () {
 window.onerror = (msg, url, lineNo, columnNo, error) => {
     game.modals.generate.notif(error, msg + ". ln " + lineNo, "error");
 }
-
-document.getElementById("playingfield").style.display = 'none'
-document.getElementById("next").style.display = 'none'
-document.getElementById("hold").style.display = 'none'
-document.getElementById("backboard").style.display = 'none'
-document.getElementById("backborder").style.display = 'none'

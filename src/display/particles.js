@@ -20,10 +20,9 @@ class Point {
         this.twinkle = twinkle ?? false;
         this.twinkleTime = twinkleTime ?? this.life;
 
-        const particle = new PIXI.Sprite(particleInstance.texture);
-        this.particle = particle;
+        this.particle = particleInstance.game.pixi.createParticleSprite()
         this.particle.tint = colour;
-        particleInstance.container.addChild(particle);
+        particleInstance.container.addChild(this.particle);
         particleInstance.particles.push(this);
     }
 
@@ -60,10 +59,6 @@ export class Particles {
 
     initBoard() {
         this.container = this.game.pixi.app.stage.getChildByLabel("particles");
-    }
-
-    async loadTexture() {
-        this.texture = await PIXI.Assets.load('./assets/particle.png');
     }
 
     spawnParticles(posX, posY, type, pieceWidth = 1, cw = false, colour = "white") {

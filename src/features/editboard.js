@@ -1,14 +1,12 @@
 import { Game } from "../game.js";
 
 export class BoardEditor {
-    clickareasdiv = document.getElementById("clickareas");
+    // clickareasdiv = document.getElementById("clickareas");
     mousedown = false;
     currentMode = "fill";
     fillPiece = 'G';
     fillRow = false;
     override = false;
-
-    elementEditButton = document.getElementById("editButton");
 
     /**
      * @param {Game} game
@@ -111,9 +109,5 @@ export class BoardEditor {
             });
         })
         return { board, next, hold }
-    }
-
-    setEditButton(bool) {
-        this.elementEditButton.style.display = bool ? "flex" : "none";
     }
 }

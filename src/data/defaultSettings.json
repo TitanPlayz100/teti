@@ -8,7 +8,6 @@
         "shadowOpacity": 20,
         "boardHeight": 80,
         "colouredShadow": false,
-        "colouredQueues": true,
         "lockBar": true,
         "rainbowPB": true,
         "boardBounce": 2,

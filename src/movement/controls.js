@@ -153,10 +153,9 @@ export class Controls {
 
         if (!animation || this.game.settings.game.stride) {
             this.game.startGame();
-            return;
+        } else {
+            this.game.pixi.resetAnimation()
         }
-
-        this.game.pixi.startResetAnimation()
     }
 
     toggleCursor(enable) {
