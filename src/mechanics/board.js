@@ -103,11 +103,14 @@ export class Board {
 
     setComboBoard(start) {
         // 4w sides
-        this.boardState.forEach((row, y) =>
+
+        const board = JSON.parse(JSON.stringify(this.boardState));          
+        board.forEach((row, y) => {
             row.forEach((col, x) => {
-                if (x < 3 || x > 6) this.addMinos("S G", [[x, y]], [0, 0]);
+                if ((x > 2 && x < 7) || y > 30) return;
+                this.setValue([x, y], 'S G')
             })
-        );
+        })
 
         if (!start) return;
         // garbage pattern
@@ -123,5 +126,6 @@ export class Board {
 
         this.addMinos("S G", garbCoords.map(([x, y]) => [x + 3, y]), [0, 0]);
         this.game.mechanics.setShadow();
+
     }
 }

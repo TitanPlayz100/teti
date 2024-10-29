@@ -1,71 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>teti</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="./assets/titanicon.ico">
-    <title>teti</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles/style.css">
     <link rel="stylesheet" href="./styles/boards.css">
-    <link rel="stylesheet" href="./styles/menus.css">
-    <link rel="stylesheet" href="./styles/miscmenus.css">
-    <link rel="stylesheet" href="./styles/settings.css">
+    <link rel="preload" href="./styles/menus.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="./styles/miscmenus.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="./styles/settings.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <script defer src="https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/gsap.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/PixiPlugin.min.js"></script>
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
     <!-- BOARD -->
     <div id="board">
-        <div id="backboard"></div>
+        <!-- todo move to pixi -->
         <p class="text" id="warningText">⚠ GO DOWN</p>
-
-        <div id="backborder"></div>
-        <div id="dangerOverlay"></div>
-        <button id="openSettingsButton" onclick="modal.openModal('settingsPanel')">
-            <img src="./assets/icons/settings.svg">
-        </button>
-        <button id="editButton" onclick="modal.openModal('editMenu')">
-            <img src="./assets/icons/edit.svg">
-        </button>
-        
-        <canvas id="next" onclick="modal.openModal('queueModify')"></canvas>
-        <canvas id="hold" onclick="modal.openModal('queueModify')"></canvas>
-        <canvas id="playingfield"></canvas>
-        <p class="text" id="timeLeftText">60S LEFT</p>
-        <div id="clickareas"></div>
-
         <progress id="garbageQueue" max="40" value="0"></progress>
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
         <progress id="climbSpeedBar" max="100" value="0"></progress>
-        
-        <div>
-            <p class="text nextText">Next</p>
-            <p class="text holdText">Hold</p>
-            <p class="actiontext" id="cleartext" style="top: 25%;"></p>
-            <p class="actiontext" id="combotext" style="top: 35%;"></p>
-            <p class="actiontext" id="btbtext" style="top: 40%;"></p>
-            <p class="actiontext" id="pctext" style="top: 50%;"></p>
-            <p class="actiontext" id="linessent" style="right: 120%; top: 17%;"></p>
-            <p class="statstext" id="stats1" style="bottom: 5%;"></p>
-            <p class="statstext" id="stats2" style="bottom: 15%;"></p>
-            <p class="statstext" id="stats3" style="bottom: 25%;"></p>
-            <p class="smalltext" id="smallStat1" style="bottom: 2.5%"></p>
-            <p class="smalltext" id="smallStat2" style="bottom: 12.5%"></p>
-            <p class="smalltext" id="smallStat3" style="bottom: 22.5%"></p>
-            <p class="smalltext" id="statName1" style="bottom: 0%;"></p>
-            <p class="smalltext" id="statName2" style="bottom: 10%;"></p>
-            <p class="smalltext" id="statName3" style="bottom: 20%;"></p>
-            <p class="text objectiveText" id="objective"></p>
-            <p class="smalltext" id="objectiveText" style="left: 110%; bottom: 14%;"></p>
-            <p class="smalltext" id="history" style="left: 110%; bottom: 0%; width: 10vw; display: none;">history: 0</p>
-        </div>
-
-        <div id="redochoices">
-            <button class="redochoice selected">1</button>
-            <button class="redochoice">2</button>
-        </div>
     </div>
-    
+
     <!-- INFO OVERLAYS -->
     <div id="splashScreen" onclick="finishLoad()">
         <h1>Teti</h1>
@@ -75,9 +37,18 @@
 
     <div id="nofocus">OUT OF FOCUS<span>Click To Return</span></div>
 
+    <div id="redochoices">
+        <p class="smalltext" id="history" style="font-size: 0.9em; color: var(--l-gray); width: 100%;">history: 0</p>
+        <button class="redochoice selected">1</button>
+        <button class="redochoice">2</button>
+    </div>
+
     <!-- MAIN MENU -->
     <dialog id="settingsPanel" class="dialog">
         <!-- top row -->
+        <button id="closeSettings" class="settingPanelButton smallPanelButton" onclick="menu.toggleDialog()" title="Continue playing">
+            <img src="./assets/icons/play.svg" style="transform: translateY(-15%); height: 200%;">
+        </button>
         <button id="handling" class="settingPanelButton smallPanelButton" onclick="modal.openModal('handlingDialog')" title="Change handling/tuning">
             <img src="./assets/icons/handling.svg" style="transform: translateY(10%); height: 90%;">
         </button>
@@ -146,17 +117,17 @@
             <div class="settingRow"><p>Background URL/Hex</p> <input class="option textInput" type="text" id="background" /></div>
             <div class="settingRow"><p>Block Skin URL/Name</p> <input class="option textInput" type="text" id="skin" list="options"/></div>
             <div class="settingRow"><p>Board Opacity</p> <input class="option range" type="range" id="boardOpacity" min="0" max="100" step="1"/></div>
-            <div class="settingRow"><p>Board Size</p> <input class="option range" type="range" id="boardHeight" min="0" max="100" step="1" /></div>
+            <div class="settingRow"><p>Board Size</p> <input class="option range" type="range" id="boardHeight" min="0" max="130" step="1" /></div>
             <div class="settingRow"><p>Board Bounciness</p> <input class="option range" type="range" id="boardBounce" min="-5" max="20" step="0.1" /></div>
             <div class="settingRow"><p>Enable Grid</p> <input class="option check" type="checkbox" id="showGrid" /></div>
             <div class="settingRow"><p>Grid opacity</p> <input class="option range" type="range" id="gridopacity" min="0" max="100" step="2" /></div>
             <div class="settingRow"><p>Grid Type</p> <select class="option dropdown" id="gridType"></select></div>
             <div class="settingRow"><p>Shadow opacity</p> <input class="option range" type="range" id="shadowOpacity" min="0" max="100" step="5" /></div>
             <div class="settingRow"><p>Coloured Shadow</p> <input class="option check" type="checkbox" id="colouredShadow" /></div>
-            <div class="settingRow"><p>Coloured Borders</p> <input class="option check" type="checkbox" id="colouredQueues" /></div>
             <div class="settingRow"><p>Rainbow effect on fast pace</p> <input class="option check" type="checkbox" id="rainbowPB" /></div>
             <div class="settingRow"><p>Show Lock Bar</p> <input class="option check" type="checkbox" id="lockBar" /></div>
             <div class="settingRow"><p>Show out of focus text</p> <input class="option check" type="checkbox" id="outoffocus" /></div>
+            <div class="settingRow"><p>Action Text</p> <input class="option check" type="checkbox" id="actionText" /></div>
             <div class="settingRow"><p>Enable Particles</p> <input class="option check" type="checkbox" id="particles" /></div>
             <div class="settingRow"><p>Particle Volume</p> <input class="option range" type="range" id="particleVolume" min="5" max="1000" step="5" /></div>
             <div class="settingRow"><p>Particle Size</p> <input class="option range" type="range" id="particleSize" min="0.1" max="10" step="0.1" /></div>
@@ -182,7 +153,6 @@
             <div class="settingRow"><p>Allow Hold Queue</p> <input class="option check" type="checkbox" id="allowHold" /></div>
             <div class="settingRow"><p>Infinite Hold</p> <input class="option check" type="checkbox" id="infiniteHold" /></div>
             <div class="settingRow"><p>Allow Queue Modification</p> <input class="option check" type="checkbox" id="allowQueueModify" /></div>
-            <div class="settingRow"><p>Line Clear Delay</p> <input class="option range" type="range" id="clearDelay" min="0" max="1000" step="5" /></div>
             <div class="settingRow"><p>Line Clear Delay</p> <input class="option range" type="range" id="clearDelay" min="0" max="1000" step="5" /></div>
             <div class="settingRow"><p>Allspin</p> <input class="option check" type="checkbox" id="allspin" /></div>
             <div class="settingRow"><p>Allspin's are mini</p> <input class="option check" type="checkbox" id="allspinminis" /></div>

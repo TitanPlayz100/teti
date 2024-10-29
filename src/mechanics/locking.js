@@ -71,19 +71,18 @@ export class LockPiece {
 
     lockPiece() {
         const lockCoords = this.game.mechanics.board.getMinos("A");
-        this.game.boardrender.justPlacedCoords = lockCoords;
-        this.game.boardrender.justPlacedAlpha = 1;
+        this.game.pixi.justPlacedCoords = lockCoords;
+        this.game.pixi.justPlacedAlpha = 1;
 
         lockCoords.forEach(([x, y]) => {
-            this.game.boardrender.flashTimes.push({ c: [x, y], t: 15 })
             this.game.mechanics.board.rmValue([x, y], "A");
             this.game.mechanics.board.addValFront([x, y], "S");
         });
+        this.game.pixi.flash(lockCoords);
 
         this.game.mechanics.locking.clearLockDelay();
         clearInterval(this.game.gravityTimer);
         const cleared = this.game.mechanics.clear.clearLines(lockCoords);
-        
         this.game.endGame( // check stopped overlap next
             this.game.mechanics.checkDeath(
                 this.game.mechanics.board.getMinos("S"),
@@ -104,17 +103,20 @@ export class LockPiece {
         this.game.falling.moved = false;
         if (this.game.stats.tgm_level % 100 != 99 && this.game.stats.tgm_level != this.game.settings.game.raceTarget - 1) this.game.stats.tgm_level++;
 
+
         const xvals = [...new Set(lockCoords.map(([x, y]) => x))];
         const yval = Math.min(...lockCoords.map(([x, y]) => y));
-        this.game.particles.spawnParticles(Math.min(...xvals) + 1, yval, "lock", xvals.length);
+        this.game.particles.spawnParticles(Math.min(...xvals), yval, "lock", xvals.length);
         this.game.renderer.renderDanger();
 
         const delay = (cleared > 0) ? this.game.settings.game.clearDelay : 0;
-        this.timings.clearDelay = setTimeout(() => {
+        const onClear = () => {
             this.game.mechanics.spawnPiece(this.game.bag.randomiser());
             this.game.history.save();
             this.timings.clearDelay = 0;
-        }, delay);
+        }
+        if (delay == 0) onClear();
+        else this.timings.clearDelay = setTimeout(() => onClear(), delay);
     }
 
     clearLockDelay(clearCount = true) {

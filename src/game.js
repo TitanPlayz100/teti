@@ -16,9 +16,9 @@ import { History } from "./features/history.js";
 import { BoardEffects } from "./display/boardEffects.js";
 import { ProfileStats } from "./features/profileStats.js";
 import { Modes } from "./features/modes.js";
-import { BoardRenderer } from "./display/renderBoard.js";
 import { Particles } from "./display/particles.js";
 import { Zenith, Grandmaster } from "./mechanics/gamemode_extended.js";
+import { PixiRender } from "./display/pixirender.js";
 
 export class Game {
     started;
@@ -28,7 +28,7 @@ export class Game {
     gravityTimer = 0;
     zenithTimer = 0;
     grandmasterTimer = 0;
-    version = '1.3.2';
+    version = '1.3.5';
     tickrate = 60;
 
     elementReason = document.getElementById("reason");
@@ -51,22 +51,26 @@ export class Game {
         this.modals = new ModalActions(this);
         this.movement = new Movement(this);
         this.renderer = new Renderer(this);
-        this.boardrender = new BoardRenderer(this);
         this.particles = new Particles(this);
         this.boardeditor = new BoardEditor(this);
         this.controls = new Controls(this);
         this.history = new History(this);
         this.modes = new Modes(this);
         this.zenith = new Zenith(this);
-        this.grandmaster = new Grandmaster(this);
+        this.grandmaster = new Grandmaster(this);;
+        this.pixi = new PixiRender(this);
+        this.init();
+    }
 
-        this.renderer.sizeCanvas();
-        this.particles.initBoard();
+    async init() {
+        this.menuactions.loadSettings();
+        this.board.resetBoard();
+        await this.pixi.init();
+        this.modes.loadModes();
+        this.renderer.renderStyles();
         this.renderer.setEditPieceColours();
         this.sounds.initSounds();
         this.startGame();
-        this.renderer.renderingLoop();
-        this.boardeditor.addListeners();
         this.menuactions.addRangeListener();
         this.modals.generate.addMenuListeners();
         this.modals.generate.generateGamemodeMenu();
@@ -79,6 +83,7 @@ export class Game {
 
     startGame() {
         this.menuactions.loadSettings();
+        this.modes.loadModes();
         this.resetState();
         this.renderer.renderStyles();
         this.mechanics.spawnPiece(this.bag.randomiser(true), true);
@@ -121,8 +126,8 @@ export class Game {
     resetState() {
         this.boardeffects.hasPace = true;
         this.boardeffects.paceCooldown = 0;
-        this.boardrender.boardAlpha = 1;
-        this.boardrender.queueAlpha = 1;
+        this.pixi.boardAlpha = 1;
+        this.pixi.queueAlpha = 1;
         this.renderer.inDanger = false;
         this.started = false;
         this.ended = false;
@@ -130,11 +135,11 @@ export class Game {
         this.board.resetBoard();
         this.mechanics.locking.clearLockDelay();
         this.boardeffects.toggleRainbow(false);
-        this.renderer.resetActionText();
         this.renderer.renderDanger();
         this.particles.clearParticles();
         this.renderer.clearHold();
         this.stopGameTimers();
+        this.pixi.resetActionTexts();
 
         this.bag = new Bag(this);
         this.mechanics = new Mechanics(this);
@@ -149,7 +154,7 @@ export class Game {
         this.renderer.renderSidebar();
         this.modes.checkFinished();
         this.stats.updateStats();
-        this.renderer.updateAlpha();
+        this.pixi.updateAlpha();
         this.boardeffects.rainbowBoard();
     }
 
@@ -157,7 +162,6 @@ export class Game {
         this.renderer.renderSidebar();
         this.modes.checkFinished();
         this.stats.updateStats();
-        this.renderer.updateAlpha();
         this.boardeffects.rainbowBoard();
     }
 

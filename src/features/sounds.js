@@ -93,7 +93,7 @@ export class Sounds {
             const name = file.name.split(".")[0];
             const a = new Audio(file.path);
             this.sfx[name] = a;
-            this.playSound(name, false, true);
+            // this.playSound(name, false, true);
         })
 
 
@@ -111,7 +111,6 @@ export class Sounds {
             track.connect(this.lowpassfilter);
             this.lowpassfilter.connect(this.audioContext.destination);
         })
-        // this.playSound("allclear") // wait literally how is this fine by chrome
     }
 
     setAudioLevel() {

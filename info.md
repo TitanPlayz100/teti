@@ -17,6 +17,7 @@ This project started out as a learning experience, because surprisingly it was m
 ## Acknowledgements
 Thanks [existancepy](https://github.com/existancepy) for all the fixes.  
 Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding many modes and fixes.  
+Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding many modes and fixes.  
 
 Feel free to contribute with features and fixes, and open issues.  
 
@@ -69,22 +70,66 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 Things that I am working on based on other changes
 - ready set go start option
 - arcade mode
+- rotation centres
 
-Maybe:
-- cooler action text (maybe if i switch to pixijs then i can make text better)
+- issue holding softdrop and left/right removes piece dropping cooldown
 
-Future thoughts (honestly only if i have time):
-- I honestly might want to break my rule and start using a framework for rendering.
-    - (turns out pixijs is much better for games than canvas 2d, and howler for audio)
-- I have mixed feelings, because this would make the project technically no longer purely made by me (though the info page is a bit iffy)
-- Maybe I don't care and will switch anyway, and maybe in the end it will pay off. 
-- this would make my most recent changes irrelivent 
-    - such as piece flash and reset animation cause i have to redo them in pixi
-    - in the future itll probably pay off
+- CHANGE GAME CLASS TO BE EXPORTED MODULES
+    - remove all this.game references in replacement with just the class being imported
+    - **no longer shall the shackles of past object oriented java code bound the multiparadigm eutopia which is javascript**
+
+Zenith mode additions
+- add fatigue:
+8:00 - 2 permanent garbage
+9:00 - receive 25% more garbage
+10:00 - 3 more permanent garbage (5 total)
+11:00 - debuff increased to 50% more garbage
+12:00 - 5 more permanent garbage (10 total)
+
+- maybe add a "currently in hyperspeed" graphic
+- simulated garbage recieving option
+    - amount of garbage sent to player increases with floor
+    - garbage is random bursts
+    - attacks 8 or larger split using {!!} thing (0.5s gap)
+- option for expert mode style
+
+- update climb bar colours:
+Red (#e43921)
+Yellow (#ffb400)
+Green (#82fc40)
+Blue (#3ca6ff)
+Magenta (#ff46da)
+Khaki (#ffc48e)
+"Teal Green" (#99ffc6)
+"Cyan Blue" (#00f7ff)
+"Soft Pink" (#ffbbea)
+White (#ffffff)
 
 ***
 
 ## Updates
+#### v1.3.5
+- New board design inspired from [this reddit post](https://www.reddit.com/r/Tetris/comments/1g80adg/tetris_ui_concept/)
+- added continue button in menu, and changed ingame buttons to use pixijs now
+- experimenting with animation library called gsap
+- changed action text and stats text to use pixi now
+- changed PC text to be more TETR.IO-like
+- changed spike text to show in the middle of the board (like techmino)
+- RIP coloured queues
+- better page loading using defer and lazy loading
+- Experimental: pressed keys are stored in a queue, and evry pixi tick they all fire, might be more responsive
+- changed timeLeftText animation to use gsap and pixi
+- added setting for toggling action text
+
+#### v1.3.4 => PIXI.js
+- COMPLETE REWRITE OF ALL GRAPHICS
+- Everything is now rendered through pixijs
+    - this includes the board, next queue, hold queue, and particles
+    - ye turns out there is a high learning curve with pixi (i lost it several times)
+    - everything should now be much more performant and smooth yay
+- some things were changed due to this
+    - need to add border colour back
+
 #### v1.3.3
 - Thanks to itzblack for the Zenith Tower mode
 - added option for line clear delay

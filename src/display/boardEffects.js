@@ -6,8 +6,8 @@ export class BoardEffects {
     Y = 0;
     dX = 0;
     dY = 0;
-    friction = 0.75;
-    springConstant = 0.02;
+    friction = 0.7;
+    springConstant = 0.015;
     targetX = 0;
     targetY = 0;
     R = 0;
@@ -18,9 +18,6 @@ export class BoardEffects {
     paceCooldown = 0;
 
     divBoard = document.getElementById("board");
-    divDanger = document.getElementById("dangerOverlay");
-    border = document.getElementById('backborder')
-    backboard = document.getElementById('backboard')
 
     /**
      * 
@@ -50,7 +47,7 @@ export class BoardEffects {
         this.Y = this.clamp(this.Y, 0.5);
 
         if (this.X != 0 || this.Y != 0) {
-            this.divBoard.style.translate = `${this.X}px ${this.Y}px`
+            this.game.pixi.app.canvas.style.translate = `${this.X}px ${this.Y}px`
         }
     }
 
@@ -65,7 +62,7 @@ export class BoardEffects {
         this.R = this.clamp(this.R, 0.1);
 
         if (this.R != 0) {
-            this.divBoard.style.rotate = `${this.R}deg`
+            this.game.pixi.app.canvas.style.rotate = `${this.R}deg`
         }
     }
 
@@ -99,14 +96,10 @@ export class BoardEffects {
     }
 
     toggleRainbow(pace) {
-        this.border.style.setProperty('--blur-size', pace ? `0.3vmin` : `0vmin`)
-        this.border.style.setProperty('--blur-strength', pace ? '0.7vmin' : '0')
-        this.backboard.style.setProperty('--blur-strength', pace ? '0.5vmin' : '0')
-        this.hasPace = pace;
-    }
-
-    toggleDangerBoard(inDanger) {
-        this.border.classList.toggle("boardDanger", inDanger);
-        this.divDanger.style.opacity = inDanger ? "0.1" : "0";
+        // todo add back
+        // this.border.style.setProperty('--blur-size', pace ? `0.3vmin` : `0vmin`)
+        // this.border.style.setProperty('--blur-strength', pace ? '0.7vmin' : '0')
+        // this.backboard.style.setProperty('--blur-strength', pace ? '0.5vmin' : '0')
+        // this.hasPace = pace;
     }
 }

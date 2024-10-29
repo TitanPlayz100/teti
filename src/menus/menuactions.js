@@ -95,16 +95,11 @@ export class MenuActions {
     loadSettings() {
         const data = localStorage.getItem("settings") ?? "{}";
         this.game.settings.load(JSON.parse(data))
-        this.game.modes.loadModes();
-        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 'custom');
-        this.game.boardeditor.setEditButton(this.game.settings.game.gamemode == 'custom');
     }
 
     setGamemode(mode) {
         this.game.modes.setGamemode(mode);
         this.game.modes.loadModes();
-        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 'custom');
-        this.game.boardeditor.setEditButton(this.game.settings.game.gamemode == 'custom');
     }
 
     downloadSettings() {
@@ -124,6 +119,7 @@ export class MenuActions {
         reader.onload = () => {
             localStorage.setItem("settings", reader.result.toString());
             this.loadSettings();
+            this.game.modes.loadModes();
             this.game.modals.generate.notif("Settings Loaded", "User settings have successfully loaded", "message");
         };
     }

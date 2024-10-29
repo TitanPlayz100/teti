@@ -9,6 +9,9 @@ export class Controls {
     timings = { arr: 0, das: 0, sd: 0 }; // timeout and interval ids
     menuKey = "Escape"; // html modals close using escape
     cursorVisible = true;
+    resetting = false;
+
+    keyQueue = [];
 
     /**
      * @param {Game} game
@@ -30,17 +33,24 @@ export class Controls {
         if (key == keys.resetKey) this.retry(true);
         if (this.game.ended) return;
 
-        if (key == keys.cwKey) this.moves.rotate("CW");
-        else if (key == keys.ccwKey) this.moves.rotate("CCW");
-        else if (key == keys.rotate180Key) this.moves.rotate("180");
-        else if (key == keys.hdKey) this.moves.harddrop();
-        else if (key == keys.holdKey) this.game.mechanics.switchHold();
-        else if (key == keys.rightKey) this.startDas("RIGHT");
-        else if (key == keys.leftKey) this.startDas("LEFT");
-        else if (key == keys.sdKey) this.startArrSD();
-
+        this.keyQueue.push(key);
         this.toggleCursor(false);
         this.game.stats.inputs++;
+    }
+
+    runKeyQueue() {
+        const keys = this.game.settings.control;
+        this.keyQueue.forEach(key => {
+            if (key == keys.cwKey) this.moves.rotate("CW");
+            else if (key == keys.ccwKey) this.moves.rotate("CCW");
+            else if (key == keys.rotate180Key) this.moves.rotate("180");
+            else if (key == keys.hdKey) this.moves.harddrop();
+            else if (key == keys.holdKey) this.game.mechanics.switchHold();
+            else if (key == keys.rightKey) this.startDas("RIGHT");
+            else if (key == keys.leftKey) this.startDas("LEFT");
+            else if (key == keys.sdKey) this.startArrSD();
+        });
+        this.keyQueue = [];
     }
 
     onKeyDownRepeat(event, key) { // allows for arr undo/redo
@@ -64,8 +74,7 @@ export class Controls {
         this.directionState[direction] = "das";
         this.stopTimeout("das");
         this.stopInterval("arr");
-        this.timings.das = setTimeout(() =>
-            Promise.resolve().then(() => this.startArr(direction)), // feels faster with promise but idk
+        this.timings.das = setTimeout(() => this.startArr(direction),
             this.game.settings.handling.das
         );
     }
@@ -145,8 +154,6 @@ export class Controls {
         this.timings[name] = 0;
     }
 
-    resetting = false;
-
     retry(animation) {
         if (this.resetting) return; // no overlap
         this.game.ended = true;
@@ -154,12 +161,9 @@ export class Controls {
 
         if (!animation || this.game.settings.game.stride) {
             this.game.startGame();
-            return;
+        } else {
+            this.game.pixi.resetAnimation()
         }
-
-        this.game.stopGameTimers()
-        this.resetting = true;
-        this.game.renderer.resetAnimCurrent = 0; // start animation
     }
 
     toggleCursor(enable) {

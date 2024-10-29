@@ -3,8 +3,6 @@ import gamemodeJSON from "../data/gamemodes.json" with { type: "json" };
 import { gameoverResultText, gameoverText, resultSuffix } from "../data/data.js";
 
 export class Modes {
-    elementobjectives = document.getElementById("objective");
-    divObjectiveText = document.getElementById("objectiveText");
     modeJSON;
     customSettings;
 
@@ -53,7 +51,7 @@ export class Modes {
         if (statValue != undefined) statValue = Math.round(statValue * 1000) / 1000
         let modetext = (statValue == undefined ? '' : statValue)
             + (resultValue == undefined ? '' : `/${resultValue}`)
-        this.elementobjectives.textContent = modetext;
+        this.game.pixi.objectiveTexts[0].text = modetext;
     }
 
     loadModes() {
@@ -63,7 +61,9 @@ export class Modes {
             currentGamemode = 'sprint'
         }
         this.setGamemode(currentGamemode);
-        this.divObjectiveText.textContent = this.modeJSON.objectiveText;
+
+        this.game.pixi.objectiveTexts[1].text = this.modeJSON.objectiveText.toUpperCase();
+        this.game.pixi.toggleEditButton(this.game.settings.game.gamemode == 'custom');
     }
 
     setGamemode(mode) {

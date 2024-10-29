@@ -270,58 +270,11 @@ button>img {
     text-shadow: 0 0 3vh white;
 }
 
-/* stats */
-
-.actiontext,
-.statstext {
-    position: fixed;
-    font-size: 3vh;
-    text-shadow: 0 0 3vh var(--vl-gray);
-    margin: 0;
-    text-align: right;
-    width: 200%;
-    user-select: none;
-    transition: all 0.2s ease;
-    right: 105%;
-}
-
-.actiontext {
-    opacity: 0;
-}
-
-.smalltext {
-    position: absolute;
-    font-size: 0.9em;
-    color: var(--l-gray);
-    user-select: none;    
-}
-
-#smallStat1,
-#smallStat2,
-#smallStat3 {
-    right: 150%;
-    font-size: 2.1vh;
-    text-align: right;
-}
-
-#statName1,
-#statName2,
-#statName3 {
-    text-align: right;
-    right: 105%;
-    transform: translateY(0.5vh);
-}
-
-.statText,
-#explanationText,
-#updatetext {
-    display: flex;
-    margin: 0;
-    opacity: 0.4;
-}
-
+/* do not remove, used in menu */
 .statText {
     opacity: 1;
+    display: flex;
+    margin: 0.5vmin;
 }
 
 /* focus */
@@ -346,4 +299,11 @@ button>img {
     display: block;
     color: #fff;
     font-size: .6em;
+}
+
+#explanationText,
+#updatetext {
+    display: flex;
+    margin: 0;
+    opacity: 0.4;
 }

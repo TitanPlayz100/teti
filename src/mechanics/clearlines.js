@@ -24,7 +24,7 @@ export class ClearLines {
                 removedGarbage++;
             stopped.filter(c => c[1] == row).forEach(([x, y]) => { // clear rows
                 this.game.mechanics.board.setCoordEmpty([x, y]);
-                this.game.boardrender.removeCoords([x, y]);
+                this.game.pixi.endFlash([x, y]);
             });
             this.game.mechanics.board.moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1);
         }

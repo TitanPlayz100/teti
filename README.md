@@ -8,8 +8,6 @@ The info page can be found [here](https://titanplayz100.github.io/teti/info.html
 > Firefox is not supported (due to import assertions)
 
 ## Desktop App
-### NEW!
-
 Releases are now run through a workflow. They are **up to date** and contain all the latest features.
 
 App build using Tauri, feel free to open issues and PRs.
@@ -35,7 +33,7 @@ gamemodes = {
 }
 ```
 
-Add functionality mainly in `features/modes.js`.  
+Add functionality mainly in `features/modes.js`.
 You can modify existing modules as well from other files
 
 ### Adding Audio (sfxlist.json)
@@ -48,3 +46,17 @@ You can modify existing modules as well from other files
 }
 ```
 Use with `this.game.sounds.playSound(<name>)`
+
+
+## Types for PIXIjs
+Workaround to use types when using pixijs imported through script tag:
+- download [pixi.js.d.ts](https://github.com/pixijs/pixijs/releases) from pixijs repo and place file in /src
+- setup jsconfig.json to automatically detect pixi.js.d.ts for types
+
+```json 
+{
+    "typeAcquisition": {
+        "include": ["pixi.js.d.ts"]
+    }
+}
+```

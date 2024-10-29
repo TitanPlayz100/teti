@@ -6,151 +6,7 @@
     transform: scale(1.1) translate(-50%, -50%);
     height: 60vh;
     aspect-ratio: 0.5;
-}
-
-#backboard,
-#backborder {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background-color: var(--background);
-    outline: 0.2vh solid var(--cl-blue);
-    box-shadow: 0 0 5vh var(--l-gray);
-}
-
-@property --angle {
-    syntax: "<angle>";
-    initial-value: 0deg;
-    inherits: false;
-}
-
-#backboard {
-    --blur-size: 7vmin;
-    --spin-speed: 6s;
-    --blur-radius: 20vmin;
-    --blur-strength: 0;
-    --colours: #ff4545, #00ff99, #006aff, #ff0095, #ff4545;
-}
-
-#backborder {
-    --blur-size: 0.3vmin;
-    --spin-speed: 2s;
-    --blur-radius: 0.3vmin;
-    --blur-strength: 0;
-    --colours: #ff4545, #00ff99, #006aff, #ff0095, #ff4545;
-}
-
-#backboard::before,
-#backborder::before {
-    content: " ";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-image: conic-gradient(from var(--angle), var(--colours));
-    padding: var(--blur-size);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 1vmin;
-    animation: var(--spin-speed) spin linear infinite;
-    filter: blur(var(--blur-radius));
-    opacity: var(--blur-strength);
-    transition: all 1s ease;
-}
-
-#backboard {
-    outline: none;
-}
-
-@keyframes spin {
-    from {
-        --angle: 0deg;
-    }
-
-    to {
-        --angle: 360deg;
-    }
-}
-
-#backboard::after,
-#backborder::after {
-    content: " ";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: var(--background);
-}
-
-#backborder.boardDanger {
-    outline: 0.2vh solid red !important;
-    box-shadow: 0 0 3vh red !important;
-    transition: all 0.5s ease;
-}
-
-#dangerOverlay {
-    position: absolute;
-    background-color: red;
-    transition: all 0.2s ease;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-}
-
-#playingfield {
-    position: fixed;
-    width: 100%;
-    height: 200%;
-    top: -100%;
-}
-
-#clickareas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(20, 1fr);
-}
-
-.clickmino {
-    user-select: none;
-    z-index: 10;
-}
-
-.highlighting {
-    background-color: #7d7d7d4e;
-}
-
-#grid {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-}
-
-#next {
-    position: fixed;
-    left: 101%;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(15, 1fr);
-    height: 79%;
-    width: 40%;
-    border-radius: 0 1.5vh 1.5vh 0;
-    outline: 0.2vh solid var(--cl-blue);
-    background-color: black;
-    transition: all 0.3s ease;
-}
-
-#hold {
-    position: fixed;
-    left: -40%;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    height: 15%;
-    width: 39.5%;
-    border-radius: 1.5vh 0 0 1.5vh;
-    background-color: black;
+    pointer-events: none;
 }
 
 #lockTimer,
@@ -167,31 +23,28 @@
     height: 0.6vh;
 }
 
-#lockTimer::-webkit-progress-bar,
-#lockCounter::-webkit-progress-bar,
-#garbageQueue::-webkit-progress-bar {
+:is(#lockTimer, #lockCounter, #garbageQueue)::-webkit-progress-bar {
     background-color: var(--invis);
 }
 
-#lockTimer::-moz-progress-bar,
-#lockCounter::-moz-progress-bar,
-#garbageQueue::-moz-progress-bar {
+:is(#lockTimer, #lockCounter, #garbageQueue)::-moz-progress-bar {
     background-color: var(--invis);
 }
 
-#lockTimer::-webkit-progress-value,
-#lockCounter::-webkit-progress-value {
+:is(#lockTimer, #lockCounter)::-webkit-progress-value {
     background-color: var(--cl-blue);
     border-radius: 0.7vh;
 }
 
-#lockTimer::-moz-progress-value,
-#lockCounter::-moz-progress-value {
+:is(#lockTimer, #lockCounter)::-moz-progress-value {
     background-color: var(--cl-blue);
     border-radius: 0.7vh;
 }
 
 #climbSpeedBar {
+    /* css variables which can be changed with js */
+    --bar-colour: red;
+    --background-colour: #00000000;
     position: absolute;
     width: 32vh;
     height: 1vh;
@@ -202,130 +55,14 @@
 }
 
 #climbSpeedBar::-webkit-progress-value {
-    background-color: red;
+    background-color: var(--bar-colour);
     border-radius: 0.7vh;
 }
 
 #climbSpeedBar::-webkit-progress-bar {
-    background-color: var(--invis);
+    background-color: var(--background-colour);
+    border-radius: 0.7vh;
 }
-
-#timeLeftText {
-    font-family: "Montserrat", sans-serif;
-    font-weight: bold;
-    color: gold;
-    font-size: 1em;
-    width: 100%;
-    text-align: center;
-    bottom: 75%;
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-#timeLeftText.warn {
-    animation: timeLeft 3s;
-}
-
-@keyframes timeLeft {
-    0% {
-        opacity: 1;
-        letter-spacing: 0px;
-        color: gold;
-    }
-
-    5%{
-        color: red;
-    }
-
-    10%{
-        color: gold;
-
-    }
-
-    15%{
-        color: red;
-    }
-
-    20%{
-        color: gold;
-
-    }
-
-    25%{
-        color: red;
-    }
-
-    30%{
-        color: gold;
-
-    }
-
-    35%{
-        color: red;
-    }
-
-    40%{
-        color: gold;
-
-    }
-
-    45%{
-        color: red;
-    }
-
-    50%{
-        color: gold;
-
-    }
-
-    55%{
-        color: red;
-    }
-
-    60%{
-        color: gold;
-
-    }
-
-    65%{
-        color: red;
-    }
-
-    70% {
-        opacity: 1;
-        color:gold
-    }
-
-    75%{
-        color: red;
-    }
-
-    80%{
-        color: gold;
-
-    }
-
-    85%{
-        color: red;
-    }
-
-    90%{
-        color: gold;
-
-    }
-
-    95%{
-        color: red;
-    }
-
-
-    100% {
-        opacity: 0;
-        letter-spacing: 5px;
-        color: gold;
-    }
-}
-
 
 #garbageQueue {
     position: absolute;
@@ -382,29 +119,19 @@
     }
 }
 
-.nextText {
-    left: 110%;
-    bottom: 100%;
-}
-
-.holdText {
-    right: 110%;
-    bottom: 100%;
-}
-
-.objectiveText {
-    left: 110%;
-    bottom: 10%;
-}
-
 #redochoices {
     position: absolute;
-    top: 100%;
-    left: 110%;
-    width: 40vw;
+    display: flex;
+    bottom: 8vh;
+    width: 100%;
+    flex-direction: row;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
     opacity: 0;
-    pointer-events: none;
     transition: all 0.3s ease;
+    user-select: none;
 }
 
 .redochoice {

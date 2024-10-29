@@ -4,6 +4,7 @@ import { Game } from "../game.js";
 export class ProfileStats {
     personalBests = {};
     notSaved = ['game', 'level', 'combo']
+    elementGameEndTitle = document.getElementById("gameEndTitle");
 
     /**
      * @param {Game} game 
@@ -13,7 +14,7 @@ export class ProfileStats {
     }
 
     setPB(score) {
-        this.game.elementGameEndTitle.textContent = 'GAME ENDED';
+        this.elementGameEndTitle.textContent = 'GAME ENDED';
         const gamemode = this.game.settings.game.gamemode
         const gamemodeStats = this.personalBests[gamemode] ?? {};
         const currentScore = Number(gamemodeStats.score);
@@ -28,7 +29,7 @@ export class ProfileStats {
             gameStatsKeys.forEach(key => gameStats[key] = this.game.stats[key])
             const ts = new Date().toJSON();
             this.personalBests[gamemode] = { score, pbstats: gameStats, version: this.game.version, ts };
-            this.game.elementGameEndTitle.textContent = 'NEW PB!';
+            this.elementGameEndTitle.textContent = 'NEW PB!';
             setTimeout(() => this.game.sounds.playSound("personalbest"), 1000);
 
             this.game.modals.generate.notif("PB Saved", `PB on ${gamemode} saved`, "success");
