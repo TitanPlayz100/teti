@@ -26,7 +26,7 @@ export class Modes {
         let result = stats[this.modeJSON.result]
 
         if (stat >= goal || combobreak || gameend) {
-            result = Math.round(result * 1000) / 1000
+            if(this.game.settings.game.gamemode != "race" ) result = Math.round(result * 1000) / 1000
             stat = Math.round(stat * 1000) / 1000
             this.game.profilestats.setPB(result);
             const text = this.statText(this.modeJSON.goalStat, stat, this.modeJSON.result, result)

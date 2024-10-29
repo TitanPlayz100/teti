@@ -17,6 +17,7 @@ This project started out as a learning experience, because surprisingly it was m
 ## Acknowledgements
 Thanks [existancepy](https://github.com/existancepy) for all the fixes.  
 Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding many modes and fixes.  
+Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding many modes and fixes.  
 
 Feel free to contribute with features and fixes, and open issues.  
 

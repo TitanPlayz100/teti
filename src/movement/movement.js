@@ -11,6 +11,7 @@ export class Movement {
 
     firstMovement() {
         this.game.zenith.startZenithMode();
+        this.game.grandmaster.startGrandmasterTimer();
         if(this.game.zenith.tickPass == 0 && this.game.settings.game.gamemode == "zenith") this.game.renderer.renderTimeLeft("FLOOR 1")
         this.game.started = true;
         this.game.mechanics.startGravity();
