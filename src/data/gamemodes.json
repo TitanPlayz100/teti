@@ -22,6 +22,7 @@
         "goalStat": "",
         "target": "",
         "result": "",
+        
         "music": "",
         "compmusic": "",
         "startBoard": "",
@@ -142,6 +143,23 @@
             "gravitySpeed": 950,
             "allspin": true,
             "allspinminis": true
+        }
+    },
+    "classic": {
+        "displayName": "Classic",
+        "objectiveText": "Score",
+        "goalStat": "score",
+        "target": "clearlines",
+        "result": "score",
+        "settings": {
+            "requiredLines": 999,
+            "gravitySpeed": 999,
+            "lockDelay": 30,
+            "maxLockMovements": 1,
+            "nextPieces": 1,
+            "allowHold": false,
+            "sidebar": ["time", "score", "pps"],
+            "clearDelay": 500
         }
     }
 }

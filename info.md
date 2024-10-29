@@ -71,6 +71,8 @@ Things that I am working on based on other changes
 - arcade mode
 - rotation centres
 
+- issue holding softdrop and left/right removes piece dropping cooldown
+
 - CHANGE GAME CLASS TO BE EXPORTED MODULES
     - remove all this.game references in replacement with just the class being imported
     - **no longer shall the shackles of past object oriented java code bound the multiparadigm eutopia which is javascript**
