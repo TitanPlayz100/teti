@@ -46,7 +46,6 @@ jobs:
           cp -r assets/ tauri/src/
           cp -r styles/ tauri/src/
           cp -r src/ tauri/src/
-          cp -r lib/ tauri/src/
           cd tauri
           npm install
 

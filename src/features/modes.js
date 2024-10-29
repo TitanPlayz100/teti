@@ -1,6 +1,7 @@
 import { Game } from "../game.js";
 import gamemodeJSON from "../data/gamemodes.json" with { type: "json" };
-import { gameoverResultText, gameoverText, resultSuffix } from "../data/data.js";
+import { gameoverResultText, gameoverText, resultSuffix, statDecimals } from "../data/data.js";
+import { reverseLookup } from "../display/renderer.js";
 
 export class Modes {
     modeJSON;
@@ -38,7 +39,7 @@ export class Modes {
             stat = stats.score;
             goal = undefined
         }
-        this.setObjectiveText(stat, goal);
+        this.setObjectiveText(this.modeJSON.goalstat, stat, goal);
     }
 
     statText(stat, value, result, resultvalue) {
@@ -47,8 +48,8 @@ export class Modes {
         return front + back;
     }
 
-    setObjectiveText(statValue, resultValue) {
-        if (statValue != undefined) statValue = Math.round(statValue * 1000) / 1000
+    setObjectiveText(stat, statValue, resultValue) {
+        if (statValue != undefined) statValue = statValue.toFixed(reverseLookup(statDecimals)[stat])
         let modetext = (statValue == undefined ? '' : statValue)
             + (resultValue == undefined ? '' : `/${resultValue}`)
         this.game.pixi.objectiveTexts[0].text = modetext;
