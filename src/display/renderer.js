@@ -127,7 +127,7 @@ export class Renderer {
 
         // sidebar constants
         this.sidebarStats = this.game.settings.game.sidebar;
-        this.sidebarFixed = this.sidebarStats.map(stat => this.createReverseLookup(statDecimals)[stat]);
+        this.sidebarFixed = this.sidebarStats.map(stat => reverseLookup(statDecimals)[stat]);
         this.sidebarSecondary = this.sidebarStats.map(stat => statsSecondaries[stat] ?? "None");
 
         this.sidebarStats.forEach((stat, index) => {
@@ -154,16 +154,6 @@ export class Renderer {
                 this.game.pixi.statTexts[index].statSecondary.text = displaySecond;
             }
         })
-    }
-
-    createReverseLookup(obj) {
-        const reverseLookup = {}
-        for (const [key, array] of Object.entries(obj)) {
-            array.forEach(item => {
-                reverseLookup[item] = key;
-            });
-        }
-        return reverseLookup
     }
 
     formatTime(s, d) {
@@ -195,4 +185,14 @@ export class Renderer {
         const forces = { "CW": force, "CCW": -force }
         this.game.boardeffects.rotate(forces[type]);
     }
+}
+
+export function reverseLookup(obj) {
+    const reverseLookup = {}
+    for (const [key, array] of Object.entries(obj)) {
+        array.forEach(item => {
+            reverseLookup[item] = key;
+        });
+    }
+    return reverseLookup
 }

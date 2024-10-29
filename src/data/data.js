@@ -96,7 +96,7 @@ export const resultSuffix = {
 }
 
 export const statDecimals = {
-    0: ["clearlines", "pieceCount", "score", "pcs", "quads", "allspins", "level", "attack", "cleargarbage", "sent", "recieved", "combo", "maxCombo", "btbCount", "maxBTB", "tpE", "ipE", "inputs", "holds", "rotates", "ppb",],    
+    0: ["clearlines", "pieceCount", "score", "pcs", "quads", "allspins", "level", "attack", "cleargarbage", "sent", "recieved", "combo", "maxCombo", "btbCount", "maxBTB", "tpE", "ipE", "inputs", "holds", "rotates", "ppb", "altitude"],
     1: ["time", "vs", "chzind", "garbeff",],
     2: ["pps", "apm", "lpm", "app", "apl", "appw", "dss", "dsp", "vsOnApm", "kps", "kpp"]
 }
