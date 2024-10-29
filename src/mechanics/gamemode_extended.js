@@ -109,8 +109,9 @@ export class Zenith {
 
             climbSpeedBar.value = point
             climbSpeedBar.max = require
-            document.styleSheets[1].cssRules[24].style.backgroundColor = color[speed - 1]
-            document.styleSheets[1].cssRules[23].style.backgroundColor = color[speed]
+            // changes css variable, better selection
+            document.getElementById("climbSpeedBar").style.setProperty("--background-colour", color[speed-1])
+            document.getElementById("climbSpeedBar").style.setProperty("--bar-colour", color[speed])
         }
  
 }
