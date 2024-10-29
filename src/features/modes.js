@@ -63,7 +63,6 @@ export class Modes {
         this.setGamemode(currentGamemode);
 
         this.game.pixi.objectiveTexts[1].text = this.modeJSON.objectiveText.toUpperCase();
-        this.game.history.setHistoryDiv(this.game.settings.game.gamemode == 'custom');
         this.game.pixi.toggleEditButton(this.game.settings.game.gamemode == 'custom');
     }
 

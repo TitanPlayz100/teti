@@ -86,7 +86,7 @@ export class History {
     updateUI() {
         const branches = this.historyConnections[this.currentState] ?? [];
         this.selectedbranch = Math.max(...branches);
-        this.historyelement.textContent = `history: ${this.currentState}`;
+        this.historyelement.textContent = `current: ${this.currentState}`;
         if (branches.length <= 1) {
             this.choiceselement.style.opacity = "0";
             this.choiceselement.style.pointerEvents = "none";
@@ -96,7 +96,7 @@ export class History {
 
         this.choiceselement.style.opacity = "1";
         this.choiceselement.style.pointerEvents = "all";
-        [...this.choiceselement.children].forEach(button => button.remove())
+        [...document.getElementsByClassName("redochoice")].forEach(button => button.remove())
         branches.forEach(state => {
             const button = document.createElement("button");
             button.classList.add("redochoice");
@@ -183,9 +183,4 @@ export class History {
         this.game.hold.piece = this.game.renderer.getPiece(hold);
         this.game.mechanics.spawnPiece(this.game.bag.randomiser());
     }
-
-    setHistoryDiv(bool) {
-        this.historyelement.style.display = bool ? "block" : "none";
-    }
-
 }

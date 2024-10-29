@@ -14,6 +14,7 @@ export class PixiRender {
     justPlacedAlpha = 1;
     shadowSprites = {};
     editButtonVisible = false;
+    currentlyFlashing = {}
 
     divlock = document.getElementById("lockTimer");
 
@@ -27,7 +28,7 @@ export class PixiRender {
     async init() {
         this.app = new PIXI.Application();
         await this.app.init({ backgroundAlpha: 0, resizeTo: window, autoDensity: true });
-        document.body.appendChild(this.app.canvas);
+        document.body.prepend(this.app.canvas);
 
         // grid
         const grid = new PIXI.Container();
@@ -38,6 +39,10 @@ export class PixiRender {
         this.board = new PIXI.Container();
         this.app.stage.addChild(this.board);
         this.board.label = "board";
+
+        const clickArea = new PIXI.Container();
+        this.app.stage.addChild(clickArea);
+        clickArea.label = "clickArea";
 
         const next = new PIXI.Container();
         this.app.stage.addChild(next);
@@ -77,12 +82,15 @@ export class PixiRender {
         const next = this.app.stage.getChildByLabel("next");
         const hold = this.app.stage.getChildByLabel("hold");
         const board = this.app.stage.getChildByLabel("board");
+        const clickArea = this.app.stage.getChildByLabel("clickArea");
         const particles = this.app.stage.getChildByLabel("particles");
         const textContainer = this.app.stage.getChildByLabel("textContainer");
 
         // clear
         grid.children.forEach(child => child.destroy());
         grid.removeChildren();
+        clickArea.children.forEach(child => child.destroy());
+        clickArea.removeChildren();
         textContainer.removeChildren();
 
         // resize
@@ -102,6 +110,8 @@ export class PixiRender {
         board.y = screenHeight;
         board.pivot.x = width / 2;
         board.pivot.y = height * 3 / 2;
+
+
 
         // hold
         const clickRectHold = new PIXI.Graphics().rect(0, 0, width * 2 / 5, height * 3 / 20).fill("transparent");
@@ -127,15 +137,25 @@ export class PixiRender {
         next.pivot.x = width / 2 - width * 11 / 10;
         next.pivot.y = height / 2;
 
+        const rect2 = new PIXI.Graphics().rect(0, 0, width, height).fill("transparent");
+        rect2.interactive = true;
+        rect2.cursor = 'pointer'
+        rect2.on("pointerdown", () => console.log("click"));
+        clickArea.addChild(rect2);
+        clickArea.x = screenWidth;
+        clickArea.y = screenHeight;
+        clickArea.pivot.x = width / 2;
+        clickArea.pivot.y = height / 2;
+
         // grid and outline
         const { textHold, textNext } = this.textGraphics(width);
         const { settings, reset, edit } = this.buttonGraphics(width);
 
-        this.boardBG = new PIXI.Graphics()
+        this.boardDanger = new PIXI.Graphics()
             .rect(0, 0, width, height)
             .fill("red")
-        this.boardBG.alpha = 0;
-        grid.addChild(this.boardBG);
+        this.boardDanger.alpha = 0;
+        grid.addChild(this.boardDanger);
 
         this.border = new PIXI.Graphics()
             .lineTo(0, height).lineTo(width, height).lineTo(width, 0)
@@ -156,8 +176,8 @@ export class PixiRender {
         rectNext.x = width;
         grid.addChild(textNext);
 
-        grid.addChild(settings);
         grid.addChild(reset);
+        grid.addChild(settings);
         grid.addChild(edit);
         this.editButton = edit;
 
@@ -183,6 +203,7 @@ export class PixiRender {
         textContainer.addChild(this.actionTexts.btbtext.sprite)
         textContainer.addChild(this.actionTexts.spiketext.sprite)
         textContainer.addChild(this.actionTexts.pctext.sprite)
+        textContainer.addChild(this.actionTexts.timeleft.sprite)
         this.statTexts.forEach((text) => {
             textContainer.addChild(text.stat);
             textContainer.addChild(text.statText);
@@ -193,6 +214,7 @@ export class PixiRender {
 
         this.generateGrid();
         this.resetAnimGraphic();
+        this.generateClickMinos(clickArea);
     }
 
     // TEXT
@@ -227,6 +249,14 @@ export class PixiRender {
         pcText.pivot.x = pcText.width / 2 - 10;
         pcText.pivot.y = pcText.height / 2;
 
+        const timeLeftStyle = new PIXI.TextStyle({ fontFamily: "Montserrat", fontSize: 20, fill: "gold", fontWeight: "bold" });
+        const timeLeftText = new PIXI.Text({ text: "", style: timeLeftStyle });
+        timeLeftText.resolution = 2;
+        timeLeftText.alpha = 0;
+        timeLeftText.x = this.width / 2;
+        timeLeftText.y = this.height * 1 / 8;
+        timeLeftText.anchor.x = 0.5;
+
         const spiketext = actionText(3);
         spiketext.sprite.x = this.width / 2;
         spiketext.sprite.y = this.height * 1 / 4;
@@ -238,7 +268,8 @@ export class PixiRender {
             combotext: actionText(1),
             btbtext: actionText(2),
             spiketext,
-            pctext: { sprite: pcText, animation: gsap.timeline() }
+            pctext: { sprite: pcText, animation: gsap.timeline() },
+            timeleft: { sprite: timeLeftText, animation: gsap.timeline() }
         }
 
         const statStyle = new PIXI.TextStyle({ fontFamily: "Major Mono Display", fontSize: 16, fill: "white", fontWeight: "bold" });
@@ -268,18 +299,32 @@ export class PixiRender {
 
         const objectiveText = new PIXI.Text({ text: "", style: statSecondaryStyle });
         objectiveText.resolution = 2;
-        objectiveText.position.set(width*11/10, this.height - this.height * 3 / 40)
+        objectiveText.position.set(width * 11 / 10, this.height - this.height * 3 / 40)
 
         const objectiveNameText = new PIXI.Text({ text: "", style: statTextStyle });
         objectiveNameText.resolution = 2;
-        objectiveNameText.position.set(width*11/10, this.height - this.height * 5/40)
+        objectiveNameText.position.set(width * 11 / 10, this.height - this.height * 5 / 40)
 
         this.objectiveTexts = [objectiveText, objectiveNameText];
 
         return { textHold, textNext };
     }
 
-    // todo reset action text
+    resetActionTexts() {
+        Object.keys(this.actionTexts).forEach(key => {
+            this.actionTexts[key].animation.pause();
+            gsap.to(this.actionTexts[key].sprite, {
+                duration: 0.2, pixi: { alpha: 0 },
+                onComplete: () => this.actionTexts[key].animation.kill()
+            })
+        })
+        if (this.timeLeftTextSplit) this.timeLeftTextSplit.forEach(s => {
+            s.animation.kill();
+            s.sprite.destroy();
+        });
+        this.timeLeftTextSplit = undefined;
+    }
+
     showActionText(type, message) {
         this.actionTexts[type].animation.kill();
         const text = this.actionTexts[type].sprite;
@@ -318,6 +363,23 @@ export class PixiRender {
             .to(pc, { duration: 2.5, pixi: { scale: 0, alpha: 0 }, ease: "power3.in" }, "1.5")
     }
 
+    showTimeLeftText(msg) {
+        const textContainer = this.app.stage.getChildByLabel("textContainer");
+        this.actionTexts.timeleft.animation.kill();
+        const text = this.actionTexts.timeleft.sprite;
+        text.text = msg;
+        const split = this.splitSprite(text)
+        this.timeLeftTextSplit = split.map((s, i) => {
+            textContainer.addChild(s);
+            const animation = gsap.timeline({ onComplete: () => s.destroy() })
+                .to(s, { duration: 0, pixi: { alpha: 1, x: s.x, tint: "white" } })
+                .to(s, { duration: 3, pixi: { x: s.x + 8 * (i - split.length / 2) } })
+                .to(s, { duration: 3 / 20, pixi: { tint: "red" }, repeat: 20, yoyo: true, ease: "none" }, "0")
+                .to(s, { duration: 0.5, pixi: { alpha: 0 } }, "2.5")
+            return { sprite: s, animation }
+        });
+    }
+
     // GRAPHICS and GENERATORS
     buttonGraphics(width) {
         const iconframe = (texture, scale, y) => {
@@ -333,12 +395,10 @@ export class PixiRender {
             return icon
         }
 
-        const settings = iconframe(this.settingsIcon, 0.18, 0)
-        settings.on("pointerdown", () => this.game.modals.openModal("settingsPanel"));
-
-        const reset = iconframe(this.resetIcon, 0.23, width * 3 / 20)
+        const reset = iconframe(this.resetIcon, 0.23, 0)
         reset.on("pointerdown", () => this.game.controls.retry(true));
-
+        const settings = iconframe(this.settingsIcon, 0.18, width * 3 / 20)
+        settings.on("pointerdown", () => this.game.modals.openModal("settingsPanel"));
         const edit = iconframe(this.editIcon, 0.21, width * 6 / 20)
         edit.on("pointerdown", () => this.game.modals.openModal("editMenu"));
         edit.visible = this.editButtonVisible
@@ -408,6 +468,21 @@ export class PixiRender {
         this.shadowSprites[type] = shadowArray
     }
 
+    generateClickMinos(clickArea) {
+        for (let y = 0; y < 20; y++) {
+            for (let x = 0; x < 10; x++) {
+                const mino = new PIXI.Sprite(this.textures['g']);
+                mino.interactive = true;
+                mino.on("mousedown", () => this.game.boardeditor.mouseDown([x, y], mino));
+                mino.on("mouseenter", () => this.game.boardeditor.mouseEnter([x, y], mino));
+                mino.on("mouseleave", () => this.game.boardeditor.mouseLeave([x, y], mino));
+                clickArea.addChild(mino);
+                mino.position.set(x * this.minoSize, y * this.minoSize);
+                mino.setSize(this.minoSize);
+                mino.alpha = 0;
+            }
+        }
+    }
 
     generateGrid() {
         if (this.game.settings.display.showGrid === false) return;
@@ -440,6 +515,7 @@ export class PixiRender {
 
     // RENDER CLOCK
     tick(time) {
+        this.game.controls.runKeyQueue();
         this.render("board", this.game.board.boardState);
         this.game.boardeffects.move(0, 0);
         this.game.boardeffects.rotate(0);
@@ -489,7 +565,6 @@ export class PixiRender {
         return this.textures[piece];
     }
 
-    // todo remove flash for cleared lines
     flash(coords) {
         coords.forEach(([x, y]) => {
             const triangle = new PIXI.Sprite(this.triangle);
@@ -497,10 +572,15 @@ export class PixiRender {
             triangle.y = (39 - y) * this.minoSize;
             triangle.label = "invincible";
             this.board.addChild(triangle);
-            gsap.timeline({ onComplete: () => this.board.removeChild(triangle) })
+            this.currentlyFlashing[`${x},${y}`] = gsap.timeline({ onComplete: () => this.board.removeChild(triangle) })
                 .to(triangle, { duration: 0, pixi: { width: this.minoSize, height: this.minoSize } })
                 .to(triangle, { duration: 0.15, pixi: { width: 0, height: 0 }, ease: "power1.inOut", })
         })
+    }
+
+    endFlash([x, y]) {
+        const a = this.currentlyFlashing[`${x},${y}`];
+        a.totalProgress(1).kill();
     }
 
     getOpacity(cell, type, x, y) {
@@ -553,7 +633,7 @@ export class PixiRender {
     }
 
     toggleDangerBG(danger) {
-        gsap.to(this.boardBG, { duration: 0.2, pixi: { alpha: danger ? 0.1 : 0 } });
+        gsap.to(this.boardDanger, { duration: 0.2, pixi: { alpha: danger ? 0.1 : 0 } });
         gsap.to(this.border, { duration: 0.2, pixi: { tint: danger ? "red" : "none" } });
     }
 
@@ -585,5 +665,24 @@ export class PixiRender {
         this.board.mask = null;
         this.board.removeChild(this.resetMask);
         this.board.removeChild(this.resetTriangle);
+    }
+
+    /** @param {PIXI.Text} textSprite */
+    splitSprite(textSprite) {
+        const target = textSprite;
+        const textContent = textSprite.text;
+        let currentX = target.x - target.width / 2;
+        target.text = "";
+        const textChars = textContent.split("");
+        /**@type {PIXI.Text[]} */
+        let chars = []
+        textChars.forEach((char) => {
+            const charSprite = new PIXI.Text({ text: char, style: target.style });
+            charSprite.x = currentX;
+            charSprite.y = target.y;
+            currentX += charSprite.width;
+            chars.push(charSprite);
+        });
+        return chars
     }
 }

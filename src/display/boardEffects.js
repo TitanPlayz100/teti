@@ -18,8 +18,6 @@ export class BoardEffects {
     paceCooldown = 0;
 
     divBoard = document.getElementById("board");
-    // border = document.getElementById('backborder')
-    // backboard = document.getElementById('backboard')
 
     /**
      * 
@@ -49,7 +47,6 @@ export class BoardEffects {
         this.Y = this.clamp(this.Y, 0.5);
 
         if (this.X != 0 || this.Y != 0) {
-            this.divBoard.style.translate = `${this.X}px ${this.Y}px`
             this.game.pixi.app.canvas.style.translate = `${this.X}px ${this.Y}px`
         }
     }
@@ -65,7 +62,6 @@ export class BoardEffects {
         this.R = this.clamp(this.R, 0.1);
 
         if (this.R != 0) {
-            this.divBoard.style.rotate = `${this.R}deg`
             this.game.pixi.app.canvas.style.rotate = `${this.R}deg`
         }
     }
@@ -100,10 +96,10 @@ export class BoardEffects {
     }
 
     toggleRainbow(pace) {
-        return;
-        this.border.style.setProperty('--blur-size', pace ? `0.3vmin` : `0vmin`)
-        this.border.style.setProperty('--blur-strength', pace ? '0.7vmin' : '0')
-        this.backboard.style.setProperty('--blur-strength', pace ? '0.5vmin' : '0')
-        this.hasPace = pace;
+        // todo add back
+        // this.border.style.setProperty('--blur-size', pace ? `0.3vmin` : `0vmin`)
+        // this.border.style.setProperty('--blur-strength', pace ? '0.7vmin' : '0')
+        // this.backboard.style.setProperty('--blur-strength', pace ? '0.5vmin' : '0')
+        // this.hasPace = pace;
     }
 }

@@ -14,7 +14,8 @@
             "allspinminis": false,
             "history": false,
             "sidebar": ["time", "apm", "pps"],
-            "stride": false
+            "stride": false,
+            "clearDelay": 0
         },
         "displayName": "Unset",
         "objectiveText": "",

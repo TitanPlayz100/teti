@@ -26,7 +26,7 @@ export class Game {
     gameTimer = 0; // id of timeout
     survivalTimer = 0; // id of timeout
     gravityTimer = 0;
-    version = '1.3.4';
+    version = '1.3.5';
     tickrate = 60;
 
     elementReason = document.getElementById("reason");
@@ -68,7 +68,6 @@ export class Game {
         this.renderer.setEditPieceColours();
         this.sounds.initSounds();
         this.startGame();
-        // this.boardeditor.addListeners();
         this.menuactions.addRangeListener();
         this.modals.generate.addMenuListeners();
         this.modals.generate.generateGamemodeMenu();
@@ -136,6 +135,7 @@ export class Game {
         this.particles.clearParticles();
         this.renderer.clearHold();
         this.stopGameTimers();
+        this.pixi.resetActionTexts();
 
         this.bag = new Bag(this);
         this.mechanics = new Mechanics(this);

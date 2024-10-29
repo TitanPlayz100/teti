@@ -202,7 +202,7 @@ export class Particles {
             const posX = (direction ? 0 : width) + x + Math.random() * len
             const posY = y + Math.random() * height;
             const life = Math.random() * 25 + 50;
-            const dx = (direction ? 1 : -1) * (Math.random() * 2);
+            const dx = (direction ? -1 : 1) * (Math.random() * 2);
             const dy = Math.random() * 2 - 1;
 
             const BTBParticle = { x: posX, y: posY, colour, life, dx, dy, gravity: 0.15 }

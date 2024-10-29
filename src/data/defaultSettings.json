@@ -15,7 +15,8 @@
         "particles":true,
         "particleVolume": 60,
         "particleSize":1,
-        "skin":"tetrio"
+        "skin":"tetrio",
+        "actionText": true
     },
     "game": {
         "gravitySpeed": 950,

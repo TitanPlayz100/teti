@@ -270,21 +270,7 @@ button>img {
     text-shadow: 0 0 3vh white;
 }
 
-/* stats */
-.smalltext {
-    position: absolute;
-    font-size: 0.9em;
-    color: var(--l-gray);
-    user-select: none;    
-}
-
-#explanationText,
-#updatetext {
-    display: flex;
-    margin: 0;
-    opacity: 0.4;
-}
-
+/* do not remove, used in menu */
 .statText {
     opacity: 1;
     display: flex;
@@ -313,4 +299,11 @@ button>img {
     display: block;
     color: #fff;
     font-size: .6em;
+}
+
+#explanationText,
+#updatetext {
+    display: flex;
+    margin: 0;
+    opacity: 0.4;
 }

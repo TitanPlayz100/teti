@@ -74,13 +74,13 @@ export class Renderer {
         this.inDanger = condition;
     }
 
-    renderActionText(damagetype, isBTB, isPC, damage, linecount) {
-        if (damagetype != "") this.game.pixi.showActionText("cleartext", damagetype);
-        if (this.game.stats.combo > 0) this.game.pixi.showActionText("combotext", `Combo ${this.game.stats.combo}`);
-        if (isBTB && this.game.stats.btbCount > 0) this.game.pixi.showActionText("btbtext", `btb ${this.game.stats.btbCount} `);
-        if (this.game.mechanics.spikeCounter > 4) this.game.pixi.showSpikeText(`${this.game.mechanics.spikeCounter}`);
-        if (isPC) this.game.pixi.showPCText();
+    dangerParticles() {
+        if (!this.inDanger) return;
+        this.game.particles.spawnParticles(0, 0, "dangerboard");
+        this.game.particles.spawnParticles(0, 20, "dangersides");
+    }
 
+    renderActionText(damagetype, isBTB, isPC, damage, linecount) {
         // audio
         if (isPC) this.game.sounds.playSound("allclear");
         if (this.game.stats.btbCount == 2 && isBTB) this.game.sounds.playSound("btb_1");
@@ -98,11 +98,15 @@ export class Renderer {
         if (this.game.mechanics.spikeCounter >= 15) this.game.sounds.playSound("thunder", false);
         if (this.game.stats.combo > 0)
             this.game.sounds.playSound(`combo_${this.game.stats.combo > 16 ? 16 : this.game.stats.combo}`);
-    }
 
-    stopTimeout(name) {
-        clearTimeout(this.texttimeouts[name]);
-        this.texttimeouts[name] = 0;
+        // text
+        if (this.game.settings.display.actionText == false) return;
+        if (damagetype != "") this.game.pixi.showActionText("cleartext", damagetype);
+        if (this.game.stats.combo > 0) this.game.pixi.showActionText("combotext", `Combo ${this.game.stats.combo}`);
+        if (isBTB && this.game.stats.btbCount > 0) this.game.pixi.showActionText("btbtext", `btb ${this.game.stats.btbCount} `);
+        if (this.game.mechanics.spikeCounter > 4 && linecount > 0) this.game.pixi.showSpikeText(`${this.game.mechanics.spikeCounter}`);
+        if (isPC) this.game.pixi.showPCText();
+
     }
 
     renderStyles(settings = false) {
@@ -115,6 +119,7 @@ export class Renderer {
         const height = Number(this.game.settings.display.boardHeight);
         this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
 
+        // todo add board background
         // board opacity
         // const background = `rgba(0, 0, 0, ${Number(this.game.settings.display.boardOpacity) / 100})`;
         // this.divBackboard.style.backgroundColor = background;
@@ -168,16 +173,7 @@ export class Renderer {
     }
 
     renderTimeLeft(text){
-        const e = document.getElementById("timeLeftText")
-        if (this.texttimeouts["timeLeft"] != 0){
-            this.stopTimeout("timeLeft");
-            //e.classList.remove("warn");
-        } 
-        e.textContent = text
-        e.classList.add("warn")
-        this.texttimeouts["timeLeft"] = setTimeout(() => {
-            e.classList.remove("warn");
-        }, 3000);
+        this.game.pixi.showTimeLeftText(text);
     }
 
     setEditPieceColours() {
@@ -198,11 +194,5 @@ export class Renderer {
         const force = Number(this.game.settings.display.boardBounce) * 0.5;
         const forces = { "CW": force, "CCW": -force }
         this.game.boardeffects.rotate(forces[type]);
-    }
-
-    dangerParticles() {
-        if (!this.inDanger) return;
-        this.game.particles.spawnParticles(0, 0, "dangerboard");
-        this.game.particles.spawnParticles(0, 20, "dangersides");
     }
 }

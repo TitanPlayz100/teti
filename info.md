@@ -69,6 +69,11 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 Things that I am working on based on other changes
 - ready set go start option
 - arcade mode
+- rotation centres
+
+- CHANGE GAME CLASS TO BE EXPORTED MODULES
+    - remove all this.game references in replacement with just the class being imported
+    - **no longer shall the shackles of past object oriented java code bound the multiparadigm eutopia which is javascript**
 
 Zenith mode additions
 - add fatigue:
@@ -97,7 +102,6 @@ Khaki (#ffc48e)
 "Soft Pink" (#ffbbea)
 White (#ffffff)
 
-
 ***
 
 ## Updates
@@ -109,6 +113,10 @@ White (#ffffff)
 - changed PC text to be more TETR.IO-like
 - changed spike text to show in the middle of the board (like techmino)
 - RIP coloured queues
+- better page loading using defer and lazy loading
+- Experimental: pressed keys are stored in a queue, and evry pixi tick they all fire, might be more responsive
+- changed timeLeftText animation to use gsap and pixi
+- added setting for toggling action text
 
 #### v1.3.4 => PIXI.js
 - COMPLETE REWRITE OF ALL GRAPHICS

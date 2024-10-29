@@ -111,7 +111,6 @@ export class Sounds {
             track.connect(this.lowpassfilter);
             this.lowpassfilter.connect(this.audioContext.destination);
         })
-        // this.playSound("allclear") // i knew it was a bad idea
     }
 
     setAudioLevel() {

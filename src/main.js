@@ -7,9 +7,6 @@ window["menu"] = game.menuactions;
 window["modal"] = game.modals;
 window["songs"] = game.sounds;
 
-const elementSplashScreen = document.getElementById("splashScreen");
-const elementSplashText = document.getElementById("splashText");
-
 window.addEventListener("keydown", event => {
     if (event.key == undefined) return;
     let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // 1 letter words are lowercase
@@ -21,7 +18,6 @@ window.addEventListener("keydown", event => {
     game.controls.onKeyDown(event, key);
 });
 
-
 window.addEventListener("keyup", event => {
     if (event.key == undefined) return;
     let key = event.key.length > 1 ? event.key : event.key.toLowerCase();
@@ -32,6 +28,10 @@ window.addEventListener('mousemove', () => {
     game.controls.toggleCursor(true);
 })
 
+document.body.addEventListener("mouseup", (e) => {
+    game.boardeditor.mouseUp(e);
+});
+
 window.addEventListener("resize", () => {
     setTimeout(() => {
         game.pixi.resize();
@@ -40,6 +40,9 @@ window.addEventListener("resize", () => {
     }, 0);
 })
 
+
+const elementSplashScreen = document.getElementById("splashScreen");
+const elementSplashText = document.getElementById("splashText");
 export function clearSplash() {
     elementSplashText.textContent = "Ready";
     elementSplashScreen.style.opacity = 0;
