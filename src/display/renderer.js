@@ -1,6 +1,6 @@
 import { Game } from "../game.js";
-import pieces from "../data/pieces.json" with { type: "json" };
 import { statDecimals, statsSecondary as statsSecondaries } from "../data/data.js";
+import { getPiece } from "../mechanics/randomisers.js";
 
 export class Renderer {
     holdQueueGrid = [];
@@ -27,9 +27,8 @@ export class Renderer {
     updateNext() {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
 
-        const next5 = this.game.bag.getFirstFive();
-        next5.forEach((name, idx) => {
-            const piece = this.getPiece(name);
+        const next5 = this.game.bag.getFirstN(this.game.settings.game.nextPieces);
+        next5.forEach((piece, idx) => {
             let [dx, dy] = [0, 3 * (4 - idx)];
             if (piece.name == "o") [dx, dy] = [dx + 1, dy + 1]; // shift o piece
             const coords = this.board.pieceToCoords(piece.shape1);
@@ -37,11 +36,6 @@ export class Renderer {
         });
 
         this.game.pixi.render("next", this.nextQueueGrid);
-    }
-
-    getPiece(name) {
-        if (name == "G") return { colour: "gray" }
-        return pieces.filter(p => p.name == name)[0];
     }
 
     updateHold() {
@@ -170,7 +164,7 @@ export class Renderer {
         const elPieces = [...this.elementEditPieces.children];
         elPieces.forEach(elpiece => {
             const pieceid = elpiece.id.split("_")[0];
-            elpiece.style.backgroundColor = this.getPiece(pieceid).colour
+            elpiece.style.backgroundColor = getPiece(pieceid).colour
         })
     }
 

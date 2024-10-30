@@ -56,6 +56,7 @@ export const spinChecks = [
     ],
 ];
 
+// when adding new gamemodes make sure to add variables
 export const gameoverText = {
     clearlines: "Cleared _ lines",
     attack: "Sent _ damage",

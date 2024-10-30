@@ -111,7 +111,7 @@ export class LockPiece {
 
         const delay = (cleared > 0) ? this.game.settings.game.clearDelay : 0;
         const onClear = () => {
-            this.game.mechanics.spawnPiece(this.game.bag.randomiser());
+            this.game.mechanics.spawnPiece(this.game.bag.cycleNext());
             this.game.history.save();
             this.timings.clearDelay = 0;
         }

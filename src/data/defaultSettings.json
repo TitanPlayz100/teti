@@ -35,6 +35,7 @@
         "competitiveMode": false,
         "sidebar": ["time", "apm", "pps"],
         "stride": false,
+        "randomiser": "7bag",
         "requiredLines": 40,
         "timeLimit": 120,
         "requiredAttack": 40,

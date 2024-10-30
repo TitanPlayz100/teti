@@ -1,5 +1,5 @@
 import { Game } from "../game.js";
-import pieces from "../data/pieces.json" with { type: "json" };
+import { getPiece } from "./randomisers.js";
 
 
 export class Hold {
@@ -30,14 +30,10 @@ export class Hold {
 
     setNewHold(val) {
         const validPiece = [val].filter(p => this.pieceNames.includes(p));
-        this.piece = this.getPiece(validPiece);
+        this.piece = getPiece(validPiece);
         this.occured = false;
         this.game.renderer.updateHold();
         this.game.history.save();
-    }
-
-    getPiece(name) {
-        return pieces.filter(p => p.name == name)[0];
     }
 
 }

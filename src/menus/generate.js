@@ -1,5 +1,6 @@
 import { defaultSkins } from "../data/data.js";
 import { Game } from "../game.js";
+import { randomisers } from "../mechanics/randomisers.js";
 
 
 export class GenerateMenus {
@@ -187,6 +188,14 @@ export class GenerateMenus {
             const option = document.createElement("option");
             option.textContent = type;
             gridType.appendChild(option);
+        })
+
+        const randomiser = document.getElementById("randomiser");
+        const randomTypes = randomisers;
+        randomTypes.forEach(type => {
+            const option = document.createElement("option");
+            option.textContent = type;
+            randomiser.appendChild(option);
         })
     }
 

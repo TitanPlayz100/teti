@@ -62,7 +62,7 @@ export class Mechanics {
 
     spawnOverlay() {
         this.board.MinoToNone("NP");
-        const next = this.game.bag.nextPiece();
+        const next = this.game.bag.getFirstN(1)[0];
         const x = next.name == "o" ? 4 : 3;
         const y = next.name == "o" ? 21 : next.name == "i" ? 19 : 20;
         this.board.pieceToCoords(next.shape1, [x, y]).forEach(([x, y]) => this.board.addValue([x, y], "NP"));
@@ -122,7 +122,7 @@ export class Mechanics {
         this.game.stats.holds++;
         if (this.game.hold.piece == null) {
             this.game.hold.setHold();
-            this.spawnPiece(this.game.bag.randomiser());
+            this.spawnPiece(this.game.bag.cycleNext());
         } else {
             this.game.hold.swapHold();
             this.spawnPiece(this.game.falling.piece);
