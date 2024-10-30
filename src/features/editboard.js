@@ -57,7 +57,7 @@ export class BoardEditor {
 
     convertToMap() {
         const board = this.game.board.boardState;
-        const next = this.game.bag.nextPieces;
+        const next = this.game.bag.getMapQueue();
         const hold = this.game.hold.piece == null ? "" : this.game.hold.piece.name;
         const currPiece = this.game.falling.piece.name;
 
@@ -71,7 +71,7 @@ export class BoardEditor {
                 return col;
             })
         }).join("")
-        return `${boardstring}?${currPiece},${next.flat()}?${hold}`
+        return `${boardstring}?${currPiece},${next}?${hold}`
 
     }
 

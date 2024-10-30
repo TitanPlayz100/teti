@@ -71,6 +71,7 @@ Things that I am working on based on other changes
 - ready set go start option
 - arcade mode
 - rotation centres
+- bag seperators
 
 - issue holding softdrop and left/right removes piece dropping cooldown
 
@@ -108,6 +109,12 @@ White (#ffffff)
 ***
 
 ## Updates
+#### v1.3.6
+- added total mayhem randomiser
+    - in the future it is very easy to add more randomisers
+    - thinking of adding all tetrio randomisers
+    - also figuring out tetrio's seed gen to mimic it for future additions (digging source code aaaaaa)
+
 #### v1.3.5
 - New board design inspired from [this reddit post](https://www.reddit.com/r/Tetris/comments/1g80adg/tetris_ui_concept/)
 - added continue button in menu, and changed ingame buttons to use pixijs now
@@ -280,6 +287,7 @@ Future wants for game, kinda ordered by ease and desire for feature
     - misdrop remover mode
     - holdless and next queueless gamemode kinda like qp2 cards
     - colourblind gamemode
+    - TEC Zone mode
 - guide like progression using custom maps
     - maybe like tetris tres bien
     - achievements, progression tree

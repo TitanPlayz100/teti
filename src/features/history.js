@@ -1,4 +1,5 @@
 import { Game } from "../game.js";
+import { getPiece } from "../mechanics/randomisers.js";
 
 export class History {
     /**
@@ -150,7 +151,7 @@ export class History {
 
     convertToMapCompressed() {
         const board = this.game.board.boardState;
-        const next = this.game.bag.nextPieces;
+        const next = this.game.bag.getMapQueue();
         const hold = this.game.hold.piece == null ? "" : this.game.hold.piece.name;
         const currPiece = this.game.falling.piece == null ? "" : this.game.falling.piece.name;
         let boardstring = board.toReversed().flatMap(row => {
@@ -164,7 +165,7 @@ export class History {
                 return col;
             })
         }).join("")
-        return `${this.compress(boardstring)}?${currPiece},${next.flat()}?${hold}`
+        return `${this.compress(boardstring)}?${currPiece},${next}?${hold}`
 
     }
 
@@ -179,8 +180,8 @@ export class History {
             });
         })
         this.game.board.boardState = board;
-        this.game.bag.nextPieces = [next.split(","), []];
-        this.game.hold.piece = this.game.renderer.getPiece(hold);
-        this.game.mechanics.spawnPiece(this.game.bag.randomiser());
+        this.game.bag.setQueue(next.split(","));
+        this.game.hold.piece = getPiece(hold);
+        this.game.mechanics.spawnPiece(this.game.bag.cycleNext());
     }
 }

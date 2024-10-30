@@ -1,4 +1,4 @@
-import { Bag } from "./mechanics/bag.js";
+import { BagFactory } from "./mechanics/randomisers.js";
 import { Board } from "./mechanics/board.js";
 import { Controls } from "./movement/controls.js";
 import { Hold } from "./mechanics/hold.js";
@@ -45,7 +45,6 @@ export class Game {
         this.hold = new Hold(this);
         this.sounds = new Sounds(this);
         this.board = new Board(this);
-        this.bag = new Bag(this);
         this.mechanics = new Mechanics(this);
         this.menuactions = new MenuActions(this);
         this.modals = new ModalActions(this);
@@ -57,7 +56,7 @@ export class Game {
         this.history = new History(this);
         this.modes = new Modes(this);
         this.zenith = new Zenith(this);
-        this.grandmaster = new Grandmaster(this);;
+        this.grandmaster = new Grandmaster(this);
         this.pixi = new PixiRender(this);
         this.init();
     }
@@ -86,7 +85,7 @@ export class Game {
         this.modes.loadModes();
         this.resetState();
         this.renderer.renderStyles();
-        this.mechanics.spawnPiece(this.bag.randomiser(true), true);
+        this.mechanics.spawnPiece(this.bag.cycleNext(true), true);
         this.history.save();
     }
 
@@ -141,7 +140,7 @@ export class Game {
         this.stopGameTimers();
         this.pixi.resetActionTexts();
 
-        this.bag = new Bag(this);
+        this.bag = BagFactory(this);
         this.mechanics = new Mechanics(this);
         this.falling = new Falling(this);
         this.hold = new Hold(this);

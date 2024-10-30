@@ -5,7 +5,6 @@ export class ModalActions {
     open;
     closing;
     selectedRangeElement;
-    pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
 
     settingPanel = document.getElementById("settingsPanel");
     options = [...document.getElementsByClassName("option")];
@@ -78,7 +77,7 @@ export class ModalActions {
             }
             if (setting.classList[2] == "exp") val = toExpValue(val);
             if (setting.classList[2] == "statoption") this.game.settings.game.sidebar[setting.id[10]-1] = val;
-            if (setting.id == "nextQueue") this.game.bag.setQueue(val, this.pieceNames);
+            if (setting.id == "nextQueue") this.game.bag.updateQueue(val);
             if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
             if (setting.id == "rowfillmode") this.game.boardeditor.fillRow = val;
             if (setting.id == "override") this.game.boardeditor.override = val;

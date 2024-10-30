@@ -68,7 +68,6 @@ export class PixiRender {
         this.generateAllSprites("board", this.game.board.boardState, 39, [0, 0]);
         this.generateAllSprites("hold", this.game.renderer.holdQueueGrid, 2, [0, 0]);
         this.generateAllSprites("next", this.game.renderer.nextQueueGrid, 15, [0, 0]);
-        this.game.renderer.updateNext();
         this.game.renderer.updateHold();
 
         this.app.ticker.add(time => this.tick(time));

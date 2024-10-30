@@ -1,4 +1,5 @@
 import { Game } from "../game.js";
+import { getPiece } from "../mechanics/randomisers.js";
 import { toExpValue } from "./modals.js";
 
 export class MenuActions {
@@ -185,9 +186,9 @@ export class MenuActions {
         const input = prompt("Enter Map String Here:")
         const { board, next, hold } = this.game.boardeditor.convertFromMap(input);
         this.game.board.boardState = board;
-        this.game.bag.nextPieces = [next.split(","), []];
-        this.game.hold.piece = this.game.renderer.getPiece(hold);
-        this.game.mechanics.spawnPiece(this.game.bag.randomiser());
+        this.game.bag.setQueue(next.split(","));
+        this.game.hold.piece = getPiece(hold);
+        this.game.mechanics.spawnPiece(this.game.bag.cycleNext());
         this.game.modals.generate.notif("Map Loaded", "Custom map has successfully loaded", "message");
     }
 
