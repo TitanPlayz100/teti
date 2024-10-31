@@ -17,7 +17,6 @@ This project started out as a learning experience, because surprisingly it was m
 ## Acknowledgements
 Thanks [existancepy](https://github.com/existancepy) for all the fixes.  
 Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding many modes and fixes.  
-Thanks [ItzBlack6093](https://github.com/ItzBlack6093) for adding many modes and fixes.  
 
 Feel free to contribute with features and fixes, and open issues.  
 
@@ -35,7 +34,7 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 ## Features
 - modern guideline (customisable)
     - colours
-    - 7bag
+    - 7-bag
     - 5 next queue
     - hold
     - srs+ (tetrio)
@@ -72,9 +71,9 @@ Things that I am working on based on other changes
 - arcade mode
 - rotation centres
 - bag seperators
+- gravity increase over time (and maybe fix softdrop)
 
-- issue holding softdrop and left/right removes piece dropping cooldown
-
+Maybe:
 - CHANGE GAME CLASS TO BE EXPORTED MODULES
     - remove all this.game references in replacement with just the class being imported
     - **no longer shall the shackles of past object oriented java code bound the multiparadigm eutopia which is javascript**
@@ -109,6 +108,16 @@ White (#ffffff)
 ***
 
 ## Updates
+#### v1.3.7
+- changed randomiser to use TETR.IO's seed system
+    - seeds from tetrio replays match teti's
+    - possibly could be handy in the future
+- more bag systems added
+    - designed from tetrio's randomisers
+    - changed 7bag
+    - added 7+1 and 7+2 bag, 7+x bag, classic, total mayhem, pairs, and 14 bag
+- classic gamemode uses classic randomiser
+
 #### v1.3.6
 - added total mayhem randomiser
     - in the future it is very easy to add more randomisers
@@ -280,7 +289,6 @@ Future wants for game, kinda ordered by ease and desire for feature
     - WIKI for technical docs about project
     - glossary of useful terms
 - more rotation systems (ars, trs, srs/srsX, none)
-- more bag systems (pure random, nes random, 14 bag, 7+2 bag)
 - replay functionality (either save gamestate or save keystrokes idk yet)
     - statistics graph
 - more unique gamemodes (techmino styled)

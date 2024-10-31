@@ -136,11 +136,6 @@ export class PixiRender {
         next.pivot.x = width / 2 - width * 11 / 10;
         next.pivot.y = height / 2;
 
-        const rect2 = new PIXI.Graphics().rect(0, 0, width, height).fill("transparent");
-        rect2.interactive = true;
-        rect2.cursor = 'pointer'
-        rect2.on("pointerdown", () => console.log("click"));
-        clickArea.addChild(rect2);
         clickArea.x = screenWidth;
         clickArea.y = screenHeight;
         clickArea.pivot.x = width / 2;
@@ -579,6 +574,7 @@ export class PixiRender {
 
     endFlash([x, y]) {
         const a = this.currentlyFlashing[`${x},${y}`];
+        if (!a) return;
         a.totalProgress(1).kill();
     }
 
