@@ -1,4 +1,4 @@
-import { BagFactory } from "./mechanics/randomisers.js";
+import { Bag } from "./mechanics/randomisers.js";
 import { Board } from "./mechanics/board.js";
 import { Controls } from "./movement/controls.js";
 import { Hold } from "./mechanics/hold.js";
@@ -140,7 +140,7 @@ export class Game {
         this.stopGameTimers();
         this.pixi.resetActionTexts();
 
-        this.bag = BagFactory(this);
+        this.bag = new Bag(this);
         this.mechanics = new Mechanics(this);
         this.falling = new Falling(this);
         this.hold = new Hold(this);

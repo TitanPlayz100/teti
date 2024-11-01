@@ -1,31 +1,31 @@
 import { Game } from "../game.js";
 import pieces from "../data/pieces.json" with { type: "json" };
 
-const pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
+const pieceNames = ["z", "l", "o", "s", "i", "j", "t"]; // THIS ORDER IS VERY IMPORTANT
 
-// update this for options to show in menu
-export const randomisers = ['7bag', 'total mayhem'];
+const maxInt = 2 ** 31 - 1;
+export const randomisers = ["total mayhem", "classic", "pairs", "14-bag", "7+1-bag", "7+2-bag", "7+x-bag", "7bag"];
 
 export function getPiece(name) {
     if (name == "G") return { colour: "gray" }
     return pieces.find(p => p.name == name);
 }
 
-// MAKE SURE TO ADD NEW BAGS HERE
-/** @returns {Bag} */
-export function BagFactory(game) {
-    return {
-        "7bag": new SevenBag(game),
-        "total mayhem": new TotalMayhem(game)
-    }[game.settings.game.randomiser];
-}
+export class Bag {
+    lastGenerated = null;
+    bagid = 0;
+    bagExtra = [];
+    queue = [];
+    type;
 
-// Can implement custom bags in other classes, 
-// make sure to update BagFactory
-class Bag {
     /** @param {Game} game */
-    constructor(game) {
+    constructor(game, seed = null) {
         this.game = game;
+        this.type = game.settings.game.randomiser;
+        this.stride = game.settings.game.stride;
+        const genSeed = seed ?? Math.floor((maxInt - 1) * Math.random() + 1);
+        this.rng = new RNG(genSeed);
+        this.PopulateBag();
     }
 
     getQueue() {
@@ -46,133 +46,147 @@ class Bag {
         this.game.history.save();
     }
 
-    // must be implemented
-    freshBag() { throw new Error("Method 'freshBag()' must be implemented."); }
-
-    /**
-     * @param {boolean} start
-     * @returns {string} 
-     */
-    cycleNext(start = false) { throw new Error("Method 'cycleNext()' must be implemented."); }
-
-    /**
-     * @param {Number} n
-     * @returns {{name: string, colour: string}[]}
-     */
-    getFirstN(n) { throw new Error("Method 'getFirstN()' must be implemented."); }
-
-    /**
-     * @param {string[]} value 
-     */
-    setQueue(value) { throw new Error("Method 'setQueue()' must be implemented."); }
-
-    /**
-     * @returns {string}
-     */
-    getMapQueue() { throw new Error("Method 'getMapQueue()' must be implemented."); }
-}
-
-
-
-
-class SevenBag extends Bag {
-    /** @type {string[][]} */
-    #nextPieces;
-    #stride;
-
-    constructor(game) {
-        super(game);
-        this.#stride = game.settings.game.stride
-        this.freshBag();
-    }
-
-    freshBag() {
-        this.#nextPieces = [[], []];
-    }
 
     cycleNext(start = false) {
-        if (this.#nextPieces[1].length == 0) this.#shuffle();
-        if (this.#nextPieces[0].length == 0) {
-            this.#nextPieces = [this.#nextPieces[1], []];
-            this.#shuffle();
-        }
-        const piece = this.#nextPieces[0].splice(0, 1)[0];
-
-        if (["o", "s", "z"].includes(piece) && this.#stride && start) { // stride mode
-            this.freshBag();
-            return this.cycleNext(start);
-        }
-
-        return getPiece(piece);
-    }
-
-    #shuffle() {
-        pieces.forEach(piece => this.#nextPieces[1].push(piece.name));
-        this.#nextPieces[1] = this.#nextPieces[1]
-            .map(value => ({ value, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value);
-    }
-
-    getFirstN(n) {
-        return this.#nextPieces.flat()
-            .map(p => getPiece(p))
-            .slice(0, n);
-    }
-
-    setQueue(value) {
-        this.#nextPieces = [value, []];
-    }
-
-    getMapQueue() {
-        return this.#nextPieces.flat().join(",");
-    }
-}
-
-
-
-
-class TotalMayhem extends Bag {
-    /** @type {String[]} */
-    #next;
-    #stride;
-
-    constructor(game) {
-        super(game);
-        this.#stride = game.settings.game.stride;
-        this.freshBag();
-    }
-
-    freshBag() {
-        this.#next = [];
-    }
-
-    cycleNext(start = false) {
-        this.randomise();
-        const piece = this.#next.splice(0, 1)[0];
-        if (["o", "s", "z"].includes(piece) && this.#stride && start) { // stride mode
-            this.freshBag();
-            return this.cycleNext(start);
+        let piece = this.PullFromBag();
+        if (this.stride && start) {
+            while (["o", "s", "z"].includes(piece)) piece = this.PullFromBag();
         }
         return getPiece(piece);
     }
 
-    randomise() {
-        while (this.#next.length < 7) {
-            const num = Math.floor(Math.random() * pieceNames.length);
-            this.#next.push(pieceNames[num]);
-        }
-    }
-
     getFirstN(n) {
-        return this.#next.slice(0, n).map(p => getPiece(p));
+        return this.queue.slice(0, n).map(p => getPiece(p));
     }
 
     setQueue(value) {
-        this.#next = value;
+        this.queue = value;
     }
 
     getMapQueue() {
-        return this.#next.join(",");
+        return this.queue.join(",")
+    }
+
+    PopulateBag() {
+        let bag = [];
+        if (this.type == "total mayhem") bag = this.mayhem();
+        if (this.type == "classic") bag = this.classic();
+        if (this.type == "pairs") bag = this.pairs();
+        if (this.type == "14-bag") bag = this.fourteen();
+        if (this.type == "7+1-bag") bag = this.sevenPlusN(1);
+        if (this.type == "7+2-bag") bag = this.sevenPlusN(2);
+        if (this.type == "7+x-bag") bag = this.sevenX();
+        if (this.type == "7bag") bag = this.seven();
+        this.queue.push(...bag);
+        this.bagid++
+    }
+
+    seven() {
+        let bag = [...pieceNames];
+        this.rng.shuffleArray(bag)
+        return bag
+    }
+
+    fourteen() {
+        let bag = [...pieceNames, ...pieceNames];
+        this.rng.shuffleArray(bag)
+        return bag
+    }
+
+    pairs() {
+        const piecePairs = [...pieceNames];
+        this.rng.shuffleArray(piecePairs);
+        const p1 = piecePairs[0], p2 = piecePairs[1];
+        let bag = [p1, p1, p1, p2, p2, p2];
+        this.rng.shuffleArray(bag);
+        return bag
+    }
+
+    classic() {
+        let bag = [];
+        for (let i = 0; i < 7; i++) {
+            let ind = Math.floor(this.rng.nextFloat() * (pieceNames.length + 1));
+            if (ind === this.lastGenerated || ind >= pieceNames.length) {
+                ind = Math.floor(this.rng.nextFloat() * pieceNames.length);
+            }
+            this.lastGenerated = ind;
+            bag.push(pieceNames[ind]);
+        }
+        return bag
+    }
+
+    mayhem() {
+        let bag = [];
+        for (let i = 0; i < 7; i++) {
+            const ind = Math.floor(this.rng.nextFloat() * pieceNames.length);
+            bag.push(pieceNames[ind]);
+        }
+        return bag
+    }
+
+    sevenX() {
+        const extra = [3, 2, 1, 1][this.bagid] ?? 0; // # extra pieces depending on bag count
+        if (this.bagExtra.length < extra) {
+            this.bagExtra = [...pieceNames];
+            this.rng.shuffleArray(this.bagExtra);
+        }
+        let bag = [...pieceNames, ...this.bagExtra.splice(0, extra)];
+        this.rng.shuffleArray(bag);
+        return bag
+    }
+
+    sevenPlusN(n) {
+        let bag = [...pieceNames];
+        for (let i = 0; i < n; i++) {
+            const ind = Math.floor(this.rng.nextFloat() * pieceNames.length);
+            const randPiece = pieceNames[ind];
+            bag.push(randPiece);
+        }
+        this.rng.shuffleArray(bag);
+        return bag
+    }
+
+    PullFromBag() {
+        while (this.queue.length < 14) {
+            this.PopulateBag();
+        }
+        const piece = this.queue.shift();
+        return piece;
+    }
+}
+
+
+class RNG {
+    constructor(seed) {
+        this.seed = parseInt(seed) % maxInt;
+        if (this.seed <= 0) {
+            this.seed += maxInt - 1;
+            this.seed = this.seed || 1;
+        }
+    }
+
+    next() {
+        this.seed = 16807 * this.seed % maxInt;
+        return this.seed;
+    }
+
+    nextFloat() {
+        return (this.next() - 1) / (maxInt - 1)
+    }
+
+    shuffleArray(arr) {
+        let len = arr.length;
+        if (0 == len) return arr;
+
+        while (--len > 0) {
+            const ind = Math.floor(this.nextFloat() * (len + 1));
+            [arr[len], arr[ind]] = [arr[ind], arr[len]];
+        }
+
+        return arr;
+    }
+
+    getCurrentSeed() {
+        return this.seed
     }
 }

@@ -2,8 +2,7 @@ import { Game } from "./game.js";
 
 const game = new Game();
 
-console.log("%cTETI", "color: #DFC0F3;\n\t\t\t\t\t display: block;\n\t\t\t\t\t font-size: 5em;\n\t\t\t\t\t font-weight: 900;\n\t\t\t\t\t text-shadow: 0px 0px 2px #9150BA;\n\t\t\t\t\t background-color: #45345088;\n\t\t\t\t\t padding: 0 0.25em;\n\t\t\t\t\t border-radius: 3px;"),
-
+console.log("%cTETI", "color: #cccccc; font-size: 5em; font-weight: 900; background-color: #222222; padding: 0 0.25em; border-radius: 3px;"),
 
 // allow html to access functions
 window["menu"] = game.menuactions;
