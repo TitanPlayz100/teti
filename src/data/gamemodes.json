@@ -16,7 +16,7 @@
             "sidebar": ["time", "apm", "pps"],
             "stride": false,
             "clearDelay": 0,
-            "randomiser": "7bag"
+            "randomiser": "7-bag"
         },
         "displayName": "Unset",
         "objectiveText": "",
