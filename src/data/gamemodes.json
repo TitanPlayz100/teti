@@ -131,7 +131,9 @@
         "settings": {
             "raceTarget": 999,
             "gravitySpeed": 0,
-            "clearDelay": 420
+            "clearDelay": 420,
+            "nextPieces": 3,
+            "maxLockMovements": 8
         }
     },
     "zenith": {

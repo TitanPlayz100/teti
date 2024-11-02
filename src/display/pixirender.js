@@ -367,9 +367,9 @@ export class PixiRender {
             textContainer.addChild(s);
             const animation = gsap.timeline({ onComplete: () => s.destroy() })
                 .to(s, { duration: 0, pixi: { alpha: 1, x: s.x, tint: "white" } })
-                .to(s, { duration: 3, pixi: { x: s.x + 8 * (i - split.length / 2) } })
-                .to(s, { duration: 3 / 20, pixi: { tint: "red" }, repeat: 20, yoyo: true, ease: "none" }, "0")
-                .to(s, { duration: 0.5, pixi: { alpha: 0 } }, "2.5")
+                .to(s, { duration: 5, pixi: { x: s.x + 8 * (i - split.length / 2) } })
+                .to(s, { duration: 5 / 20, pixi: { tint: "red" }, repeat: 10, yoyo: true, ease: "none" }, "0")
+                .to(s, { duration: 0.8, pixi: { alpha: 0 } }, "2.5")
             return { sprite: s, animation }
         });
     }

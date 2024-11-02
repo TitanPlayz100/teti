@@ -104,24 +104,56 @@
         "path": "assets/sfx/pbend.mp3"
     },
     {
+        "name": "garbagerise.mp3",
+        "path": "assets/sfx/garbagerise.mp3"
+    },
+    {
+        "name": "garbagesmash.mp3",
+        "path": "assets/sfx/garbagesmash.mp3"
+    },
+    {
         "name": "speed_up.mp3",
-        "path": "assets/sfx/speed_up.mp3",
-        "type": "file"
+        "path": "assets/sfx/speed_up.mp3"
     },
     {
         "name": "speed_down.mp3",
-        "path": "assets/sfx/speed_down.mp3",
-        "type": "file"
+        "path": "assets/sfx/speed_down.mp3"
+    },
+    {
+        "name": "z.mp3",
+        "path": "assets/sfx/piece/z.mp3"
+    },
+    {
+        "name": "s.mp3",
+        "path": "assets/sfx/piece/s.mp3"
+    },
+    {
+        "name": "l.mp3",
+        "path": "assets/sfx/piece/l.mp3"
+    },
+    {
+        "name": "j.mp3",
+        "path": "assets/sfx/piece/j.mp3"
+    },
+    {
+        "name": "t.mp3",
+        "path": "assets/sfx/piece/t.mp3"
+    },
+    {
+        "name": "o.mp3",
+        "path": "assets/sfx/piece/o.mp3"
+    },
+    {
+        "name": "i.mp3",
+        "path": "assets/sfx/piece/i.mp3"
     },
     {
         "name": "levelup.mp3",
-        "path": "assets/sfx/levelup.mp3",
-        "type": "file"
+        "path": "assets/sfx/piece/levelup.mp3"
     },
     {
         "name": "zenith_levelup.mp3",
-        "path": "assets/sfx/zenith_levelup.mp3",
-        "type": "file"
+        "path": "assets/sfx/zenith_levelup.mp3"
     },
     {
         "name": "combo_1.mp3",

@@ -80,11 +80,11 @@ Maybe:
 
 Zenith mode additions
 - add fatigue:
-8:00 - 2 permanent garbage
-9:00 - receive 25% more garbage
-10:00 - 3 more permanent garbage (5 total)
-11:00 - debuff increased to 50% more garbage
-12:00 - 5 more permanent garbage (10 total)
+    - 8:00 - 2 permanent garbage
+    - 9:00 - receive 25% more garbage
+    - 10:00 - 3 more permanent garbage (5 total)
+    - 11:00 - debuff increased to 50% more garbage
+    - 12:00 - 5 more permanent garbage (10 total)
 
 - maybe add a "currently in hyperspeed" graphic
 - simulated garbage recieving option
@@ -92,18 +92,6 @@ Zenith mode additions
     - garbage is random bursts
     - attacks 8 or larger split using {!!} thing (0.5s gap)
 - option for expert mode style
-
-- update climb bar colours:
-Red (#e43921)
-Yellow (#ffb400)
-Green (#82fc40)
-Blue (#3ca6ff)
-Magenta (#ff46da)
-Khaki (#ffc48e)
-"Teal Green" (#99ffc6)
-"Cyan Blue" (#00f7ff)
-"Soft Pink" (#ffbbea)
-White (#ffffff)
 
 ***
 

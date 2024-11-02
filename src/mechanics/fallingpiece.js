@@ -22,6 +22,7 @@ export class Falling {
         this.location = [dx, dy];
         this.piece = piece;
         this.rotation = 1;
+        this.game.sounds.playSound(piece.name)
     }
     
     getKickData(rotationType, shapeNo) {
