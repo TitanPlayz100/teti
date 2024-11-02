@@ -133,7 +133,8 @@
             "gravitySpeed": 0,
             "clearDelay": 420,
             "nextPieces": 3,
-            "maxLockMovements": 8
+            "maxLockMovements": 8,
+            "randomiser": "tgm"
         }
     },
     "zenith": {
