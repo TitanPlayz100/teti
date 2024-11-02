@@ -78,6 +78,7 @@ export class Bag {
         if (this.type == "7+2-bag") bag = this.sevenPlusN(2);
         if (this.type == "7+x-bag") bag = this.sevenX();
         if (this.type == "7-bag") bag = this.seven();
+        if (this.type == "tgm") bag = this.tgmHis(4);
         this.queue.push(...bag);
         this.bagid++
     }
