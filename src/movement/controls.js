@@ -72,11 +72,18 @@ export class Controls {
     startDas(direction) {
         this.moves.movePieceSide(direction);
         this.directionState[direction] = "das";
-        this.stopTimeout("das");
         this.stopInterval("arr");
-        this.timings.das = setTimeout(() => this.startArr(direction),
-            this.game.settings.handling.das
-        );
+        this.startedDas = performance.now();
+        this.currentDirection = direction;
+    }
+
+    timer() {
+        if (this.currentDirection == undefined || this.startedDas == undefined) return;
+        const now = performance.now();
+        if (now - this.startedDas < this.game.settings.handling.das) return;
+        this.startArr(this.currentDirection)
+        this.currentDirection = undefined;
+        this.startedDas = undefined;
     }
 
     startArr(direction) {
@@ -126,7 +133,9 @@ export class Controls {
                 this.startArr(oppDirection);
                 return;
             }
-            this.stopTimeout("das");
+            // this.stopTimeout("das");
+            this.currentDirection = undefined;
+            this.startedDas = undefined;
             this.stopInterval("arr");
         }
         if (direction == "DOWN") this.stopInterval("sd");

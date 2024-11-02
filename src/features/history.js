@@ -9,7 +9,7 @@ export class History {
     historyStates = [];
     /**
      * stores connections by assigning index as the node, and the value as an array of every connection to other nodes
-     * @type {Number[][]}
+     * @type {number[][]}
      */
     historyConnections = [];
     currentState = 0;

@@ -16,7 +16,8 @@
             "sidebar": ["time", "apm", "pps"],
             "stride": false,
             "clearDelay": 0,
-            "randomiser": "7bag"
+            "randomiser": "7bag",
+            "kicktable": "SRS+"
         },
         "displayName": "Unset",
         "objectiveText": "",
@@ -162,7 +163,8 @@
             "allowHold": false,
             "sidebar": ["time", "score", "pps"],
             "clearDelay": 500,
-            "randomiser": "classic"
+            "randomiser": "classic",
+            "kicktable": "NRS"
         }
     }
 }

@@ -42,12 +42,13 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
     - ghost
     - tspins and allspins
     - locking with indicator
-- stats sidebar
+- customisable stats sidebar (and many stats to choose)
 - customisable display, game, controls, and handling settings
+- customisable randomisers and kick tables
+- customise queues
+- import/export settings
 - tetrio sfx
-- touhou jazz music
     - can play/pause, skip song
-- responsive design
 - many modes
     - 40l, blitz, custom
     - attacker (reach certain attack amount)
@@ -55,28 +56,27 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
     - semi invis mode
     - 4W
     - Race (TGM style)
-- clean, modern, and animated menus
-- import/export settings
-- customise queues
 - edit and draw on board (custom game)
 - custom menu to import/export board states, and edit garbage
 - undo and redo with non linear branches
 - pbs are saved, as well as lifetime stats
-- can edit piece skins
+- custom and preset piece skins
 - cool particles
+- clean, modern, and animated menus
+- responsive design
+- touhou jazz music
 
 ## TODO list
 Things that I am working on based on other changes
 - ready set go start option
-- arcade mode
 - rotation centres
 - bag seperators
 - gravity increase over time (and maybe fix softdrop)
+- loading bar
 
 Maybe:
-- CHANGE GAME CLASS TO BE EXPORTED MODULES
-    - remove all this.game references in replacement with just the class being imported
-    - **no longer shall the shackles of past object oriented java code bound the multiparadigm eutopia which is javascript**
+- change game class to be export modules instead
+    - remove all this.game references in replacement with just the instance being imported
 
 Zenith mode additions
 - add fatigue:
@@ -108,6 +108,16 @@ White (#ffffff)
 ***
 
 ## Updates
+#### v1.3.8
+- changed movement to use a precision timer (setinterval at 0ms) to be as accurate to das as possible
+- added most other kicks (code maybe stolen from tetrio)
+    - had to change tetrio's table rotation numbers 
+    - (switch digits, then 1 is 4, 2 is 3, 3 is 2, 0 is 1)
+    - eg 01 was 41 (01 -> 10 -> 41)
+    - wtf was this nightmare
+- kicks include SRS, SRS+, SRS-X, NRS, ARS, ASC, TETRA-X, and none
+
+
 #### v1.3.7
 - changed randomiser to use TETR.IO's seed system
     - seeds from tetrio replays match teti's
@@ -119,6 +129,7 @@ White (#ffffff)
 - classic gamemode uses classic randomiser
 
 #### v1.3.6
+- added basics of a classic mode (with gravity, instant lock, and classic rng)
 - added total mayhem randomiser
     - in the future it is very easy to add more randomisers
     - thinking of adding all tetrio randomisers
@@ -283,6 +294,8 @@ White (#ffffff)
 ## Feature Wishlist
 Future wants for game, kinda ordered by ease and desire for feature
 - finesse detection
+- custom game presets
+    - setting presets for display settings and game settings
 - allow importing tetrio settings and custom game files
 - small guide on essential things for game
     - show info when hovering over settings

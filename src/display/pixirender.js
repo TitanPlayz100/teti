@@ -2,6 +2,8 @@ import { Game } from '../game.js';
 import { defaultSkins } from '../data/data.js';
 import blocksprites from '../data/blocksprites.json' with { type: 'json' };
 import { clearSplash } from '../main.js';
+import kicks from '../data/kicks.json' with { type: 'json' };
+import { getPiece } from '../mechanics/randomisers.js';
 
 export class PixiRender {
     textures = {};
@@ -57,9 +59,9 @@ export class PixiRender {
         textContainer.label = "textContainer";
 
         // particles
-        const particles = new PIXI.Container();
-        this.app.stage.addChild(particles);
-        particles.label = "particles";
+        this.particleContainer = new PIXI.Container
+        this.app.stage.addChild(this.particleContainer);
+        this.particleContainer.label = "particles";
         this.game.particles.initBoard();
 
         // init
@@ -510,6 +512,7 @@ export class PixiRender {
     // RENDER CLOCK
     tick(time) {
         this.game.controls.runKeyQueue();
+        this.game.controls.timer();
         this.render("board", this.game.board.boardState);
         this.game.boardeffects.move(0, 0);
         this.game.boardeffects.rotate(0);
@@ -536,6 +539,7 @@ export class PixiRender {
                 const cell = col.split(" ");
                 const sprite = shadowArray[y][x];
                 sprite.visible = false;
+                sprite.tint = undefined;
                 if (cell.includes("A") || cell.includes("S")) { // active or stopped piece
                     sprite.visible = true;
                     sprite.texture = this.getTexture(type, cell);
@@ -545,18 +549,26 @@ export class PixiRender {
                     sprite.texture = this.textures["topout"];
                     sprite.alpha = 0.32;
                 } else if (cell.includes("Sh")) { // shadow piece
-                    const pieceName = this.game.settings.display.colouredShadow ? this.game.falling.piece.name : "shadow";
                     sprite.visible = true;
-                    sprite.texture = this.textures[pieceName];
+                    sprite.texture = this.textures["shadow"];
                     sprite.alpha = this.getShadowOpacity();
+                    this.setShadowTint(sprite)
                 }
             });
         });
     }
 
     getTexture(type, cell) {
-        const piece = this.game.hold.occured && type == "hold" ? "hold" : cell[1].toLowerCase()
-        return this.textures[piece];
+        const piece = this.game.hold.occured && type == "hold" ? "hold" : cell[1].toLowerCase();
+        const override = kicks[this.game.settings.game.kicktable].color_overrides ?? {};
+        return this.textures[override[piece] ?? piece];
+    }
+
+    setShadowTint(sprite) {
+        if (!this.game.settings.display.colouredShadow) return;
+        const pieceName = this.game.falling.piece.name;
+        const override = kicks[this.game.settings.game.kicktable].color_overrides ?? {};
+        sprite.tint = getPiece(override[pieceName] ?? pieceName).colour;
     }
 
     flash(coords) {
@@ -623,8 +635,12 @@ export class PixiRender {
         update("justPlacedAlpha", 6)
     }
 
-    createParticleSprite() {
-        return new PIXI.Sprite(this.game.particles.texture);
+    addNewParticle(colour) {
+        const p = new PIXI.Sprite(this.game.particles.texture);
+        p.tint = colour
+        p.scale.set(0.5);
+        this.particleContainer.addChild(p);
+        return p;
     }
 
     toggleDangerBG(danger) {

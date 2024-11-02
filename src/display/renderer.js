@@ -1,13 +1,14 @@
 import { Game } from "../game.js";
 import { statDecimals, statsSecondary as statsSecondaries } from "../data/data.js";
 import { getPiece } from "../mechanics/randomisers.js";
+import kicks from "../data/kicks.json" with { type: "json" };
 
 export class Renderer {
     holdQueueGrid = [];
     nextQueueGrid = [];
     inDanger;
     texttimeouts = {};
-    
+
     sidebarStats;
     sidebarFixed;
     sidebarSecondary;
@@ -31,7 +32,9 @@ export class Renderer {
         next5.forEach((piece, idx) => {
             let [dx, dy] = [0, 3 * (4 - idx)];
             if (piece.name == "o") [dx, dy] = [dx + 1, dy + 1]; // shift o piece
-            const coords = this.board.pieceToCoords(piece.shape1);
+            const initialRotations = kicks[this.game.settings.game.kicktable].spawn_rotation ?? {}
+            const rotation = initialRotations[piece.name] ?? 1;
+            const coords = this.board.pieceToCoords(piece[`shape${rotation}`]);
             coords.forEach(([x, y]) => (this.nextQueueGrid[y + dy][x + dx] = "A " + piece.name));
         });
 
@@ -47,7 +50,9 @@ export class Renderer {
         const isO = name == "o",
             isI = name == "i";
         const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
-        const coords = this.board.pieceToCoords(this.game.hold.piece.shape1);
+        const initialRotations = kicks[this.game.settings.game.kicktable].spawn_rotation ?? {}
+        const rotation = initialRotations[name] ?? 1;
+        const coords = this.board.pieceToCoords(this.game.hold.piece[`shape${rotation}`]);
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
 
         this.game.pixi.render("hold", this.holdQueueGrid);
@@ -153,10 +158,10 @@ export class Renderer {
     formatTime(s, d) {
         const minutes = Math.floor(s / 60);
         const seconds = (s - minutes * 60).toFixed(d)
-        return `${minutes>0?minutes:""}:${seconds < 10 ? "0" : ""}${seconds}`
+        return `${minutes > 0 ? minutes : ""}:${seconds < 10 ? "0" : ""}${seconds}`
     }
 
-    renderTimeLeft(text){
+    renderTimeLeft(text) {
         this.game.pixi.showTimeLeftText(text);
     }
 

@@ -1,6 +1,7 @@
 import { Game } from "../game.js";
 
 class Point {
+    /** * @param {Particles} particleInstance */
     constructor(particleInfo, particleInstance) {
         const { x, y, colour, life, dx, dy, sway, xF, yF, swayF, gravity, twinkle, twinkleTime } = particleInfo;
         this.x = x;
@@ -20,9 +21,7 @@ class Point {
         this.twinkle = twinkle ?? false;
         this.twinkleTime = twinkleTime ?? this.life;
 
-        this.particle = particleInstance.game.pixi.createParticleSprite()
-        this.particle.tint = colour;
-        particleInstance.container.addChild(this.particle);
+        this.particle = particleInstance.game.pixi.addNewParticle(colour)
         particleInstance.particles.push(this);
     }
 
@@ -30,7 +29,7 @@ class Point {
         this.particle.alpha = Math.max(0, this.life / this.maxLife);
         this.particle.x = this.x;
         this.particle.y = this.y;
-        this.particle.scale.set(0.5 * this.size)
+        this.particle.scale.set(this.size*0.5);
     }
 
     update() {
@@ -58,7 +57,7 @@ export class Particles {
     }
 
     initBoard() {
-        this.container = this.game.pixi.app.stage.getChildByLabel("particles");
+        this.container = this.game.pixi.particleContainer;
     }
 
     spawnParticles(posX, posY, type, pieceWidth = 1, cw = false, colour = "white") {
@@ -221,7 +220,7 @@ export class Particles {
         this.particles.forEach(particle => {
             if (particle.life <= 0) { // something here worked to fix memory leak
                 this.container.removeChild(particle.particle);
-                // particle.particle.destroy();
+                particle.particle.destroy();
             }
         })
         this.particles = this.particles.filter(p => p.life > 0);

@@ -1,7 +1,7 @@
 import { defaultSkins } from "../data/data.js";
 import { Game } from "../game.js";
 import { randomisers } from "../mechanics/randomisers.js";
-
+import kicks from "../data/kicks.json" with { type: "json" };
 
 export class GenerateMenus {
     gamemodeStart = document.getElementById("startGamemodeList");
@@ -196,6 +196,14 @@ export class GenerateMenus {
             const option = document.createElement("option");
             option.textContent = type;
             randomiser.appendChild(option);
+        })
+
+        const kicktable = document.getElementById("kicktable");
+        const kicktypes = Object.getOwnPropertyNames(kicks);
+        kicktypes.forEach(type => {
+            const option = document.createElement("option");
+            option.textContent = type;
+            kicktable.appendChild(option);
         })
     }
 

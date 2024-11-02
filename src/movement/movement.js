@@ -12,7 +12,7 @@ export class Movement {
     firstMovement() {
         this.game.zenith.startZenithMode();
         this.game.grandmaster.startGrandmasterTimer();
-        if(this.game.zenith.tickPass == 0 && this.game.settings.game.gamemode == "zenith") this.game.renderer.renderTimeLeft("FLOOR 1")
+        if (this.game.zenith.tickPass == 0 && this.game.settings.game.gamemode == "zenith") this.game.renderer.renderTimeLeft("FLOOR 1")
         this.game.started = true;
         this.game.mechanics.startGravity();
         this.game.modes.startSurvival();
@@ -74,13 +74,13 @@ export class Movement {
     rotate(type) {
         if (this.game.falling.piece.name == "o") return;
         const newRotation = this.game.falling.getRotateState(type);
-        const kickdata = this.game.falling.getKickData(type, newRotation);
+        const kickdata = this.game.falling.getKickData(newRotation);
         const rotatingCoords = this.game.falling.getNewCoords(newRotation);
         const change = kickdata.find(([dx, dy]) =>
             !this.checkCollision(rotatingCoords.map(c => [c[0] + dx, c[1] + dy]), "ROTATE"));
         if (!change) return;
         this.game.board.MinoToNone("A");
-        this.game.board.addMinos(this.game.falling.newName(), rotatingCoords, change);
+        this.game.board.addMinos("A " + this.game.falling.piece.name, rotatingCoords, change);
         this.game.falling.updateLocation(change);
         this.game.mechanics.isTspin = this.checkTspin(newRotation, this.game.falling.location, change);
         this.game.mechanics.isAllspin = this.checkAllspin(this.game.board.getMinos("A"));
@@ -96,7 +96,7 @@ export class Movement {
             this.game.renderer.rotateBoard(type);
             this.game.particles.spawnParticles(...this.game.falling.location,
                 "spin", 5, type == "CW", this.game.falling.piece.colour);
-                this.game.sounds.playSound("spin");
+            this.game.sounds.playSound("spin");
         }
     }
 
