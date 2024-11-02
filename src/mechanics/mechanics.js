@@ -110,6 +110,9 @@ export class Mechanics {
             }
         }
         this.setShadow();
+
+        if(lines >= 8) this.game.sounds.playSound("garbagesmash")
+        else this.game.sounds.playSound("garbagerise")
     }
 
     switchHold() {

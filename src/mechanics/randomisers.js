@@ -4,7 +4,7 @@ import pieces from "../data/pieces.json" with { type: "json" };
 const pieceNames = ["z", "l", "o", "s", "i", "j", "t"]; // THIS ORDER IS VERY IMPORTANT
 
 const maxInt = 2 ** 31 - 1;
-export const randomisers = ["total mayhem", "classic", "pairs", "14-bag", "7+1-bag", "7+2-bag", "7+x-bag", "7bag"];
+export const randomisers = ["total mayhem", "classic", "pairs", "14-bag", "7+1-bag", "7+2-bag", "7+x-bag", "7-bag", "tgm"];
 
 export function getPiece(name) {
     if (name == "G") return { colour: "gray" }
@@ -16,6 +16,7 @@ export class Bag {
     bagid = 0;
     bagExtra = [];
     queue = [];
+    history = ["s","z","s","z"]
     type;
 
     /** @param {Game} game */
@@ -76,7 +77,8 @@ export class Bag {
         if (this.type == "7+1-bag") bag = this.sevenPlusN(1);
         if (this.type == "7+2-bag") bag = this.sevenPlusN(2);
         if (this.type == "7+x-bag") bag = this.sevenX();
-        if (this.type == "7bag") bag = this.seven();
+        if (this.type == "7-bag" || this.type == "7bag") bag = this.seven();
+        if (this.type == "tgm") bag = this.tgmHis(4);
         this.queue.push(...bag);
         this.bagid++
     }
@@ -144,6 +146,25 @@ export class Bag {
         }
         this.rng.shuffleArray(bag);
         return bag
+    }
+
+    tgmHis(reroll) {
+        let bag = [];
+        let rerollCount = reroll
+
+        while(bag.length != 7){
+            const ind = Math.floor(this.rng.nextFloat() * pieceNames.length);
+            rerollCount--
+
+            if( !this.history.includes(pieceNames[ind]) || rerollCount == 0 ){
+                this.history.shift()
+                this.history.push(pieceNames[ind])
+                bag.push(pieceNames[ind]);
+                rerollCount = reroll
+            }
+
+        }
+        return bag    
     }
 
     PullFromBag() {

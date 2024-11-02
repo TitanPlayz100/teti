@@ -17,7 +17,8 @@ export class Zenith {
         promotionFatigue = 0;
         rankLock = 0;
         tickPass = 0;
-        tempAltitude = 0
+        tempAltitude = 0;
+        bonusAltitude = 0;
 
         FloorDistance = [0, 50, 150, 300, 450, 650, 850, 1100, 1350, 1650, 1 / 0];
         SpeedrunReq = [7, 8, 8, 9, 9, 10, 0, 0, 0, 0, 0];
@@ -40,7 +41,7 @@ export class Zenith {
         }
 
         GiveBonus(e) {
-            this.tempAltitude += e
+            this.bonusAltitude += e
         }
 
         GiveClimbPts(e) {
@@ -57,6 +58,7 @@ export class Zenith {
                         let t = Math.floor(this.game.stats.climbSpeed),
                             o = .25 * t,
                             a = this.GetSpeedCap(this.tempAltitude);
+                    //calculate climb speed
 
                     if (this.tickPass >= this.rankLock) {
                         let e = 3;
@@ -85,9 +87,18 @@ export class Zenith {
                         this.promotionFatigue++;
                     }
 
+                //calculate stats
                     this.game.stats.climbSpeed = t + this.climbPoints / (4 * t);
-
                     this.tempAltitude += o / 60 * a
+                    if (this.bonusAltitude > 0)
+                        if (this.bonusAltitude <= .05)
+                            this.tempAltitude += this.bonusAltitude,
+                            this.bonusAltitude = 0;
+                        else {
+                            const e = Math.min(10, .1 * this.bonusAltitude);
+                            this.tempAltitude += e,
+                            this.bonusAltitude -= e
+                        }
 
                     if(this.game.stats.floor != this.GetFloorLevel(this.tempAltitude)){
                         this.startZenithMode()
@@ -95,23 +106,22 @@ export class Zenith {
                         this.game.sounds.playSound("zenith_levelup")
                         this.game.renderer.renderTimeLeft("FLOOR " + this.game.stats.floor)
                     }
-                    const g = this.tempAltitude
                     this.game.stats.altitude = this.tempAltitude
                     this.tickPass++
                     this.drawClimbSpeedBar(Math.floor(this.game.stats.climbSpeed), this.climbPoints, s)
-        }
+            }
                 , 1000 / this.game.tickrate);
         }
 
         drawClimbSpeedBar(speed, point, require){ // todo: drawing polygons (parallelogram) cus idk
-            const color = ["var(--invis)", "red", "orange", "green", "blue", "#FF1493", "tan", "lightgreen", "lightblue", "pink", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white"]
+            const color = ["var(--invis)", "#e43921", "#ffb400", "#82fc40", "#3ca6ff", "#ff46da", "#ffc48e", "#99ffc6", "#00f7ff", "#ffbbea", "#ffffff"]
             const climbSpeedBar = document.getElementById("climbSpeedBar")
 
             climbSpeedBar.value = point
             climbSpeedBar.max = require
             // changes css variable, better selection
-            document.getElementById("climbSpeedBar").style.setProperty("--background-colour", color[speed-1])
-            document.getElementById("climbSpeedBar").style.setProperty("--bar-colour", color[speed])
+            document.getElementById("climbSpeedBar").style.setProperty("--background-colour", color[Math.min(10, speed - 1)])
+            document.getElementById("climbSpeedBar").style.setProperty("--bar-colour", color[Math.min(10, speed)])
         }
  
 }
@@ -172,53 +182,10 @@ export class Grandmaster {
         [5, 10, 15, 30],
         [5, 10, 15, 30],
         [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30],
-        [2, 12, 13, 30], // is this long enough?
     ];
     gradeBoostTable = [
         0,1,2,3,4,5,5,6,6,7,7,7,8,8,8,9,9,9,10,11,12,12,12,13,13,14,14,15,15,16,16,17,17,18,18,19,19,20,20,21,21,22,22,23,23,24,24,25,25,26,26,26,27,27,27,27,28,28,28,28,28,29,29,29,29,29,30,30,30,30,30
-    ];
+];
 
     coolsTable = [52, 52, 49, 45, 45, 42, 42, 38, 38, 0];
     regretsTable = [90, 75, 75, 68, 60, 60, 50, 50, 50, 50];
@@ -230,7 +197,7 @@ export class Grandmaster {
         this.game.stats.grade = this.grades[this.gradeBoost + this.coolsCount - this.regretsCount];
         if (row<1) return;
 
-        const pts = this.gradePointBonus[this.internalGrade][row - 1];
+        const pts = this.gradePointBonus[Math.min(10, this.internalGrade)][row - 1];
         const cmb_mult = this.mult[Math.min(9, cmb)][row - 1];
         const lvl_mult = Math.floor(lvl / 250) + 1;
 
@@ -240,7 +207,7 @@ export class Grandmaster {
             this.gradePoint = 0;
             this.internalGrade++;
             this.gradeBoost = this.gradeBoostTable[this.internalGrade];
-            this.startGrandmasterTimer(this.gradePointDecay[this.internalGrade]);
+            this.startGrandmasterTimer();
         };
     }
     
@@ -249,12 +216,12 @@ export class Grandmaster {
         if(this.game.settings.game.gamemode != "race") return
         this.game.grandmasterTimer = setInterval(() => {
             this.gradePoint = Math.max(0, this.gradePoint - 1);
-        }, (1000 / 60 * this.gradePointDecay[this.internalGrade]) )
+        }, (1000 / 60 * this.gradePointDecay[Math.min(31, this.internalGrade)]) )
     }
 
     checkSectionCleared(){
         if(this.game.stats.tgm_level >= this.sectionTarget){
-            this.game.renderer.renderTimeLeft("SECTION " + this.sectionTarget / 100 + " CLEAR");
+            this.game.renderer.renderTimeLeft("SECTION " + Math.ceil(this.sectionTarget / 100) + " CLEAR");
             this.game.sounds.playSound("levelup");
             if(this.sectionTime >= this.regretsTable[(this.sectionTarget / 100) - 1]){
                 this.game.renderer.renderTimeLeft("REGRET");

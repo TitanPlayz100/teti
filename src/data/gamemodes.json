@@ -16,7 +16,7 @@
             "sidebar": ["time", "apm", "pps"],
             "stride": false,
             "clearDelay": 0,
-            "randomiser": "7bag"
+            "randomiser": "7-bag"
         },
         "displayName": "Unset",
         "objectiveText": "",
@@ -131,7 +131,10 @@
         "settings": {
             "raceTarget": 999,
             "gravitySpeed": 0,
-            "clearDelay": 420
+            "clearDelay": 420,
+            "nextPieces": 3,
+            "maxLockMovements": 8,
+            "randomiser": "tgm"
         }
     },
     "zenith": {
