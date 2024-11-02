@@ -50,16 +50,6 @@ body {
     opacity: 1;
 }
 
-#splashAnim{
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    background-color: #000;
-    right: 22px;
-    bottom: 22px;
-    animation: 3s LoaderSpin ease-out infinite;
-}
-
 #ignoreText {
     opacity: 0;
     transition: all 1s ease;
