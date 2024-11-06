@@ -2,10 +2,9 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform-origin: 0 0;
-    transform: scale(1.1) translate(-50%, -50%);
-    height: 60vh;
-    aspect-ratio: 0.5;
+    transform: translate(-50%, -50%);
+    height: 60%;
+    aspect-ratio: 1/2;
     pointer-events: none;
 }
 
@@ -92,33 +91,6 @@
     user-select: none;
 }
 
-#warningText {
-    font-family: "Montserrat", sans-serif;
-    font-weight: bold;
-    color: red;
-    font-size: 1em;
-    width: 100%;
-    text-align: center;
-    bottom: 100%;
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-#warningText.warn {
-    opacity: 0.5;
-    animation: warn 0.3s infinite;
-}
-
-@keyframes warn {
-    0% {
-        opacity: 0.5;
-    }
-
-    50% {
-        opacity: 0;
-    }
-}
-
 #redochoices {
     position: absolute;
     display: flex;
@@ -161,4 +133,28 @@
     border-color: var(--green);
     color: var(--green);
     transition: all 0.05s ease;
+}
+
+#rainbowSides {
+    position: fixed;
+    top: -100vh;
+    left: 0;
+    height: 500vh;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    opacity: 0;
+}
+
+#rainbowLeft {
+    width: 13vw;
+    background: repeating-linear-gradient(#ff4545, #00c375, #006aff, #ff0095, #ff4545 200vh);
+    filter: blur(150px);
+}
+
+#rainbowRight {
+    width: 13vw;
+    background: repeating-linear-gradient(#ff4545, #00c375, #006aff, #ff0095, #ff4545 200vh);
+    filter: blur(150px);
+
 }

@@ -23,16 +23,13 @@ export class Falling {
         this.game.mechanics.board.addMinos("A " + piece.name, coords, [dx, dy]);
         this.location = [dx, dy];
         this.piece = piece;
-        this.rotation = 1;
-        this.game.sounds.playSound(piece.name)
+        this.game.sounds.playSound(this.game.bag.queue[0]); // play NEXT piece sfx
     }
 
     getKickData(newRotation) {
         let iPiece = this.piece.name == "i" ? "i_kicks" : "kicks";
         const type = `${this.rotation}${newRotation}`;
         const kicktable = this.game.settings.game.kicktable;
-
-        /**@type {number[][]} */
         const kickdata = (kicks[kicktable][iPiece] ?? {})[type] ?? [];
         kickdata.unshift([0, 0]);
         return kickdata

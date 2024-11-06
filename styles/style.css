@@ -1,4 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap");
+@font-face {
+    font-family: "MajorMonoDisplay";
+    src: url(./MajorMonoDisplay.ttf);
+}
 
 :root {
     --night: #080b0c;
@@ -17,10 +20,8 @@
 
 body {
     color: var(--cl-blue);
-    font-family: "Major Mono Display", monospace;
+    font-family: "MajorMonoDisplay";
     margin: 0;
-    /* height: 100vh; */
-    /* width: 100vw; */
     overflow: hidden;
     background: var(--night);
     --background: black;
@@ -50,9 +51,19 @@ body {
     opacity: 1;
 }
 
-#ignoreText {
-    opacity: 0;
-    transition: all 1s ease;
+.spinner {
+    width: 3vmin;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1vmin solid;
+    border-color: #ffffff #ffffff00;
+    animation: l1 1s infinite;
+}
+
+@keyframes l1 {
+    to {
+        transform: rotate(.5turn)
+    }
 }
 
 .dialog img,

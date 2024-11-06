@@ -72,11 +72,12 @@ Things that I am working on based on other changes
 - rotation centres
 - bag seperators
 - gravity increase over time (and maybe fix softdrop)
-- loading bar
+- fix rounding stuff with end screen
 
 Maybe:
 - change game class to be export modules instead
     - remove all this.game references in replacement with just the instance being imported
+- make setting menus be json generated
 
 Zenith mode additions
 - add fatigue:
@@ -96,15 +97,25 @@ Zenith mode additions
 ***
 
 ## Updates
+#### v1.3.9
+- refactored graphic visuals to be in another file, and animations in another file
+- pixirender is much clearer
+- added board opacity back
+- added a new pb rainbow effect on sides of board (old one was too complex)
+- loading spinner
+
 #### v1.3.8
-- changed movement to use a precision timer (setinterval at 0ms) to be as accurate to das as possible
+- changed movement to use pixi ticker (frames) to give smoother movement
 - added most other kicks (code maybe stolen from tetrio)
     - had to change tetrio's table rotation numbers 
     - (switch digits, then 1 is 4, 2 is 3, 3 is 2, 0 is 1)
-    - eg 01 was 41 (01 -> 10 -> 41)
-    - wtf was this nightmare
+    - eg tetrio 01 (01 -> 10 -> 41) is 41 in kicks.json
 - kicks include SRS, SRS+, SRS-X, NRS, ARS, ASC, TETRA-X, and none
 
+- piece spawning sfx added
+- changed more competitive mode settings
+    - updated race mode to use accurate randomiser
+- added tgm randomiser (HiS in techmino)
 
 #### v1.3.7
 - changed randomiser to use TETR.IO's seed system
@@ -122,6 +133,9 @@ Zenith mode additions
     - in the future it is very easy to add more randomisers
     - thinking of adding all tetrio randomisers
     - also figuring out tetrio's seed gen to mimic it for future additions (digging source code aaaaaa)
+
+- more skins added (TGM classic and world)
+- grading system in race
 
 #### v1.3.5
 - New board design inspired from [this reddit post](https://www.reddit.com/r/Tetris/comments/1g80adg/tetris_ui_concept/)
@@ -229,7 +243,7 @@ Zenith mode additions
 #### v1.2.1.2
 - fixed edit modal breaking when main menu open
 - fixed flashing being too fast in lookahead mode
-- fixed setting snot properly saving with competitive mode active
+- fixed settings not properly saving with competitive mode active
 
 #### v1.2.1.1
 - fun with parallax effect in info page
@@ -289,7 +303,6 @@ Future wants for game, kinda ordered by ease and desire for feature
     - show info when hovering over settings
     - WIKI for technical docs about project
     - glossary of useful terms
-- more rotation systems (ars, trs, srs/srsX, none)
 - replay functionality (either save gamestate or save keystrokes idk yet)
     - statistics graph
 - more unique gamemodes (techmino styled)

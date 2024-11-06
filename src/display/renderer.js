@@ -69,7 +69,7 @@ export class Renderer {
         if (condition && !this.inDanger) {
             this.game.sounds.playSound("damage_alert");
         }
-        this.game.pixi.toggleDangerBG(condition);
+        this.game.animations.toggleDangerBG(condition);
         this.inDanger = condition;
     }
 
@@ -100,31 +100,29 @@ export class Renderer {
 
         // text
         if (this.game.settings.display.actionText == false) return;
-        if (damagetype != "") this.game.pixi.showActionText("cleartext", damagetype);
-        if (this.game.stats.combo > 0) this.game.pixi.showActionText("combotext", `Combo ${this.game.stats.combo}`);
-        if (isBTB && this.game.stats.btbCount > 0) this.game.pixi.showActionText("btbtext", `btb ${this.game.stats.btbCount} `);
-        if (this.game.mechanics.spikeCounter > 4 && linecount > 0) this.game.pixi.showSpikeText(`${this.game.mechanics.spikeCounter}`);
-        if (isPC) this.game.pixi.showPCText();
+        if (damagetype != "") this.game.animations.showActionText("cleartext", damagetype);
+        if (this.game.stats.combo > 0) this.game.animations.showActionText("combotext", `Combo ${this.game.stats.combo}`);
+        if (isBTB && this.game.stats.btbCount > 0) this.game.animations.showActionText("btbtext", `btb ${this.game.stats.btbCount} `);
+        if (this.game.mechanics.spikeCounter > 4 && linecount > 0) this.game.animations.showSpikeText(`${this.game.mechanics.spikeCounter}`);
+        if (isPC) this.game.animations.showPCText();
 
     }
 
     renderStyles(settings = false) {
-        // custom background
         const bg = this.game.settings.display.background;
         if (bg == "") bg = "#080B0C";
         document.body.style.background = (bg[0] == "#") ? bg : `url("${bg}") no-repeat center center`
         document.body.style.backgroundSize = "cover";
 
-        const height = Number(this.game.settings.display.boardHeight);
-        this.divBoard.style.transform = `scale(${height}%) translate(-50%, -50%)`;
+        if (settings) {
+            this.game.pixi.resize();
+            this.game.pixi.generateTextures();
+        }
+        this.setupSidebar();
+        this.divBoard.style.height = `${this.game.pixi.height}px`;
+    }
 
-        // todo add board background
-        // board opacity
-        // const background = `rgba(0, 0, 0, ${Number(this.game.settings.display.boardOpacity) / 100})`;
-        // this.divBackboard.style.backgroundColor = background;
-        // document.body.style.setProperty('--background', background);
-
-        // sidebar constants
+    setupSidebar() {
         this.sidebarStats = this.game.settings.game.sidebar;
         this.sidebarFixed = this.sidebarStats.map(stat => reverseLookup(statDecimals)[stat]);
         this.sidebarSecondary = this.sidebarStats.map(stat => statsSecondaries[stat] ?? "None");
@@ -133,19 +131,17 @@ export class Renderer {
             if (stat == "None") stat = ""
             this.game.pixi.statTexts[index].statText.text = stat.toUpperCase();
         })
-
-        if (settings) this.game.pixi.resize();
     }
 
     renderSidebar() {
         this.sidebarStats.forEach((stat, index) => {
-            if (stat == "None") { // no stat
+            if (stat == "None") {
                 this.game.pixi.statTexts[index].stat.text = "";
                 return;
             };
 
             let displayStat = this.game.stats[stat].toFixed(this.sidebarFixed[index]) ?? "";
-            if (stat == "time") displayStat = this.formatTime(Number(displayStat), this.sidebarFixed[index]); // reformat time
+            if (stat == "time") displayStat = this.formatTime(Number(displayStat), this.sidebarFixed[index]); // reformats time
             this.game.pixi.statTexts[index].stat.text = displayStat;
 
             if (this.sidebarSecondary[index]) {
@@ -162,7 +158,7 @@ export class Renderer {
     }
 
     renderTimeLeft(text) {
-        this.game.pixi.showTimeLeftText(text);
+        this.game.animations.showTimeLeftText(text);
     }
 
     setEditPieceColours() {

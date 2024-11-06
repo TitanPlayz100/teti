@@ -4,8 +4,8 @@ const game = new Game();
 
 console.log("%cTETI", "color: #cccccc; font-size: 5em; font-weight: 900; background-color: #222222; padding: 0 0.25em; border-radius: 3px;"),
 
-// allow html to access functions
-window["menu"] = game.menuactions;
+    // allow html to access functions
+    window["menu"] = game.menuactions;
 window["modal"] = game.modals;
 window["songs"] = game.sounds;
 
@@ -14,7 +14,7 @@ window.addEventListener("keydown", event => {
     let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // 1 letter words are lowercase
     if (event.altKey) key = "Alt+" + key;
     if (event.ctrlKey) key = "Ctrl+" + key;
-    
+
     game.controls.onKeyDownRepeat(event, key);
     if (event.repeat) return;
     game.controls.onKeyDown(event, key);
@@ -37,6 +37,7 @@ document.body.addEventListener("mouseup", (e) => {
 window.addEventListener("resize", () => {
     setTimeout(() => {
         game.pixi.resize();
+        game.renderer.setupSidebar();
         game.renderer.updateNext();
         game.renderer.updateHold();
     }, 0);
@@ -50,7 +51,6 @@ export function clearSplash() {
     elementSplashScreen.style.opacity = 0;
     elementSplashScreen.style.scale = 1.2;
     elementSplashScreen.style.display = "none";
-    document.getElementById("ignoreText").style.opacity = 0.5;
 }
 
 window.addEventListener("focus", function () {

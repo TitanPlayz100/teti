@@ -12,6 +12,14 @@ Releases are now run through a workflow. They are **up to date** and contain all
 
 App build using Tauri, feel free to open issues and PRs.
 
+## Contributing
+Feel free to add and modify any code, as long as its for improvements or optimisations. (I'm pretty lenient)
+
+Just make sure ur accounting for breaking changes, and have clear PRs with good descriptions.
+
+If you need help with understanding code feel free to open an issue.
+
+
 ## Data Formats (for my convenience)
 ### Gamemode Structure (gamemodes.json)
 ```js
@@ -55,8 +63,7 @@ Workaround to use types when using pixijs imported through script tag:
 
 ```json 
 {
-    "typeAcquisition": {
-        "include": ["pixi.js.d.ts"]
-    }
+    "compilerOptions": { "resolveJsonModule": true },
+    "typeAcquisition": { "include": ["pixi.js.d.ts"] }
 }
 ```

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+    
 <head>
     <title>teti</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="./assets/titanicon.ico">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles/style.css">
@@ -20,8 +22,6 @@
 <body id="body">
     <!-- BOARD -->
     <div id="board">
-        <!-- todo move to pixi -->
-        <p class="text" id="warningText">⚠ GO DOWN</p>
         <progress id="garbageQueue" max="40" value="0"></progress>
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
@@ -32,7 +32,7 @@
     <div id="splashScreen" onclick="finishLoad()">
         <h1>Teti</h1>
         <p id="splashText">loading code</p>
-        <p id="ignoreText" >Click to ignore</p>
+        <div class="spinner"></div>
     </div>
 
     <div id="nofocus">OUT OF FOCUS<span>Click To Return</span></div>
@@ -41,6 +41,13 @@
         <p class="smalltext" id="history" style="font-size: 0.9em; color: var(--l-gray); width: 100%;">history: 0</p>
         <button class="redochoice selected">1</button>
         <button class="redochoice">2</button>
+    </div>
+
+    <div id="notifications"></div>
+
+    <div id="rainbowSides">
+        <div id="rainbowLeft"></div>
+        <div id="rainbowRight"></div>
     </div>
 
     <!-- MAIN MENU -->
@@ -367,7 +374,5 @@
             <button class="closeDialogButton" onclick="modal.closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
         </div>
     </dialog>
-
-    <div id="notifications"></div>
 </body>
 </html>

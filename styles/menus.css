@@ -242,7 +242,7 @@ button>img {
     user-select: none;
     border: none;
     animation: fadein 0.4s forwards ease;
-    font-family: "Montserrat", sans-serif;
+    font-family: "Montserrat";
 }
 
 #frontdrop.closingAnimation {
@@ -279,7 +279,7 @@ button>img {
 
 /* focus */
 #nofocus {
-    font-family: "Montserrat", sans-serif;
+    font-family: "Montserrat";
     display: none;
     opacity: 1;
     text-align: center;

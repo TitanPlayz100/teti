@@ -52,7 +52,7 @@ export class Modes {
         if (statValue != undefined) statValue = statValue.toFixed(reverseLookup(statDecimals)[stat])
         let modetext = (statValue == undefined ? '' : statValue)
             + (resultValue == undefined ? '' : `/${resultValue}`)
-        this.game.pixi.objectiveTexts[0].text = modetext;
+        this.game.pixi.texts.objectiveText.sprite.text = modetext;
     }
 
     loadModes() {
@@ -63,7 +63,7 @@ export class Modes {
         }
         this.setGamemode(currentGamemode);
 
-        this.game.pixi.objectiveTexts[1].text = this.modeJSON.objectiveText.toUpperCase();
+        this.game.pixi.texts.objectiveNameText.sprite.text = this.modeJSON.objectiveText.toUpperCase();
         this.game.pixi.toggleEditButton(this.game.settings.game.gamemode == 'custom');
     }
 

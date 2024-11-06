@@ -19,6 +19,7 @@ import { Modes } from "./features/modes.js";
 import { Particles } from "./display/particles.js";
 import { Zenith, Grandmaster } from "./mechanics/gamemode_extended.js";
 import { PixiRender } from "./display/pixirender.js";
+import { Animations } from "./display/animations.js";
 
 export class Game {
     started;
@@ -28,7 +29,7 @@ export class Game {
     gravityTimer = 0;
     zenithTimer = 0;
     grandmasterTimer = 0;
-    version = '1.3.5';
+    version = '1.3.8';
     tickrate = 60;
 
     elementReason = document.getElementById("reason");
@@ -58,6 +59,7 @@ export class Game {
         this.zenith = new Zenith(this);
         this.grandmaster = new Grandmaster(this);
         this.pixi = new PixiRender(this);
+        this.animations = new Animations(this);
         this.init();
     }
 
@@ -138,7 +140,7 @@ export class Game {
         this.particles.clearParticles();
         this.renderer.clearHold();
         this.stopGameTimers();
-        this.pixi.resetActionTexts();
+        this.animations.resetActionTexts();
 
         this.bag = new Bag(this);
         this.mechanics = new Mechanics(this);

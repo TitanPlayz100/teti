@@ -164,7 +164,7 @@
             "maxLockMovements": 1,
             "nextPieces": 1,
             "allowHold": false,
-            "sidebar": ["time", "score", "pps"],
+            "sidebar": ["clearlines", "score"],
             "clearDelay": 500,
             "randomiser": "classic",
             "kicktable": "NRS"

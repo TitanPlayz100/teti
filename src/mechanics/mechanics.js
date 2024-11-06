@@ -9,7 +9,7 @@ export class Mechanics {
     isMini = false;
     garbageQueue = 0;
     spikeCounter = 0;
-    toppingOut = false; 
+    toppingOut = false;
 
     /**
      * @param {Game} game
@@ -34,15 +34,14 @@ export class Mechanics {
     deathAlert() {
         const check = this.checkDeath(this.board.getMinos('Sh'), this.board.getMinos('NP'));
         const check2 = this.checkDeath(this.board.getMinos('G'), this.board.getMinos('NP'));
-        const warn = document.getElementById('warningText');
         if (!!(check || check2)) {
             if (this.toppingOut) return;
             this.game.sounds.playSound('hyperalert');
             this.toppingOut = true;
-            warn.classList.toggle('warn', true);
+            this.game.animations.flashWarning(true);
         } else {
             this.toppingOut = false;
-            warn.classList.toggle('warn', false);
+            this.game.animations.flashWarning(false);
         }
     }
 
@@ -111,7 +110,7 @@ export class Mechanics {
         }
         this.setShadow();
 
-        if(lines >= 8) this.game.sounds.playSound("garbagesmash")
+        if (lines >= 8) this.game.sounds.playSound("garbagesmash")
         else this.game.sounds.playSound("garbagerise")
     }
 

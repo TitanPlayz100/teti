@@ -171,7 +171,7 @@ export class Controls {
         if (!animation || this.game.settings.game.stride) {
             this.game.startGame();
         } else {
-            this.game.pixi.resetAnimation()
+            this.game.animations.resetAnimation()
         }
     }
 

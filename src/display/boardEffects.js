@@ -96,10 +96,7 @@ export class BoardEffects {
     }
 
     toggleRainbow(pace) {
-        // todo add back
-        // this.border.style.setProperty('--blur-size', pace ? `0.3vmin` : `0vmin`)
-        // this.border.style.setProperty('--blur-strength', pace ? '0.7vmin' : '0')
-        // this.backboard.style.setProperty('--blur-strength', pace ? '0.5vmin' : '0')
-        // this.hasPace = pace;
+        this.game.animations.playRainbowAnimation(pace);
+        this.hasPace = pace;
     }
 }

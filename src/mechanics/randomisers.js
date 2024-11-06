@@ -4,7 +4,7 @@ import pieces from "../data/pieces.json" with { type: "json" };
 const pieceNames = ["z", "l", "o", "s", "i", "j", "t"]; // THIS ORDER IS VERY IMPORTANT
 
 const maxInt = 2 ** 31 - 1;
-export const randomisers = ["total mayhem", "classic", "pairs", "14-bag", "7+1-bag", "7+2-bag", "7+x-bag", "7-bag", "tgm"];
+export const randomisers = ["7-bag", "total mayhem", "classic", "pairs", "14-bag", "7+1-bag", "7+2-bag", "7+x-bag", "tgm"];
 
 export function getPiece(name) {
     if (name == "G") return { colour: "gray" }
@@ -16,14 +16,14 @@ export class Bag {
     bagid = 0;
     bagExtra = [];
     queue = [];
-    history = ["s","z","s","z"]
+    history = ["s", "z", "s", "z"]
     type;
 
     /** @param {Game} game */
     constructor(game, seed = null) {
         this.game = game;
         this.type = game.settings.game.randomiser;
-        this.stride = game.settings.game.stride;
+        this.stride = seed == null ? game.settings.game.stride : false;
         const genSeed = seed ?? Math.floor((maxInt - 1) * Math.random() + 1);
         this.rng = new RNG(genSeed);
         this.PopulateBag();
@@ -50,8 +50,11 @@ export class Bag {
 
     cycleNext(start = false) {
         let piece = this.PullFromBag();
-        if (this.stride && start) {
-            while (["o", "s", "z"].includes(piece)) piece = this.PullFromBag();
+        if (this.stride && start) { // custom stride logic
+            if (["o", "s", "z"].includes(piece)) {
+                this.game.bag = new Bag(this.game);
+                return this.game.bag.cycleNext(true);
+            }
         }
         return getPiece(piece);
     }
@@ -152,11 +155,11 @@ export class Bag {
         let bag = [];
         let rerollCount = reroll
 
-        while(bag.length != 7){
+        while (bag.length != 7) {
             const ind = Math.floor(this.rng.nextFloat() * pieceNames.length);
             rerollCount--
 
-            if( !this.history.includes(pieceNames[ind]) || rerollCount == 0 ){
+            if (!this.history.includes(pieceNames[ind]) || rerollCount == 0) {
                 this.history.shift()
                 this.history.push(pieceNames[ind])
                 bag.push(pieceNames[ind]);
@@ -164,7 +167,7 @@ export class Bag {
             }
 
         }
-        return bag    
+        return bag
     }
 
     PullFromBag() {

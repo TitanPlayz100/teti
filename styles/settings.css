@@ -1,6 +1,6 @@
 /* dialog */
 .scrollSettings {
-    font-family: "Montserrat", sans-serif;
+    font-family: "Montserrat";
     height: 90vh;
     aspect-ratio: 2/3;
     background-color: var(--almost-invis);

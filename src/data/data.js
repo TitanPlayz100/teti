@@ -37,8 +37,8 @@ export const disabledKeys = [
     "Tab",
 ];
 
-export const spinChecks = [
-    [
+export const spinChecks = [ // each rotation state corner checks
+    [ 
         [0, 2],
         [2, 2],
     ],
@@ -122,7 +122,7 @@ export const statsSecondary = {
 // const sfx = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx")
 // const combo = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/sfx/combo")
 // const songs = await fetch("https://api.github.com/repos/titanplayz100/teti/contents/assets/songs")
-// manually remove dirs
+// manually remove type: dir
 export const songsobj = [
     {
         "name": "Cafe de Touhou 3 - The Girl's Secret Room.mp3",
