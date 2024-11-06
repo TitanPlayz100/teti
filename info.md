@@ -73,6 +73,7 @@ Things that I am working on based on other changes
 - bag seperators
 - gravity increase over time (and maybe fix softdrop)
 - fix rounding stuff with end screen
+- pro mode (large line count on board)
 
 Maybe:
 - change game class to be export modules instead

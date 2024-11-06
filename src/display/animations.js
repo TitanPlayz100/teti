@@ -72,8 +72,8 @@ export class Animations {
 
     showTimeLeftText(msg) {
         const textContainer = this.pixi.app.stage.getChildByLabel("textContainer");
-        this.texts.timeleft.animation.kill();
-        const text = this.texts.timeleft.sprite;
+        this.texts.timelefttext.animation.kill();
+        const text = this.texts.timelefttext.sprite;
         text.text = msg;
         const split = this.splitSprite(text)
         this.timeLeftTextSplit = split.map((s, i) => {

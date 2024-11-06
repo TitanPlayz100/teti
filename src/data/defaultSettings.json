@@ -6,7 +6,7 @@
         "gridopacity": 30,
         "gridType":"round",
         "shadowOpacity": 20,
-        "boardHeight": 80,
+        "boardHeight": 100,
         "colouredShadow": false,
         "lockBar": true,
         "rainbowPB": true,
