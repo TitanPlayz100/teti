@@ -20,6 +20,7 @@ import { Particles } from "./display/particles.js";
 import { Zenith, Grandmaster } from "./mechanics/gamemode_extended.js";
 import { PixiRender } from "./display/pixirender.js";
 import { Animations } from "./display/animations.js";
+import { Replay } from "./features/replays.js";
 
 export class Game {
     started;
@@ -60,6 +61,7 @@ export class Game {
         this.grandmaster = new Grandmaster(this);
         this.pixi = new PixiRender(this);
         this.animations = new Animations(this);
+        this.replay = new Replay(this);
         this.init();
     }
 

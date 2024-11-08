@@ -208,6 +208,7 @@ export class PixiRender {
 
     // RENDER CLOCK
     tick(time) {
+        this.game.replay.tick();
         this.game.controls.runKeyQueue();
         this.game.controls.timer();
         this.render("board", this.game.board.boardState);

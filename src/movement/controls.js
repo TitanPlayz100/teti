@@ -11,7 +11,8 @@ export class Controls {
     cursorVisible = true;
     resetting = false;
 
-    keyQueue = [];
+    keyDownQueue = [];
+    keyUpQueue = [];
 
     /**
      * @param {Game} game
@@ -33,24 +34,13 @@ export class Controls {
         if (key == keys.resetKey) this.retry(true);
         if (this.game.ended) return;
 
-        this.keyQueue.push(key);
+        this.keyDownQueue.push(key);
         this.toggleCursor(false);
         this.game.stats.inputs++;
     }
 
-    runKeyQueue() {
-        const keys = this.game.settings.control;
-        this.keyQueue.forEach(key => {
-            if (key == keys.cwKey) this.moves.rotate("CW");
-            else if (key == keys.ccwKey) this.moves.rotate("CCW");
-            else if (key == keys.rotate180Key) this.moves.rotate("180");
-            else if (key == keys.hdKey) this.moves.harddrop();
-            else if (key == keys.holdKey) this.game.mechanics.switchHold();
-            else if (key == keys.rightKey) this.startDas("RIGHT");
-            else if (key == keys.leftKey) this.startDas("LEFT");
-            else if (key == keys.sdKey) this.startArrSD();
-        });
-        this.keyQueue = [];
+    onKeyUp(event, key) {
+        this.keyUpQueue.push(key);
     }
 
     onKeyDownRepeat(event, key) { // allows for arr undo/redo
@@ -61,12 +51,25 @@ export class Controls {
         else if (key == keys.redoKey) this.game.history.redo()
     }
 
-    onKeyUp(event, key) {
-        this.keys = this.game.settings.control;
-
-        if (key == this.keys.rightKey) this.endDasArr("RIGHT");
-        if (key == this.keys.leftKey) this.endDasArr("LEFT");
-        if (key == this.keys.sdKey) this.endDasArr("DOWN");
+    runKeyQueue() {
+        const keys = this.game.settings.control;
+        this.keyDownQueue.forEach(key => {
+            if (key == keys.cwKey) this.moves.rotate("CW");
+            else if (key == keys.ccwKey) this.moves.rotate("CCW");
+            else if (key == keys.rotate180Key) this.moves.rotate("180");
+            else if (key == keys.hdKey) this.moves.harddrop();
+            else if (key == keys.holdKey) this.game.mechanics.switchHold();
+            else if (key == keys.rightKey) this.startDas("RIGHT");
+            else if (key == keys.leftKey) this.startDas("LEFT");
+            else if (key == keys.sdKey) this.startArrSD();
+        });
+        this.keyDownQueue = [];
+        this.keyUpQueue.forEach(key => {
+            if (key == keys.rightKey) this.endDasArr("RIGHT");
+            else if (key == keys.leftKey) this.endDasArr("LEFT");
+            else if (key == keys.sdKey) this.endDasArr("DOWN");
+        });
+        this.keyUpQueue = [];
     }
 
     startDas(direction) {
