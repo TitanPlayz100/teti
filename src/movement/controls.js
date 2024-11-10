@@ -29,21 +29,32 @@ export class Controls {
         if (key == this.menuKey) this.game.menuactions.toggleDialog();
         else if (key == keys.editMenuKey) this.game.menuactions.openEditMenu();
 
+        if (this.game.replay.state == "replaying") return;
+
         if (this.game.modals.open || this.game.modals.closing || this.game.mechanics.locking.timings.clearDelay != 0) return;
         if (event.key != this.menuKey && !this.game.started) this.moves.firstMovement();
         if (key == keys.resetKey) this.retry(true);
         if (this.game.ended) return;
 
-        this.keyDownQueue.push(key);
+        const keytype = Object.keys(keys).find(type => keys[type] == key);
+        if (keytype == undefined) return;
+        this.keyDownQueue.push(keytype);
         this.toggleCursor(false);
         this.game.stats.inputs++;
     }
 
     onKeyUp(event, key) {
-        this.keyUpQueue.push(key);
+        if (this.game.replay.state == "replaying") return;
+
+        const keys = this.game.settings.control;
+        const keytype = Object.keys(keys).find(type => keys[type] == key);
+        if (keytype == undefined) return;
+        this.keyUpQueue.push(keytype);
     }
 
     onKeyDownRepeat(event, key) { // allows for arr undo/redo
+        if (this.game.replay.state == "replaying") return;
+
         const keys = this.game.settings.control;
         if (event.key == this.menuKey) event.preventDefault();
 
@@ -52,22 +63,21 @@ export class Controls {
     }
 
     runKeyQueue() {
-        const keys = this.game.settings.control;
         this.keyDownQueue.forEach(key => {
-            if (key == keys.cwKey) this.moves.rotate("CW");
-            else if (key == keys.ccwKey) this.moves.rotate("CCW");
-            else if (key == keys.rotate180Key) this.moves.rotate("180");
-            else if (key == keys.hdKey) this.moves.harddrop();
-            else if (key == keys.holdKey) this.game.mechanics.switchHold();
-            else if (key == keys.rightKey) this.startDas("RIGHT");
-            else if (key == keys.leftKey) this.startDas("LEFT");
-            else if (key == keys.sdKey) this.startArrSD();
+            if (key == "cwKey") this.moves.rotate("CW");
+            else if (key == "ccwKey") this.moves.rotate("CCW");
+            else if (key == "rotate180Key") this.moves.rotate("180");
+            else if (key == "hdKey") this.moves.harddrop();
+            else if (key == "holdKey") this.game.mechanics.switchHold();
+            else if (key == "rightKey") this.startDas("RIGHT");
+            else if (key == "leftKey") this.startDas("LEFT");
+            else if (key == "sdKey") this.startArrSD();
         });
         this.keyDownQueue = [];
         this.keyUpQueue.forEach(key => {
-            if (key == keys.rightKey) this.endDasArr("RIGHT");
-            else if (key == keys.leftKey) this.endDasArr("LEFT");
-            else if (key == keys.sdKey) this.endDasArr("DOWN");
+            if (key == "rightKey") this.endDasArr("RIGHT");
+            else if (key == "leftKey") this.endDasArr("LEFT");
+            else if (key == "sdKey") this.endDasArr("DOWN");
         });
         this.keyUpQueue = [];
     }

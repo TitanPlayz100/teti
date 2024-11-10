@@ -125,6 +125,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 1vh;
 }
 
@@ -222,4 +223,12 @@
     margin: 1%;
     background: black;
     color: white;
+}
+
+#uploadReplay {
+    width: 50%;
+    justify-content: center;
+    padding: 1.3vh;
+    font-size: 1.3em;
+    transition: all 0.4s ease;
 }

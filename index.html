@@ -68,6 +68,9 @@
         <button id="competitive" class="settingPanelButton smallPanelButton" onclick="modal.openModal('competitiveDialog')" title="Toggle competitive mode and view PBs">
             <img src="./assets/icons/medal.svg" style="transform: translateY(-8%); height: 140%;">
         </button>
+        <button id="replays" class="settingPanelButton smallPanelButton" onclick="modal.openModal('replaysDialog')" title="Play replay">
+            <img src="./assets/icons/history.svg" style="transform: translateY(10%); height: 100%;">
+        </button>
         <br>
 
         <!-- main row -->
@@ -291,6 +294,22 @@
         </div>
     </dialog>
 
+    <dialog id="replaysDialog" class="scrollSettings">
+        <div class="settingsTop"><h2>REPLAYS<h2></div>
+
+        <div class="settingsBox" style="align-items: center;">
+            <div id="uploadReplay" class="closeDialogButton" onclick="document.getElementById('replayUpload').click()">
+                <input type="file" id="replayUpload" onchange="menu.uploadReplay(this)" hidden accept=".trf">
+                <p>Open Replay</p>
+            </div>
+        </div>
+
+        <div class="settingsFooter">
+            <p>Press Esc to close without saving</p>
+            <button class="closeDialogButton" onclick="modal.closeModal('replaysDialog')">Save and Close</button>
+        </div>
+    </dialog>
+
     <!-- GAME MENUS -->
     <dialog id="changeRangeValue" class="dialog" style="height: 25vh;"> 
         <h1>Enter Value</h1>
@@ -370,8 +389,9 @@
         <p id="reason" style="font-size: 3.6vh;"></p>
         <p id="result"></p>
         <div class="settingsFooter">
+            <button class="closeDialogButton" onclick="menu.saveReplay()">Save Replay</button>
             <button id="seeStats" class="closeDialogButton" onclick="modal.openModal('gameStatsDialog')">See Stats</button>
-            <button class="closeDialogButton" onclick="modal.closeModal('gameEnd')" style="bottom: 10%;" >Play Again</button>
+            <button class="closeDialogButton" onclick="modal.closeModal('gameEnd')">Play Again</button>
         </div>
     </dialog>
 </body>

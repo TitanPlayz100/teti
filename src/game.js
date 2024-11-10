@@ -84,13 +84,14 @@ export class Game {
         this.versionChecker();
     }
 
-    startGame() {
+    startGame(seed = undefined) {
         this.menuactions.loadSettings();
         this.modes.loadModes();
-        this.resetState();
+        this.resetState(seed);
         this.renderer.renderStyles();
         this.mechanics.spawnPiece(this.bag.cycleNext(true), true);
         this.history.save();
+        this.replay.start();
     }
 
     stopGameTimers() { //stop all the game's timers
@@ -118,15 +119,17 @@ export class Game {
             this.sounds.playSound("finish");
         }
 
+
         this.ended = true;
         this.modals.openModal("gameEnd");
         this.stopGameTimers()
         this.elementReason.textContent = top;
         this.elementResult.textContent = bottom;
         this.profilestats.saveSession();
+        this.replay.stop();
     }
 
-    resetState() {
+    resetState(seed = undefined) {
         this.boardeffects.hasPace = true;
         this.boardeffects.paceCooldown = 0;
         this.pixi.boardAlpha = 1;
@@ -144,7 +147,7 @@ export class Game {
         this.stopGameTimers();
         this.animations.resetActionTexts();
 
-        this.bag = new Bag(this);
+        this.bag = new Bag(this, seed);
         this.mechanics = new Mechanics(this);
         this.falling = new Falling(this);
         this.hold = new Hold(this);

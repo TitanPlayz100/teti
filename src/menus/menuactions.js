@@ -209,7 +209,7 @@ export class MenuActions {
 
         let el = document.createElement("a");
         el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(stats)));
-        el.setAttribute("download", "stats.json");
+        el.setAttribute("download", "stats.tsf");
         document.body.appendChild(el);
         el.click();
         document.body.removeChild(el);
@@ -228,10 +228,35 @@ export class MenuActions {
 
         let el = document.createElement("a");
         el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(data)));
-        el.setAttribute("download", `teti_stats_${day}.json`);
+        el.setAttribute("download", `teti_stats_${day}.tlsf`);
         document.body.appendChild(el);
         el.click();
         document.body.removeChild(el);
         this.game.modals.generate.notif("Lifetime Stats Exported", "All your lifetime stats and PBs have been exported. Enjoy the many stats you can analyse!", "success");
     }
+
+    saveReplay() {
+        const replay = this.game.replay.saveReplay();
+
+        let el = document.createElement("a");
+        el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(replay));
+        el.setAttribute("download", `replay.trf`);
+        document.body.appendChild(el);
+        el.click();
+        document.body.removeChild(el);
+        this.game.modals.generate.notif("Replay Exported", "Your replay was successfully exported", "success");
+    }
+
+    uploadReplay(el) {
+        const reader = new FileReader();
+        reader.readAsText(el.files[0]);
+        reader.onload = () => {
+            this.game.modals.generate.notif("Replay Loaded", "Replay successfully loaded", "message");
+            this.game.modals.closeModal("replaysDialog");
+            setTimeout(() => {
+                this.game.replay.runReplay(reader.result.toString());
+            }, 1000);
+        };
+    }
+
 }
