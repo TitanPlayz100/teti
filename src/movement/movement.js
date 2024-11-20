@@ -9,7 +9,7 @@ export class Movement {
         this.game = game;
     }
 
-    firstMovement() {
+    startTimers() {
         this.game.zenith.startZenithMode();
         this.game.grandmaster.startGrandmasterTimer();
         if (this.game.zenith.tickPass == 0 && this.game.settings.game.gamemode == "zenith") this.game.renderer.renderTimeLeft("FLOOR 1")

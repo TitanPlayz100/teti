@@ -20,6 +20,7 @@ import { Particles } from "./display/particles.js";
 import { Zenith, Grandmaster } from "./mechanics/gamemode_extended.js";
 import { PixiRender } from "./display/pixirender.js";
 import { Animations } from "./display/animations.js";
+import { Replay } from "./features/replays.js";
 
 export class Game {
     started;
@@ -60,6 +61,7 @@ export class Game {
         this.grandmaster = new Grandmaster(this);
         this.pixi = new PixiRender(this);
         this.animations = new Animations(this);
+        this.replay = new Replay(this);
         this.init();
     }
 
@@ -82,13 +84,14 @@ export class Game {
         this.versionChecker();
     }
 
-    startGame() {
+    startGame(seed = undefined) {
         this.menuactions.loadSettings();
         this.modes.loadModes();
-        this.resetState();
+        this.resetState(seed);
         this.renderer.renderStyles();
         this.mechanics.spawnPiece(this.bag.cycleNext(true), true);
         this.history.save();
+        this.replay.start();
     }
 
     stopGameTimers() { //stop all the game's timers
@@ -101,6 +104,7 @@ export class Game {
     }
 
     endGame(top, bottom = "Better luck next time") {
+        if (this.ended) return;
         const dead = ["Lockout", "Topout", "Blockout"].includes(top); // survival mode end instead of lose
         if (this.settings.game.gamemode == 'survival' && dead) {
             this.ended = true;
@@ -116,7 +120,15 @@ export class Game {
             this.sounds.playSound("finish");
         }
 
+        if (this.replay.state == "replaying") { // replay ended
+            this.ended = true;
+            this.modals.openModal("replaysDialog");
+            this.replay.stop();
+            return;
+        }
+
         this.ended = true;
+        this.replay.stop();
         this.modals.openModal("gameEnd");
         this.stopGameTimers()
         this.elementReason.textContent = top;
@@ -124,7 +136,7 @@ export class Game {
         this.profilestats.saveSession();
     }
 
-    resetState() {
+    resetState(seed = undefined) {
         this.boardeffects.hasPace = true;
         this.boardeffects.paceCooldown = 0;
         this.pixi.boardAlpha = 1;
@@ -142,7 +154,7 @@ export class Game {
         this.stopGameTimers();
         this.animations.resetActionTexts();
 
-        this.bag = new Bag(this);
+        this.bag = new Bag(this, seed);
         this.mechanics = new Mechanics(this);
         this.falling = new Falling(this);
         this.hold = new Hold(this);

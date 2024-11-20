@@ -18,14 +18,15 @@ export class Bag {
     queue = [];
     history = ["s", "z", "s", "z"]
     type;
+    genseed;
 
     /** @param {Game} game */
     constructor(game, seed = null) {
         this.game = game;
         this.type = game.settings.game.randomiser;
         this.stride = seed == null ? game.settings.game.stride : false;
-        const genSeed = seed ?? Math.floor((maxInt - 1) * Math.random() + 1);
-        this.rng = new RNG(genSeed);
+        this.genseed = seed ?? Math.floor((maxInt - 1) * Math.random() + 1);
+        this.rng = new RNG(this.genseed);
         this.PopulateBag();
     }
 
