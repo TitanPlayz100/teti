@@ -200,6 +200,7 @@
             <div class="settingRow"><p>Open Edit Menu (Custom)</p> <button class="option keybind" id="editMenuKey"></button></div>
             <div class="settingRow"><p>Undo</p> <button class="option keybind" id="undoKey"></button></div>
             <div class="settingRow"><p>Redo</p> <button class="option keybind" id="redoKey"></button></div>
+            <div class="settingRow"><p>Pause and Play in Replays</p> <button class="option keybind" id="pauseReplayKey"></button></div>
         </div>
         <div class="settingsFooter">
             <p>Press Esc to close without saving</p>
@@ -298,6 +299,9 @@
         <div class="settingsTop"><h2>REPLAYS<h2></div>
 
         <div class="settingsBox" style="align-items: center;">
+            <p>Replays are currently in beta</p>
+            <p>They probably are not able to be shared yet <br><i>(due to settings and fps related issues)</i></p>
+            <p>They may break from upcoming updates</p>
             <div id="uploadReplay" class="closeDialogButton" onclick="document.getElementById('replayUpload').click()">
                 <input type="file" id="replayUpload" onchange="menu.uploadReplay(this)" hidden accept=".trf">
                 <p>Open Replay</p>

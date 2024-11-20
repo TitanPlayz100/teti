@@ -1,5 +1,4 @@
 import { Game } from "../game.js";
-import { Bag } from "../mechanics/randomisers.js";
 
 // start recording replay with start()
 // save replay with copyReplay()
@@ -7,8 +6,10 @@ import { Bag } from "../mechanics/randomisers.js";
 export class Replay {
     events = {};
     currentFrame = 0;
-    /**@type {"idle" | "running" | "replaying"} */
+    /**@type { "idle" | "running" | "replaying" } */
     state = "idle";
+    
+    totalLength;
 
     /**
      * @param {Game} game 
@@ -26,6 +27,16 @@ export class Replay {
 
     stop() {
         this.state = "idle";
+        this.game.menuactions.loadSettings();
+    }
+
+    togglePause() {
+        this.state = (this.state == "replaying") ? "idle" : "replaying";
+        if (this.state == "idle") {
+            this.game.stopGameTimers();
+        } else {
+            this.game.movement.startTimers();
+        }
     }
 
     tick() {
@@ -54,7 +65,18 @@ export class Replay {
     saveReplay() {
         const date = (new Date()).toISOString();
         const fps = Math.round(this.game.pixi.app.ticker.FPS);
-        const replay = { events: this.events, date, version: this.game.version, fps, seed:this.game.bag.genseed };
+        const replay = {
+            events: this.events,
+            header: {
+                date,
+                version: this.game.version,
+                fps,
+                seed: this.game.bag.genseed,
+            },
+            handling: this.game.settings.handling,
+            settings: this.game.settings.game,
+            length: this.currentFrame
+        };
         return JSON.stringify(replay);
     }
 
@@ -63,8 +85,11 @@ export class Replay {
         this.events = replay.events;
         this.currentFrame = 0;
         this.state = "replaying";
+        this.game.settings.handling = replay.handling;
+        this.game.settings.game = replay.settings;
+        this.totalLength = replay.length;
 
-        this.game.startGame(replay.seed);
+        this.game.startGame(replay.header.seed);
     }
 
     replayKey(event) {
@@ -72,5 +97,7 @@ export class Replay {
         const keyup = event.keyup ?? [];
         this.game.controls.keyDownQueue = keydown;
         this.game.controls.keyUpQueue = keyup;
+
+        if (!this.game.started && keydown.length > 0) this.game.movement.startTimers();
     }
 }

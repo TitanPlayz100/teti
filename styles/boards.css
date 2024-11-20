@@ -144,6 +144,7 @@
     display: flex;
     justify-content: space-between;
     opacity: 0;
+    pointer-events: none;
 }
 
 #rainbowLeft {
@@ -156,5 +157,4 @@
     width: 13vw;
     background: repeating-linear-gradient(#ff4545, #00c375, #006aff, #ff0095, #ff4545 200vh);
     filter: blur(150px);
-
 }

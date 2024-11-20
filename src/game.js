@@ -104,6 +104,7 @@ export class Game {
     }
 
     endGame(top, bottom = "Better luck next time") {
+        if (this.ended) return;
         const dead = ["Lockout", "Topout", "Blockout"].includes(top); // survival mode end instead of lose
         if (this.settings.game.gamemode == 'survival' && dead) {
             this.ended = true;
@@ -119,14 +120,20 @@ export class Game {
             this.sounds.playSound("finish");
         }
 
+        if (this.replay.state == "replaying") { // replay ended
+            this.ended = true;
+            this.modals.openModal("replaysDialog");
+            this.replay.stop();
+            return;
+        }
 
         this.ended = true;
+        this.replay.stop();
         this.modals.openModal("gameEnd");
         this.stopGameTimers()
         this.elementReason.textContent = top;
         this.elementResult.textContent = bottom;
         this.profilestats.saveSession();
-        this.replay.stop();
     }
 
     resetState(seed = undefined) {

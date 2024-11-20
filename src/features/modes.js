@@ -75,6 +75,7 @@ export class Modes {
         if (competitive) {
             if (custom == null) {
                 localStorage.setItem('customGame', JSON.stringify(this.game.settings.game));
+                this.game.menuactions.saveSettings();
             }
             this.modeJSON = this.getGamemodeJSON(mode);
             this.game.settings.game = { ...this.game.settings.game, ...this.modeJSON.settings };
@@ -83,11 +84,11 @@ export class Modes {
                 this.game.settings.game = custom;
                 this.game.settings.game.competitiveMode = false;
                 localStorage.removeItem('customGame');
+                this.game.menuactions.saveSettings();
             }
             this.modeJSON = this.getGamemodeJSON(mode);
         }
         this.toggleDialogState(competitive);
-        this.game.menuactions.saveSettings();
     }
 
     toggleDialogState(enabled) {

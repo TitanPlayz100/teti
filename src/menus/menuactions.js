@@ -122,6 +122,7 @@ export class MenuActions {
             this.loadSettings();
             this.game.modes.loadModes();
             this.game.modals.generate.notif("Settings Loaded", "User settings have successfully loaded", "message");
+            el.value = "";
         };
     }
 
@@ -141,7 +142,7 @@ export class MenuActions {
         }
         document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
         document.querySelectorAll("scrollSettings[open]").forEach(e => this.menus.closeDialog(e));
-        if (this.game.started && !this.game.ended) this.game.movement.firstMovement();
+        if (this.game.started && !this.game.ended) this.game.movement.startTimers();
     }
 
     newGame(key, modal) {
@@ -256,6 +257,7 @@ export class MenuActions {
             setTimeout(() => {
                 this.game.replay.runReplay(reader.result.toString());
             }, 1000);
+            el.value = "";
         };
     }
 

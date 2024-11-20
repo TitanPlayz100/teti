@@ -60,7 +60,8 @@
         "rotate180Key": "a",
         "editMenuKey": "e",
         "undoKey": "Ctrl+z",
-        "redoKey": "Ctrl+y"
+        "redoKey": "Ctrl+y",
+        "pauseReplayKey": " "
     },
     "volume": {
         "audioLevel": 15,

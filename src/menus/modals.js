@@ -94,7 +94,7 @@ export class ModalActions {
 
         this.closeDialog(document.getElementById(id));
         if (id != 'changeRangeValue' && id != "frontdrop" && this.game.started && !this.game.ended)
-            this.game.movement.firstMovement();
+            this.game.movement.startTimers();
         this.actions.saveSettings();
         if (id == "displayDialog") this.game.renderer.renderStyles(true);
 

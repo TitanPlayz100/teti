@@ -88,7 +88,7 @@ export class PixiRender {
         }
 
         const reset = iconframe(this.resetIcon, 0.23, 0)
-        reset.on("pointerdown", () => this.game.controls.retry(true));
+        reset.on("pointerdown", () => { console.log("test"); this.game.controls.retry(true) });
         const settings = iconframe(this.settingsIcon, 0.18, width * 3 / 20)
         settings.on("pointerdown", () => this.game.modals.openModal("settingsPanel"));
         const edit = iconframe(this.editIcon, 0.21, width * 6 / 20)
