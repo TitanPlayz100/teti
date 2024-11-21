@@ -30,7 +30,7 @@ export class Game {
     gravityTimer = 0;
     zenithTimer = 0;
     grandmasterTimer = 0;
-    version = '1.3.8';
+    version = '1.4.0';
     tickrate = 60;
 
     elementReason = document.getElementById("reason");

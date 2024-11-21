@@ -65,6 +65,7 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 - clean, modern, and animated menus
 - responsive design
 - touhou jazz music
+- Replays of games can be saved and viewed
 
 ## TODO list
 Things that I am working on based on other changes
@@ -98,6 +99,12 @@ Zenith mode additions
 ***
 
 ## Updates
+### v1.4.0 => REPLAYS
+- Replays are added, which can be viewed in the replay section
+- There is still quite a bit of development related to making replays sharable
+- bugs with replays are inevitable
+- fixed icons being unclickable
+
 #### v1.3.9
 - refactored graphic visuals to be in another file, and animations in another file
 - pixirender is much clearer
