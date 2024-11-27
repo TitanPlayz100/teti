@@ -99,6 +99,10 @@ Zenith mode additions
 ***
 
 ## Updates
+#### v1.4.1
+- replays save as milliseconds instead of frames => fps independant
+- settings properly load from replays now
+
 ### v1.4.0 => REPLAYS
 - Replays are added, which can be viewed in the replay section
 - There is still quite a bit of development related to making replays sharable

@@ -66,6 +66,7 @@ export class Controls {
     }
 
     runKeyQueue() {
+        if (this.keyDownQueue.length > 1) console.log("double");
         this.keyDownQueue.forEach(key => {
             if (key == "cwKey") this.moves.rotate("CW");
             else if (key == "ccwKey") this.moves.rotate("CCW");

@@ -94,6 +94,7 @@ export class MenuActions {
     }
 
     loadSettings() {
+        if (this.game.replay.state == "replaying") return;
         const data = localStorage.getItem("settings") ?? "{}";
         this.game.settings.load(JSON.parse(data))
     }
