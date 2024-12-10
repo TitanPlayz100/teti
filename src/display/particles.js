@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 class Point {
     /** * @param {Particles} particleInstance */
@@ -21,8 +21,8 @@ class Point {
         this.twinkle = twinkle ?? false;
         this.twinkleTime = twinkleTime ?? this.life;
 
-        this.particle = particleInstance.game.pixi.addNewParticle(colour)
-        particleInstance.particles.push(this);
+        this.particle = Game.pixi.addNewParticle(colour)
+        Game.particles.particles.push(this);
     }
 
     draw() {
@@ -49,26 +49,19 @@ export class Particles {
     /** @type {Point[]} */
     particles = [];
 
-    /**
-     * @param {Game} game 
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     initBoard() {
-        this.container = this.game.pixi.particleContainer;
+        this.container = Game.pixi.particleContainer;
     }
 
     spawnParticles(posX, posY, type, pieceWidth = 1, cw = false, colour = "white") {
-        if (!this.game.settings.display.particles) return;
+        if (!Game.settings.display.particles) return;
 
-        const boardWidth = this.game.pixi.width;
-        const boardHeight = this.game.pixi.height * 2;
-        const minosize = this.game.pixi.minoSize;
+        const boardWidth = Game.pixi.width;
+        const boardHeight = Game.pixi.height * 2;
+        const minosize = Game.pixi.minoSize;
         const [x, y] = [posX * minosize, (40 - posY) * minosize];
-        this.volume = this.game.settings.display.particleVolume;
-        this.size = this.game.settings.display.particleSize;
+        this.volume = Game.settings.display.particleVolume;
+        this.size = Game.settings.display.particleSize;
         if (type == "drop") this.creatDropParticles(x, y, colour, minosize * pieceWidth, -boardHeight);
         if (type == "lock") this.createLockParticles(x, y, colour, minosize * pieceWidth, 10);
         if (type == "clear") this.createClearParticles(x, y, colour, boardWidth, -10);

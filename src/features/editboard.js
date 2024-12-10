@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class BoardEditor {
     mousedown = false;
@@ -7,22 +7,14 @@ export class BoardEditor {
     fillRow = false;
     override = false;
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-        this.board = game.board;
-    }
-
     mouseDown([x, y], sprite) {
-        if (this.game.settings.game.gamemode != 'custom') return;
+        if (Game.settings.game.gamemode != 'custom') return;
         if (this.fillRow) { this.fillWholeRow([x, 19 - y]) }
         else { this.fillCell([x, 19 - y]); }
     }
 
     mouseEnter([x, y], sprite) {
-        if (this.game.settings.game.gamemode != 'custom') return;
+        if (Game.settings.game.gamemode != 'custom') return;
         sprite.alpha = 0.5;
         if (this.mousedown) {
             if (this.fillRow) { this.fillWholeRow([x, 19 - y]) }
@@ -35,31 +27,31 @@ export class BoardEditor {
     }
 
     mouseUp(e) {
-        if (this.mousedown) this.game.history.save();
+        if (this.mousedown) Game.history.save();
         this.mousedown = false;
     }
 
     fillCell([x, y]) {
-        if (!this.mousedown) this.currentMode = this.board.checkMino([x, y], "S") ? "remove" : "fill";
+        if (!this.mousedown) this.currentMode = Game.board.checkMino([x, y], "S") ? "remove" : "fill";
         this.mousedown = true;
-        if (this.board.checkMino([x, y], "A")) return;
-        if (!this.override && this.currentMode == "fill" && this.board.checkMino([x, y], "S")) return;
-        this.board.setValue([x, y], this.currentMode == "fill" ? "S " + this.fillPiece : "");
-        this.game.mechanics.setShadow();
+        if (Game.board.checkMino([x, y], "A")) return;
+        if (!this.override && this.currentMode == "fill" && Game.board.checkMino([x, y], "S")) return;
+        Game.board.setValue([x, y], this.currentMode == "fill" ? "S " + this.fillPiece : "");
+        Game.mechanics.setShadow();
     }
 
     fillWholeRow([x, y]) {
         for (let i = 0; i < 10; i++) {
-            this.board.setValue([i, y], x == i ? "" : "S G");
+            Game.board.setValue([i, y], x == i ? "" : "S G");
             this.mousedown = true;
         }
     }
 
     convertToMap() {
-        const board = this.game.board.boardState;
-        const next = this.game.bag.getMapQueue();
-        const hold = this.game.hold.piece == null ? "" : this.game.hold.piece.name;
-        const currPiece = this.game.falling.piece.name;
+        const board = Game.board.boardState;
+        const next = Game.bag.getMapQueue();
+        const hold = Game.hold.piece == null ? "" : Game.hold.piece.name;
+        const currPiece = Game.falling.piece.name;
 
         let boardstring = board.toReversed().flatMap(row => {
             return row.map(col => {

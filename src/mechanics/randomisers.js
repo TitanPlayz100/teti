@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import pieces from "../data/pieces.json" with { type: "json" };
 
 const pieceNames = ["z", "l", "o", "s", "i", "j", "t"]; // THIS ORDER IS VERY IMPORTANT
@@ -20,32 +20,30 @@ export class Bag {
     type;
     genseed;
 
-    /** @param {Game} game */
-    constructor(game, seed = null) {
-        this.game = game;
-        this.type = game.settings.game.randomiser;
-        this.stride = seed == null ? game.settings.game.stride : false;
+    constructor(seed = null) {
+        this.type = Game.settings.game.randomiser;
+        this.stride = seed == null ? Game.settings.game.stride : false;
         this.genseed = seed ?? Math.floor((maxInt - 1) * Math.random() + 1);
         this.rng = new RNG(this.genseed);
         this.PopulateBag();
     }
 
     getQueue() {
-        return this.game.falling.piece.name
-            + this.game.bag.getFirstN(6).map(p => p.name).join("");
+        return Game.falling.piece.name
+            + Game.bag.getFirstN(6).map(p => p.name).join("");
     }
 
     updateQueue(value) {
         const pieces = value.split("").filter(p => pieceNames.includes(p));
-        this.game.bag.setQueue(pieces);
-        this.game.renderer.updateNext();
-        this.game.mechanics.locking.clearLockDelay();
-        this.game.board.MinoToNone("A");
-        this.game.mechanics.isTspin = false;
-        this.game.mechanics.isAllspin = false;
-        this.game.mechanics.isMini = false;
-        this.game.mechanics.spawnPiece(this.game.bag.cycleNext());
-        this.game.history.save();
+        Game.bag.setQueue(pieces);
+        Game.renderer.updateNext();
+        Game.mechanics.locking.clearLockDelay();
+        Game.board.MinoToNone("A");
+        Game.mechanics.isTspin = false;
+        Game.mechanics.isAllspin = false;
+        Game.mechanics.isMini = false;
+        Game.mechanics.spawnPiece(Game.bag.cycleNext());
+        Game.history.save();
     }
 
 
@@ -53,8 +51,8 @@ export class Bag {
         let piece = this.PullFromBag();
         if (this.stride && start) { // custom stride logic
             if (["o", "s", "z"].includes(piece)) {
-                this.game.bag = new Bag(this.game);
-                return this.game.bag.cycleNext(true);
+                Game.bag = new Bag(this.game);
+                return Game.bag.cycleNext(true);
             }
         }
         return getPiece(piece);

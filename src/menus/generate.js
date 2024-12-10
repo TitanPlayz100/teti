@@ -1,5 +1,5 @@
 import { defaultSkins } from "../data/data.js";
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import { randomisers } from "../mechanics/randomisers.js";
 import kicks from "../data/kicks.json" with { type: "json" };
 
@@ -12,16 +12,9 @@ export class GenerateMenus {
     settingDialogs = [...document.getElementsByClassName("settingsBox")];
     settings = [...document.getElementsByClassName("settingRow")];
 
-    /**
-     * @param {Game} game 
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     generateGamemodeMenu() {
-        this.game.modes.getGamemodeNames().forEach(name => {
-            const setting = this.game.modes.getGamemodeJSON(name);
+        Game.modes.getGamemodeNames().forEach(name => {
+            const setting = Game.modes.getGamemodeJSON(name);
             const button = document.createElement("button");
             button.id = name;
             button.classList.add("gamemodeSelect");
@@ -39,7 +32,7 @@ export class GenerateMenus {
         const gamemodeSelect = [...document.getElementsByClassName("gamemodeSelect")];
         gamemodeSelect.forEach(setting => {
             setting.classList.remove("selected");
-            if (setting.id == this.game.settings.game.gamemode)
+            if (setting.id == Game.settings.game.gamemode)
                 setting.classList.add("selected");
         });
     }
@@ -58,7 +51,7 @@ export class GenerateMenus {
 
     generateStatList() {
         const statoptions = [...document.getElementsByClassName("statoption")];
-        const options = Object.getOwnPropertyNames(this.game.stats);
+        const options = Object.getOwnPropertyNames(Game.stats);
         options.sort();
         options.unshift("None");
 
@@ -77,7 +70,7 @@ export class GenerateMenus {
         const previous = [...document.getElementsByClassName("pbbox")];
         previous.forEach(el => el.remove());
 
-        const pbs = this.game.profilestats.personalBests;
+        const pbs = Game.profilestats.personalBests;
         Object.keys(pbs).forEach(mode => {
             const score = pbs[mode].score
             const pbbox = document.createElement("div");
@@ -85,12 +78,12 @@ export class GenerateMenus {
             const text1 = document.createElement("h2")
             text1.textContent = mode[0].toUpperCase() + mode.slice(1) + ': ';
             const text2 = document.createElement("h2")
-            text2.textContent = score + this.game.modes.getSuffix(mode);
+            text2.textContent = score + Game.modes.getSuffix(mode);
             const clearbutton = document.createElement("button");
             clearbutton.textContent = "X";
             clearbutton.addEventListener("click", (event) => {
                 event.stopPropagation();
-                this.game.profilestats.removePB(mode);
+                Game.profilestats.removePB(mode);
                 pbbox.remove()
             });
             pbbox.appendChild(text1);
@@ -115,11 +108,11 @@ export class GenerateMenus {
         const previous = [...document.getElementsByClassName("statText")];
         previous.forEach(el => el.remove());
 
-        const stats = Object.getOwnPropertyNames(this.game.stats);
+        const stats = Object.getOwnPropertyNames(Game.stats);
         const skip = ['clearCols', 'clearPieces', 'game']
         stats.forEach(stat => {
             if (skip.includes(stat)) return;
-            let score = this.game.stats[stat]
+            let score = Game.stats[stat]
             if (stat == "tspins") score = score.reduce((a, b) => a + b, 0)
             const statItem = document.createElement("p");
             statItem.classList = "statText";

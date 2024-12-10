@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import { getPiece } from "./randomisers.js";
 
 
@@ -7,33 +7,25 @@ export class Hold {
     occured = false;
     pieceNames = ["s", "z", "i", "j", "l", "o", "t"];
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-        this.curr = this.game.falling;
-    }
-
     setHold() {
-        this.piece = this.curr.piece;
+        this.piece = Game.falling.piece;
     }
 
     swapHold() {
-        [this.game.hold.piece, this.curr.piece]
-            = [this.curr.piece, this.game.hold.piece,];
+        [Game.hold.piece, Game.falling.piece]
+            = [Game.falling.piece, Game.hold.piece,];
     }
 
     getHold() {
-        return this.game.hold.piece ? this.game.hold.piece.name : ""
+        return Game.hold.piece ? Game.hold.piece.name : ""
     }
 
     setNewHold(val) {
         const validPiece = [val].filter(p => this.pieceNames.includes(p));
         this.piece = getPiece(validPiece);
         this.occured = false;
-        this.game.renderer.updateHold();
-        this.game.history.save();
+        Game.renderer.updateHold();
+        Game.history.save();
     }
 
 }

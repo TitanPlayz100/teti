@@ -65,21 +65,17 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 - clean, modern, and animated menus
 - responsive design
 - touhou jazz music
-- Replays of games can be saved and viewed
+- Replays can be saved and viewed
 
 ## TODO list
-Things that I am working on based on other changes
-- ready set go start option
+Things that might be in progress
+- ready set go start option (working on)
 - rotation centres
 - bag seperators
 - gravity increase over time (and maybe fix softdrop)
 - fix rounding stuff with end screen
 - pro mode (large line count on board)
 
-Maybe:
-- change game class to be export modules instead
-    - remove all this.game references in replacement with just the instance being imported
-- make setting menus be json generated
 
 Zenith mode additions
 - add fatigue:
@@ -96,11 +92,17 @@ Zenith mode additions
     - attacks 8 or larger split using {!!} thing (0.5s gap)
 - option for expert mode style
 
+[Longterm ideas here](#feature-wishlist)
+
 ***
 
 ## Updates
+#### v1.4.2
+- Instead of using this.game, the Game instance is exported (less object oriented and more intuitive)
+- started adding ready set go option
+
 #### v1.4.1
-- replays save as milliseconds instead of frames => fps independant
+- replays save as milliseconds instead of frames
 - settings properly load from replays now
 
 ### v1.4.0 => REPLAYS
@@ -332,3 +334,4 @@ Future wants for game, kinda ordered by ease and desire for feature
     - connecting tetrio stats
 - touch settings
 - bot to play against
+- make setting menus be json generated

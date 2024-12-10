@@ -1,5 +1,5 @@
 import { levellingTable } from "../data/data.js";
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class GameStats {
     // game stats
@@ -66,16 +66,9 @@ export class GameStats {
         z: [0, 0, 0, 0],
     };
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     updateStats() {
-        this.time += 1 / this.game.tickrate;
-        this.game.grandmaster.sectionTime += 1 / this.game.tickrate;
+        this.time += 1 / Game.tickrate;
+        Game.grandmaster.sectionTime += 1 / Game.tickrate;
 
         this.pps = this.pieceCount / this.time;
         this.apm = this.attack * 60 / this.time;
@@ -100,11 +93,11 @@ export class GameStats {
     }
 
     checkInvis() {
-        return this.pieceCount % this.game.settings.game.lookAheadPieces == 0 && !this.game.falling.moved
+        return this.pieceCount % Game.settings.game.lookAheadPieces == 0 && !Game.falling.moved
     }
 
     getRemainingGarbage() {
-        return this.game.settings.game.requiredGarbage - this.cleargarbage
+        return Game.settings.game.requiredGarbage - this.cleargarbage
     }
 
     updateBTB(isBTB, count) {
@@ -130,8 +123,8 @@ export class GameStats {
         if (isTspin) this.tspins[count]++;
         this.allspins += isAllspin ? 1 : 0;
         this.tgm_level += levellingTable[count];
-        this.game.grandmaster.addGrade(count, this.combo, this.tgm_level)
-        if (count > 0) this.clearPieces[this.game.falling.piece.name][count - 1]++;
+        Game.grandmaster.addGrade(count, this.combo, this.tgm_level)
+        if (count > 0) this.clearPieces[Game.falling.piece.name][count - 1]++;
     }
 
 }

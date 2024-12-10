@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import kicks from "../data/kicks.json" with { type: "json" };
 
 export class Falling {
@@ -7,29 +7,23 @@ export class Falling {
     moved = false;
     rotation = 1;
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     spawn(piece) {
         const dx = piece.name == "o" ? 4 : 3;
         const dy = piece.name == "o" ? 21 : piece.name == "i" ? 19 : 20;
-        const initialRotations = kicks[this.game.settings.game.kicktable].spawn_rotation ?? {}
+        const initialRotations = kicks[Game.settings.game.kicktable].spawn_rotation ?? {}
         this.rotation = initialRotations[piece.name] ?? 1;
-        const coords = this.game.mechanics.board.pieceToCoords(piece[`shape${this.rotation}`]);
-        this.game.mechanics.board.addMinos("A " + piece.name, coords, [dx, dy]);
+
+        const coords = Game.board.pieceToCoords(piece[`shape${this.rotation}`]);
+        Game.board.addMinos("A " + piece.name, coords, [dx, dy]);
         this.location = [dx, dy];
         this.piece = piece;
-        this.game.sounds.playSound(this.game.bag.queue[0]); // play NEXT piece sfx
+        Game.sounds.playSound(Game.bag.queue[0]); // play NEXT piece sfx
     }
 
     getKickData(newRotation) {
         let iPiece = this.piece.name == "i" ? "i_kicks" : "kicks";
         const type = `${this.rotation}${newRotation}`;
-        const kicktable = this.game.settings.game.kicktable;
+        const kicktable = Game.settings.game.kicktable;
         const kickdata = (kicks[kicktable][iPiece] ?? {})[type] ?? [];
         kickdata.unshift([0, 0]);
         return kickdata
@@ -41,7 +35,7 @@ export class Falling {
     }
 
     getNewCoords(rotation) {
-        return this.game.board.pieceToCoords(
+        return Game.board.pieceToCoords(
             this.piece[`shape${rotation}`],
             this.location
         );

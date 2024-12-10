@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import { getPiece } from "../mechanics/randomisers.js";
 
 export class History {
@@ -18,15 +18,8 @@ export class History {
     historyelement = document.getElementById("history");
     choiceselement = document.getElementById("redochoices");
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     save() {
-        if (!this.game.settings.game.history) return;
+        if (!Game.settings.game.history) return;
         const map = this.convertToMapCompressed();
         this.pushHistory(map);
         this.updateUI();
@@ -49,24 +42,24 @@ export class History {
     }
 
     undo() {
-        if (this.currentState == 0 || !this.game.settings.game.history) return;
+        if (this.currentState == 0 || !Game.settings.game.history) return;
         this.historyConnections.forEach((next, ind) => {
             if (next.includes(this.currentState)) {
                 this.currentState = ind;
             }
         })
-        this.game.sounds.playSound("undo");
-        this.game.boardeffects.move(-1, 0);
+        Game.sounds.playSound("undo");
+        Game.boardeffects.move(-1, 0);
         this.load()
     }
 
     redo() {
-        if (!this.game.settings.game.history) return;
+        if (!Game.settings.game.history) return;
         const connection = this.historyConnections[this.currentState];
         if (connection == undefined) return;
         this.currentState = this.selectedbranch || Math.max(...connection);
-        this.game.sounds.playSound("redo");
-        this.game.boardeffects.move(1, 0);
+        Game.sounds.playSound("redo");
+        Game.boardeffects.move(1, 0);
         this.load()
     }
 
@@ -150,10 +143,10 @@ export class History {
     }
 
     convertToMapCompressed() {
-        const board = this.game.board.boardState;
-        const next = this.game.bag.getMapQueue();
-        const hold = this.game.hold.piece == null ? "" : this.game.hold.piece.name;
-        const currPiece = this.game.falling.piece == null ? "" : this.game.falling.piece.name;
+        const board = Game.board.boardState;
+        const next = Game.bag.getMapQueue();
+        const hold = Game.hold.piece == null ? "" : Game.hold.piece.name;
+        const currPiece = Game.falling.piece == null ? "" : Game.falling.piece.name;
         let boardstring = board.toReversed().flatMap(row => {
             return row.map(col => {
                 col = col.replace("Sh", "").replace("NP", "").replace("G", "#");
@@ -179,9 +172,9 @@ export class History {
                 return col
             });
         })
-        this.game.board.boardState = board;
-        this.game.bag.setQueue(next.split(","));
-        this.game.hold.piece = getPiece(hold);
-        this.game.mechanics.spawnPiece(this.game.bag.cycleNext());
+        Game.board.boardState = board;
+        Game.bag.setQueue(next.split(","));
+        Game.hold.piece = getPiece(hold);
+        Game.mechanics.spawnPiece(Game.bag.cycleNext());
     }
 }

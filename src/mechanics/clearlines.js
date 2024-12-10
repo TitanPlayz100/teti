@@ -1,110 +1,105 @@
 import { cleartypes, scoringTable } from "../data/data.js";
 import attackValues from "../data/attacktable.json" with { type: "json" };
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class ClearLines {
     progressDamage = document.getElementById("garbageQueue");
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game
-        this.sounds = game.sounds;
+    constructor() {
         this.progressDamage.value = 0;
     }
 
     clearLines(clearCoords) {
-        const clearRows = this.game.mechanics.board.getFullRows();
+        const clearRows = Game.board.getFullRows();
         let removedGarbage = 0;
         
         for (let row of clearRows) {
-            const stopped = this.game.mechanics.board.getMinos("S");
-            if (stopped.filter(c => c[1] == row).some(([x, y]) => this.game.mechanics.board.checkMino([x, y], "G"))) // count garbage
+            const stopped = Game.board.getMinos("S");
+            if (stopped.filter(c => c[1] == row).some(([x, y]) => Game.board.checkMino([x, y], "G"))) // count garbage
                 removedGarbage++;
             stopped.filter(c => c[1] == row).forEach(([x, y]) => { // clear rows
-                this.game.mechanics.board.setCoordEmpty([x, y]);
-                this.game.pixi.endFlash([x, y]);
+                Game.board.setCoordEmpty([x, y]);
+                Game.pixi.endFlash([x, y]);
             });
-            this.game.mechanics.board.moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1);
+            Game.board.moveMinos(stopped.filter(c => c[1] > row), "DOWN", 1);
         }
 
-        this.game.modes.diggerAddGarbage(removedGarbage); // add garbage
+        Game.modes.diggerAddGarbage(removedGarbage); // add garbage
         clearCoords.forEach(([x, y]) => { // stats
-            if (clearRows.includes(y)) this.game.stats.clearCols[x]++;
+            if (clearRows.includes(y)) Game.stats.clearCols[x]++;
         })
 
-        if (clearRows.length > 0) this.game.renderer.bounceBoard("DOWN");
-        this.game.particles.spawnParticles(0, Math.min(...clearRows), "clear")
+        if (clearRows.length > 0) Game.renderer.bounceBoard("DOWN");
+        Game.particles.spawnParticles(0, Math.min(...clearRows), "clear")
         this.processLineClear(removedGarbage, clearRows);
         return clearRows.length;
     }
 
     clearRow(rowNumber) {
-        const stopped = this.game.mechanics.board.getMinos("S");
+        const stopped = Game.board.getMinos("S");
         stopped.filter(c => c[1] == rowNumber)
-            .forEach(([x, y]) => this.game.mechanics.board.setCoordEmpty([x, y]));
+            .forEach(([x, y]) => Game.board.setCoordEmpty([x, y]));
         const minos = stopped.filter(c => c[1] > rowNumber);
-        this.game.mechanics.board.moveMinos(minos, "DOWN", 1);
+        Game.board.moveMinos(minos, "DOWN", 1);
     }
 
     processLineClear(garbageCleared, clearRows) {
-        const mech = this.game.mechanics, stats = this.game.stats;
+        const mech = Game.mechanics, stats = Game.stats;
         const linecount = clearRows.length;
         const isBTB = this.checkBTB(linecount);
-        const isPC = mech.board.getMinos("S").length == 0;
+        const isPC = Game.board.getMinos("S").length == 0;
         let damagetype = this.getDamageType(linecount);
 
         // update stats
-        if (!isBTB && linecount > 0) this.game.zenith.AwardLines(Math.max(0, this.game.stats.btbCount))    
-        this.game.stats.updateBTB(isBTB, linecount);
-        this.game.stats.updateCombo(linecount);
+        if (!isBTB && linecount > 0) Game.zenith.AwardLines(Math.max(0, Game.stats.btbCount))    
+        Game.stats.updateBTB(isBTB, linecount);
+        Game.stats.updateCombo(linecount);
         const damage = this.calcDamage(stats.combo, damagetype, isPC, stats.btbCount, isBTB);
         const score = this.calcScore(damagetype, isPC, isBTB, stats.combo);
-        this.game.stats.incrementStats(score, linecount, damage, isPC, mech.isTspin, mech.isAllspin, garbageCleared);
+        Game.stats.incrementStats(score, linecount, damage, isPC, mech.isTspin, mech.isAllspin, garbageCleared);
 
         mech.spikeCounter += damage;
         this.manageGarbageSent(damage);
 
-        this.game.zenith.AwardLines(damage);
-        if (linecount == 1) this.game.zenith.AwardLines(1);
+        Game.zenith.AwardLines(damage);
+        if (linecount == 1) Game.zenith.AwardLines(1);
         // render action text
-        if (mech.isAllspin) damagetype = damagetype.replace("Tspin ", this.game.falling.piece.name + " spin ");
-        this.game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);
+        if (mech.isAllspin) damagetype = damagetype.replace("Tspin ", Game.falling.piece.name + " spin ");
+        Game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);
 
         // particles
-        if (isPC) this.game.particles.spawnParticles(0, 0, "pc");
-        if (stats.btbCount > 7 && isBTB) this.game.particles.spawnParticles(0, 20, "BTB");
-        if (damage > 10 || stats.combo > 10) this.game.particles.spawnParticles(0, 0, "spike");
+        if (isPC) Game.particles.spawnParticles(0, 0, "pc");
+        if (stats.btbCount > 7 && isBTB) Game.particles.spawnParticles(0, 20, "BTB");
+        if (damage > 10 || stats.combo > 10) Game.particles.spawnParticles(0, 0, "spike");
     }
 
     manageGarbageSent(damage) {
-        this.game.stats.sent += damage;
-        const garb = damage * this.game.settings.game.backfireMulti;
-        const sent = Math.abs(this.game.mechanics.garbageQueue - garb);
-        this.game.mechanics.garbageQueue = sent;
+        Game.stats.sent += damage;
+        const garb = damage * Game.settings.game.backfireMulti;
+        const sent = Math.abs(Game.mechanics.garbageQueue - garb);
+        Game.mechanics.garbageQueue = sent;
 
-        if (this.game.settings.game.gamemode != 'backfire') return;
-        if (garb > 0) this.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
+        if (Game.settings.game.gamemode != 'backfire') return;
+        if (garb > 0) Game.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
 
-        if (this.game.stats.combo == -1 && this.game.mechanics.garbageQueue > 0) {
-            this.game.mechanics.addGarbage(this.game.mechanics.garbageQueue, 0);
-            this.game.stats.recieved += this.game.mechanics.garbageQueue;
-            this.game.mechanics.garbageQueue = 0;
+        if (Game.stats.combo == -1 && Game.mechanics.garbageQueue > 0) {
+            Game.mechanics.addGarbage(Game.mechanics.garbageQueue, 0);
+            Game.stats.recieved += Game.mechanics.garbageQueue;
+            Game.mechanics.garbageQueue = 0;
             this.progressDamage.value = 0;
         }
-        if (damage > 0) this.progressDamage.value = this.game.mechanics.garbageQueue;
+        if (damage > 0) this.progressDamage.value = Game.mechanics.garbageQueue;
     }
 
     checkBTB(linecount) {
         if (linecount == 0) return false;
-        if (this.game.mechanics.isAllspin && this.game.settings.game.allspin) return true;
-        return this.game.mechanics.isTspin || this.game.mechanics.isMini || linecount >= 4;
+        if (Game.mechanics.isAllspin && Game.settings.game.allspin) return true;
+        return Game.mechanics.isTspin || Game.mechanics.isMini || linecount >= 4;
     }
 
     getDamageType(linecount) {
-        const isSpin = this.game.mechanics.isTspin || (this.game.mechanics.isAllspin && this.game.settings.game.allspin);
-        const isMini = this.game.mechanics.isMini;
+        const isSpin = Game.mechanics.isTspin || (Game.mechanics.isAllspin && Game.settings.game.allspin);
+        const isMini = Game.mechanics.isMini;
         const type = cleartypes[Math.min(linecount, 5)] // limit to 5 line clear
         return (isSpin ? "Tspin " : "") + (isMini ? "mini " : "") + type;
     }

@@ -1,29 +1,29 @@
 import { spinChecks } from "../data/data.js";
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class Movement {
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     startTimers() {
-        this.game.zenith.startZenithMode();
-        this.game.grandmaster.startGrandmasterTimer();
-        if (this.game.zenith.tickPass == 0 && this.game.settings.game.gamemode == "zenith") this.game.renderer.renderTimeLeft("FLOOR 1")
-        this.game.started = true;
-        this.game.mechanics.startGravity();
-        this.game.modes.startSurvival();
-        this.game.mechanics.locking.lockingResume();
-        this.game.gameTimer = setInterval(() =>
-            this.game.gameClock(), (1000 / this.game.tickrate)
+        Game.zenith.startZenithMode();
+        Game.grandmaster.startGrandmasterTimer();
+        if (Game.zenith.tickPass == 0 && Game.settings.game.gamemode == "zenith") Game.renderer.renderTimeLeft("FLOOR 1")
+        Game.started = true;
+        Game.mechanics.startGravity();
+        Game.modes.startSurvival();
+        Game.mechanics.locking.lockingResume();
+        Game.gameTimer = setInterval(() =>
+            Game.gameClock(), (1000 / Game.tickrate)
         );
     }
 
+    startCountdown() {
+        
+        this.startTimers()
+        // setTimeout(() => {
+        // }, 1000);
+    }
+
     checkCollision(coords, action, collider) {
-        collider = collider ?? this.game.board.getMinos("S");
+        collider = collider ?? Game.board.getMinos("S");
         for (let [x, y] of coords) {
             if (
                 (action == "RIGHT" && x > 8) ||
@@ -49,114 +49,114 @@ export class Movement {
     }
 
     checkTspin(rotation, [x, y], [dx, dy]) {
-        if (this.game.falling.piece.name != "t") return false;
-        this.game.mechanics.isMini = false;
+        if (Game.falling.piece.name != "t") return false;
+        Game.mechanics.isMini = false;
         const minos = spinChecks[(rotation + 1) % 4]
             .concat(spinChecks[rotation - 1])
             .map(([ddx, ddy]) => this.checkCollision([[ddx + x, ddy + y]], "ROTATE"));
         if (minos[2] && minos[3] && (minos[0] || minos[1])) return true;
         if ((minos[2] || minos[3]) && minos[0] && minos[1]) {
             if ((dx == 1 || dx == -1) && dy == -2) return true;
-            this.game.mechanics.isMini = true;
+            Game.mechanics.isMini = true;
             return true;
         }
     }
 
     checkAllspin(pieceCoords) {
-        if (this.game.falling.piece.name == "t") return false;
+        if (Game.falling.piece.name == "t") return false;
         const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
         const validSpin = directions.every(([dx, dy]) =>
             this.checkCollision(pieceCoords.map(([x, y]) => [x + dx, y + dy]), "ROTATE"));
-        if (validSpin && this.game.settings.game.allspinminis) this.game.mechanics.isMini = true;
+        if (validSpin && Game.settings.game.allspinminis) Game.mechanics.isMini = true;
         return validSpin;
     }
 
     rotate(type) {
-        if (this.game.falling.piece.name == "o") return;
-        const newRotation = this.game.falling.getRotateState(type);
-        const kickdata = this.game.falling.getKickData(newRotation);
-        const rotatingCoords = this.game.falling.getNewCoords(newRotation);
+        if (Game.falling.piece.name == "o") return;
+        const newRotation = Game.falling.getRotateState(type);
+        const kickdata = Game.falling.getKickData(newRotation);
+        const rotatingCoords = Game.falling.getNewCoords(newRotation);
         const change = kickdata.find(([dx, dy]) =>
             !this.checkCollision(rotatingCoords.map(c => [c[0] + dx, c[1] + dy]), "ROTATE"));
         if (!change) return;
-        this.game.board.MinoToNone("A");
-        this.game.board.addMinos("A " + this.game.falling.piece.name, rotatingCoords, change);
-        this.game.falling.updateLocation(change);
-        this.game.mechanics.isTspin = this.checkTspin(newRotation, this.game.falling.location, change);
-        this.game.mechanics.isAllspin = this.checkAllspin(this.game.board.getMinos("A"));
-        this.game.falling.rotation = newRotation;
-        this.game.mechanics.locking.incrementLock();
-        this.game.stats.rotates++;
-        this.game.sounds.playSound("rotate");
-        this.game.mechanics.setShadow();
-        if (this.game.settings.game.gravitySpeed == 0) this.game.mechanics.startGravity();
-        this.game.controls.startArr("current");
-        this.game.controls.checkSD();
-        if (this.game.mechanics.isTspin || (this.game.mechanics.isAllspin && this.game.settings.game.allspin)) {
-            this.game.renderer.rotateBoard(type);
-            this.game.particles.spawnParticles(...this.game.falling.location,
-                "spin", 5, type == "CW", this.game.falling.piece.colour);
-            this.game.sounds.playSound("spin");
+        Game.board.MinoToNone("A");
+        Game.board.addMinos("A " + Game.falling.piece.name, rotatingCoords, change);
+        Game.falling.updateLocation(change);
+        Game.mechanics.isTspin = this.checkTspin(newRotation, Game.falling.location, change);
+        Game.mechanics.isAllspin = this.checkAllspin(Game.board.getMinos("A"));
+        Game.falling.rotation = newRotation;
+        Game.mechanics.locking.incrementLock();
+        Game.stats.rotates++;
+        Game.sounds.playSound("rotate");
+        Game.mechanics.setShadow();
+        if (Game.settings.game.gravitySpeed == 0) Game.mechanics.startGravity();
+        Game.controls.startArr("current");
+        Game.controls.checkSD();
+        if (Game.mechanics.isTspin || (Game.mechanics.isAllspin && Game.settings.game.allspin)) {
+            Game.renderer.rotateBoard(type);
+            Game.particles.spawnParticles(...Game.falling.location,
+                "spin", 5, type == "CW", Game.falling.piece.colour);
+            Game.sounds.playSound("spin");
         }
     }
 
     movePieceSide(direction, max = 1) {
-        this.game.controls.checkSD();
-        const minos = this.game.board.getMinos("A");
+        Game.controls.checkSD();
+        const minos = Game.board.getMinos("A");
         let amount = 0;
         const check = dx => !this.checkCollision(minos.map(([x, y]) => [x + dx, y]), direction);
         while (check(amount) && Math.abs(amount) < max) direction == "RIGHT" ? amount++ : amount--;
-        if (!check(amount)) this.game.renderer.bounceBoard(direction);
+        if (!check(amount)) Game.renderer.bounceBoard(direction);
         if (amount == 0) {
-            this.game.controls.stopInterval("arr");
+            Game.controls.stopInterval("arr");
             return;
         }
-        this.game.board.moveMinos(minos, "RIGHT", amount);
-        this.game.falling.updateLocation([amount, 0]);
-        this.game.mechanics.isTspin = false;
-        this.game.mechanics.isAllspin = false;
-        this.game.mechanics.isMini = false;
-        this.game.mechanics.locking.incrementLock();
-        this.game.sounds.playSound("move");
-        this.game.mechanics.setShadow();
-        this.game.controls.checkSD();
-        if (this.game.settings.game.gravitySpeed == 0) this.game.mechanics.startGravity();
+        Game.board.moveMinos(minos, "RIGHT", amount);
+        Game.falling.updateLocation([amount, 0]);
+        Game.mechanics.isTspin = false;
+        Game.mechanics.isAllspin = false;
+        Game.mechanics.isMini = false;
+        Game.mechanics.locking.incrementLock();
+        Game.sounds.playSound("move");
+        Game.mechanics.setShadow();
+        Game.controls.checkSD();
+        if (Game.settings.game.gravitySpeed == 0) Game.mechanics.startGravity();
     }
 
     movePieceDown(sonic, scoring = false) {
-        const minos = this.game.board.getMinos("A");
+        const minos = Game.board.getMinos("A");
         if (this.checkCollision(minos, "DOWN")) return;
-        this.game.board.moveMinos(minos, "DOWN", 1);
+        Game.board.moveMinos(minos, "DOWN", 1);
 
-        this.game.mechanics.isTspin = false;
-        this.game.mechanics.isAllspin = false;
-        this.game.mechanics.isMini = false;
-        this.game.falling.updateLocation([0, -1]);
-        if (this.checkCollision(this.game.board.getMinos("A"), "DOWN")) {
-            this.game.mechanics.locking.scheduleLock();
-            this.game.renderer.bounceBoard("DOWN");
-            this.game.controls.startArr("current");
+        Game.mechanics.isTspin = false;
+        Game.mechanics.isAllspin = false;
+        Game.mechanics.isMini = false;
+        Game.falling.updateLocation([0, -1]);
+        if (this.checkCollision(Game.board.getMinos("A"), "DOWN")) {
+            Game.mechanics.locking.scheduleLock();
+            Game.renderer.bounceBoard("DOWN");
+            Game.controls.startArr("current");
         }
-        if (scoring && sonic) this.game.stats.score += 1;
+        if (scoring && sonic) Game.stats.score += 1;
         if (sonic) this.movePieceDown(true, scoring);
     }
 
     harddrop() {
-        const minos = this.game.board.getMinos("A");
+        const minos = Game.board.getMinos("A");
         let amount = 0;
         while (!this.checkCollision(minos.map(([x, y]) => [x, y - amount]), "DOWN")) amount++;
         if (amount > 0) {
-            this.game.mechanics.isTspin = false;
-            this.game.mechanics.isAllspin = false;
-            this.game.mechanics.isMini = false;
+            Game.mechanics.isTspin = false;
+            Game.mechanics.isAllspin = false;
+            Game.mechanics.isMini = false;
         }
-        this.game.board.moveMinos(minos, "DOWN", amount);
-        this.game.falling.updateLocation([0, -amount]);
-        this.game.stats.score += 2 * amount;
-        this.game.sounds.playSound("harddrop");
-        this.game.renderer.bounceBoard('DOWN');
+        Game.board.moveMinos(minos, "DOWN", amount);
+        Game.falling.updateLocation([0, -amount]);
+        Game.stats.score += 2 * amount;
+        Game.sounds.playSound("harddrop");
+        Game.renderer.bounceBoard('DOWN');
         const xvals = [...new Set(minos.map(([x, y]) => x))];
-        this.game.particles.spawnParticles(Math.min(...xvals), this.game.falling.location[1], "drop", xvals.length);
-        this.game.mechanics.locking.lockPiece();
+        Game.particles.spawnParticles(Math.min(...xvals), Game.falling.location[1], "drop", xvals.length);
+        Game.mechanics.locking.lockPiece();
     }
 }

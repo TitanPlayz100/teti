@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class Board {
     /**
@@ -6,12 +6,6 @@ export class Board {
      */
     boardState = [];
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
     // modify board
     checkMino([x, y], val) {
         return this.boardState[y][x].split(" ").includes(val);
@@ -88,7 +82,7 @@ export class Board {
         const newcoords = coords.map(c => getChange(c, size)[dir]);
 
         if (newcoords.some(([x, y]) => y > 39)) {
-            this.game.endGame("Topout");
+            Game.endGame("Topout");
             return;
         }
 
@@ -98,7 +92,7 @@ export class Board {
         newcoords.forEach((c, idx) =>
             value ? this.addValue(c, valTable[idx]) : this.setValue(c, valTable[idx])
         );
-        this.game.mechanics.spawnOverlay();
+        Game.mechanics.spawnOverlay();
     }
 
     setComboBoard(start) {
@@ -125,7 +119,7 @@ export class Board {
         }
 
         this.addMinos("S G", garbCoords.map(([x, y]) => [x + 3, y]), [0, 0]);
-        this.game.mechanics.setShadow();
+        Game.mechanics.setShadow();
 
     }
 }

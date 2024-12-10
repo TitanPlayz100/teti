@@ -1,6 +1,6 @@
 import sfxobj from "../data/sfxlist.json" with { type: "json" };
 import { songsobj } from "../data/data.js";
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class Sounds {
     sfx = {};
@@ -13,14 +13,6 @@ export class Sounds {
     lowpassfilter;
     audioContext;
 
-
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     /**
      * 
      * @param {string} audioName 
@@ -32,7 +24,7 @@ export class Sounds {
     playSound(audioName, replace = true, silent = false) {
         if (this.sfx[audioName] == undefined) return;
         this.sfx[audioName].muted = silent;
-        this.sfx[audioName].volume = this.game.settings.volume.sfxLevel / 1000;
+        this.sfx[audioName].volume = Game.settings.volume.sfxLevel / 1000;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
         this.sfx[audioName].currentTime = 0;
         this.sfx[audioName].play();
@@ -44,7 +36,7 @@ export class Sounds {
             this.endSong();
             this.startSong();
         };
-        this.songs[this.curSongIdx].volume = this.game.settings.volume.audioLevel / 1000;
+        this.songs[this.curSongIdx].volume = Game.settings.volume.audioLevel / 1000;
         this.songs[this.curSongIdx].play();
     }
 
@@ -68,10 +60,10 @@ export class Sounds {
 
     addMenuSFX() {
         let hoverSFX = (e) => {
-            document.querySelectorAll(e).forEach(el => (el.addEventListener("mouseenter", () => this.game.sounds.playSound("menutap"))));
+            document.querySelectorAll(e).forEach(el => (el.addEventListener("mouseenter", () => Game.sounds.playSound("menutap"))));
         };
         let clickSFX = (e) => {
-            document.querySelectorAll(e).forEach(el => (el.addEventListener("click", () => this.game.sounds.playSound("menuclick"))));
+            document.querySelectorAll(e).forEach(el => (el.addEventListener("click", () => Game.sounds.playSound("menuclick"))));
         };
         hoverSFX(".settingRow");
         hoverSFX(".closeDialogButton");
@@ -114,7 +106,7 @@ export class Sounds {
     }
 
     setAudioLevel() {
-        this.songs[this.curSongIdx].volume = Number(this.game.settings.volume.audioLevel) / 1000;
+        this.songs[this.curSongIdx].volume = Number(Game.settings.volume.audioLevel) / 1000;
     }
 
     toggleSongMuffle(muffled) {

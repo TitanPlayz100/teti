@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 // start recording replay with start()
 // save replay with copyReplay()
@@ -9,13 +9,6 @@ export class Replay {
     /**@type { "idle" | "running" | "replaying" } */
     state = "idle";
 
-    /**
-     * @param {Game} game 
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     start() {
         if (this.state == "replaying") return;
         this.state = "running";
@@ -25,15 +18,15 @@ export class Replay {
 
     stop() {
         this.state = "idle";
-        this.game.menuactions.loadSettings();
+        Game.menuactions.loadSettings();
     }
 
     togglePause() {
         this.state = (this.state == "replaying") ? "idle" : "replaying";
         if (this.state == "idle") {
-            this.game.stopGameTimers();
+            Game.stopGameTimers();
         } else {
-            this.game.movement.startTimers();
+            Game.movement.startTimers();
         }
     }
 
@@ -49,8 +42,8 @@ export class Replay {
     }
 
     saveKeys() {
-        const keyDowns = this.game.controls.keyDownQueue;
-        const keyUps = this.game.controls.keyUpQueue;
+        const keyDowns = Game.controls.keyDownQueue;
+        const keyUps = Game.controls.keyUpQueue;
 
         const event = {}
         if (keyDowns.length > 0) event.keydown = keyDowns;
@@ -62,7 +55,7 @@ export class Replay {
 
     saveReplay() {
         const date = (new Date()).toISOString();
-        const fps = Math.round(this.game.pixi.app.ticker.FPS);
+        const fps = Math.round(Game.pixi.app.ticker.FPS);
 
         const newEvents = {}
         Object.getOwnPropertyNames(this.events).map(key => {
@@ -74,12 +67,12 @@ export class Replay {
             events: newEvents,
             header: {
                 date,
-                version: this.game.version,
+                version: Game.version,
                 fps,
-                seed: this.game.bag.genseed,
+                seed: Game.bag.genseed,
             },
-            handling: this.game.settings.handling,
-            settings: this.game.settings.game,
+            handling: Game.settings.handling,
+            settings: Game.settings.game,
         };
         return JSON.stringify(replay);
     }
@@ -100,10 +93,10 @@ export class Replay {
 
         this.currentFrame = 0;
         this.state = "replaying";
-        this.game.settings.handling = replay.handling;
-        this.game.settings.game = replay.settings;
+        Game.settings.handling = replay.handling;
+        Game.settings.game = replay.settings;
 
-        this.game.startGame(replay.header.seed);
+        Game.startGame(replay.header.seed);
     }
 
     joinEvent(frame, event) {
@@ -118,10 +111,10 @@ export class Replay {
     replayKey(event) {
         const keydown = event.keydown ?? [];
         const keyup = event.keyup ?? [];
-        this.game.controls.keyDownQueue = keydown;
-        this.game.controls.keyUpQueue = keyup;
+        Game.controls.keyDownQueue = keydown;
+        Game.controls.keyUpQueue = keyup;
 
-        if (!this.game.started && keydown.length > 0) this.game.movement.startTimers();
+        if (!Game.started && keydown.length > 0) Game.movement.startTimers();
     }
 
     toMillisecond(frame, fps) {

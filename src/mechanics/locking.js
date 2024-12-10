@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
@@ -9,39 +9,32 @@ export class LockPiece {
     startTime = 0;
     remaining = 0;
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
-
     incrementLock() {
         if (this.timings.lockdelay != 0) {
             this.lockCount++;
-            this.game.mechanics.locking.clearLockDelay(false);
-            if (this.game.settings.game.maxLockMovements != 0 && this.game.settings.display.lockBar) {
-                const amountToAdd = 100 / this.game.settings.game.maxLockMovements;
+            Game.mechanics.locking.clearLockDelay(false);
+            if (Game.settings.game.maxLockMovements != 0 && Game.settings.display.lockBar) {
+                const amountToAdd = 100 / Game.settings.game.maxLockMovements;
                 this.divLockCounter.value += amountToAdd;
             }
         }
-        if (this.game.movement.checkCollision(this.game.mechanics.board.getMinos("A"), "DOWN")) {
-            this.game.mechanics.locking.scheduleLock();
+        if (Game.movement.checkCollision(Game.board.getMinos("A"), "DOWN")) {
+            Game.mechanics.locking.scheduleLock();
         }
     }
 
     scheduleLock() {
         const LockMoves =
-            this.game.settings.game.maxLockMovements == 0
+            Game.settings.game.maxLockMovements == 0
                 ? Infinity
-                : this.game.settings.game.maxLockMovements;
+                : Game.settings.game.maxLockMovements;
         if (this.lockCount >= LockMoves) {
-            this.game.mechanics.locking.lockPiece();
+            Game.mechanics.locking.lockPiece();
             return;
         }
-        if (this.game.settings.game.lockDelay == 0) return;
+        if (Game.settings.game.lockDelay == 0) return;
 
-        this.lockDelayStart(this.game.settings.game.lockDelay);
+        this.lockDelayStart(Game.settings.game.lockDelay);
     }
 
     lockDelayStart(delay) {
@@ -49,17 +42,17 @@ export class LockPiece {
         clearInterval(this.timings.lockingTimer);
         this.startTime = Date.now();
         this.timings.lockdelay = setTimeout(
-            () => this.game.mechanics.locking.lockPiece(),
+            () => Game.mechanics.locking.lockPiece(),
             delay);
         this.timings.lockingTimer = setInterval(() => {
-            const amountToAdd = 1000 / this.game.settings.game.lockDelay;
-            if (this.game.settings.display.lockBar) this.divLockTimer.value += amountToAdd;
+            const amountToAdd = 1000 / Game.settings.game.lockDelay;
+            if (Game.settings.display.lockBar) this.divLockTimer.value += amountToAdd;
         }, 10);
     }
 
     lockingPause() {
         if (this.timings.lockdelay == 0) return;
-        this.remaining = this.game.settings.game.lockDelay - (Date.now() - this.startTime);
+        this.remaining = Game.settings.game.lockDelay - (Date.now() - this.startTime);
         clearTimeout(this.timings.lockdelay);
         clearInterval(this.timings.lockingTimer);
     }
@@ -70,49 +63,49 @@ export class LockPiece {
     }
 
     lockPiece() {
-        const lockCoords = this.game.mechanics.board.getMinos("A");
-        this.game.pixi.justPlacedCoords = lockCoords;
-        this.game.pixi.justPlacedAlpha = 1;
+        const lockCoords = Game.board.getMinos("A");
+        Game.pixi.justPlacedCoords = lockCoords;
+        Game.pixi.justPlacedAlpha = 1;
 
         lockCoords.forEach(([x, y]) => {
-            this.game.mechanics.board.rmValue([x, y], "A");
-            this.game.mechanics.board.addValFront([x, y], "S");
+            Game.board.rmValue([x, y], "A");
+            Game.board.addValFront([x, y], "S");
         });
-        this.game.pixi.flash(lockCoords);
+        Game.pixi.flash(lockCoords);
 
-        this.game.mechanics.locking.clearLockDelay();
-        clearInterval(this.game.gravityTimer);
-        const cleared = this.game.mechanics.clear.clearLines(lockCoords);
-        this.game.endGame( // check stopped overlap next
-            this.game.mechanics.checkDeath(
-                this.game.mechanics.board.getMinos("S"),
-                this.game.mechanics.board.getMinos("NP")
+        Game.mechanics.locking.clearLockDelay();
+        clearInterval(Game.gravityTimer);
+        const cleared = Game.mechanics.clear.clearLines(lockCoords);
+        Game.endGame( // check stopped overlap next
+            Game.mechanics.checkDeath(
+                Game.board.getMinos("S"),
+                Game.board.getMinos("NP")
             )
         );
-        this.game.endGame( // check lockout
-            this.game.mechanics.checkDeath(
+        Game.endGame( // check lockout
+            Game.mechanics.checkDeath(
                 lockCoords,
-                this.game.mechanics.board.getMinos("NP")
+                Game.board.getMinos("NP")
             )
         );
-        this.game.stats.pieceCount++;
-        this.game.hold.occured = false;
-        this.game.mechanics.isTspin = false;
-        this.game.mechanics.isAllspin = false;
-        this.game.mechanics.isMini = false;
-        this.game.falling.moved = false;
-        if (this.game.stats.tgm_level % 100 != 99 && this.game.stats.tgm_level != this.game.settings.game.raceTarget - 1) this.game.stats.tgm_level++;
+        Game.stats.pieceCount++;
+        Game.hold.occured = false;
+        Game.mechanics.isTspin = false;
+        Game.mechanics.isAllspin = false;
+        Game.mechanics.isMini = false;
+        Game.falling.moved = false;
+        if (Game.stats.tgm_level % 100 != 99 && Game.stats.tgm_level != Game.settings.game.raceTarget - 1) Game.stats.tgm_level++;
 
 
         const xvals = [...new Set(lockCoords.map(([x, y]) => x))];
         const yval = Math.min(...lockCoords.map(([x, y]) => y));
-        this.game.particles.spawnParticles(Math.min(...xvals), yval, "lock", xvals.length);
-        this.game.renderer.renderDanger();
+        Game.particles.spawnParticles(Math.min(...xvals), yval, "lock", xvals.length);
+        Game.renderer.renderDanger();
 
-        const delay = (cleared > 0) ? this.game.settings.game.clearDelay : 0;
+        const delay = (cleared > 0) ? Game.settings.game.clearDelay : 0;
         const onClear = () => {
-            this.game.mechanics.spawnPiece(this.game.bag.cycleNext());
-            this.game.history.save();
+            Game.mechanics.spawnPiece(Game.bag.cycleNext());
+            Game.history.save();
             this.timings.clearDelay = 0;
         }
         if (delay == 0) onClear();
@@ -126,8 +119,8 @@ export class LockPiece {
         if (!clearCount) return;
         this.divLockCounter.value = 0;
         this.lockCount = 0;
-        if (this.game.settings.game.preserveARR) return;
-        this.game.controls.resetMovements();
+        if (Game.settings.game.preserveARR) return;
+        Game.controls.resetMovements();
     }
 
     stopTimeout(name) {

@@ -1,7 +1,7 @@
 import blocksprites from '../data/blocksprites.json' with { type: 'json' };
 import kicks from '../data/kicks.json' with { type: 'json' };
 import { defaultSkins } from '../data/data.js';
-import { Game } from '../game.js';
+import { Game } from '../main.js';
 import { clearSplash } from '../main.js';
 import { getPiece } from '../mechanics/randomisers.js';
 import { Visuals } from './visuals.js';
@@ -24,12 +24,8 @@ export class PixiRender {
 
     divlock = document.getElementById("lockTimer");
 
-    /**
-     * @param {Game} game 
-     */
-    constructor(game) {
-        this.game = game;
-        this.visuals = new Visuals(game);
+    constructor() {
+        this.visuals = new Visuals();
     }
 
     async init() {
@@ -42,19 +38,19 @@ export class PixiRender {
         this.board = containers["board"];
         this.particleContainer = containers["particles"];
 
-        this.game.particles.initBoard();
+        Game.particles.initBoard();
         await this.generateTextures();
         this.resize();
-        this.generateAllSprites("board", this.game.board.boardState, 39);
-        this.generateAllSprites("hold", this.game.renderer.holdQueueGrid, 2);
-        this.generateAllSprites("next", this.game.renderer.nextQueueGrid, 15);
-        this.game.renderer.updateHold();
+        this.generateAllSprites("board", Game.board.boardState, 39);
+        this.generateAllSprites("hold", Game.renderer.holdQueueGrid, 2);
+        this.generateAllSprites("next", Game.renderer.nextQueueGrid, 15);
+        Game.renderer.updateHold();
 
         this.app.ticker.add(time => this.tick(time));
     }
 
     resize() {
-        const scale = Number(this.game.settings.display.boardHeight) / 100;
+        const scale = Number(Game.settings.display.boardHeight) / 100;
         const screenHeight = Math.floor(this.app.screen.height / 2);
         const screenWidth = Math.floor(this.app.screen.width / 2);
         this.height = Math.floor(screenHeight * 2 * 0.6 * scale / 40) * 40;
@@ -88,11 +84,11 @@ export class PixiRender {
         }
 
         const reset = iconframe(this.resetIcon, 0.23, 0)
-        reset.on("pointerdown", () => { console.log("test"); this.game.controls.retry(true) });
+        reset.on("pointerdown", () => Game.controls.retry(true));
         const settings = iconframe(this.settingsIcon, 0.18, width * 3 / 20)
-        settings.on("pointerdown", () => this.game.modals.openModal("settingsPanel"));
+        settings.on("pointerdown", () => Game.modals.openModal("settingsPanel"));
         const edit = iconframe(this.editIcon, 0.21, width * 6 / 20)
-        edit.on("pointerdown", () => this.game.modals.openModal("editMenu"));
+        edit.on("pointerdown", () => Game.modals.openModal("editMenu"));
         edit.visible = this.editButtonVisible
 
         return { settings, reset, edit };
@@ -121,7 +117,7 @@ export class PixiRender {
     }
 
     async generateTextures() {
-        let url = this.game.settings.display.skin;
+        let url = Game.settings.display.skin;
         if (defaultSkins.includes(url)) url = `./assets/skins/${url}.png`;
         const texture = await PIXI.Assets.load(url);
         const spritesheet = new PIXI.Spritesheet(texture, blocksprites);
@@ -135,7 +131,7 @@ export class PixiRender {
         const triangleGraphic = new PIXI.Graphics().poly([0, 0, 10, 0, 0, 10]).fill(0xffffff, 0.4);
         this.triangle = this.app.renderer.generateTexture(triangleGraphic);
 
-        this.game.particles.texture = await PIXI.Assets.load('./assets/particle.png');
+        Game.particles.texture = await PIXI.Assets.load('./assets/particle.png');
         clearSplash();
     }
 
@@ -166,9 +162,9 @@ export class PixiRender {
             for (let x = 0; x < 10; x++) {
                 const mino = new PIXI.Sprite(this.textures['g']);
                 mino.interactive = true;
-                mino.on("mousedown", () => this.game.boardeditor.mouseDown([x, y], mino));
-                mino.on("mouseenter", () => this.game.boardeditor.mouseEnter([x, y], mino));
-                mino.on("mouseleave", () => this.game.boardeditor.mouseLeave([x, y], mino));
+                mino.on("mousedown", () => Game.boardeditor.mouseDown([x, y], mino));
+                mino.on("mouseenter", () => Game.boardeditor.mouseEnter([x, y], mino));
+                mino.on("mouseleave", () => Game.boardeditor.mouseLeave([x, y], mino));
                 clickArea.addChild(mino);
                 mino.position.set(x * this.minoSize, y * this.minoSize);
                 mino.setSize(this.minoSize);
@@ -178,10 +174,10 @@ export class PixiRender {
     }
 
     generateGrid() {
-        if (this.game.settings.display.showGrid === false) return;
+        if (Game.settings.display.showGrid === false) return;
         const grid = this.app.stage.getChildByLabel("grid");
-        const type = this.game.settings.display.gridType;
-        const opacity = this.game.settings.display.gridopacity / 100;
+        const type = Game.settings.display.gridType;
+        const opacity = Game.settings.display.gridopacity / 100;
         const gridGraphic = new PIXI.Graphics();
 
         if (type == "square") {
@@ -208,23 +204,23 @@ export class PixiRender {
 
     // RENDER CLOCK
     tick(time) {
-        this.game.replay.tick();
-        this.game.controls.runKeyQueue();
-        this.game.controls.timer();
-        this.render("board", this.game.board.boardState);
-        this.game.boardeffects.move(0, 0);
-        this.game.boardeffects.rotate(0);
-        this.game.particles.update();
-        this.game.renderer.dangerParticles();
+        Game.replay.tick();
+        Game.controls.runKeyQueue();
+        Game.controls.timer();
+        this.render("board", Game.board.boardState);
+        Game.boardeffects.move(0, 0);
+        Game.boardeffects.rotate(0);
+        Game.particles.update();
+        Game.renderer.dangerParticles();
         this.updateAlpha();
         this.showTextOnTime(60, "60S LEFT");
         this.showTextOnTime(90, "90S LEFT");
     }
 
     showTextOnTime(time, text) {
-        if (this.game.settings.game.gamemode == "ultra") {
-            if (Math.floor(this.game.stats.time) == time) {
-                this.game.renderer.renderTimeLeft(text);
+        if (Game.settings.game.gamemode == "ultra") {
+            if (Math.floor(Game.stats.time) == time) {
+                Game.renderer.renderTimeLeft(text);
             }
         }
     }
@@ -250,7 +246,7 @@ export class PixiRender {
                     sprite.visible = true;
                     sprite.texture = this.getTexture(type, cell);
                     sprite.alpha = this.getOpacity(cell, type, x, y) ?? this.queueAlpha;
-                } else if (cell.includes("NP") && this.game.renderer.inDanger) { // next piece overlay
+                } else if (cell.includes("NP") && Game.renderer.inDanger) { // next piece overlay
                     sprite.visible = true;
                     sprite.texture = this.textures["topout"];
                     sprite.alpha = 0.32;
@@ -265,15 +261,15 @@ export class PixiRender {
     }
 
     getTexture(type, cell) {
-        const piece = this.game.hold.occured && type == "hold" ? "hold" : cell[1].toLowerCase();
-        const override = kicks[this.game.settings.game.kicktable].color_overrides ?? {};
+        const piece = Game.hold.occured && type == "hold" ? "hold" : cell[1].toLowerCase();
+        const override = kicks[Game.settings.game.kicktable].color_overrides ?? {};
         return this.textures[override[piece] ?? piece];
     }
 
     setShadowTint(sprite) {
-        if (!this.game.settings.display.colouredShadow) return;
-        const pieceName = this.game.falling.piece.name;
-        const override = kicks[this.game.settings.game.kicktable].color_overrides ?? {};
+        if (!Game.settings.display.colouredShadow) return;
+        const pieceName = Game.falling.piece.name;
+        const override = kicks[Game.settings.game.kicktable].color_overrides ?? {};
         sprite.tint = getPiece(override[pieceName] ?? pieceName).colour;
     }
 
@@ -298,10 +294,10 @@ export class PixiRender {
 
     getOpacity(cell, type, x, y) {
         if (type != "board") return;
-        if (this.divlock.value != 0 && cell.includes("A") && this.game.settings.game.gamemode != "lookahead") {
+        if (this.divlock.value != 0 && cell.includes("A") && Game.settings.game.gamemode != "lookahead") {
             return 1 - (this.divlock.value / 250);
         }
-        if (this.game.settings.game.gamemode == "lookahead") {
+        if (Game.settings.game.gamemode == "lookahead") {
             for (let [posX, posY] of this.justPlacedCoords) {
                 if (posX == x && posY == y) {
                     return Math.max(this.justPlacedAlpha, this.boardAlpha).toFixed(2);
@@ -312,25 +308,25 @@ export class PixiRender {
     }
 
     getShadowOpacity() {
-        const opacity = this.game.settings.display.shadowOpacity / 100;
-        if (this.game.settings.game.gamemode == "lookahead") return (opacity * this.boardAlpha).toFixed(2);
+        const opacity = Game.settings.display.shadowOpacity / 100;
+        if (Game.settings.game.gamemode == "lookahead") return (opacity * this.boardAlpha).toFixed(2);
         return opacity;
     }
 
     updateAlpha() {
-        if (this.game.settings.game.gamemode != 'lookahead') return;
+        if (Game.settings.game.gamemode != 'lookahead') return;
         const update = (type, amount) => {
-            if (this.game.stats.checkInvis()) {
+            if (Game.stats.checkInvis()) {
                 if (this[type] <= 0) {
                     this[type] = 1;
-                    this.game.renderer.updateNext();
-                    this.game.renderer.updateHold();
+                    Game.renderer.updateNext();
+                    Game.renderer.updateHold();
                 }
             } else {
                 if (this[type] > 0) {
-                    this[type] += -amount / this.game.tickrate;
-                    this.game.renderer.updateNext();
-                    this.game.renderer.updateHold();
+                    this[type] += -amount / Game.tickrate;
+                    Game.renderer.updateNext();
+                    Game.renderer.updateHold();
                 } else {
                     this[type] = 0;
                 }
@@ -342,7 +338,7 @@ export class PixiRender {
     }
 
     addNewParticle(colour) {
-        const p = new PIXI.Sprite(this.game.particles.texture);
+        const p = new PIXI.Sprite(Game.particles.texture);
         p.tint = colour
         p.scale.set(0.5);
         this.particleContainer.addChild(p);

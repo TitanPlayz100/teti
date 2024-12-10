@@ -46,7 +46,8 @@
         "backfireMulti": 1,
         "lookAheadPieces": 3,
         "raceTarget": 500,
-        "requiredAltitude": 1650
+        "requiredAltitude": 1650,
+        "readysetgo": false
     },
     "control": {
         "rightKey": "ArrowRight",

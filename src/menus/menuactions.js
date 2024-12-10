@@ -1,20 +1,12 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import { getPiece } from "../mechanics/randomisers.js";
 import { toExpValue } from "./modals.js";
 
 export class MenuActions {
     bindingKey;
-    menus;
     elementSelectKeyText = document.getElementById("selectkeytext");
     controlUsed = false;
     altUsed = false;
-
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-    }
 
     // sliders
     sliderChange(el) {
@@ -29,8 +21,8 @@ export class MenuActions {
         document.body.addEventListener("click", (event) => {
             if (event.target.dataset.isRange == "true") {
                 const el = event.target.children[1]
-                this.game.modals.selectedRangeElement = el;
-                this.menus.openModal("changeRangeValue");
+                Game.modals.selectedRangeElement = el;
+                Game.modals.openModal("changeRangeValue");
                 document.getElementById("rangeValue").value = el.value;
             }
         })
@@ -45,8 +37,8 @@ export class MenuActions {
         this.bindingKey = el.id;
     }
 
-    checkValue(el, el2 = this.game.modals.selectedRangeElement) {
-        this.game.modals.selectedRangeElement = el2;
+    checkValue(el, el2 = Game.modals.selectedRangeElement) {
+        Game.modals.selectedRangeElement = el2;
         if (el.value == "") return;
         if (el.value < Number(el2.min)) el.value = Number(el2.min);
         if (el.value > Number(el2.max)) el.value = Number(el2.max);
@@ -74,13 +66,13 @@ export class MenuActions {
 
         const key = (event.ctrlKey ? "Ctrl+" : "") + (event.altKey ? "Alt+" : "") + event.key;
         document.getElementById(this.bindingKey).textContent = key;
-        for (let i in this.game.settings.control) {
+        for (let i in Game.settings.control) {
             if (i == this.bindingKey) continue;
             const otherKeys = document.getElementById(i);
             if (otherKeys.textContent == key) otherKeys.textContent = "None";
         }
-        this.menus.closeDialog(document.getElementById("frontdrop"));
-        this.game.modals.open = true;
+        Game.modals.closeDialog(document.getElementById("frontdrop"));
+        Game.modals.open = true;
         this.bindingKey = undefined;
         this.controlUsed = false;
         this.altUsed = false;
@@ -89,19 +81,19 @@ export class MenuActions {
 
     // settings
     saveSettings() {
-        const data = this.game.settings.save();
+        const data = Game.settings.save();
         localStorage.setItem("settings", JSON.stringify(data));
     }
 
     loadSettings() {
-        if (this.game.replay.state == "replaying") return;
+        if (Game.replay.state == "replaying") return;
         const data = localStorage.getItem("settings") ?? "{}";
-        this.game.settings.load(JSON.parse(data))
+        Game.settings.load(JSON.parse(data))
     }
 
     setGamemode(mode) {
-        this.game.modes.setGamemode(mode);
-        this.game.modes.loadModes();
+        Game.modes.setGamemode(mode);
+        Game.modes.loadModes();
     }
 
     downloadSettings() {
@@ -121,34 +113,34 @@ export class MenuActions {
         reader.onload = () => {
             localStorage.setItem("settings", reader.result.toString());
             this.loadSettings();
-            this.game.modes.loadModes();
-            this.game.modals.generate.notif("Settings Loaded", "User settings have successfully loaded", "message");
+            Game.modes.loadModes();
+            Game.modals.generate.notif("Settings Loaded", "User settings have successfully loaded", "message");
             el.value = "";
         };
     }
 
     resetSettings(group) {
-        this.game.settings.reset(group);
+        Game.settings.reset(group);
         this.saveSettings();
         location.reload();
-        this.game.modals.generate.notif("Settings Reset", `${group} settings have been reset to default`, "message");
+        Game.modals.generate.notif("Settings Reset", `${group} settings have been reset to default`, "message");
     }
 
     // menu
     toggleDialog() {
-        if (this.game.menuactions.bindingKey != undefined) return;
-        if (!this.game.modals.open) {
-            this.menus.openModal("settingsPanel");
+        if (Game.menuactions.bindingKey != undefined) return;
+        if (!Game.modals.open) {
+            Game.modals.openModal("settingsPanel");
             return;
         }
-        document.querySelectorAll("dialog[open]").forEach(e => this.menus.closeDialog(e));
-        document.querySelectorAll("scrollSettings[open]").forEach(e => this.menus.closeDialog(e));
-        if (this.game.started && !this.game.ended) this.game.movement.startTimers();
+        document.querySelectorAll("dialog[open]").forEach(e => Game.modals.closeDialog(e));
+        document.querySelectorAll("scrollSettings[open]").forEach(e => Game.modals.closeDialog(e));
+        if (Game.started && !Game.ended) Game.movement.startTimers();
     }
 
     newGame(key, modal) {
-        if (key == this.game.settings.control.resetKey) {
-            this.game.modals.closeModal(modal);
+        if (key == Game.settings.control.resetKey) {
+            Game.modals.closeModal(modal);
         }
     }
 
@@ -158,55 +150,55 @@ export class MenuActions {
 
     // edit menu
     openEditMenu() {
-        if (this.game.modals.open) {
+        if (Game.modals.open) {
             if (document.querySelectorAll("#editMenu[open]").length == 0) return;
             this.toggleDialog();
             return;
         }
-        if (this.game.settings.game.gamemode != 'custom') return
-        this.menus.openModal("editMenu");
+        if (Game.settings.game.gamemode != 'custom') return
+        Game.modals.openModal("editMenu");
     }
 
-    changeEditPiece(pieceName) { this.game.boardeditor.fillPiece = pieceName; }
+    changeEditPiece(pieceName) { Game.boardeditor.fillPiece = pieceName; }
 
     addGarbageRow() {
-        this.game.mechanics.addGarbage(1);
-        this.game.mechanics.setShadow();
+        Game.mechanics.addGarbage(1);
+        Game.mechanics.setShadow();
     }
 
     removeLastRow() {
-        this.game.mechanics.clear.clearRow(0);
-        this.game.mechanics.setShadow();
+        Game.mechanics.clear.clearRow(0);
+        Game.mechanics.setShadow();
     }
 
     clearGarbage() {
-        this.game.mechanics.board.EradicateMinoCells("S G");
-        this.game.mechanics.setShadow();
+        Game.board.EradicateMinoCells("S G");
+        Game.mechanics.setShadow();
     }
 
     setBoard() {
         const input = prompt("Enter Map String Here:")
-        const { board, next, hold } = this.game.boardeditor.convertFromMap(input);
-        this.game.board.boardState = board;
-        this.game.bag.setQueue(next.split(","));
-        this.game.hold.piece = getPiece(hold);
-        this.game.mechanics.spawnPiece(this.game.bag.cycleNext());
-        this.game.modals.generate.notif("Map Loaded", "Custom map has successfully loaded", "message");
+        const { board, next, hold } = Game.boardeditor.convertFromMap(input);
+        Game.board.boardState = board;
+        Game.bag.setQueue(next.split(","));
+        Game.hold.piece = getPiece(hold);
+        Game.mechanics.spawnPiece(Game.bag.cycleNext());
+        Game.modals.generate.notif("Map Loaded", "Custom map has successfully loaded", "message");
     }
 
     getBoardString() {
-        const exportstring = this.game.boardeditor.convertToMap();
+        const exportstring = Game.boardeditor.convertToMap();
         navigator.clipboard.writeText(exportstring)
-        this.game.modals.generate.notif("Map Exported", "Custom map has been copied to your clipboard", "message");
+        Game.modals.generate.notif("Map Exported", "Custom map has been copied to your clipboard", "message");
         alert("TETR.IO Map String:\n" + exportstring)
     }
 
     // stats
     exportStats() {
         let stats = {}
-        Object.getOwnPropertyNames(this.game.stats).forEach(key => {
+        Object.getOwnPropertyNames(Game.stats).forEach(key => {
             if (key == "game") return;
-            stats[key] = this.game.stats[key];
+            stats[key] = Game.stats[key];
         })
 
         let el = document.createElement("a");
@@ -215,16 +207,16 @@ export class MenuActions {
         document.body.appendChild(el);
         el.click();
         document.body.removeChild(el);
-        this.game.modals.generate.notif("Stats Exported", "The current game's stats have been exported.", "message");
+        Game.modals.generate.notif("Stats Exported", "The current game's stats have been exported.", "message");
     }
 
     closeStats() {
-        this.menus.closeDialog(document.getElementById("gameStatsDialog"));
-        this.game.modals.open = true;
+        Game.modals.closeDialog(document.getElementById("gameStatsDialog"));
+        Game.modals.open = true;
     }
 
     exportLifetime() {
-        this.game.profilestats.saveSession();
+        Game.profilestats.saveSession();
         const data = localStorage.getItem("stats");
         const day = (new Date()).toLocaleDateString().replace("/", "-");
 
@@ -234,11 +226,11 @@ export class MenuActions {
         document.body.appendChild(el);
         el.click();
         document.body.removeChild(el);
-        this.game.modals.generate.notif("Lifetime Stats Exported", "All your lifetime stats and PBs have been exported. Enjoy the many stats you can analyse!", "success");
+        Game.modals.generate.notif("Lifetime Stats Exported", "All your lifetime stats and PBs have been exported. Enjoy the many stats you can analyse!", "success");
     }
 
     saveReplay() {
-        const replay = this.game.replay.saveReplay();
+        const replay = Game.replay.saveReplay();
 
         let el = document.createElement("a");
         el.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(replay));
@@ -246,17 +238,17 @@ export class MenuActions {
         document.body.appendChild(el);
         el.click();
         document.body.removeChild(el);
-        this.game.modals.generate.notif("Replay Exported", "Your replay was successfully exported", "success");
+        Game.modals.generate.notif("Replay Exported", "Your replay was successfully exported", "success");
     }
 
     uploadReplay(el) {
         const reader = new FileReader();
         reader.readAsText(el.files[0]);
         reader.onload = () => {
-            this.game.modals.generate.notif("Replay Loaded", "Replay successfully loaded", "message");
-            this.game.modals.closeModal("replaysDialog");
+            Game.modals.generate.notif("Replay Loaded", "Replay successfully loaded", "message");
+            Game.modals.closeModal("replaysDialog");
             setTimeout(() => {
-                this.game.replay.runReplay(reader.result.toString());
+                Game.replay.runReplay(reader.result.toString());
             }, 1000);
             el.value = "";
         };

@@ -1,5 +1,5 @@
 import { pbTrackingStat } from "../data/data.js";
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class BoardEffects {
     X = 0;
@@ -18,14 +18,6 @@ export class BoardEffects {
     paceCooldown = 0;
 
     divBoard = document.getElementById("board");
-
-    /**
-     * 
-     * @param {Game} game 
-     */
-    constructor(game) {
-        this.game = game;
-    }
 
     move(forceX, forceY) {
         this.dX += forceX;
@@ -47,7 +39,7 @@ export class BoardEffects {
         this.Y = this.clamp(this.Y, 0.5);
 
         if (this.X != 0 || this.Y != 0) {
-            this.game.pixi.app.canvas.style.translate = `${this.X}px ${this.Y}px`
+            Game.pixi.app.canvas.style.translate = `${this.X}px ${this.Y}px`
         }
     }
 
@@ -62,7 +54,7 @@ export class BoardEffects {
         this.R = this.clamp(this.R, 0.1);
 
         if (this.R != 0) {
-            this.game.pixi.app.canvas.style.rotate = `${this.R}deg`
+            Game.pixi.app.canvas.style.rotate = `${this.R}deg`
         }
     }
 
@@ -72,31 +64,31 @@ export class BoardEffects {
     }
 
     rainbowBoard() {
-        const stats = this.game.stats;
-        const pbs = this.game.profilestats.personalBests;
-        const gamemode = this.game.settings.game.gamemode;
+        const stats = Game.stats;
+        const pbs = Game.profilestats.personalBests;
+        const gamemode = Game.settings.game.gamemode;
 
-        if (!this.game.settings.display.rainbowPB ||
-            !this.game.settings.game.competitiveMode ||
+        if (!Game.settings.display.rainbowPB ||
+            !Game.settings.game.competitiveMode ||
             stats.time < 0.5 || pbs[gamemode] == undefined) return;
         if (this.paceCooldown > 0) { this.paceCooldown--; return; }
 
-        const trackingStat = pbTrackingStat[this.game.modes.modeJSON.goalStat];
+        const trackingStat = pbTrackingStat[Game.modes.modeJSON.goalStat];
         const current = stats[trackingStat];
         const pbpace = pbs[gamemode].pbstats[trackingStat];
         if (current < pbpace && this.hasPace) {
-            this.game.sounds.playSound("pbend");
+            Game.sounds.playSound("pbend");
             this.toggleRainbow(false);
         } else if (current >= pbpace && !this.hasPace) {
-            this.game.sounds.playSound("pbstart");
+            Game.sounds.playSound("pbstart");
             this.toggleRainbow(true);
         }
 
-        this.paceCooldown = this.game.tickrate * 3;
+        this.paceCooldown = Game.tickrate * 3;
     }
 
     toggleRainbow(pace) {
-        this.game.animations.playRainbowAnimation(pace);
+        Game.animations.playRainbowAnimation(pace);
         this.hasPace = pace;
     }
 }

@@ -1,15 +1,10 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class Animations {
     actionTexts = ["cleartext", "combotext", "btbtext", "spiketext", "pctext", "timelefttext"]
 
-    /**
-     * @param {Game} game 
-     */
-    constructor(game) {
-        this.game = game;
-        this.texts = game.pixi.texts;
-        this.pixi = game.pixi;
+    constructor() {
+        this.texts = Game.pixi.texts;
         gsap.registerPlugin(PixiPlugin); // gsap animation library
         PixiPlugin.registerPIXI(PIXI);
 
@@ -36,8 +31,8 @@ export class Animations {
         this.texts[type].animation.kill();
         const text = this.texts[type].sprite;
         text.text = message;
-        this.texts[type].animation = gsap.timeline({ onComplete: () => this.game.mechanics.spikeCounter = 0 })
-            .to(text, { duration: 0.2, pixi: { alpha: 1, x: - this.pixi.width * 1 / 10, scaleX: 1 }, ease: "power1.inOut" })
+        this.texts[type].animation = gsap.timeline({ onComplete: () => Game.mechanics.spikeCounter = 0 })
+            .to(text, { duration: 0.2, pixi: { alpha: 1, x: - Game.pixi.width * 1 / 10, scaleX: 1 }, ease: "power1.inOut" })
             .to(text, { duration: 2, pixi: { alpha: 1, scaleX: 1.1 } })
             .to(text, { duration: 0.2, pixi: { alpha: 0, x: 0 }, ease: "power1.inOut" })
     }
@@ -54,9 +49,9 @@ export class Animations {
     }
 
     spikeTextStyle() {
-        if (this.game.mechanics.spikeCounter >= 20) return { colour: "#fad9f7", power: 12 };
-        if (this.game.mechanics.spikeCounter >= 15) return { colour: "#7ac9fa", power: 8 };
-        if (this.game.mechanics.spikeCounter >= 10) return { colour: "#faa823", power: 4 };
+        if (Game.mechanics.spikeCounter >= 20) return { colour: "#fad9f7", power: 12 };
+        if (Game.mechanics.spikeCounter >= 15) return { colour: "#7ac9fa", power: 8 };
+        if (Game.mechanics.spikeCounter >= 10) return { colour: "#faa823", power: 4 };
         return { colour: "white", power: 1 };
     }
 
@@ -71,7 +66,7 @@ export class Animations {
     }
 
     showTimeLeftText(msg) {
-        const textContainer = this.pixi.app.stage.getChildByLabel("textContainer");
+        const textContainer = Game.pixi.app.stage.getChildByLabel("textContainer");
         this.texts.timelefttext.animation.kill();
         const text = this.texts.timelefttext.sprite;
         text.text = msg;
@@ -108,37 +103,37 @@ export class Animations {
 
     // reset
     resetAnimation() {
-        this.pixi.board.mask = this.pixi.resetMask;
-        this.pixi.board.addChild(this.pixi.resetMask);
-        this.pixi.board.addChild(this.pixi.resetTriangle);
-        this.game.stopGameTimers();
-        this.game.controls.resetting = true;
+        Game.pixi.board.mask = Game.pixi.resetMask;
+        Game.pixi.board.addChild(Game.pixi.resetMask);
+        Game.pixi.board.addChild(Game.pixi.resetTriangle);
+        Game.stopGameTimers();
+        Game.controls.resetting = true;
         const animateOpacity = () => {
             gsap.timeline()
-                .to(this.pixi.board, { duration: 0, pixi: { alpha: 0 } })
-                .to(this.pixi.board, { duration: 0.2, pixi: { alpha: 1 } })
+                .to(Game.pixi.board, { duration: 0, pixi: { alpha: 0 } })
+                .to(Game.pixi.board, { duration: 0.2, pixi: { alpha: 1 } })
         }
 
         gsap.timeline({ onComplete: () => { this.endResetAnimation(); animateOpacity(); } })
-            .to(this.pixi.resetMask, { duration: 0, pixi: { scale: 1 } })
-            .to(this.pixi.resetMask, { duration: 0.4, pixi: { scale: 0 }, ease: "power1.inOut", })
+            .to(Game.pixi.resetMask, { duration: 0, pixi: { scale: 1 } })
+            .to(Game.pixi.resetMask, { duration: 0.4, pixi: { scale: 0 }, ease: "power1.inOut", })
 
         gsap.timeline()
-            .to(this.pixi.resetTriangle, { duration: 0, pixi: { scale: 0 } })
-            .to(this.pixi.resetTriangle, { duration: 0.4, pixi: { scale: 9 }, ease: "power1.inOut", })
+            .to(Game.pixi.resetTriangle, { duration: 0, pixi: { scale: 0 } })
+            .to(Game.pixi.resetTriangle, { duration: 0.4, pixi: { scale: 9 }, ease: "power1.inOut", })
     }
 
     endResetAnimation() {
-        this.game.startGame();
-        this.game.controls.resetting = false;
-        this.pixi.board.mask = null;
-        this.pixi.board.removeChild(this.pixi.resetMask);
-        this.pixi.board.removeChild(this.pixi.resetTriangle);
+        Game.startGame();
+        Game.controls.resetting = false;
+        Game.pixi.board.mask = null;
+        Game.pixi.board.removeChild(Game.pixi.resetMask);
+        Game.pixi.board.removeChild(Game.pixi.resetTriangle);
     }
 
     toggleDangerBG(danger) {
-        gsap.to(this.pixi.boardDanger, { duration: 0.2, pixi: { alpha: danger ? 0.1 : 0 } });
-        gsap.to(this.pixi.border, { duration: 0.2, pixi: { tint: danger ? "red" : "none" } });
+        gsap.to(Game.pixi.boardDanger, { duration: 0.2, pixi: { alpha: danger ? 0.1 : 0 } });
+        gsap.to(Game.pixi.border, { duration: 0.2, pixi: { tint: danger ? "red" : "none" } });
     }
 
     flashWarning(inDanger) {

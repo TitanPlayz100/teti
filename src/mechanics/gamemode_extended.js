@@ -1,15 +1,6 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class Zenith {
-    
-    /**
-     * @param {Game} game
-     */
-
-    constructor(game) {
-        this.game = game
-    }
-
         climbPoints = 0;
         isLastRankChangePromote = !0;
         isHyperspeed = true;
@@ -34,7 +25,7 @@ export class Zenith {
         }
 
         AwardLines(e, t=!0, n=!0) {
-            const s = .25 * Math.floor(this.game.stats.climbSpeed);
+            const s = .25 * Math.floor(Game.stats.climbSpeed);
             this.GiveBonus(s * e * (t ? 1 : 0));
             if (e <= 0 ) return 
             this.GiveClimbPts((e + .05) * (n ? 1 : 0))
@@ -49,13 +40,13 @@ export class Zenith {
         }
 
         startZenithMode() {
-            clearInterval(this.game.zenithTimer);
+            clearInterval(Game.zenithTimer);
             document.getElementById("climbSpeedBar").style.display = "none"
-            if(this.game.settings.game.gamemode != "zenith") return
+            if(Game.settings.game.gamemode != "zenith") return
             document.getElementById("climbSpeedBar").style.display = "block"
-            this.game.zenithTimer = setInterval(
+            Game.zenithTimer = setInterval(
                 () => {
-                        let t = Math.floor(this.game.stats.climbSpeed),
+                        let t = Math.floor(Game.stats.climbSpeed),
                             o = .25 * t,
                             a = this.GetSpeedCap(this.tempAltitude);
                     //calculate climb speed
@@ -73,14 +64,14 @@ export class Zenith {
                         }
                         else {
                             this.climbPoints += i,
-                            this.game.sounds.playSound("speed_down")
+                            Game.sounds.playSound("speed_down")
                             this.isLastRankChangePromote = !1,
                             t--
                         }
                     }
                     else if (this.climbPoints >= s) {
                         this.climbPoints -= s,
-                        this.game.sounds.playSound("speed_up")
+                        Game.sounds.playSound("speed_up")
                         this.isLastRankChangePromote = !0,
                         t++;
                         this.rankLock = this.tickPass + Math.max(60, 60 * (5 - this.promotionFatigue));
@@ -88,7 +79,7 @@ export class Zenith {
                     }
 
                 //calculate stats
-                    this.game.stats.climbSpeed = t + this.climbPoints / (4 * t);
+                    Game.stats.climbSpeed = t + this.climbPoints / (4 * t);
                     this.tempAltitude += o / 60 * a
                     if (this.bonusAltitude > 0)
                         if (this.bonusAltitude <= .05)
@@ -100,17 +91,17 @@ export class Zenith {
                             this.bonusAltitude -= e
                         }
 
-                    if(this.game.stats.floor != this.GetFloorLevel(this.tempAltitude)){
+                    if(Game.stats.floor != this.GetFloorLevel(this.tempAltitude)){
                         this.startZenithMode()
-                        this.game.stats.floor = this.GetFloorLevel(this.tempAltitude)
-                        this.game.sounds.playSound("zenith_levelup")
-                        this.game.renderer.renderTimeLeft("FLOOR " + this.game.stats.floor)
+                        Game.stats.floor = this.GetFloorLevel(this.tempAltitude)
+                        Game.sounds.playSound("zenith_levelup")
+                        Game.renderer.renderTimeLeft("FLOOR " + Game.stats.floor)
                     }
-                    this.game.stats.altitude = this.tempAltitude
+                    Game.stats.altitude = this.tempAltitude
                     this.tickPass++
-                    this.drawClimbSpeedBar(Math.floor(this.game.stats.climbSpeed), this.climbPoints, s)
+                    this.drawClimbSpeedBar(Math.floor(Game.stats.climbSpeed), this.climbPoints, s)
             }
-                , 1000 / this.game.tickrate);
+                , 1000 / Game.tickrate);
         }
 
         drawClimbSpeedBar(speed, point, require){ // todo: drawing polygons (parallelogram) cus idk
@@ -127,14 +118,6 @@ export class Zenith {
 }
 
 export class Grandmaster {
-    
-    /**
-     * @param {Game} game
-     */
-
-    constructor(game) {
-        this.game = game
-    }
 
     gradeBoost = 0; // the one used to determine which grade to shown in the array
     gradePoint = 0; 
@@ -191,10 +174,10 @@ export class Grandmaster {
     regretsTable = [90, 75, 75, 68, 60, 60, 50, 50, 50, 50];
 
     addGrade(row, cmb, lvl){
-        if(this.game.settings.game.gamemode != "race") return
+        if(Game.settings.game.gamemode != "race") return
         this.checkSectionCleared();
         this.checkCool();
-        this.game.stats.grade = this.grades[this.gradeBoost + this.coolsCount - this.regretsCount];
+        Game.stats.grade = this.grades[this.gradeBoost + this.coolsCount - this.regretsCount];
         if (row<1) return;
 
         const pts = this.gradePointBonus[Math.min(10, this.internalGrade)][row - 1];
@@ -212,32 +195,32 @@ export class Grandmaster {
     }
     
     startGrandmasterTimer(){
-        clearInterval(this.game.grandmasterTimer);
-        if(this.game.settings.game.gamemode != "race") return
-        this.game.grandmasterTimer = setInterval(() => {
+        clearInterval(Game.grandmasterTimer);
+        if(Game.settings.game.gamemode != "race") return
+        Game.grandmasterTimer = setInterval(() => {
             this.gradePoint = Math.max(0, this.gradePoint - 1);
         }, (1000 / 60 * this.gradePointDecay[Math.min(31, this.internalGrade)]) )
     }
 
     checkSectionCleared(){
-        if(this.game.stats.tgm_level >= this.sectionTarget){
-            this.game.renderer.renderTimeLeft("SECTION " + Math.ceil(this.sectionTarget / 100) + " CLEAR");
-            this.game.sounds.playSound("levelup");
+        if(Game.stats.tgm_level >= this.sectionTarget){
+            Game.renderer.renderTimeLeft("SECTION " + Math.ceil(this.sectionTarget / 100) + " CLEAR");
+            Game.sounds.playSound("levelup");
             if(this.sectionTime >= this.regretsTable[(this.sectionTarget / 100) - 1]){
-                this.game.renderer.renderTimeLeft("REGRET");
+                Game.renderer.renderTimeLeft("REGRET");
                 this.regretsCount++;
             }
             this.sectionTime = 0;
             this.isCoolCheck = false;
-            this.sectionTarget = Math.min(this.sectionTarget + 100, this.game.settings.game[this.game.modes.modeJSON.target])
+            this.sectionTarget = Math.min(this.sectionTarget + 100, Game.settings.game[Game.modes.modeJSON.target])
         }
     }
 
     checkCool(){
-        if(this.game.stats.tgm_level % 100 >= 70 && !this.isCoolCheck){
+        if(Game.stats.tgm_level % 100 >= 70 && !this.isCoolCheck){
             this.isCoolCheck = true;
             if(this.sectionTime <= this.coolsTable[(this.sectionTarget / 100) - 1]){
-                this.game.renderer.renderTimeLeft("COOL!");
+                Game.renderer.renderTimeLeft("COOL!");
                 this.coolsCount++;
             }
         }

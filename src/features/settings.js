@@ -1,12 +1,8 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import defaultSettings from "../data/defaultSettings.json" with { type: "json" };
 
 export class Settings {
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.gameObject = game;
+    constructor() {
         this.loadDefault();
     }
 
@@ -37,7 +33,6 @@ export class Settings {
     save() {
         const data = {};
         Object.getOwnPropertyNames(this).forEach(key => {
-            if (key == 'gameObject') return;
             data[key] = this[key];
         })
         return data;

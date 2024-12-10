@@ -1,5 +1,5 @@
 import { disabledKeys } from "../data/data.js";
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class Controls {
     /**
@@ -14,65 +14,56 @@ export class Controls {
     keyDownQueue = [];
     keyUpQueue = [];
 
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-        this.moves = game.movement;
-    }
-
     onKeyDown(event, key) {
-        const keys = this.game.settings.control;
+        const keys = Game.settings.control;
         if (disabledKeys.includes(event.key)) event.preventDefault();
 
-        if (key == this.menuKey) this.game.menuactions.toggleDialog();
-        else if (key == keys.editMenuKey) this.game.menuactions.openEditMenu();
-        if (key == keys.pauseReplayKey && this.game.replay.state != "running") {
-            this.game.replay.togglePause(); return;
+        if (key == this.menuKey) Game.menuactions.toggleDialog();
+        else if (key == keys.editMenuKey) Game.menuactions.openEditMenu();
+        if (key == keys.pauseReplayKey && Game.replay.state != "running") {
+            Game.replay.togglePause(); return;
         }
 
-        if (this.game.replay.state == "replaying") return;
+        if (Game.replay.state == "replaying") return;
 
-        if (this.game.modals.open || this.game.modals.closing || this.game.mechanics.locking.timings.clearDelay != 0) return;
-        if (event.key != this.menuKey && !this.game.started) this.moves.startTimers();
+        if (Game.modals.open || Game.modals.closing || Game.mechanics.locking.timings.clearDelay != 0) return;
+        if (event.key != this.menuKey && !Game.started && Game.settings.game.readysetgo == false) Game.movement.startTimers();
         if (key == keys.resetKey) this.retry(true);
-        if (this.game.ended) return;
+        if (Game.ended) return;
 
         const keytype = Object.keys(keys).find(type => keys[type] == key);
         if (keytype == undefined) return;
         this.keyDownQueue.push(keytype);
         this.toggleCursor(false);
-        this.game.stats.inputs++;
+        Game.stats.inputs++;
     }
 
     onKeyUp(event, key) {
-        if (this.game.replay.state == "replaying") return;
+        if (Game.replay.state == "replaying") return;
 
-        const keys = this.game.settings.control;
+        const keys = Game.settings.control;
         const keytype = Object.keys(keys).find(type => keys[type] == key);
         if (keytype == undefined) return;
         this.keyUpQueue.push(keytype);
     }
 
     onKeyDownRepeat(event, key) { // allows for arr undo/redo
-        if (this.game.replay.state == "replaying") return;
+        if (Game.replay.state == "replaying") return;
 
-        const keys = this.game.settings.control;
+        const keys = Game.settings.control;
         if (event.key == this.menuKey) event.preventDefault();
 
-        if (key == keys.undoKey) this.game.history.undo();
-        else if (key == keys.redoKey) this.game.history.redo()
+        if (key == keys.undoKey) Game.history.undo();
+        else if (key == keys.redoKey) Game.history.redo()
     }
 
     runKeyQueue() {
-        if (this.keyDownQueue.length > 1) console.log("double");
         this.keyDownQueue.forEach(key => {
-            if (key == "cwKey") this.moves.rotate("CW");
-            else if (key == "ccwKey") this.moves.rotate("CCW");
-            else if (key == "rotate180Key") this.moves.rotate("180");
-            else if (key == "hdKey") this.moves.harddrop();
-            else if (key == "holdKey") this.game.mechanics.switchHold();
+            if (key == "cwKey") Game.movement.rotate("CW");
+            else if (key == "ccwKey") Game.movement.rotate("CCW");
+            else if (key == "rotate180Key") Game.movement.rotate("180");
+            else if (key == "hdKey") Game.movement.harddrop();
+            else if (key == "holdKey") Game.mechanics.switchHold();
             else if (key == "rightKey") this.startDas("RIGHT");
             else if (key == "leftKey") this.startDas("LEFT");
             else if (key == "sdKey") this.startArrSD();
@@ -87,7 +78,7 @@ export class Controls {
     }
 
     startDas(direction) {
-        this.moves.movePieceSide(direction);
+        Game.movement.movePieceSide(direction);
         this.directionState[direction] = "das";
         this.stopInterval("arr");
         this.startedDas = performance.now();
@@ -97,7 +88,7 @@ export class Controls {
     timer() {
         if (this.currentDirection == undefined || this.startedDas == undefined) return;
         const now = performance.now();
-        if (now - this.startedDas < this.game.settings.handling.das) return;
+        if (now - this.startedDas < Game.settings.handling.das) return;
         this.startArr(this.currentDirection)
         this.currentDirection = undefined;
         this.startedDas = undefined;
@@ -113,13 +104,13 @@ export class Controls {
         }
         this.directionState[direction] = "arr";
         this.stopInterval("arr");
-        if (this.game.settings.handling.arr == 0) {
+        if (Game.settings.handling.arr == 0) {
             this.timings.arr = -1;
-            this.moves.movePieceSide(direction, Infinity);
+            Game.movement.movePieceSide(direction, Infinity);
         } else {
             this.timings.arr = setInterval(
-                () => this.moves.movePieceSide(direction),
-                this.game.settings.handling.arr
+                () => Game.movement.movePieceSide(direction),
+                Game.settings.handling.arr
             );
         }
     }
@@ -127,17 +118,17 @@ export class Controls {
     startArrSD() {
         this.directionState["DOWN"] = "arr";
         clearInterval(this.timings.sd);
-        if (this.game.settings.handling.sdarr == 0) {
+        if (Game.settings.handling.sdarr == 0) {
             this.timings.sd = -1;
-            this.moves.movePieceDown(true, true);
+            Game.movement.movePieceDown(true, true);
             return;
         }
         this.timings.sd = setInterval(
             () => {
-                this.moves.movePieceDown(false);
-                this.game.stats.score += 1;
+                Game.movement.movePieceDown(false);
+                Game.stats.score += 1;
             },
-            this.game.settings.handling.sdarr
+            Game.settings.handling.sdarr
         );
     }
 
@@ -182,13 +173,13 @@ export class Controls {
 
     retry(animation) {
         if (this.resetting) return; // no overlap
-        this.game.ended = true;
-        this.game.sounds.playSound("retry");
+        Game.ended = true;
+        Game.sounds.playSound("retry");
 
-        if (!animation || this.game.settings.game.stride) {
-            this.game.startGame();
+        if (!animation || Game.settings.game.stride) {
+            Game.startGame();
         } else {
-            this.game.animations.resetAnimation()
+            Game.animations.resetAnimation()
         }
     }
 

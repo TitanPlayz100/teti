@@ -1,14 +1,7 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 
 export class Visuals {
     textSprites = {};
-
-    /**
-     * @param {Game} game 
-     */
-    constructor(game) {
-        this.game = game;
-    }
 
     newContainer(label, parent) {
         const container = new PIXI.Container();
@@ -22,7 +15,7 @@ export class Visuals {
         /**@type {Record<string, PIXI.Container>} */
         const containers = {};
         labels.forEach(label => {
-            const container = this.newContainer(label, this.game.pixi.app.stage);
+            const container = this.newContainer(label, Game.pixi.app.stage);
             containers[label] = container;
         });
         return containers;
@@ -33,7 +26,7 @@ export class Visuals {
      * @param {{sw:number, sh:number, bw:number, bh:number}} consts
     */
     baseContainer(label, scales, consts, graphic = null, removeChildren = false) {
-        const container = this.game.pixi.app.stage.getChildByLabel(label);
+        const container = Game.pixi.app.stage.getChildByLabel(label);
         if (removeChildren) {
             container.children.forEach(child => child.destroy());
             container.removeChildren();
@@ -55,13 +48,13 @@ export class Visuals {
         const clickhold = new PIXI.Graphics().rect(0, 0, width * 2 / 5, height * 3 / 20).fill("transparent");
         clickhold.interactive = true;
         clickhold.cursor = 'pointer'
-        clickhold.on("pointerdown", () => this.game.modals.openModal("queueModify"));
+        clickhold.on("pointerdown", () => Game.modals.openModal("queueModify"));
         clickhold.label = "invincible"
 
         const clicknext = new PIXI.Graphics().rect(0, 0, width * 2 / 5, height * 16 / 20).fill("transparent");
         clicknext.interactive = true;
         clicknext.cursor = 'pointer'
-        clicknext.on("pointerdown", () => this.game.modals.openModal("queueModify"));
+        clicknext.on("pointerdown", () => Game.modals.openModal("queueModify"));
         clicknext.label = "invincible"
 
         this.baseContainer("board", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts, rect);
@@ -85,7 +78,7 @@ export class Visuals {
             .rect(-width * 2 / 5, 0, width * 2 / 5, height * 1 / 4)
             .rect(width, 0, width * 1/2, height * 17 / 20)
             .fill("black")
-        pixi.boardBG.alpha = Number(this.game.settings.display.boardOpacity)/100;
+        pixi.boardBG.alpha = Number(Game.settings.display.boardOpacity)/100;
         grid.addChild(pixi.boardBG);
 
         pixi.boardDanger = new PIXI.Graphics()

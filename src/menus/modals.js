@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import { GenerateMenus } from "./generate.js";
 
 export class ModalActions {
@@ -9,37 +9,30 @@ export class ModalActions {
     settingPanel = document.getElementById("settingsPanel");
     options = [...document.getElementsByClassName("option")];
 
-    
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-        this.actions = this.game.menuactions;
-        game.menuactions.menus = this;
-        this.generate = new GenerateMenus(game);
+    constructor() {
+        this.generate = new GenerateMenus();
     }
 
     openModal(id) {
         //ensure that everything has been closed before trying to open the settings panel
         if (id == "settingsPanel" && this.closing) return;
-        if (id == "queueModify" && !this.game.settings.game.allowQueueModify) return;
-        this.game.stopGameTimers()
+        if (id == "queueModify" && !Game.settings.game.allowQueueModify) return;
+        Game.stopGameTimers()
         this.getOptions(id).forEach(setting => {
             let settingType = this.getSettingType(id);
             let newval;
-            if (this.game.settings.hasOwnProperty(settingType)) newval = this.game.settings[settingType][setting.id]
+            if (Game.settings.hasOwnProperty(settingType)) newval = Game.settings[settingType][setting.id]
             if (setting.classList[2] == "exp") newval = toLogValue(newval);
-            if (setting.classList[2] == "statoption") newval = this.game.settings.game.sidebar[setting.id[10]-1]; 
-            if (setting.id == "nextQueue") newval = this.game.bag.getQueue();
-            if (setting.id == "holdQueue") newval = this.game.hold.getHold();
-            if (setting.id == "rowfillmode") newval = this.game.boardeditor.fillRow;
+            if (setting.classList[2] == "statoption") newval = Game.settings.game.sidebar[setting.id[10]-1]; 
+            if (setting.id == "nextQueue") newval = Game.bag.getQueue();
+            if (setting.id == "holdQueue") newval = Game.hold.getHold();
+            if (setting.id == "rowfillmode") newval = Game.boardeditor.fillRow;
             setting.value = newval;
             if (setting.classList[1] == "keybind") setting.textContent = newval;
             if (setting.classList[1] == "check") setting.checked = newval;
             if (setting.classList[1] == "range") {
-                this.actions.sliderChange(setting);
-                this.actions.rangeClickInit(setting);
+                Game.menuactions.sliderChange(setting);
+                Game.menuactions.rangeClickInit(setting);
             }
         });
 
@@ -50,7 +43,7 @@ export class ModalActions {
         if (id == "competitiveDialog") this.generate.renderPBs();
         if (id != "settingsPanel" && this.settingPanel.open) this.closeDialog(this.settingPanel);
         this.open = true;
-        this.game.sounds.toggleSongMuffle(this.open);
+        Game.sounds.toggleSongMuffle(this.open);
     }
 
     getOptions(id) {
@@ -76,30 +69,30 @@ export class ModalActions {
                     : setting.textContent.toLowerCase();
             }
             if (setting.classList[2] == "exp") val = toExpValue(val);
-            if (setting.classList[2] == "statoption") this.game.settings.game.sidebar[setting.id[10]-1] = val;
-            if (setting.id == "nextQueue") this.game.bag.updateQueue(val);
-            if (setting.id == "holdQueue") this.game.hold.setNewHold(val);
-            if (setting.id == "rowfillmode") this.game.boardeditor.fillRow = val;
-            if (setting.id == "override") this.game.boardeditor.override = val;
+            if (setting.classList[2] == "statoption") Game.settings.game.sidebar[setting.id[10]-1] = val;
+            if (setting.id == "nextQueue") Game.bag.updateQueue(val);
+            if (setting.id == "holdQueue") Game.hold.setNewHold(val);
+            if (setting.id == "rowfillmode") Game.boardeditor.fillRow = val;
+            if (setting.id == "override") Game.boardeditor.override = val;
 
             if (id == "changeRangeValue") {
                 this.selectedRangeElement.value = document.getElementById("rangeValue").value;
-                this.actions.sliderChange(this.selectedRangeElement);
+                Game.menuactions.sliderChange(this.selectedRangeElement);
             }
-            if (setting.id == "audioLevel") this.game.sounds.setAudioLevel();
+            if (setting.id == "audioLevel") Game.sounds.setAudioLevel();
 
-            if (!this.game.settings.hasOwnProperty(settingType)) return;
-            this.game.settings[settingType][setting.id] = val;
+            if (!Game.settings.hasOwnProperty(settingType)) return;
+            Game.settings[settingType][setting.id] = val;
         });
 
         this.closeDialog(document.getElementById(id));
-        if (id != 'changeRangeValue' && id != "frontdrop" && this.game.started && !this.game.ended)
-            this.game.movement.startTimers();
-        this.actions.saveSettings();
-        if (id == "displayDialog") this.game.renderer.renderStyles(true);
+        if (id != 'changeRangeValue' && id != "frontdrop" && Game.started && !Game.ended)
+            Game.movement.startTimers();
+        Game.menuactions.saveSettings();
+        if (id == "displayDialog") Game.renderer.renderStyles(true);
 
         const restartMenus = ["gameDialog", "gamemodeDialog", "gameEnd", "goalsDialog", "competitiveDialog"];
-        if (restartMenus.includes(id)) this.game.controls.retry(false);
+        if (restartMenus.includes(id)) Game.controls.retry(false);
         if (id == "changeRangeValue") this.open = true;
     }
 
@@ -112,7 +105,7 @@ export class ModalActions {
             this.closing = false
         };
         this.open = false;
-        this.game.sounds.toggleSongMuffle(this.open);
+        Game.sounds.toggleSongMuffle(this.open);
         element.classList.add("closingAnimation");
         element.addEventListener("animationend", closingAnimation);
     }

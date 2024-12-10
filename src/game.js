@@ -22,7 +22,7 @@ import { PixiRender } from "./display/pixirender.js";
 import { Animations } from "./display/animations.js";
 import { Replay } from "./features/replays.js";
 
-export class Game {
+export class GameClass {
     started;
     ended;
     gameTimer = 0; // id of timeout
@@ -37,35 +37,31 @@ export class Game {
     elementResult = document.getElementById("result");
     elementGameEndTitle = document.getElementById("gameEndTitle");
 
-
-    constructor() {
-        this.boardeffects = new BoardEffects(this);
-        this.profilestats = new ProfileStats(this);
-        this.stats = new GameStats(this);
-        this.falling = new Falling(this);
-        this.settings = new Settings(this);
-        this.hold = new Hold(this);
-        this.sounds = new Sounds(this);
-        this.board = new Board(this);
-        this.mechanics = new Mechanics(this);
-        this.menuactions = new MenuActions(this);
-        this.modals = new ModalActions(this);
-        this.movement = new Movement(this);
-        this.renderer = new Renderer(this);
-        this.particles = new Particles(this);
-        this.boardeditor = new BoardEditor(this);
-        this.controls = new Controls(this);
-        this.history = new History(this);
-        this.modes = new Modes(this);
-        this.zenith = new Zenith(this);
-        this.grandmaster = new Grandmaster(this);
-        this.pixi = new PixiRender(this);
-        this.animations = new Animations(this);
-        this.replay = new Replay(this);
-        this.init();
-    }
-
     async init() {
+        this.boardeffects = new BoardEffects();
+        this.profilestats = new ProfileStats();
+        this.stats = new GameStats();
+        this.falling = new Falling();
+        this.settings = new Settings();
+        this.hold = new Hold();
+        this.sounds = new Sounds();
+        this.board = new Board();
+        this.mechanics = new Mechanics();
+        this.menuactions = new MenuActions();
+        this.modals = new ModalActions();
+        this.movement = new Movement();
+        this.renderer = new Renderer();
+        this.particles = new Particles();
+        this.boardeditor = new BoardEditor();
+        this.controls = new Controls();
+        this.history = new History();
+        this.modes = new Modes();
+        this.zenith = new Zenith();
+        this.grandmaster = new Grandmaster();
+        this.pixi = new PixiRender();
+        this.animations = new Animations();
+        this.replay = new Replay();
+
         this.menuactions.loadSettings();
         this.board.resetBoard();
         await this.pixi.init();
@@ -90,6 +86,7 @@ export class Game {
         this.resetState(seed);
         this.renderer.renderStyles();
         this.mechanics.spawnPiece(this.bag.cycleNext(true), true);
+        
         this.history.save();
         this.replay.start();
     }
@@ -154,14 +151,14 @@ export class Game {
         this.stopGameTimers();
         this.animations.resetActionTexts();
 
-        this.bag = new Bag(this, seed);
-        this.mechanics = new Mechanics(this);
-        this.falling = new Falling(this);
-        this.hold = new Hold(this);
-        this.stats = new GameStats(this);
-        this.history = new History(this);
-        this.zenith = new Zenith(this);
-        this.grandmaster = new Grandmaster(this);
+        this.bag = new Bag(seed);
+        this.mechanics = new Mechanics();
+        this.falling = new Falling();
+        this.hold = new Hold();
+        this.stats = new GameStats();
+        this.history = new History();
+        this.zenith = new Zenith();
+        this.grandmaster = new Grandmaster();
 
 
         this.renderer.renderSidebar();

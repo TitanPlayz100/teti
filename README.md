@@ -53,7 +53,7 @@ You can modify existing modules as well from other files
     }
 }
 ```
-Use with `this.game.sounds.playSound(<name>)`
+Use with `Game.sounds.playSound(<name>)`
 
 
 ## Types for PIXIjs

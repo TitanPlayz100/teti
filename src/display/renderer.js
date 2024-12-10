@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game } from "../main.js";
 import { statDecimals, statsSecondary as statsSecondaries } from "../data/data.js";
 import { getPiece } from "../mechanics/randomisers.js";
 import kicks from "../data/kicks.json" with { type: "json" };
@@ -15,12 +15,8 @@ export class Renderer {
 
     divBoard = document.getElementById("board");
     elementEditPieces = document.getElementById("editMenuPieces");
-    /**
-     * @param {Game} game
-     */
-    constructor(game) {
-        this.game = game;
-        this.board = game.board;
+    
+    constructor() {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
         this.holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ""));
     }
@@ -28,125 +24,125 @@ export class Renderer {
     updateNext() {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
 
-        const next5 = this.game.bag.getFirstN(this.game.settings.game.nextPieces);
+        const next5 = Game.bag.getFirstN(Game.settings.game.nextPieces);
         next5.forEach((piece, idx) => {
             let [dx, dy] = [0, 3 * (4 - idx)];
             if (piece.name == "o") [dx, dy] = [dx + 1, dy + 1]; // shift o piece
-            const initialRotations = kicks[this.game.settings.game.kicktable].spawn_rotation ?? {}
+            const initialRotations = kicks[Game.settings.game.kicktable].spawn_rotation ?? {}
             const rotation = initialRotations[piece.name] ?? 1;
-            const coords = this.board.pieceToCoords(piece[`shape${rotation}`]);
+            const coords = Game.board.pieceToCoords(piece[`shape${rotation}`]);
             coords.forEach(([x, y]) => (this.nextQueueGrid[y + dy][x + dx] = "A " + piece.name));
         });
 
-        this.game.pixi.render("next", this.nextQueueGrid);
+        Game.pixi.render("next", this.nextQueueGrid);
     }
 
     updateHold() {
         this.holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ""));
         this.clearHold();
-        if (this.game.hold.piece == undefined) return;
+        if (Game.hold.piece == undefined) return;
 
-        const name = this.game.hold.piece.name;
+        const name = Game.hold.piece.name;
         const isO = name == "o",
             isI = name == "i";
         const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
-        const initialRotations = kicks[this.game.settings.game.kicktable].spawn_rotation ?? {}
+        const initialRotations = kicks[Game.settings.game.kicktable].spawn_rotation ?? {}
         const rotation = initialRotations[name] ?? 1;
-        const coords = this.board.pieceToCoords(this.game.hold.piece[`shape${rotation}`]);
+        const coords = Game.board.pieceToCoords(Game.hold.piece[`shape${rotation}`]);
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
 
-        this.game.pixi.render("hold", this.holdQueueGrid);
+        Game.pixi.render("hold", this.holdQueueGrid);
     }
 
     clearHold() {
-        this.game.pixi.render("hold", this.holdQueueGrid);
+        Game.pixi.render("hold", this.holdQueueGrid);
     }
 
     renderDanger() {
         const condition =
-            this.game.board.getMinos("S").some(c => c[1] > 16) && // any mino if above row 16
-            this.game.settings.game.gamemode != 'combo'; // not combo mode
+            Game.board.getMinos("S").some(c => c[1] > 16) && // any mino if above row 16
+            Game.settings.game.gamemode != 'combo'; // not combo mode
         if (condition && !this.inDanger) {
-            this.game.sounds.playSound("damage_alert");
+            Game.sounds.playSound("damage_alert");
         }
-        this.game.animations.toggleDangerBG(condition);
+        Game.animations.toggleDangerBG(condition);
         this.inDanger = condition;
     }
 
     dangerParticles() {
         if (!this.inDanger) return;
-        this.game.particles.spawnParticles(0, 0, "dangerboard");
-        this.game.particles.spawnParticles(0, 20, "dangersides");
+        Game.particles.spawnParticles(0, 0, "dangerboard");
+        Game.particles.spawnParticles(0, 20, "dangersides");
     }
 
     renderActionText(damagetype, isBTB, isPC, damage, linecount) {
         // audio
-        if (isPC) this.game.sounds.playSound("allclear");
-        if (this.game.stats.btbCount == 2 && isBTB) this.game.sounds.playSound("btb_1");
-        if (linecount >= 4 && this.game.stats.btbCount > 0) {
-            this.game.sounds.playSound("clearbtb");
+        if (isPC) Game.sounds.playSound("allclear");
+        if (Game.stats.btbCount == 2 && isBTB) Game.sounds.playSound("btb_1");
+        if (linecount >= 4 && Game.stats.btbCount > 0) {
+            Game.sounds.playSound("clearbtb");
         } else if (linecount >= 4) {
-            this.game.sounds.playSound("clearquad");
-        } else if (linecount > 0 && this.game.mechanics.isTspin) {
-            this.game.sounds.playSound("clearspin");
-        } else if (linecount > 0 && this.game.mechanics.isAllspin && this.game.settings.game.allspin) {
-            this.game.sounds.playSound("clearspin");
+            Game.sounds.playSound("clearquad");
+        } else if (linecount > 0 && Game.mechanics.isTspin) {
+            Game.sounds.playSound("clearspin");
+        } else if (linecount > 0 && Game.mechanics.isAllspin && Game.settings.game.allspin) {
+            Game.sounds.playSound("clearspin");
         } else if (linecount > 0) {
-            this.game.sounds.playSound("clearline");
+            Game.sounds.playSound("clearline");
         }
-        if (this.game.mechanics.spikeCounter >= 15) this.game.sounds.playSound("thunder", false);
-        if (this.game.stats.combo > 0)
-            this.game.sounds.playSound(`combo_${this.game.stats.combo > 16 ? 16 : this.game.stats.combo}`);
+        if (Game.mechanics.spikeCounter >= 15) Game.sounds.playSound("thunder", false);
+        if (Game.stats.combo > 0)
+            Game.sounds.playSound(`combo_${Game.stats.combo > 16 ? 16 : Game.stats.combo}`);
 
         // text
-        if (this.game.settings.display.actionText == false) return;
-        if (damagetype != "") this.game.animations.showActionText("cleartext", damagetype);
-        if (this.game.stats.combo > 0) this.game.animations.showActionText("combotext", `Combo ${this.game.stats.combo}`);
-        if (isBTB && this.game.stats.btbCount > 0) this.game.animations.showActionText("btbtext", `btb ${this.game.stats.btbCount} `);
-        if (this.game.mechanics.spikeCounter > 4 && linecount > 0) this.game.animations.showSpikeText(`${this.game.mechanics.spikeCounter}`);
-        if (isPC) this.game.animations.showPCText();
+        if (Game.settings.display.actionText == false) return;
+        if (damagetype != "") Game.animations.showActionText("cleartext", damagetype);
+        if (Game.stats.combo > 0) Game.animations.showActionText("combotext", `Combo ${Game.stats.combo}`);
+        if (isBTB && Game.stats.btbCount > 0) Game.animations.showActionText("btbtext", `btb ${Game.stats.btbCount} `);
+        if (Game.mechanics.spikeCounter > 4 && linecount > 0) Game.animations.showSpikeText(`${Game.mechanics.spikeCounter}`);
+        if (isPC) Game.animations.showPCText();
 
     }
 
     renderStyles(settings = false) {
-        const bg = this.game.settings.display.background;
+        const bg = Game.settings.display.background;
         if (bg == "") bg = "#080B0C";
         document.body.style.background = (bg[0] == "#") ? bg : `url("${bg}") no-repeat center center`
         document.body.style.backgroundSize = "cover";
 
         if (settings) {
-            this.game.pixi.resize();
-            this.game.pixi.generateTextures();
+            Game.pixi.resize();
+            Game.pixi.generateTextures();
         }
         this.setupSidebar();
-        this.divBoard.style.height = `${this.game.pixi.height}px`;
+        this.divBoard.style.height = `${Game.pixi.height}px`;
     }
 
     setupSidebar() {
-        this.sidebarStats = this.game.settings.game.sidebar;
+        this.sidebarStats = Game.settings.game.sidebar;
         this.sidebarFixed = this.sidebarStats.map(stat => reverseLookup(statDecimals)[stat]);
         this.sidebarSecondary = this.sidebarStats.map(stat => statsSecondaries[stat] ?? "None");
 
         this.sidebarStats.forEach((stat, index) => {
             if (stat == "None") stat = ""
-            this.game.pixi.statTexts[index].statText.text = stat.toUpperCase();
+            Game.pixi.statTexts[index].statText.text = stat.toUpperCase();
         })
     }
 
     renderSidebar() {
         this.sidebarStats.forEach((stat, index) => {
             if (stat == "None") {
-                this.game.pixi.statTexts[index].stat.text = "";
+                Game.pixi.statTexts[index].stat.text = "";
                 return;
             };
 
-            let displayStat = this.game.stats[stat].toFixed(this.sidebarFixed[index]) ?? "";
+            let displayStat = Game.stats[stat].toFixed(this.sidebarFixed[index]) ?? "";
             if (stat == "time") displayStat = this.formatTime(Number(displayStat), this.sidebarFixed[index]); // reformats time
-            this.game.pixi.statTexts[index].stat.text = displayStat;
+            Game.pixi.statTexts[index].stat.text = displayStat;
 
             if (this.sidebarSecondary[index]) {
-                const displaySecond = this.game.stats[this.sidebarSecondary[index]] ?? ""
-                this.game.pixi.statTexts[index].statSecondary.text = displaySecond;
+                const displaySecond = Game.stats[this.sidebarSecondary[index]] ?? ""
+                Game.pixi.statTexts[index].statSecondary.text = displaySecond;
             }
         })
     }
@@ -158,7 +154,7 @@ export class Renderer {
     }
 
     renderTimeLeft(text) {
-        this.game.animations.showTimeLeftText(text);
+        Game.animations.showTimeLeftText(text);
     }
 
     setEditPieceColours() {
@@ -170,15 +166,15 @@ export class Renderer {
     }
 
     bounceBoard(direction) {
-        const force = Number(this.game.settings.display.boardBounce);
+        const force = Number(Game.settings.display.boardBounce);
         const forces = { "LEFT": [-force, 0], "RIGHT": [force, 0], "DOWN": [0, force], };
-        this.game.boardeffects.move(...forces[direction]);
+        Game.boardeffects.move(...forces[direction]);
     }
 
     rotateBoard(type) {
-        const force = Number(this.game.settings.display.boardBounce) * 0.5;
+        const force = Number(Game.settings.display.boardBounce) * 0.5;
         const forces = { "CW": force, "CCW": -force }
-        this.game.boardeffects.rotate(forces[type]);
+        Game.boardeffects.rotate(forces[type]);
     }
 }
 
