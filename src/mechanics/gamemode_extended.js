@@ -42,9 +42,10 @@ export class Zenith {
         startZenithMode() {
             clearInterval(Game.zenithTimer);
             document.getElementById("climbSpeedBar").style.display = "none"
+            Game.pixi.CreateSpeedrunContainer()
+            Game.pixi.StopSpeedrun()
             if(Game.settings.game.gamemode != "zenith") return
             document.getElementById("climbSpeedBar").style.display = "block"
-            Game.pixi.CreateSpeedrunContainer()
             Game.zenithTimer = setInterval(
                 () => {
                         let t = Math.floor(Game.stats.climbSpeed),
@@ -71,7 +72,6 @@ export class Zenith {
                             if(t <= 6 && this.isHyperspeed)
                                 {
                                     Game.pixi.StopSpeedrun()
-                                    this.isHyperspeed = false
                                 } 
                         }
                     }
@@ -85,7 +85,6 @@ export class Zenith {
                         if(t >= this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] && this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] != 0 && !this.isHyperspeed)
                         {
                             Game.pixi.StartSpeedrun()
-                            this.isHyperspeed = true
                         }
                     }
 
@@ -103,26 +102,35 @@ export class Zenith {
                         }
 
                     if(Game.stats.floor != this.GetFloorLevel(this.tempAltitude)){
-                        this.startZenithMode()
                         Game.stats.floor = this.GetFloorLevel(this.tempAltitude)
                         Game.sounds.playSound("zenith_levelup")
                         Game.renderer.renderTimeLeft("FLOOR " + Game.stats.floor)
                         if(Game.stats.floor == 10 && this.isHyperspeed)
                         {
                             Game.pixi.StopSpeedrun()
-                            this.isHyperspeed = false
                         } 
                     }
                     Game.stats.altitude = this.tempAltitude
                     this.tickPass++
                     this.drawClimbSpeedBar(Math.floor(Game.stats.climbSpeed), this.climbPoints, s)
+
+                    /*
+                        FATIGUES
+                    */
+
+                    if(this.tickPass >= 28800){ //8m
+                        
+                    }
+
+                    if(this.tickPass >= 36000){ //10m
+                        
+                    }
+
+                    if(this.tickPass >= 43200){ //12m
+                        
+                    }
             }
                 , 1000 / Game.tickrate);
-        }
-
-        checkSpeedrun(c){
-            let n = c >= this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)]
-            return n
         }
 
         drawClimbSpeedBar(speed, point, require){ // todo: drawing polygons (parallelogram) cus idk

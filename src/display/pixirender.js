@@ -363,7 +363,8 @@ export class PixiRender {
             this._speedrunMeta.container = new PIXI.Container,
             this._speedrunMeta.container.scale.set(.7),
             this._speedrunMeta.container.zIndex = 50,
-            this._speedrunMeta.container.position.set(window.innerWidth / 2, 300),
+            this._speedrunMeta.container.position.set(this.app.stage.width * 1.15, this.app.stage.height / 3.3),
+            this._speedrunMeta.container.alpha = 0
             this.app.stage.addChild(this._speedrunMeta.container),
             this._speedrunMeta.splits = [];
             for (let e = 0; e < 9; e++) {
@@ -411,11 +412,6 @@ export class PixiRender {
                 t.container.addChild(t.topText)
         }
         console.log(this._speedrunMeta)
-    }
-
-    DestroySpeedrunContainer() {
-        if(!this._speedrunMeta.container) return
-        this._speedrunMeta.container.destroy()
     }
 
     TickSpeedrunUI(floor){
@@ -476,13 +472,15 @@ export class PixiRender {
     }
 
     StartSpeedrun(){
-        this._speedrunMeta.container.position.y = 200
+        this._speedrunMeta.container.alpha = 1
         Game.animations.playRainbowAnimation(true)
+        Game.zenith.isHyperspeed = true
     }
 
     StopSpeedrun(){
-        this._speedrunMeta.container.position.y = 300
+        this._speedrunMeta.container.alpha = 0
         Game.animations.playRainbowAnimation(false)
+        Game.zenith.isHyperspeed = false
     }
 
 }
