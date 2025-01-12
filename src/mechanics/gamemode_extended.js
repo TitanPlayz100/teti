@@ -42,8 +42,10 @@ export class Zenith {
         startZenithMode() {
             clearInterval(Game.zenithTimer);
             document.getElementById("climbSpeedBar").style.display = "none"
+            //Game.pixi._DestroySpeedrunContainer()
             if(Game.settings.game.gamemode != "zenith") return
             document.getElementById("climbSpeedBar").style.display = "block"
+            Game.pixi._CreateSpeedrunContainer()
             Game.zenithTimer = setInterval(
                 () => {
                         let t = Math.floor(Game.stats.climbSpeed),
@@ -65,8 +67,9 @@ export class Zenith {
                         else {
                             this.climbPoints += i,
                             Game.sounds.playSound("speed_down")
-                            this.isLastRankChangePromote = !1,
+                            this.isLastRankChangePromote = !1
                             t--
+                            if(t <= 6) Game.pixi._StopSpeedrun()
                         }
                     }
                     else if (this.climbPoints >= s) {
@@ -76,6 +79,7 @@ export class Zenith {
                         t++;
                         this.rankLock = this.tickPass + Math.max(60, 60 * (5 - this.promotionFatigue));
                         this.promotionFatigue++;
+                        if(t >= this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] && this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] != 0) Game.pixi._StartSpeedrun()
                     }
 
                 //calculate stats
@@ -102,6 +106,11 @@ export class Zenith {
                     this.drawClimbSpeedBar(Math.floor(Game.stats.climbSpeed), this.climbPoints, s)
             }
                 , 1000 / Game.tickrate);
+        }
+
+        checkSpeedrun(c){
+            let n = c >= this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)]
+            return n
         }
 
         drawClimbSpeedBar(speed, point, require){ // todo: drawing polygons (parallelogram) cus idk
