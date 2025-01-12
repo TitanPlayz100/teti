@@ -215,7 +215,7 @@ export class PixiRender {
         this.updateAlpha();
         this.showTextOnTime(60, "60S LEFT");
         this.showTextOnTime(90, "90S LEFT");
-        this._TickSpeedrunUI(Game.renderer.formatTime(Game.stats.time, 3), Game.zenith.GetFloorLevel(Game.stats.altitude))
+        this.TickSpeedrunUI(Game.zenith.GetFloorLevel(Game.stats.altitude))
     }
 
     showTextOnTime(time, text) {
@@ -358,7 +358,7 @@ export class PixiRender {
     
 
 
-    _CreateSpeedrunContainer() {
+    CreateSpeedrunContainer() {
         if(this._speedrunMeta.container) return
             this._speedrunMeta.container = new PIXI.Container,
             this._speedrunMeta.container.scale.set(.7),
@@ -413,12 +413,12 @@ export class PixiRender {
         console.log(this._speedrunMeta)
     }
 
-    _DestroySpeedrunContainer() {
+    DestroySpeedrunContainer() {
         if(!this._speedrunMeta.container) return
         this._speedrunMeta.container.destroy()
     }
 
-    _TickSpeedrunUI(time, floor){
+    TickSpeedrunUI(floor){
 
         if(!this._speedrunMeta.container) return
 
@@ -475,12 +475,12 @@ export class PixiRender {
         }
     }
 
-    _StartSpeedrun(){
+    StartSpeedrun(){
         this._speedrunMeta.container.position.y = 200
         Game.animations.playRainbowAnimation(true)
     }
 
-    _StopSpeedrun(){
+    StopSpeedrun(){
         this._speedrunMeta.container.position.y = 300
         Game.animations.playRainbowAnimation(false)
     }

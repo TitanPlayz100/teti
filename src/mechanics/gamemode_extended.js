@@ -3,7 +3,7 @@ import { Game } from "../main.js";
 export class Zenith {
         climbPoints = 0;
         isLastRankChangePromote = !0;
-        isHyperspeed = true;
+        isHyperspeed = false;
         rankLock = 0;
         promotionFatigue = 0;
         rankLock = 0;
@@ -42,10 +42,9 @@ export class Zenith {
         startZenithMode() {
             clearInterval(Game.zenithTimer);
             document.getElementById("climbSpeedBar").style.display = "none"
-            //Game.pixi._DestroySpeedrunContainer()
             if(Game.settings.game.gamemode != "zenith") return
             document.getElementById("climbSpeedBar").style.display = "block"
-            Game.pixi._CreateSpeedrunContainer()
+            Game.pixi.CreateSpeedrunContainer()
             Game.zenithTimer = setInterval(
                 () => {
                         let t = Math.floor(Game.stats.climbSpeed),
@@ -69,7 +68,11 @@ export class Zenith {
                             Game.sounds.playSound("speed_down")
                             this.isLastRankChangePromote = !1
                             t--
-                            if(t <= 6) Game.pixi._StopSpeedrun()
+                            if(t <= 6 && this.isHyperspeed)
+                                {
+                                    Game.pixi.StopSpeedrun()
+                                    this.isHyperspeed = false
+                                } 
                         }
                     }
                     else if (this.climbPoints >= s) {
@@ -79,7 +82,11 @@ export class Zenith {
                         t++;
                         this.rankLock = this.tickPass + Math.max(60, 60 * (5 - this.promotionFatigue));
                         this.promotionFatigue++;
-                        if(t >= this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] && this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] != 0) Game.pixi._StartSpeedrun()
+                        if(t >= this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] && this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] != 0 && !this.isHyperspeed)
+                        {
+                            Game.pixi.StartSpeedrun()
+                            this.isHyperspeed = true
+                        }
                     }
 
                 //calculate stats
@@ -100,6 +107,11 @@ export class Zenith {
                         Game.stats.floor = this.GetFloorLevel(this.tempAltitude)
                         Game.sounds.playSound("zenith_levelup")
                         Game.renderer.renderTimeLeft("FLOOR " + Game.stats.floor)
+                        if(Game.stats.floor == 10 && this.isHyperspeed)
+                        {
+                            Game.pixi.StopSpeedrun()
+                            this.isHyperspeed = false
+                        } 
                     }
                     Game.stats.altitude = this.tempAltitude
                     this.tickPass++
