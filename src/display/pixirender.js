@@ -424,7 +424,6 @@ export class PixiRender {
     }
 
     TickSpeedrunUI(floor){
-
         if(!this._speedrunMeta.container) return
 
         function ol(e, t, n) {
@@ -458,17 +457,19 @@ export class PixiRender {
             let oldPB = localStorage.stats ? JSON.parse(localStorage.stats).pbs.zenith : undefined
             if (floor === t + 1) {
                 let progress = (Game.stats.altitude - Game.zenith.FloorDistance[floor - 1]) / (Game.zenith.FloorDistance[floor]- Game.zenith.FloorDistance[floor - 1])
-                s.topText.text = Game.renderer.formatTime(Game.stats.time, 3),
-                s.topText.style.fill = 16777215
                 s.bottomText.style.fill = 16777215
+                s.topText.style.fill = 16777215
                 s.bg.scale.x = 6.25 * progress
                 s.bottomText.alpha = 0;
                 if(oldPB){
                     s.topText.position.y = 3
                     s.bottomText.position.y = 30
                     s.bottomText.alpha = 1;
-                    s.bottomText.tint = Math.abs(oldPB.pbstats.floorTime[t] - Game.stats.time) >= 20 ? 16758528 : (Game.stats.time < oldPB.pbstats.floorTime[t] ? 8978176 : 16734354)
+                    s.bottomText.tint = oldPB.pbstats.floorTime[t] - Game.stats.time >= 20 ? 16758528 : (Game.stats.time < oldPB.pbstats.floorTime[t] ? 8978176 : 16734354)
                     s.bottomText.text = `${Game.stats.time < oldPB.pbstats.floorTime[t] ? "-" : "+"}${Game.renderer.formatTime(Math.abs(oldPB.pbstats.floorTime[t] - Game.stats.time), 3)}`
+                }
+                else{
+                    s.topText.text = Game.renderer.formatTime(Game.stats.time, 3)
                 }
             } else if (floor < t + 1) {
                 if(oldPB){
