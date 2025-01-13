@@ -13,6 +13,7 @@ export class GameStats {
     allspins = 0;
     tgm_level = 0;
     altitude = 0;
+    floorTime = [30, 60, 90, 120, 150, 180, 210, 240, 270]
     floor = 1;
     grade = "9";
     climbSpeed = 1;

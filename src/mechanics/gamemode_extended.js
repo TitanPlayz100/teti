@@ -8,7 +8,7 @@ export class Zenith {
         promotionFatigue = 0;
         rankLock = 0;
         tickPass = 0;
-        tempAltitude = 0;
+        altitude = 0;
         bonusAltitude = 0;
 
         FloorDistance = [0, 50, 150, 300, 450, 650, 850, 1100, 1350, 1650, 1 / 0];
@@ -50,7 +50,7 @@ export class Zenith {
                 () => {
                         let t = Math.floor(Game.stats.climbSpeed),
                             o = .25 * t,
-                            a = this.GetSpeedCap(this.tempAltitude);
+                            a = this.GetSpeedCap(this.altitude);
                     //calculate climb speed
 
                     if (this.tickPass >= this.rankLock) {
@@ -82,7 +82,7 @@ export class Zenith {
                         t++;
                         this.rankLock = this.tickPass + Math.max(60, 60 * (5 - this.promotionFatigue));
                         this.promotionFatigue++;
-                        if(t >= this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] && this.SpeedrunReq[this.GetFloorLevel(this.tempAltitude)] != 0 && !this.isHyperspeed)
+                        if(t >= this.SpeedrunReq[this.GetFloorLevel(this.altitude)] && this.SpeedrunReq[this.GetFloorLevel(this.altitude)] != 0 && !this.isHyperspeed)
                         {
                             Game.pixi.StartSpeedrun()
                         }
@@ -90,19 +90,20 @@ export class Zenith {
 
                 //calculate stats
                     Game.stats.climbSpeed = t + this.climbPoints / (4 * t);
-                    this.tempAltitude += o / 60 * a
+                    this.altitude += o / 60 * a
                     if (this.bonusAltitude > 0)
                         if (this.bonusAltitude <= .05)
-                            this.tempAltitude += this.bonusAltitude,
+                            this.altitude += this.bonusAltitude,
                             this.bonusAltitude = 0;
                         else {
                             const e = Math.min(10, .1 * this.bonusAltitude);
-                            this.tempAltitude += e,
+                            this.altitude += e,
                             this.bonusAltitude -= e
                         }
 
-                    if(Game.stats.floor != this.GetFloorLevel(this.tempAltitude)){
-                        Game.stats.floor = this.GetFloorLevel(this.tempAltitude)
+                    if(Game.stats.floor != this.GetFloorLevel(this.altitude)){
+                        Game.stats.floorTime[Game.stats.floor - 1] = Game.stats.time
+                        Game.stats.floor = this.GetFloorLevel(this.altitude)
                         Game.sounds.playSound("zenith_levelup")
                         Game.renderer.renderTimeLeft("FLOOR " + Game.stats.floor)
                         if(Game.stats.floor == 10 && this.isHyperspeed)
@@ -110,7 +111,7 @@ export class Zenith {
                             Game.pixi.StopSpeedrun()
                         } 
                     }
-                    Game.stats.altitude = this.tempAltitude
+                    Game.stats.altitude = this.altitude
                     this.tickPass++
                     this.drawClimbSpeedBar(Math.floor(Game.stats.climbSpeed), this.climbPoints, s)
 
