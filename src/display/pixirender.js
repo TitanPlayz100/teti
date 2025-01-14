@@ -66,6 +66,7 @@ export class PixiRender {
         this.generateGrid();
         this.resetAnimGraphic();
         this.generateClickMinos();
+        this.repositionSpeedrunContainer()
     }
 
     // GRAPHICS and GENERATORS
@@ -364,7 +365,8 @@ export class PixiRender {
             this._speedrunMeta.container.scale.set(.7),
             this._speedrunMeta.container.zIndex = 50,
             console.log(this.app.stage.width)
-            this._speedrunMeta.container.position.set(640, this.app.stage.height / 3.3),
+            this._speedrunMeta.container.position.set(0, 0),
+            this.repositionSpeedrunContainer() 
             this._speedrunMeta.container.alpha = 0
             this.app.stage.addChild(this._speedrunMeta.container),
             this._speedrunMeta.splits = [];
@@ -379,7 +381,7 @@ export class PixiRender {
                 };
                 this._speedrunMeta.splits[e] = t,
                 t.container = new PIXI.Container,
-                t.container.position.set(110 * (e - 4), window.innerHeight - 40),
+                t.container.position.set(110 * (e - 4), 0),
                 this._speedrunMeta.container.addChild(t.container),
 
                 t.black = new PIXI.Graphics()
@@ -502,6 +504,11 @@ export class PixiRender {
         this._speedrunMeta.container.alpha = 0
         Game.animations.playRainbowAnimation(false)
         Game.zenith.isHyperspeed = false
+    }
+
+    repositionSpeedrunContainer(){
+        if(!this._speedrunMeta.container) return
+        this._speedrunMeta.container.pivot.set(-window.innerWidth * .69, -window.innerHeight / 3.5)
     }
 
 }
