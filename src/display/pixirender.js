@@ -443,9 +443,9 @@ export class PixiRender {
             const s = this._speedrunMeta.splits[t],
                   i = Game.zenith.tickPass;
             s.bg.tint = ol(1.5 * i + 34.7 * t, 100, 70 - 10);
-            s.inner.alpha = .75
+            s.inner.alpha = .75 - ((i / Game.tickrate * 4) % 2) / 10
             let o = 0;
-                switch (Math.floor((i / Game.tickrate) % 2)) {
+                switch (Math.floor((i / Game.tickrate * 2) % 2)) {
                 case 0:
                     o = -1;
                     break;
@@ -462,6 +462,7 @@ export class PixiRender {
                 s.bg.scale.x = 6.25 * progress
                 s.bottomText.alpha = 0;
                 if(oldPB){
+                    s.topText.text = Game.renderer.formatTime(oldPB.pbstats.floorTime[t],3)
                     s.topText.position.y = 3
                     s.bottomText.position.y = 30
                     s.bottomText.alpha = 1;

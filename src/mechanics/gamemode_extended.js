@@ -72,6 +72,7 @@ export class Zenith {
                             if(t <= 6 && this.isHyperspeed)
                                 {
                                     Game.pixi.StopSpeedrun()
+                                    Game.sounds.playSound("zenith_speedrun_end")
                                 } 
                         }
                     }
@@ -85,6 +86,7 @@ export class Zenith {
                         if(t >= this.SpeedrunReq[this.GetFloorLevel(this.altitude)] && this.SpeedrunReq[this.GetFloorLevel(this.altitude)] != 0 && !this.isHyperspeed)
                         {
                             Game.pixi.StartSpeedrun()
+                            Game.sounds.playSound("zenith_speedrun_start")
                         }
                     }
 

@@ -128,6 +128,14 @@
         "path": "assets/sfx/zenith_levelup.mp3"
     },
     {
+        "name": "zenith_speedrun_start.mp3",
+        "path": "assets/sfx/zenith_speedrun_start.mp3"
+    },
+    {
+        "name": "zenith_speedrun_end.mp3",
+        "path": "assets/sfx/zenith_speedrun_end.mp3"
+    },
+    {
         "name": "z.mp3",
         "path": "assets/sfx/piece/z.mp3"
     },
