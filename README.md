@@ -4,6 +4,9 @@ Hosted on github pages [here](https://titanplayz100.github.io/teti/)
 
 The info page can be found [here](https://titanplayz100.github.io/teti/info.html)
 
+> [!INFO]
+> If you have issues use f5 to reset cache
+
 > [!WARNING]
 > Firefox is not supported (due to import assertions)
 

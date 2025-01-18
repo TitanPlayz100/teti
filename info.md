@@ -102,6 +102,8 @@ Zenith mode additions
     - the animation can be improved (need more inspiration)
 - fixed classic mode handling, now accurate to real game
 
+- added zenith pb splits and animation on hyperspeed
+
 #### v1.4.2
 - Instead of using this.game, the Game instance is exported (less object oriented and more intuitive)
 - started adding ready set go option
