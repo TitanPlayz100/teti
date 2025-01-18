@@ -360,7 +360,7 @@ export class PixiRender {
 
 
     CreateSpeedrunContainer() {
-        if(this._speedrunMeta.container) return
+        if(this._speedrunMeta.container || Game.settings.game.gamemode != "zenith") return
             this._speedrunMeta.container = new PIXI.Container,
             this._speedrunMeta.container.scale.set(.7),
             this._speedrunMeta.container.zIndex = 50,
@@ -424,7 +424,7 @@ export class PixiRender {
     }
 
     TickSpeedrunUI(floor){
-        if(!this._speedrunMeta.container) return
+        if(!this._speedrunMeta.container|| Game.settings.game.gamemode != "zenith") return
 
         function ol(e, t, n) {
             n /= 100;
