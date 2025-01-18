@@ -66,7 +66,7 @@ export class PixiRender {
         this.generateGrid();
         this.resetAnimGraphic();
         this.generateClickMinos();
-        this.repositionSpeedrunContainer(Number(Game.settings.display.boardHeight) / 100)
+        this.repositionSpeedrunContainer()
     }
 
     // GRAPHICS and GENERATORS
