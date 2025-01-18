@@ -16,10 +16,10 @@ export class Movement {
     }
 
     startCountdown() {
-        
-        this.startTimers()
-        // setTimeout(() => {
-        // }, 1000);
+        Game.animations.readySetGoText();
+        this.startTimersTimeout = setTimeout(() => {
+            this.startTimers();
+        }, 600);
     }
 
     checkCollision(coords, action, collider) {
@@ -135,7 +135,6 @@ export class Movement {
         if (this.checkCollision(Game.board.getMinos("A"), "DOWN")) {
             Game.mechanics.locking.scheduleLock();
             Game.renderer.bounceBoard("DOWN");
-            Game.controls.startArr("current");
         }
         if (scoring && sonic) Game.stats.score += 1;
         if (sonic) this.movePieceDown(true, scoring);

@@ -101,6 +101,27 @@ export class Animations {
         return chars
     }
 
+    // ready set go text
+    readySetGoText() {
+        this.texts.ready.animation.kill();
+        this.texts.set.animation.kill();
+        this.texts.go.animation.kill();
+        const ready = this.texts.ready.sprite;
+        const set = this.texts.set.sprite;
+        const go = this.texts.go.sprite;
+        this.texts.ready.animation = gsap.timeline()
+            .to(ready, { duration: 0, pixi: { alpha: 1, scale: 1 } })
+            .to(ready, { duration: 0.5, pixi: { scale: 1.6, alpha: 0 }, ease: "power1.out" })
+        this.texts.set.animation = gsap.timeline()
+            .to(set, { duration: 0, pixi: { alpha: 0, scale: 1 } })
+            .to(set, { duration: 0, pixi: { alpha: 1, scale: 1 } }, 0.3)
+            .to(set, { duration: 0.5, pixi: { scale: 1.6, alpha: 0 }, ease: "power1.out" })
+        this.texts.go.animation = gsap.timeline()
+            .to(go, { duration: 0, pixi: { alpha: 0, scale: 1 } })
+            .to(go, { duration: 0, pixi: { alpha: 1, scale: 1 } }, 0.6)
+            .to(go, { duration: 1, pixi: { scale: 2, alpha: 0 }, ease: "power1.out" })
+    }
+
     // reset
     resetAnimation() {
         Game.pixi.board.mask = Game.pixi.resetMask;

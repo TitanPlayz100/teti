@@ -72,13 +72,13 @@ export class Visuals {
 
         /**@type {PIXI.Container} */
         const grid = pixi.app.stage.getChildByLabel("grid");
-        
+
         pixi.boardBG = new PIXI.Graphics()
             .rect(0, 0, width, height)
             .rect(-width * 2 / 5, 0, width * 2 / 5, height * 1 / 4)
-            .rect(width, 0, width * 1/2, height * 17 / 20)
+            .rect(width, 0, width * 1 / 2, height * 17 / 20)
             .fill("black")
-        pixi.boardBG.alpha = Number(Game.settings.display.boardOpacity)/100;
+        pixi.boardBG.alpha = Number(Game.settings.display.boardOpacity) / 100;
         grid.addChild(pixi.boardBG);
 
         pixi.boardDanger = new PIXI.Graphics()
@@ -99,7 +99,7 @@ export class Visuals {
         rectHold.x = - width * 2 / 5;
 
         const rectNext = new PIXI.Graphics()
-            .moveTo(0, height * 17 / 20).lineTo(width * 1/2, height * 17 / 20)
+            .moveTo(0, height * 17 / 20).lineTo(width * 1 / 2, height * 17 / 20)
             .stroke({ color: 0xffffff, width: 1 })
         grid.addChild(rectNext);
         rectNext.x = width;
@@ -140,6 +140,8 @@ export class Visuals {
         const statStyle = new PIXI.TextStyle({ fontFamily: "MajorMonoDisplay", fontSize: 16, fill: "white", fontWeight: "bold" });
         const statTextStyle = new PIXI.TextStyle({ fontFamily: "Montserrat, sans-serif", fontSize: 18, fill: "#999999" });
         const statSecondaryStyle = new PIXI.TextStyle({ fontFamily: "MajorMonoDisplay", fontSize: 26, fill: "white", fontWeight: "bold" });
+        const readyTexts = new PIXI.TextStyle({ fontFamily: "MajorMonoDisplay", fontSize: 30, fill: "yellow" });
+        const goText = new PIXI.TextStyle({ fontFamily: "Montserrat, sans-serif", fontSize: 50, fill: "#7ACD44" });
 
         this.createTextGraphic(style, "hold", { ...defaultPos, x: -3.5 / 10 }, grid, 1, "hold");
         this.createTextGraphic(style, "next", { ...defaultPos, x: 11 / 10 }, grid, 1, "next");
@@ -152,6 +154,12 @@ export class Visuals {
         this.createTextGraphic(timeLeftStyle, "timelefttext", { ...defaultPos, x: 0.5, y: 1 / 8, anchorX: 0.5 }, txtCnt);
         this.createTextGraphic(statSecondaryStyle, "objectiveText", { ...defaultPos, x: 11 / 10, y: 1 - 3 / 40 }, txtCnt, 1);
         this.createTextGraphic(statTextStyle, "objectiveNameText", { ...defaultPos, x: 11 / 10, y: 1 - 5 / 40 }, txtCnt, 1);
+
+        this.createTextGraphic(readyTexts, "ready", { ...defaultPos, x: 0.5, y: 0.3, anchorX: 0.5, anchorY: 0.5 }, txtCnt, 0, "ready");
+        this.createTextGraphic(readyTexts, "set", { ...defaultPos, x: 0.5, y: 0.3 , anchorX: 0.5, anchorY: 0.5}, txtCnt, 0, "set");
+        this.createTextGraphic(goText, "go", { ...defaultPos, x: 0.5, y: 0.3 , anchorX: 0.5, anchorY: 0.5}, txtCnt, 0, "GO!");
+
+
         [0.5, 1.5, 2.5].forEach((pos, i) => {
             const stat = this.createTextGraphic(statStyle, "stat" + i, { ...defaultPos, x: -1 / 20, y: 1 - pos * 2.5 / 20, anchorX: 1 }, txtCnt, 1);
             const statText = this.createTextGraphic(statTextStyle, "statText" + i, { ...defaultPos, x: -1 / 20, y: 1 - pos * 2.5 / 20 - 2 / 40, anchorX: 1 }, txtCnt, 1);

@@ -20,7 +20,7 @@ export class Modes {
         let result = stats[this.modeJSON.result]
 
         if (stat >= goal || combobreak || gameend) {
-            if(Game.settings.game.gamemode != "race" ) result = Math.round(result * 1000) / 1000
+            if (Game.settings.game.gamemode != "race") result = Math.round(result * 1000) / 1000
             stat = Math.round(stat * 1000) / 1000
             Game.profilestats.setPB(result);
             const text = this.statText(this.modeJSON.goalStat, stat, this.modeJSON.result, result)
@@ -43,8 +43,9 @@ export class Modes {
 
     setObjectiveText(stat, statValue, resultValue) {
         if (statValue != undefined) statValue = statValue.toFixed(reverseLookup(statDecimals)[stat])
-        let modetext = (statValue == undefined ? '' : statValue)
-            + (resultValue == undefined ? '' : `/${resultValue}`)
+        let modetext =
+            (statValue == undefined ? '' : statValue) +
+            (resultValue == undefined ? '' : `/${resultValue}`)
         Game.pixi.texts.objectiveText.sprite.text = modetext;
     }
 
@@ -81,12 +82,31 @@ export class Modes {
             }
             this.modeJSON = this.getGamemodeJSON(mode);
         }
-        this.toggleDialogState(competitive);
+        this.toggleDialogState(competitive, mode);
+
+        if (mode == 'classic' && competitive) {
+            this.saveHandling();
+            Game.settings.handling = { ...Game.settings.handling, ...this.modeJSON.handling };
+        } else {
+            this.loadHandling();
+        }
     }
 
-    toggleDialogState(enabled) {
+    saveHandling() {
+        if (localStorage.getItem('handling') != null) return;
+        localStorage.setItem('handling', JSON.stringify(Game.settings.handling));
+    }
+
+    loadHandling() {
+        if (localStorage.getItem('handling') == null) return;
+        Game.settings.handling = JSON.parse(localStorage.getItem('handling'));
+        localStorage.removeItem('handling');
+    }
+
+    toggleDialogState(enabled, mode) {
         document.getElementById('game').disabled = enabled;
         document.getElementById('goals').disabled = enabled;
+        document.getElementById('handling').disabled = (enabled && mode == 'classic');
     }
 
     getGamemodeJSON(mode) {

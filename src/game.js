@@ -86,7 +86,6 @@ export class GameClass {
         this.resetState(seed);
         this.renderer.renderStyles();
         this.mechanics.spawnPiece(this.bag.cycleNext(true), true);
-        
         this.history.save();
         this.replay.start();
     }
@@ -98,6 +97,7 @@ export class GameClass {
         clearInterval(this.zenithTimer);
         clearInterval(this.grandmasterTimer);
         this.mechanics.locking.lockingPause();
+        clearTimeout(this.movement.startTimersTimeout);
     }
 
     endGame(top, bottom = "Better luck next time") {

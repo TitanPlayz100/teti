@@ -1,8 +1,5 @@
 import { Game } from "../main.js";
 
-// start recording replay with start()
-// save replay with copyReplay()
-// run replay with runReplay()
 export class Replay {
     events = {};
     currentFrame = 0;

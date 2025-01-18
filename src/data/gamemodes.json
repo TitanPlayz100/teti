@@ -17,8 +17,10 @@
             "stride": false,
             "clearDelay": 0,
             "randomiser": "7-bag",
-            "kicktable": "SRS+"
+            "kicktable": "SRS+",
+            "readysetgo": true
         },
+        "handling": {},
         "displayName": "Unset",
         "objectiveText": "",
         "goalStat": "",
@@ -84,7 +86,8 @@
         "result": "time",
         "settings": {
             "survivalRate": 60,
-            "sidebar": ["time", "lpm", "pps"]
+            "sidebar": ["time", "lpm", "pps"],
+            "readysetgo": false
         }
     },
     "backfire": {
@@ -107,7 +110,8 @@
         "settings": {
             "allspin": true,
             "allspinminis": false,
-            "sidebar": ["combo", "pps"]
+            "sidebar": ["combo", "pps"],
+            "readysetgo": false
         }
     },
     "lookahead": {
@@ -168,6 +172,11 @@
             "clearDelay": 500,
             "randomiser": "classic",
             "kicktable": "NRS"
+        },
+        "handling": {
+            "das": 200,
+            "arr": 100,
+            "sdarr": 150
         }
     }
 }

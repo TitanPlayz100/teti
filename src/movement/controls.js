@@ -29,6 +29,7 @@ export class Controls {
         if (Game.modals.open || Game.modals.closing || Game.mechanics.locking.timings.clearDelay != 0) return;
         if (event.key != this.menuKey && !Game.started && Game.settings.game.readysetgo == false) Game.movement.startTimers();
         if (key == keys.resetKey) this.retry(true);
+        if (!Game.started && Game.settings.game.readysetgo == true) return;
         if (Game.ended) return;
 
         const keytype = Object.keys(keys).find(type => keys[type] == key);

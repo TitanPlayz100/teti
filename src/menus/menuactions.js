@@ -136,6 +136,7 @@ export class MenuActions {
         document.querySelectorAll("dialog[open]").forEach(e => Game.modals.closeDialog(e));
         document.querySelectorAll("scrollSettings[open]").forEach(e => Game.modals.closeDialog(e));
         if (Game.started && !Game.ended) Game.movement.startTimers();
+        if (Game.started == false && Game.settings.game.readysetgo == true) Game.movement.startCountdown();
     }
 
     newGame(key, modal) {
