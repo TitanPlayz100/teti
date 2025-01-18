@@ -66,6 +66,7 @@ export class PixiRender {
         this.generateGrid();
         this.resetAnimGraphic();
         this.generateClickMinos();
+        this.repositionSpeedrunContainer()
     }
 
     // GRAPHICS and GENERATORS
@@ -215,6 +216,7 @@ export class PixiRender {
         this.updateAlpha();
         this.showTextOnTime(60, "60S LEFT");
         this.showTextOnTime(90, "90S LEFT");
+        this.TickSpeedrunUI(Game.zenith.GetFloorLevel(Game.stats.altitude))
     }
 
     showTextOnTime(time, text) {
@@ -344,4 +346,169 @@ export class PixiRender {
         this.particleContainer.addChild(p);
         return p;
     }
+
+
+    _speedrunMeta = {
+        container: null,
+        splits: [],
+        t: 0,
+        ShowingCounter : 0,
+        FadingCounter : 0,
+        HidingCounter : 0,
+    };
+    
+
+
+    CreateSpeedrunContainer() {
+        if(this._speedrunMeta.container) return
+            this._speedrunMeta.container = new PIXI.Container,
+            this._speedrunMeta.container.scale.set(.7),
+            this._speedrunMeta.container.zIndex = 50,
+            console.log(this.app.stage.width)
+            this._speedrunMeta.container.position.set(0, 0),
+            this.repositionSpeedrunContainer() 
+            this._speedrunMeta.container.alpha = 0
+            this.app.stage.addChild(this._speedrunMeta.container),
+            this._speedrunMeta.splits = [];
+            for (let e = 0; e < 9; e++) {
+                const t = {
+                    container: null,
+                    bg: null,
+                    outer: null,
+                    inner: null,
+                    topText: null,
+                    bottomText: null
+                };
+                this._speedrunMeta.splits[e] = t,
+                t.container = new PIXI.Container,
+                t.container.position.set(110 * (e - 4), 0),
+                this._speedrunMeta.container.addChild(t.container),
+
+                t.black = new PIXI.Graphics()
+                    .rect(0, 0, 16, 16)
+                    .fill(0xFFFFFF);
+                t.black.scale.set(6.25, 3.125)
+                t.black.tint = 0
+                t.container.addChild(t.black),
+
+                t.bg = new PIXI.Graphics()
+                    .rect(0, 0, 16, 16)
+                    .fill(0xFFFFFF);
+                t.bg.scale.set(3.25, 3.125)
+                //t.bg.tint = 0
+                t.container.addChild(t.bg),
+
+                t.inner = new PIXI.Graphics()
+                    .rect(0, 1, 17, 16)
+                    .fill(0xFFFFFF);
+                t.inner.scale.set(5.875, 2.75)
+                t.inner.tint = 0
+                t.container.addChild(t.inner),
+                
+
+                t.topText = new PIXI.Text(``,{
+                    fontSize: 23,
+                    weight: 750,
+                    anchor: [.5, .5],
+                }),
+                t.topText.position.y = 12
+                t.container.addChild(t.topText)
+
+                t.bottomText = new PIXI.Text(`test`,{
+                    fontSize: 15,
+                    weight: 750,
+                    anchor: [.5, .5],
+                }),
+                t.bottomText.position.y = 12
+                t.container.addChild(t.bottomText)
+        }
+        console.log(this._speedrunMeta)
+    }
+
+    TickSpeedrunUI(floor){
+        if(!this._speedrunMeta.container) return
+
+        function ol(e, t, n) {
+            n /= 100;
+            const s = t * Math.min(n, 1 - n) / 100
+              , i = t => {
+                const i = (t + e / 30) % 12
+                  , o = n - s * Math.max(Math.min(i - 3, 9 - i, 1), -1);
+                return Math.round(255 * o)
+            }
+            ;
+            return i(0) << 16 | i(8) << 8 | i(4)
+        }
+
+    
+        for (let t = 0; t < 9; t++) {
+            const s = this._speedrunMeta.splits[t],
+                  i = Game.zenith.tickPass;
+            s.bg.tint = ol(1.5 * i + 34.7 * t, 100, 70 - 10);
+            s.inner.alpha = .75 - ((i / Game.tickrate * 4) % 2) / 10
+            let o = 0;
+                switch (Math.floor((i / Game.tickrate * 2) % 2)) {
+                case 0:
+                    o = -1;
+                    break;
+                case 1:
+                    o = 1;
+                    break;
+                }
+                s.container.y = window.innerHeight - 40 + 4 * o * (t % 2 == 0 ? 1 : -1)
+            let oldPB = localStorage.stats ? JSON.parse(localStorage.stats).pbs.zenith : undefined
+            if (floor === t + 1) {
+                let progress = (Game.stats.altitude - Game.zenith.FloorDistance[floor - 1]) / (Game.zenith.FloorDistance[floor]- Game.zenith.FloorDistance[floor - 1])
+                s.bottomText.style.fill = 16777215
+                s.topText.style.fill = 16777215
+                s.bg.scale.x = 6.25 * progress
+                s.bottomText.alpha = 0;
+                if(oldPB){
+                    s.topText.text = Game.renderer.formatTime(oldPB.pbstats.floorTime[t],3)
+                    s.topText.position.y = 3
+                    s.bottomText.position.y = 30
+                    s.bottomText.alpha = 1;
+                    s.bottomText.tint = oldPB.pbstats.floorTime[t] - Game.stats.time >= 20 ? 16758528 : (Game.stats.time < oldPB.pbstats.floorTime[t] ? 8978176 : 16734354)
+                    s.bottomText.text = `${Game.stats.time < oldPB.pbstats.floorTime[t] ? "-" : "+"}${Game.renderer.formatTime(Math.abs(oldPB.pbstats.floorTime[t] - Game.stats.time), 3)}`
+                }
+                else{
+                    s.topText.text = Game.renderer.formatTime(Game.stats.time, 3)
+                }
+            } else if (floor < t + 1) {
+                if(oldPB){
+                    s.topText.text = `${Game.renderer.formatTime(oldPB.pbstats.floorTime[t], 3)}`
+                }
+                else{
+                    s.topText.text = `FLOOR ${t + 1}`
+                    s.bottomText.alpha = 1;
+                }
+                s.topText.style.fill = 3355443;
+                s.bottomText.style.fill = 3355443;
+                s.bottomText.alpha = 0;
+                s.bg.tint = 0
+                s.topText.position.y = 12
+            } else {
+                s.bg.scale.x = 6.25
+            }
+
+        }
+    }
+
+    StartSpeedrun(){
+        this._speedrunMeta.container.alpha = 1
+        Game.animations.playRainbowAnimation(true)
+        Game.zenith.isHyperspeed = true
+    }
+
+    StopSpeedrun(){
+        this._speedrunMeta.container.alpha = 0
+        Game.animations.playRainbowAnimation(false)
+        Game.zenith.isHyperspeed = false
+    }
+
+    repositionSpeedrunContainer(){
+        if(!this._speedrunMeta.container) return
+        this._speedrunMeta.container.pivot.set(-window.innerWidth * .69, -window.innerHeight / 3.5)
+    }
+
 }
