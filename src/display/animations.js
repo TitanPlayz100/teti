@@ -1,11 +1,13 @@
 import { Game } from "../main.js";
 
+
 export class Animations {
     actionTexts = ["cleartext", "combotext", "btbtext", "spiketext", "pctext", "timelefttext"]
 
     constructor() {
         this.texts = Game.pixi.texts;
         gsap.registerPlugin(PixiPlugin); // gsap animation library
+        gsap.registerPlugin(CustomEase);
         PixiPlugin.registerPIXI(PIXI);
 
         this.createRainbowAnimation();
