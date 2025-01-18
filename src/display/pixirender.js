@@ -457,6 +457,7 @@ export class PixiRender {
                 }
                 s.container.y = window.innerHeight - 40 + 4 * o * (t % 2 == 0 ? 1 : -1)
             let oldPB = localStorage.stats ? JSON.parse(localStorage.stats).pbs.zenith : undefined
+            if (oldPB.pbstats.floorTime == undefined) oldPB = undefined;
             if (floor === t + 1) {
                 let progress = (Game.stats.altitude - Game.zenith.FloorDistance[floor - 1]) / (Game.zenith.FloorDistance[floor]- Game.zenith.FloorDistance[floor - 1])
                 s.bottomText.style.fill = 16777215
