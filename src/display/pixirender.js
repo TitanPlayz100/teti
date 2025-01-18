@@ -531,22 +531,6 @@ export class PixiRender {
                     ease: "splitsDrop"
                 });
             }), 150 * Math.random());
-
-            // setTimeout(( () => {
-            //     Rl.animate(t.splits[e].container, {
-            //         0: {
-            //             "pivot.y": 0,
-            //             rotation: 0,
-            //             alpha: 1
-            //         },
-            //         1: {
-            //             "pivot.y": -100,
-            //             rotation: .2 * Math.random() - .1,
-            //             alpha: 0
-            //         }
-            //     }, .5, s(.21, .45, .73, .99))
-            // }
-            // ), 150 * Math.random());
         }
 
         Game.animations.playRainbowAnimation(false)
