@@ -52,6 +52,7 @@ export class Mechanics {
         Game.modes.set4WCols(start);
         if (Game.settings.game.preserveARR) Game.controls.startArr("current");
         if (Game.started) this.startGravity();
+        if (start == true && Game.settings.game.readysetgo) Game.movement.startCountdown();
     }
 
     spawnOverlay() {

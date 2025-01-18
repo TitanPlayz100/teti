@@ -86,8 +86,7 @@ export class ModalActions {
         });
 
         this.closeDialog(document.getElementById(id));
-        if (id != 'changeRangeValue' && id != "frontdrop" && Game.started && !Game.ended)
-            Game.movement.startTimers();
+        if (id != 'changeRangeValue' && id != "frontdrop" && Game.started && !Game.ended) Game.movement.startTimers();
         Game.menuactions.saveSettings();
         if (id == "displayDialog") Game.renderer.renderStyles(true);
 

@@ -48,7 +48,6 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 - customise queues
 - import/export settings
 - tetrio sfx
-    - can play/pause, skip song
 - many modes
     - 40l, blitz, custom
     - attacker (reach certain attack amount)
@@ -65,17 +64,18 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 - clean, modern, and animated menus
 - responsive design
 - touhou jazz music
+    - can play/pause, skip song
 - Replays can be saved and viewed
 
 ## TODO list
 Things that might be in progress
-- ready set go start option (working on)
 - rotation centres
 - bag seperators
 - gravity increase over time (and maybe fix softdrop)
 - fix rounding stuff with end screen
 - pro mode (large line count on board)
-
+- option to pause on focus loss
+- fix responsive design 
 
 Zenith mode additions
 - add fatigue:
@@ -97,6 +97,11 @@ Zenith mode additions
 ***
 
 ## Updates
+#### v1.4.2.2
+- finished ready set go option
+    - the animation can be improved (need more inspiration)
+- fixed classic mode handling, now accurate to real game
+
 #### v1.4.2
 - Instead of using this.game, the Game instance is exported (less object oriented and more intuitive)
 - started adding ready set go option
@@ -308,7 +313,7 @@ Zenith mode additions
 
 ***
 ## Feature Wishlist
-Future wants for game, kinda ordered by ease and desire for feature
+Possible directions for game, kinda ordered by ease and desire
 - finesse detection
 - custom game presets
     - setting presets for display settings and game settings
@@ -333,5 +338,5 @@ Future wants for game, kinda ordered by ease and desire for feature
     - leaderboards
     - connecting tetrio stats
 - touch settings
-- bot to play against
+- 1v1
 - make setting menus be json generated
