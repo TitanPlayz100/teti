@@ -69,10 +69,7 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 
 ## TODO list
 Things that might be in progress
-- rotation centres
-- bag seperators
 - gravity increase over time (and maybe fix softdrop)
-- fix rounding stuff with end screen
 - pro mode (large line count on board)
 - option to pause on focus loss
 - fix responsive design 
@@ -97,6 +94,12 @@ Zenith mode additions
 ***
 
 ## Updates
+#### v1.4.3
+- added bag seperators
+- added rotation center indicator
+- new display setting to toggle these indicators
+- sfx setting for piece spawns
+
 #### v1.4.2.2
 - finished ready set go option
     - the animation can be improved (need more inspiration)
@@ -316,6 +319,7 @@ Zenith mode additions
 ***
 ## Feature Wishlist
 Possible directions for game, kinda ordered by ease and desire
+- add beta tetrio features (surge, pco nerf, immobile tspins, garbage clearing buff )
 - finesse detection
 - custom game presets
     - setting presets for display settings and game settings

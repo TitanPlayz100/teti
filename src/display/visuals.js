@@ -1,4 +1,5 @@
 import { Game } from "../main.js";
+import { PixiRender } from "./pixirender.js";
 
 export class Visuals {
     textSprites = {};
@@ -57,6 +58,14 @@ export class Visuals {
         clicknext.on("pointerdown", () => Game.modals.openModal("queueModify"));
         clicknext.label = "invincible"
 
+        const rotationCenter = new PIXI.Graphics().circle(0, 0, 3).fill(0xffffff, 0.7);
+        if (Game.settings.display.showIndicators == false) rotationCenter.visible = false
+        Game.pixi.rotationCenter = rotationCenter
+
+        const bagSeperator = new PIXI.Graphics().rect(0, 0, width * 2 / 5, height * 0.1 / 20).fill(0xffffff);
+        if (Game.settings.display.showIndicators == false) bagSeperator.visible = false
+        Game.pixi.bagSeperator = bagSeperator
+
         this.baseContainer("board", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts, rect);
         this.baseContainer("grid", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts, null, true);
         this.baseContainer("hold", { dx: 0, dy: height * 2 / 20, pivotdx: width * 2 / 5, pivotdy: 0 }, consts, clickhold);
@@ -64,8 +73,11 @@ export class Visuals {
         this.baseContainer("clickArea", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts, null, true);
         this.baseContainer("particles", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts);
         this.baseContainer("textContainer", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts, null, true);
+        this.baseContainer("rotationCenterC", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts, rotationCenter, true);
+        this.baseContainer("bagSeperatorC", { dx: 0, dy: height * 1 / 20, pivotdx: width * -11 / 10, pivotdy: 0 }, consts, bagSeperator, true);
     }
 
+    /** @param {PixiRender} pixi */
     createGridGraphics(consts, icons, pixi) {
         const width = consts.bw;
         const height = consts.bh;
@@ -156,8 +168,8 @@ export class Visuals {
         this.createTextGraphic(statTextStyle, "objectiveNameText", { ...defaultPos, x: 11 / 10, y: 1 - 5 / 40 }, txtCnt, 1);
 
         this.createTextGraphic(readyTexts, "ready", { ...defaultPos, x: 0.5, y: 0.3, anchorX: 0.5, anchorY: 0.5 }, txtCnt, 0, "ready");
-        this.createTextGraphic(readyTexts, "set", { ...defaultPos, x: 0.5, y: 0.3 , anchorX: 0.5, anchorY: 0.5}, txtCnt, 0, "set");
-        this.createTextGraphic(goText, "go", { ...defaultPos, x: 0.5, y: 0.3 , anchorX: 0.5, anchorY: 0.5}, txtCnt, 0, "GO!");
+        this.createTextGraphic(readyTexts, "set", { ...defaultPos, x: 0.5, y: 0.3, anchorX: 0.5, anchorY: 0.5 }, txtCnt, 0, "set");
+        this.createTextGraphic(goText, "go", { ...defaultPos, x: 0.5, y: 0.3, anchorX: 0.5, anchorY: 0.5 }, txtCnt, 0, "GO!");
 
 
         [0.5, 1.5, 2.5].forEach((pos, i) => {

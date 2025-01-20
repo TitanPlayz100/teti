@@ -16,7 +16,8 @@
         "particleVolume": 60,
         "particleSize":1,
         "skin":"tetrio",
-        "actionText": true
+        "actionText": true,
+        "showIndicators": true
     },
     "game": {
         "gravitySpeed": 950,
@@ -66,7 +67,8 @@
     },
     "volume": {
         "audioLevel": 15,
-        "sfxLevel": 10
+        "sfxLevel": 10,
+        "pieceSFX": false
     },
     "handling": {
         "arr": 33,
