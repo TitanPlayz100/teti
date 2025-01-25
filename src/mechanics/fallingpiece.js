@@ -17,7 +17,10 @@ export class Falling {
         Game.board.addMinos("A " + piece.name, coords, [dx, dy]);
         this.location = [dx, dy];
         this.piece = piece;
-        Game.sounds.playSound(Game.bag.queue[0]); // play NEXT piece sfx
+        Game.pixi.setRotationCenterPos(this.location, this.piece.name);
+        Game.pixi.setBagPos(Game.stats.pieceCount)
+
+        if (Game.settings.volume.pieceSFX) Game.sounds.playSound(Game.bag.queue[0]); // play NEXT piece sfx
     }
 
     getKickData(newRotation) {
@@ -48,6 +51,7 @@ export class Falling {
         ];
         if (dx != 0 || dy != 0) {
             this.moved = true;
+            Game.pixi.setRotationCenterPos(this.location, this.piece.name);
         }
     }
 

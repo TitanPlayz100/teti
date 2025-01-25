@@ -21,6 +21,10 @@ export class PixiRender {
     statTexts = [];
     /**@type {Record<string,{sprite:PIXI.Text, animation:any}>} */
     texts = {};
+    /** @type {PIXI.Graphics} */
+    rotationCenter;
+    /** @type {PIXI.Graphics} */
+    bagSeperator;
 
     divlock = document.getElementById("lockTimer");
 
@@ -33,7 +37,10 @@ export class PixiRender {
         await this.app.init({ backgroundAlpha: 0, resizeTo: window, autoDensity: true });
         document.body.prepend(this.app.canvas);
 
-        const labels = ["grid", "board", "clickArea", "next", "hold", "textContainer", "particles"]
+        const labels = [
+            "grid", "board", "clickArea", "next", "hold", "textContainer", 
+            "particles", "rotationCenterC", "bagSeperatorC"
+        ];
         const containers = this.visuals.generateContainers(labels);
         this.board = containers["board"];
         this.particleContainer = containers["particles"];
@@ -134,6 +141,29 @@ export class PixiRender {
 
         Game.particles.texture = await PIXI.Assets.load('./assets/particle.png');
         clearSplash();
+    }
+
+    setRotationCenterPos([x, y], piece) {
+        let posX = (x + 1) * this.minoSize + this.minoSize / 2;
+        let posY = (38 - y) * this.minoSize + this.minoSize / 2;
+
+        if (piece == "i") {
+            posX += this.minoSize / 2
+            posY -= this.minoSize / 2
+        } else if (piece == "o") {
+            posX -= this.minoSize / 2
+            posY += this.minoSize / 2
+        }
+        this.rotationCenter.position.set(posX, posY);
+    }
+
+    setBagPos(pieces) {
+        const curPiece = pieces % 7 + 1
+        const y = curPiece * 3 - 0.5
+        const posY = (21 - y) * this.minoSize;
+
+        this.bagSeperator.position.set(0, posY);
+        this.bagSeperator.alpha = curPiece > 1 ? 1 : 0
     }
 
     generateAllSprites(type, array, yPosChange) {
@@ -348,6 +378,7 @@ export class PixiRender {
     }
 
 
+    // QP
     _speedrunMeta = {
         container: null,
         splits: [],
