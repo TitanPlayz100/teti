@@ -138,5 +138,10 @@ export const songsobj = [
         "name": "ShibayanRecords - Close to your Mind.mp3",
         "path": "assets/songs/ShibayanRecords - Close to your Mind.mp3",
         "type": "file"
+    },
+    {
+        "name": "Dr Ocelot - Broken Record (but cover by ItzBlack).mp3",
+        "path": "assets/songs/Dr Ocelot - Broken Record (but cover by ItzBlack).mp3",
+        "type": "file"
     }
 ];
