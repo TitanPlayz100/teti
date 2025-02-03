@@ -6,6 +6,7 @@ export class Animations {
     constructor() {
         this.texts = Game.pixi.texts;
         gsap.registerPlugin(PixiPlugin); // gsap animation library
+        gsap.registerPlugin(CustomEase); // library to create custom easing
         PixiPlugin.registerPIXI(PIXI);
 
         this.createRainbowAnimation();

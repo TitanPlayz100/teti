@@ -110,7 +110,7 @@ export class Zenith {
                         Game.renderer.renderTimeLeft("FLOOR " + Game.stats.floor)
                         if(Game.stats.floor == 10 && this.isHyperspeed)
                         {
-                            Game.pixi.StopSpeedrun()
+                            Game.pixi.WinSpeedrun()
                         } 
                     }
                     Game.stats.altitude = this.altitude

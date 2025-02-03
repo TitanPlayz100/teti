@@ -391,11 +391,10 @@ export class PixiRender {
 
 
     CreateSpeedrunContainer() {
-        if(this._speedrunMeta.container) return
+        if(this._speedrunMeta.container || Game.settings.game.gamemode != "zenith") return
             this._speedrunMeta.container = new PIXI.Container,
             this._speedrunMeta.container.scale.set(.7),
             this._speedrunMeta.container.zIndex = 50,
-            console.log(this.app.stage.width)
             this._speedrunMeta.container.position.set(0, 0),
             this.repositionSpeedrunContainer() 
             this._speedrunMeta.container.alpha = 0
@@ -453,11 +452,10 @@ export class PixiRender {
                 t.bottomText.position.y = 12
                 t.container.addChild(t.bottomText)
         }
-        console.log(this._speedrunMeta)
     }
 
     TickSpeedrunUI(floor){
-        if(!this._speedrunMeta.container) return
+        if(!this._speedrunMeta.container|| Game.settings.game.gamemode != "zenith") return
 
         function ol(e, t, n) {
             n /= 100;
@@ -478,6 +476,7 @@ export class PixiRender {
             s.bg.tint = ol(1.5 * i + 34.7 * t, 100, 70 - 10);
             s.inner.alpha = .75 - ((i / Game.tickrate * 4) % 2) / 10
             let o = 0;
+            if(Game.zenith.isHyperspeed){
                 switch (Math.floor((i / Game.tickrate * 2) % 2)) {
                 case 0:
                     o = -1;
@@ -487,6 +486,7 @@ export class PixiRender {
                     break;
                 }
                 s.container.y = window.innerHeight - 40 + 4 * o * (t % 2 == 0 ? 1 : -1)
+            }
             let oldPB = localStorage.stats ? JSON.parse(localStorage.stats).pbs.zenith : undefined
             if (oldPB && oldPB.pbstats.floorTime == undefined) oldPB = undefined;
             if (floor === t + 1) {
@@ -528,19 +528,67 @@ export class PixiRender {
 
     StartSpeedrun(){
         this._speedrunMeta.container.alpha = 1
+
+        CustomEase.create("splitsStart", ".21, .45, .73, .99");
+
+        for (let e = 0; e < 9; e++){
+            this._speedrunMeta.splits[e].container.pivot.y = 0,
+            this._speedrunMeta.splits[e].container.rotation = 0,
+            this._speedrunMeta.splits[e].container.alpha = 1,
+            this._speedrunMeta.splits[e].container.pivot.x = -window.innerWidth * 2,
+            setTimeout(( () => {
+                gsap.to(this._speedrunMeta.splits[e].container, {
+                    pixi: { pivotX: 0},
+                    duration: 1,
+                    ease: "splitsStart"
+                });
+            }), 400 + 60 * e);
+        }
+
         Game.animations.playRainbowAnimation(true)
         Game.zenith.isHyperspeed = true
     }
 
     StopSpeedrun(){
-        this._speedrunMeta.container.alpha = 0
+        CustomEase.create("splitsDrop", ".21, .45, .73, .99");
+
+        for (let e = 0; e < 9; e++){
+            this._speedrunMeta.splits[e].container.pivot.y = 0,
+            this._speedrunMeta.splits[e].container.rotation = 0,
+            setTimeout(( () => {
+                gsap.to(this._speedrunMeta.splits[e].container, {
+                    pixi: { pivotY: -100, rotation: .2 * Math.random() - .1, alpha: 0},
+                    duration: 1,
+                    ease: "splitsDrop"
+                });
+            }), 150 * Math.random());
+        }
+
         Game.animations.playRainbowAnimation(false)
         Game.zenith.isHyperspeed = false
     }
 
-    repositionSpeedrunContainer(){
+    WinSpeedrun(){
+        CustomEase.create("splitsFly", ".55, .02, .94, .67");
+
+        for (let e = 0; e < 9; e++){
+            this._speedrunMeta.splits[e].container.pivot.y = 0,
+            setTimeout(( () => {
+                gsap.to(this._speedrunMeta.splits[e].container, {
+                    pixi: { pivotY: 100, alpha: 0},
+                    duration: 1,
+                    ease: "splitsFly"
+                });
+            }), 4e3 + 150 * Math.random());
+        }
+        Game.animations.playRainbowAnimation(false)
+        Game.zenith.isHyperspeed = false
+    }
+
+    repositionSpeedrunContainer(scale){
         if(!this._speedrunMeta.container) return
         this._speedrunMeta.container.pivot.set(-window.innerWidth * .69, -window.innerHeight / 3.5)
+        //this._speedrunMeta.container.scale.set(scale)
     }
 
 }
