@@ -3,16 +3,10 @@ import attackValues from "../data/attacktable.json" with { type: "json" };
 import { Game } from "../main.js";
 
 export class ClearLines {
-    progressDamage = document.getElementById("garbageQueue");
-
-    constructor() {
-        this.progressDamage.value = 0;
-    }
-
     clearLines(clearCoords) {
         const clearRows = Game.board.getFullRows();
         let removedGarbage = 0;
-        
+
         for (let row of clearRows) {
             const stopped = Game.board.getMinos("S");
             if (stopped.filter(c => c[1] == row).some(([x, y]) => Game.board.checkMino([x, y], "G"))) // count garbage
@@ -51,7 +45,7 @@ export class ClearLines {
         let damagetype = this.getDamageType(linecount);
 
         // update stats
-        if (!isBTB && linecount > 0) Game.zenith.AwardLines(Math.max(0, Game.stats.btbCount))    
+        if (!isBTB && linecount > 0) Game.zenith.AwardLines(Math.max(0, Game.stats.btbCount))
         Game.stats.updateBTB(isBTB, linecount);
         Game.stats.updateCombo(linecount);
         const damage = this.calcDamage(stats.combo, damagetype, isPC, stats.btbCount, isBTB);
@@ -59,10 +53,18 @@ export class ClearLines {
         Game.stats.incrementStats(score, linecount, damage, isPC, mech.isTspin, mech.isAllspin, garbageCleared);
 
         mech.spikeCounter += damage;
-        this.manageGarbageSent(damage);
+        Game.stats.sent += damage;
 
+        // garbage
+        Game.garbage.cancelGarbage(damage)
+        if (Game.stats.combo == -1 && Game.garbage.garbageQueueTotal() > 0) {
+            Game.garbage.sendGarbageQueue();
+        }
+
+        // zenith
         Game.zenith.AwardLines(damage);
         if (linecount == 1) Game.zenith.AwardLines(1);
+        
         // render action text
         if (mech.isAllspin) damagetype = damagetype.replace("Tspin ", Game.falling.piece.name + " spin ");
         Game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);
@@ -71,24 +73,6 @@ export class ClearLines {
         if (isPC) Game.particles.spawnParticles(0, 0, "pc");
         if (stats.btbCount > 7 && isBTB) Game.particles.spawnParticles(0, 20, "BTB");
         if (damage > 10 || stats.combo > 10) Game.particles.spawnParticles(0, 0, "spike");
-    }
-
-    manageGarbageSent(damage) {
-        Game.stats.sent += damage;
-        const garb = damage * Game.settings.game.backfireMulti;
-        const sent = Math.abs(Game.mechanics.garbageQueue - garb);
-        Game.mechanics.garbageQueue = sent;
-
-        if (Game.settings.game.gamemode != 'backfire') return;
-        if (garb > 0) Game.sounds.playSound(garb > 4 ? "garbage_in_large" : "garbage_in_small");
-
-        if (Game.stats.combo == -1 && Game.mechanics.garbageQueue > 0) {
-            Game.mechanics.addGarbage(Game.mechanics.garbageQueue, 0);
-            Game.stats.recieved += Game.mechanics.garbageQueue;
-            Game.mechanics.garbageQueue = 0;
-            this.progressDamage.value = 0;
-        }
-        if (damage > 0) this.progressDamage.value = Game.mechanics.garbageQueue;
     }
 
     checkBTB(linecount) {

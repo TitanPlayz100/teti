@@ -1,19 +1,21 @@
+import { updateBar, updatePerlin } from "../debug.js";
 import { Game } from "../main.js";
 import { ClearLines } from "./clearlines.js";
 import { LockPiece } from "./locking.js";
+import { PerlinNoise } from "./perlin.js";
 
 export class Mechanics {
     board;
     isTspin = false;
     isAllspin = false;
     isMini = false;
-    garbageQueue = 0;
     spikeCounter = 0;
     toppingOut = false;
 
     constructor() {
         this.clear = new ClearLines();
         this.locking = new LockPiece();
+        this.perlin = new PerlinNoise(1, 0.2);
     }
 
     checkDeath(coords, collider) {
@@ -90,7 +92,7 @@ export class Mechanics {
         );
     }
 
-    addGarbage(lines, messiness = 100) {
+    addGarbage(lines, messiness = 100) { // todo: messiness should persist across all garbage sent in a game
         let randCol = Math.floor(Math.random() * 10);
         for (let i = 0; i < lines; i++) {
             if (Game.movement.checkCollision(Game.board.getMinos("A"), "DOWN")) {
@@ -134,5 +136,27 @@ export class Mechanics {
         Game.renderer.renderDanger();
         this.startGravity();
         Game.renderer.updateHold();
+    }
+
+    attackCaps = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 5]
+    sendMeter = 0;
+    simulateGarbage(time) {
+        if (Game.settings.game.gamemode != "zenith") return;
+        if (time % (Game.tickrate / 2) != 0) return; // 0.5s clock
+        const floor = Game.zenith.GetFloorLevel(Game.zenith.altitude);
+
+        const val = this.perlin.getVal(time / Game.tickrate) - (0.6 - floor * 0.02);
+        if (val > 0) this.sendMeter += val
+        updatePerlin(val);
+        updateBar(this.sendMeter / 4 * 100)
+
+        this.perlin.amplitude = 1.1 + (floor * 0.05);
+        const maxAttack = this.attackCaps[floor];
+
+        if (this.sendMeter >= 4) {
+            const attack = Math.ceil(Math.random() * maxAttack);
+            Game.garbage.addGarbageQueue(attack);
+            this.sendMeter = 0
+        }
     }
 }

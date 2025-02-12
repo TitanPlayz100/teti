@@ -66,6 +66,8 @@ export class Visuals {
         if (Game.settings.display.showIndicators == false) bagSeperator.visible = false
         Game.pixi.bagSeperator = bagSeperator
 
+        const garbBar = new PIXI.Graphics().rect(0, 0, width * 1 / 40, height).fill(0xffffff, 0.5);
+
         this.baseContainer("board", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts, rect);
         this.baseContainer("grid", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts, null, true);
         this.baseContainer("hold", { dx: 0, dy: height * 2 / 20, pivotdx: width * 2 / 5, pivotdy: 0 }, consts, clickhold);
@@ -75,6 +77,7 @@ export class Visuals {
         this.baseContainer("textContainer", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts, null, true);
         this.baseContainer("rotationCenterC", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts, rotationCenter, true);
         this.baseContainer("bagSeperatorC", { dx: 0, dy: height * 1 / 20, pivotdx: width * -11 / 10, pivotdy: 0 }, consts, bagSeperator, true);
+        this.baseContainer("garbageBar", { dx: 0, dy: 0, pivotdx: width * 1 / 40, pivotdy: 0 }, consts, null);
     }
 
     /** @param {PixiRender} pixi */

@@ -22,7 +22,7 @@ export class Sounds {
      * If false, skips if audio is already playing
      */
     playSound(audioName, replace = true, silent = false) {
-        if (this.sfx[audioName] == undefined) return;
+        if (this.sfx[audioName] == undefined) { console.log(audioName + " not found"); return; }
         this.sfx[audioName].muted = silent;
         this.sfx[audioName].volume = Game.settings.volume.sfxLevel / 1000;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;

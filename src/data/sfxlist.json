@@ -230,5 +230,21 @@
     {
         "name": "hyperalert",
         "path": "assets/sfx/hyperalert.mp3"
+    },
+    {
+        "name": "countdown5",
+        "path": "assets/sfx/countdown5.mp3"
+    },
+    {
+        "name": "countdown4",
+        "path": "assets/sfx/countdown4.mp3"
+    },
+    {
+        "name": "go",
+        "path": "assets/sfx/go.mp3"
+    },
+    {
+        "name": "offset",
+        "path": "assets/sfx/offset.mp3"
     }
 ]

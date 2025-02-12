@@ -60,6 +60,7 @@ window.addEventListener("focus", function () {
 });
 
 window.addEventListener("blur", function () {
+    if (Game.settings.display.pauseNoFocus && !Game.modals.open) Game.modals.openModal("settingsPanel");
     if (!Game.settings.display.outoffocus) return
     document.getElementById("nofocus").style.display = "block";
 });

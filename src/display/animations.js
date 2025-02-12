@@ -112,14 +112,17 @@ export class Animations {
         const go = this.texts.go.sprite;
         this.texts.ready.animation = gsap.timeline()
             .to(ready, { duration: 0, pixi: { alpha: 1, scale: 1 } })
+            .add(() => { Game.sounds.playSound("countdown5") })
             .to(ready, { duration: 0.5, pixi: { scale: 1.6, alpha: 0 }, ease: "power1.out" })
         this.texts.set.animation = gsap.timeline()
             .to(set, { duration: 0, pixi: { alpha: 0, scale: 1 } })
             .to(set, { duration: 0, pixi: { alpha: 1, scale: 1 } }, 0.3)
+            .add(() => Game.sounds.playSound("countdown4"))
             .to(set, { duration: 0.5, pixi: { scale: 1.6, alpha: 0 }, ease: "power1.out" })
         this.texts.go.animation = gsap.timeline()
             .to(go, { duration: 0, pixi: { alpha: 0, scale: 1 } })
             .to(go, { duration: 0, pixi: { alpha: 1, scale: 1 } }, 0.6)
+            .add(() => Game.sounds.playSound("go"))
             .to(go, { duration: 1, pixi: { scale: 2, alpha: 0 }, ease: "power1.out" })
     }
 

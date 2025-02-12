@@ -18,7 +18,8 @@
             "clearDelay": 0,
             "randomiser": "7-bag",
             "kicktable": "SRS+",
-            "readysetgo": true
+            "readysetgo": true,
+            "garbageTravelTime": 0.5
         },
         "handling": {},
         "displayName": "Unset",
@@ -152,7 +153,8 @@
             "requiredAltitude": 1650,
             "gravitySpeed": 950,
             "allspin": true,
-            "allspinminis": true
+            "allspinminis": true,
+            "garbageTravelTime": 1
         }
     },
     "classic": {

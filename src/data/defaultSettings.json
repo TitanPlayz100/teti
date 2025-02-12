@@ -17,7 +17,8 @@
         "particleSize":1,
         "skin":"tetrio",
         "actionText": true,
-        "showIndicators": true
+        "showIndicators": true,
+        "pauseNoFocus": true
     },
     "game": {
         "gravitySpeed": 950,
@@ -48,7 +49,8 @@
         "lookAheadPieces": 3,
         "raceTarget": 500,
         "requiredAltitude": 1650,
-        "readysetgo": false
+        "readysetgo": false,
+        "garbageTravelTime": 0.5 
     },
     "control": {
         "rightKey": "ArrowRight",

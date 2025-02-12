@@ -71,7 +71,6 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 Things that might be in progress
 - gravity increase over time (and maybe fix softdrop)
 - pro mode (large line count on board)
-- option to pause on focus loss
 - fix responsive design 
 
 Zenith mode additions
@@ -82,11 +81,6 @@ Zenith mode additions
     - 11:00 - debuff increased to 50% more garbage
     - 12:00 - 5 more permanent garbage (10 total)
 
-- maybe add a "currently in hyperspeed" graphic
-- simulated garbage recieving option
-    - amount of garbage sent to player increases with floor
-    - garbage is random bursts
-    - attacks 8 or larger split using {!!} thing (0.5s gap)
 - option for expert mode style
 
 [Longterm ideas here](#feature-wishlist)
@@ -94,6 +88,17 @@ Zenith mode additions
 ***
 
 ## Updates
+#### v1.4.4
+- added sfx for ready set go
+- option to pause on focus loss
+- the hyperspeed animation looks *CLEAN*
+- completely changed sending garbage code
+- added cooldown for incoming garbage similar to tetrio
+- added random bursting garbage in zenith mode
+- animation for garbage bar similar to tetrio
+- some temporary debug graphs added for random garbage generation
+- fixed a small bug
+
 #### v1.4.3
 - added bag seperators
 - added rotation center indicator
@@ -320,6 +325,7 @@ Zenith mode additions
 ## Feature Wishlist
 Possible directions for game, kinda ordered by ease and desire
 - add beta tetrio features (surge, pco nerf, immobile tspins, garbage clearing buff )
+- import export tetrio simple player replays
 - finesse detection
 - custom game presets
     - setting presets for display settings and game settings

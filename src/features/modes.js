@@ -129,6 +129,7 @@ export class Modes {
         return resultSuffix[modeinfo.result] ?? " (legacy)";
     }
 
+    // GAMEMODE SPECIFIC FUNCTIONS
     diggerAddGarbage(removed) {
         if (Game.stats.getRemainingGarbage() > 10 && Game.settings.game.gamemode == "digger")
             Game.mechanics.addGarbage(removed);
@@ -152,5 +153,16 @@ export class Modes {
                 : 10;
         if (Game.stats.getRemainingGarbage() > 0 && start && Game.settings.game.gamemode == 'digger')
             Game.mechanics.addGarbage(rows);
+    }
+
+    backfireGarbage(damage) {
+        const garb = damage * Game.settings.game.backfireMulti;
+        if (Game.garbage.garbageQueueTotal() > 0) {
+            Game.garbage.removeGarbage(garb);
+        } else {
+            Game.garbage.removeGarbage(garb);
+            Game.garbage.addGarbageQueue(garb);
+        }
+
     }
 }

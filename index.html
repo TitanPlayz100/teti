@@ -18,12 +18,22 @@
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/gsap.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/PixiPlugin.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/CustomEase.min.js"></script>
+    <!-- temporary -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script> -->
     <script defer src="./src/main.js" type="module"></script>
 </head>
 <body id="body">
     <!-- BOARD -->
+    <!-- <div id="chart1" style="width: 100px; height: 200px;  position: fixed; top:0; left: 0;">
+        <canvas id="sendChanceBar"></canvas>
+    </div>
+    <div id="chart2" style="width: 500px; height: 200px;  position: fixed; top:0; left: 100px;">
+        <canvas id="perlin"></canvas>
+    </div> -->
+
     <div id="board">
-        <progress id="garbageQueue" max="40" value="0"></progress>
+        <progress id="garbageQueue" max="40" value="0" style="display: none;"></progress>
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
         <progress id="climbSpeedBar" max="100" value="0"></progress>
@@ -138,6 +148,7 @@
             <div class="settingRow"><p>Rainbow effect on fast pace</p> <input class="option check" type="checkbox" id="rainbowPB" /></div>
             <div class="settingRow"><p>Show Lock Bar</p> <input class="option check" type="checkbox" id="lockBar" /></div>
             <div class="settingRow"><p>Show out of focus text</p> <input class="option check" type="checkbox" id="outoffocus" /></div>
+            <div class="settingRow"><p>Pause on focus loss</p> <input class="option check" type="checkbox" id="pauseNoFocus" /></div>
             <div class="settingRow"><p>Action Text</p> <input class="option check" type="checkbox" id="actionText" /></div>
             <div class="settingRow"><p>Enable Particles</p> <input class="option check" type="checkbox" id="particles" /></div>
             <div class="settingRow"><p>Particle Volume</p> <input class="option range" type="range" id="particleVolume" min="5" max="1000" step="5" /></div>
@@ -160,6 +171,7 @@
             <div class="settingRow"><p>Lock delay</p> <input class="option range" type="range" id="lockDelay" min="0" max="1000" step="10" /></div>
             <div class="settingRow"><p>Lock Movements</p><input class="option range" type="range" id="maxLockMovements" min="0" max="30" step="1" /></div>
             <div class="settingRow"><p>Next Pieces</p> <input class="option range" type="range" id="nextPieces" min="0" max="5" step="1" /></div>
+            <div class="settingRow"><p>Garbage travel time</p> <input class="option range" type="range" id="garbageTravelTime" min="0" max="5" step="0.05" /></div>
             <div class="settingRow"><p>Lockout Deaths</p> <input class="option check" type="checkbox" id="allowLockout" /></div>
             <div class="settingRow"><p>Preserve DAS</p> <input class="option check" type="checkbox" id="preserveARR" /></div>
             <div class="settingRow"><p>Allow Hold Queue</p> <input class="option check" type="checkbox" id="allowHold" /></div>

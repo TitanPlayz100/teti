@@ -39,11 +39,12 @@ export class PixiRender {
 
         const labels = [
             "grid", "board", "clickArea", "next", "hold", "textContainer", 
-            "particles", "rotationCenterC", "bagSeperatorC"
+            "particles", "rotationCenterC", "bagSeperatorC", "garbageBar"
         ];
         const containers = this.visuals.generateContainers(labels);
         this.board = containers["board"];
         this.particleContainer = containers["particles"];
+        this.garbageBar = containers["garbageBar"];
 
         Game.particles.initBoard();
         await this.generateTextures();
@@ -377,6 +378,36 @@ export class PixiRender {
         return p;
     }
 
+    // Garbage Bar
+    addGarbage(damage, queueTotal, sent) {
+        const y = this.height * (1 - queueTotal / 20);
+        const height = this.height * (damage / 20);
+        const garbRect = new PIXI.Graphics()
+            .rect(0, y, this.width * 1 / 40, height)
+            .stroke({ color: 'red', width: 2, alpha: sent ? 1 : 0.6 })
+            .fill({ color: 'red', alpha: sent ? 1 : 0.2 });
+        this.garbageBar.addChild(garbRect);
+
+        if (sent) return;
+        const yPos = garbRect.y
+        gsap.timeline()
+            .to(garbRect, { duration: 0, pixi: { y: yPos - this.minoSize } })
+            .to(garbRect, { duration: 0.3, pixi: { y: yPos }, ease: "bounce.out" })
+    }
+
+    updateGarbageBar(queue) {
+        if (this.garbageBar == undefined) return; // bandage patch
+
+        this.garbageBar.children.forEach(child => child.destroy());
+        this.garbageBar.removeChildren();
+
+        let prevDamage = 0
+        queue.forEach(g => {
+            prevDamage += g.damage
+            this.addGarbage(g.damage, prevDamage, g.travel <= 0);
+        })
+    }
+
 
     // QP
     _speedrunMeta = {
@@ -391,7 +422,7 @@ export class PixiRender {
 
 
     CreateSpeedrunContainer() {
-        if(this._speedrunMeta.container || Game.settings.game.gamemode != "zenith") return
+        if(this._speedrunMeta.container) return
             this._speedrunMeta.container = new PIXI.Container,
             this._speedrunMeta.container.scale.set(.7),
             this._speedrunMeta.container.zIndex = 50,
@@ -551,7 +582,7 @@ export class PixiRender {
 
     StopSpeedrun(){
         CustomEase.create("splitsDrop", ".21, .45, .73, .99");
-
+        
         for (let e = 0; e < 9; e++){
             this._speedrunMeta.splits[e].container.pivot.y = 0,
             this._speedrunMeta.splits[e].container.rotation = 0,

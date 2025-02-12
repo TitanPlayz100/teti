@@ -21,6 +21,7 @@ import { Zenith, Grandmaster } from "./mechanics/gamemode_extended.js";
 import { PixiRender } from "./display/pixirender.js";
 import { Animations } from "./display/animations.js";
 import { Replay } from "./features/replays.js";
+import { Garbage } from "./mechanics/garbage.js";
 
 export class GameClass {
     started;
@@ -30,7 +31,7 @@ export class GameClass {
     gravityTimer = 0;
     zenithTimer = 0;
     grandmasterTimer = 0;
-    version = '1.4.0';
+    version = '1.4.4';
     tickrate = 60;
 
     elementReason = document.getElementById("reason");
@@ -59,6 +60,7 @@ export class GameClass {
         this.zenith = new Zenith();
         this.grandmaster = new Grandmaster();
         this.pixi = new PixiRender();
+        this.garbage = new Garbage();
         this.animations = new Animations();
         this.replay = new Replay();
 
@@ -153,13 +155,13 @@ export class GameClass {
 
         this.bag = new Bag(seed);
         this.mechanics = new Mechanics();
+        this.garbage = new Garbage();
         this.falling = new Falling();
         this.hold = new Hold();
         this.stats = new GameStats();
         this.history = new History();
         this.zenith = new Zenith();
         this.grandmaster = new Grandmaster();
-
 
         this.renderer.renderSidebar();
         this.modes.checkFinished();
@@ -173,6 +175,8 @@ export class GameClass {
         this.modes.checkFinished();
         this.stats.updateStats();
         this.boardeffects.rainbowBoard();
+        this.mechanics.simulateGarbage(this.zenith.tickPass);
+        this.garbage.tickGarbage();
     }
 
     versionChecker() {
