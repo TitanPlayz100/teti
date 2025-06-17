@@ -12,6 +12,23 @@
     overflow: visible;
 }
 
+#settingMenuTop,
+#settingMenuBottom,
+#settingMenuMiddle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100vw;
+}
+
+#settingMenuTop > *,
+#settingMenuBottom > *,
+#settingMenuMiddle > * {
+    opacity: 0;
+} 
+
 .fullWidth {
     width: 100%;
 }
@@ -52,7 +69,7 @@ button>img {
 
 .settingPanelButton:hover {
     border: 0.3vh solid var(--cl-blue);
-    transition: all 0.1s ease;
+    transition: opacity 0.1s ease;
 }
 
 .settingPanelButton:disabled,

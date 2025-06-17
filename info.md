@@ -55,6 +55,7 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
     - semi invis mode
     - 4W
     - Race (TGM style)
+    - Zenith climb (with simulated garbage)
 - edit and draw on board (custom game)
 - custom menu to import/export board states, and edit garbage
 - undo and redo with non linear branches
@@ -69,9 +70,10 @@ Skins from [YHF](https://you.have.fail/ed/at/tetrioplus/)
 
 ## TODO list
 Things that might be in progress
+- A different main menu
+
 - gravity increase over time (and maybe fix softdrop)
 - pro mode (large line count on board)
-- fix responsive design 
 
 Zenith mode additions
 - add fatigue:
@@ -95,6 +97,7 @@ Zenith mode additions
 - fixed errors hapenning when resizing during an animation
 - removed commented debug graphs
 - slightly changed addGarbage function
+- added main menu animations
 
 #### v1.4.4
 - added sfx for ready set go

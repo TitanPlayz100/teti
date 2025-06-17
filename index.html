@@ -54,65 +54,72 @@
     <!-- MAIN MENU -->
     <dialog id="settingsPanel" class="dialog">
         <!-- top row -->
-        <button id="closeSettings" class="settingPanelButton smallPanelButton" onclick="menu.toggleDialog()" title="Continue playing">
-            <img src="./assets/icons/play.svg" style="transform: translateY(-15%); height: 200%;">
-        </button>
-        <button id="handling" class="settingPanelButton smallPanelButton" onclick="modal.openModal('handlingDialog')" title="Change handling/tuning">
-            <img src="./assets/icons/handling.svg" style="transform: translateY(10%); height: 90%;">
-        </button>
-        <button id="volume" class="settingPanelButton smallPanelButton" onclick="modal.openModal('volumeDialog')" title="Change audio settings">
-            <img src="./assets/icons/volume.svg" style="transform: translateY(5%); height: 110%;">
-        </button>
-        <button id="goals" class="settingPanelButton smallPanelButton" onclick="modal.openModal('goalsDialog')" title="Change goals for gamemodes">
-            <img src="./assets/icons/goal.svg" style="transform: translateY(0%); height: 130%;">
-        </button>
-        <button id="competitive" class="settingPanelButton smallPanelButton" onclick="modal.openModal('competitiveDialog')" title="Toggle competitive mode and view PBs">
-            <img src="./assets/icons/medal.svg" style="transform: translateY(-8%); height: 140%;">
-        </button>
-        <button id="replays" class="settingPanelButton smallPanelButton" onclick="modal.openModal('replaysDialog')" title="Play replay">
-            <img src="./assets/icons/history.svg" style="transform: translateY(10%); height: 100%;">
-        </button>
+         <div id="settingMenuTop">
+             <button id="closeSettings" class="settingPanelButton smallPanelButton" onclick="menu.toggleDialog()" title="Continue playing">
+                 <img src="./assets/icons/play.svg" style="transform: translateY(-15%); height: 200%;">
+             </button>
+             <button id="handling" class="settingPanelButton smallPanelButton" onclick="modal.openModal('handlingDialog')" title="Change handling/tuning">
+                 <img src="./assets/icons/handling.svg" style="transform: translateY(10%); height: 90%;">
+             </button>
+             <button id="volume" class="settingPanelButton smallPanelButton" onclick="modal.openModal('volumeDialog')" title="Change audio settings">
+                 <img src="./assets/icons/volume.svg" style="transform: translateY(5%); height: 110%;">
+             </button>
+             <button id="goals" class="settingPanelButton smallPanelButton" onclick="modal.openModal('goalsDialog')" title="Change goals for gamemodes">
+                 <img src="./assets/icons/goal.svg" style="transform: translateY(0%); height: 130%;">
+             </button>
+             <button id="competitive" class="settingPanelButton smallPanelButton" onclick="modal.openModal('competitiveDialog')" title="Toggle competitive mode and view PBs">
+                 <img src="./assets/icons/medal.svg" style="transform: translateY(-8%); height: 140%;">
+             </button>
+             <button id="replays" class="settingPanelButton smallPanelButton" onclick="modal.openModal('replaysDialog')" title="Play replay">
+                 <img src="./assets/icons/history.svg" style="transform: translateY(10%); height: 100%;">
+             </button>
+        </div>
         <div class="fullWidth"></div>
 
         <!-- main row -->
-        <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="User Settings - Graphics, board, and background"> 
-            <img src="./assets/icons/display.svg" style="transform: translateY(10%);">
-            <p>GRAPHICS</p>
-        </button>
-        <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - Gameplay features and mechanics">
-            <img src="./assets/icons/settings.svg">
-            <p>GAME</p>
-        </button>
-        <button id="control" class="settingPanelButton" onclick="modal.openModal('controlDialog')" title="Controls - keybinds for different actions">
-            <img src="./assets/icons/joystick.svg">
-            <p>CONTROLS</p>
-        </button>
-        <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
-            <img src="./assets/icons/timer.svg">
-            <p>GAMEMODE</p>
-        </button>
+         <div id="settingMenuMiddle">
+             <button id="display" class="settingPanelButton" onclick="modal.openModal('displayDialog')" title="User Settings - Graphics, board, and background"> 
+                 <img src="./assets/icons/display.svg" style="transform: translateY(10%);">
+                 <p>GRAPHICS</p>
+             </button>
+             <button id="game" class="settingPanelButton" onclick="modal.openModal('gameDialog')" title="Game Settings - Gameplay features and mechanics">
+                 <img src="./assets/icons/settings.svg">
+                 <p>GAME</p>
+             </button>
+             <button id="control" class="settingPanelButton" onclick="modal.openModal('controlDialog')" title="Controls - keybinds for different actions">
+                 <img src="./assets/icons/joystick.svg">
+                 <p>CONTROLS</p>
+             </button>
+             <button id="gamemode" class="settingPanelButton" onclick="modal.openModal('gamemodeDialog')" title="Select Gamemode / Change goals">
+                 <img src="./assets/icons/timer.svg">
+                 <p>GAMEMODE</p>
+             </button>
+         </div>
         <div class="fullWidth"></div>
 
-        <!-- bottom row -->
+        <!-- extra text -->
         <p id='explanationText'><span class="spanleft">Hover for info</span> | <span class="spanright">Esc to close</span></p>
         <div class="fullWidth"></div>
 
         <p id='updatetext'>Check out the new update in the info button</p>
         <div class="fullWidth"></div>
-
-        <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="window.location = './info.html'" title="See info about this project">
-            <img src="./assets/icons/info.svg" style="height: 80%;">
-        </button>
-        <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
-            <img src="./assets/icons/download.svg" style="transform: translateY(10%); height: 90%;">
-        </button>
-        <div id="uploadSettings" class="settingPanelButton smallPanelButton" style="box-sizing: border-box;" onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
-            <input type="file" id="fileUpload" onchange="menu.uploadSettings(this)" hidden accept=".teti">
-            <img src="./assets/icons/upload.svg" style="transform: translateY(10%); height: 90%;">
+        
+        <!-- bottom row -->
+        <div id="settingMenuBottom">
+            <button id="projectinfo" class="settingPanelButton smallPanelButton" onclick="window.location = './info.html'" title="See info about this project">
+                <img src="./assets/icons/info.svg" style="height: 80%;">
+            </button>
+            <button id="downloadSettings" class="settingPanelButton smallPanelButton" onclick="menu.downloadSettings()" title="Download / Export Settings">
+                <img src="./assets/icons/download.svg" style="transform: translateY(10%); height: 90%;">
+            </button>
+            <div id="uploadSettings" class="settingPanelButton smallPanelButton" style="box-sizing: border-box;" onclick="document.getElementById('fileUpload').click()" title="Upload / Import Settings (only .teti files)">
+                <input type="file" id="fileUpload" onchange="menu.uploadSettings(this)" hidden accept=".teti">
+                <img src="./assets/icons/upload.svg" style="transform: translateY(10%); height: 90%;">
+            </div>
+            <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="See the github page, star if you like it">
+                <img src="./assets/icons/github.svg" style="transform: translateY(-14%); height: 200%;">
+            </button>
         </div>
-        <button id="projectgithub" class="settingPanelButton smallPanelButton" onclick="menu.openPage('github.com/TitanPlayz100/teti')" title="See the github page, star if you like it">
-            <img src="./assets/icons/github.svg" style="transform: translateY(-14%); height: 200%;">
-        </button>
         <div class="fullWidth"></div>
 
         <div id="songSelector">

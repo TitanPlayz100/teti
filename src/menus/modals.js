@@ -7,6 +7,9 @@ export class ModalActions {
     selectedRangeElement;
 
     settingPanel = document.getElementById("settingsPanel");
+    settingmenutop = document.getElementById("settingMenuTop");
+    settingmenumiddle = document.getElementById("settingMenuMiddle");
+    settingmenubottom = document.getElementById("settingMenuBottom");
     options = [...document.getElementsByClassName("option")];
 
     constructor() {
@@ -42,8 +45,32 @@ export class ModalActions {
         if (id == "gamemodeDialog") this.generate.highlightGamemodeInMenu();
         if (id == "competitiveDialog") this.generate.renderPBs();
         if (id != "settingsPanel" && this.settingPanel.open) this.closeDialog(this.settingPanel);
+        if (id == "settingsPanel") this.animateSettingsPanel();
         this.open = true;
         Game.sounds.toggleSongMuffle(this.open);
+    }
+
+    animateSettingsPanel() {
+        const top = Array.from(this.settingmenutop.children);
+        const middle = Array.from(this.settingmenumiddle.children);
+        const bottom = Array.from(this.settingmenubottom.children);
+
+        // remove hover then add it back later
+        top.forEach(el => el.style.transition = 'none');
+        middle.forEach(el => el.style.transition = 'none');
+        bottom.forEach(el => el.style.transition = 'none');
+        const resetTransition = (el) => el.style.transition = ''
+
+        gsap.timeline({onComplete: () => {top.forEach(resetTransition)}})
+            .set(top, {y: 50, immediateRender: true, opacity: 0})
+            .to(top, {duration: 0.5, y: 0, stagger: 0.04, opacity: 1, ease: "power2.out"})
+        gsap.timeline({onComplete: () => {bottom.forEach(resetTransition)}})
+            .set(bottom, {y: -50, immediateRender: true, opacity: 0})
+            .to(bottom, {duration: 0.5, y: 0, stagger: -0.04, opacity: 1,  ease: "power2.out"})
+        gsap.timeline({onComplete: () => {middle.forEach(resetTransition)}})
+            .set(middle, {x: 0, immediateRender: true, opacity: 0})
+            .to(middle.slice(0, 2), {duration: 0.6, x: -10, stagger: -0.2, opacity: 1,  ease: "power2.out"}, "0")
+            .to(middle.slice(2, 4), {duration: 0.6, x: 10, stagger: 0.2, opacity: 1,  ease: "power2.out"}, "0")
     }
 
     getOptions(id) {
