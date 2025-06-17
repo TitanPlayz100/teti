@@ -12,7 +12,7 @@ export class Mechanics {
     toppingOut = false;
 
     curGarbageCol;
-    garbageMessiness = 50;
+    garbageMessiness = 100;
 
     constructor() {
         this.clear = new ClearLines();
