@@ -34,7 +34,7 @@ export class PixiRender {
 
     async init() {
         this.app = new PIXI.Application();
-        await this.app.init({ backgroundAlpha: 0, resizeTo: window, autoDensity: true });
+        await this.app.init({ backgroundAlpha: 0, resizeTo: window, autoDensity: true, resolution: 1 });
         document.body.prepend(this.app.canvas);
 
         const labels = [
@@ -49,19 +49,15 @@ export class PixiRender {
         Game.particles.initBoard();
         await this.generateTextures();
         this.resize();
-        this.generateAllSprites("board", Game.board.boardState, 39);
-        this.generateAllSprites("hold", Game.renderer.holdQueueGrid, 2);
-        this.generateAllSprites("next", Game.renderer.nextQueueGrid, 15);
-        Game.renderer.updateHold();
-
-        this.app.ticker.add(time => this.tick(time));
+        
+        this.app.ticker.add((deltaTime) => this.tick());
     }
 
     resize() {
         const scale = Number(Game.settings.display.boardHeight) / 100;
         const screenHeight = Math.floor(this.app.screen.height / 2);
         const screenWidth = Math.floor(this.app.screen.width / 2);
-        this.height = Math.floor(screenHeight * 2 * 0.6 * scale / 40) * 40;
+        this.height = Math.floor(screenHeight * 2 * 0.6 * scale / 20) * 20;
         this.width = this.height / 2;
         this.minoSize = this.height / 20;
 
@@ -74,14 +70,19 @@ export class PixiRender {
         this.generateGrid();
         this.resetAnimGraphic();
         this.generateClickMinos();
-        this.repositionSpeedrunContainer()
+        this.repositionSpeedrunContainer();
+
+        this.generateAllSprites("board", Game.board.boardState, 39);
+        this.generateAllSprites("hold", Game.renderer.holdQueueGrid, 2);
+        this.generateAllSprites("next", Game.renderer.nextQueueGrid, 15);
+        Game.renderer.updateHold();
     }
 
     // GRAPHICS and GENERATORS
     buttonGraphics(width) {
         const iconframe = (texture, scale, y) => {
             const icon = new PIXI.Sprite(texture)
-            icon.scale.set(scale)
+            icon.scale.set(scale * width * 0.004)
             icon.x = width * 1.525
             icon.y = y
             icon.interactive = true
@@ -235,7 +236,7 @@ export class PixiRender {
     }
 
     // RENDER CLOCK
-    tick(time) {
+    tick() {
         Game.replay.tick();
         Game.controls.runKeyQueue();
         Game.controls.timer();

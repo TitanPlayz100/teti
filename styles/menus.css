@@ -12,9 +12,8 @@
     overflow: visible;
 }
 
-#settingsPanel>br {
+.fullWidth {
     width: 100%;
-    content: ' ';
 }
 
 button>img {

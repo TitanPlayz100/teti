@@ -1,4 +1,3 @@
-import { updateBar, updatePerlin } from "../debug.js";
 import { Game } from "../main.js";
 import { ClearLines } from "./clearlines.js";
 import { LockPiece } from "./locking.js";
@@ -11,6 +10,9 @@ export class Mechanics {
     isMini = false;
     spikeCounter = 0;
     toppingOut = false;
+
+    curGarbageCol;
+    garbageMessiness = 50;
 
     constructor() {
         this.clear = new ClearLines();
@@ -92,24 +94,34 @@ export class Mechanics {
         );
     }
 
-    addGarbage(lines, messiness = 100) { // todo: messiness should persist across all garbage sent in a game
-        let randCol = Math.floor(Math.random() * 10);
-        for (let i = 0; i < lines; i++) {
-            if (Game.movement.checkCollision(Game.board.getMinos("A"), "DOWN")) {
-                if (this.locking.timings.lockdelay == 0) this.locking.scheduleLock();
-                Game.board.moveMinos(Game.board.getMinos("A"), "UP", 1);
-            }
-            Game.board.moveMinos(Game.board.getMinos("S"), "UP", 1);
-            const mustchange = Math.floor(Math.random() * 100);
-            if (mustchange < messiness) randCol = Math.floor(Math.random() * 10);
-            for (let col = 0; col < 10; col++) {
-                if (col != randCol) Game.board.addMinos("S G", [[col, 0]], [0, 0]);
-            }
+    addGarbage(lines) {
+        // switch col depending on messiness
+        let switchColumn = Math.floor(Math.random() * 100) < this.garbageMessiness;
+        if (this.curGarbageCol == undefined || switchColumn) {
+            this.curGarbageCol = Math.floor(Math.random() * 10);
         }
-        this.setShadow();
 
-        if (lines >= 8) Game.sounds.playSound("garbagesmash")
-        else Game.sounds.playSound("garbagerise")
+        for (let i = 0; i < lines; i++) {
+            const col = this.curGarbageCol;
+            this.addSingleGarbageLine(col);
+        }
+
+        this.setShadow();
+        if (lines >= 8) Game.sounds.playSound("garbagesmash");
+        else Game.sounds.playSound("garbagerise");
+    }
+
+    addSingleGarbageLine(column) {
+        const allminos = Game.board.getMinos("A"); // move all minos up
+        if (Game.movement.checkCollision(allminos, "DOWN")) {
+            if (this.locking.timings.lockdelay == 0) this.locking.scheduleLock();
+            Game.board.moveMinos(allminos, "UP", 1);
+        }
+
+        Game.board.moveMinos(Game.board.getMinos("S"), "UP", 1);
+        for (let col = 0; col < 10; col++) {
+            if (col != column) Game.board.addMinos("S G", [[col, 0]], [0, 0]);
+        }
     }
 
     switchHold() {
@@ -147,8 +159,6 @@ export class Mechanics {
 
         const val = this.perlin.getVal(time / Game.tickrate) - (0.6 - floor * 0.02);
         if (val > 0) this.sendMeter += val
-        updatePerlin(val);
-        updateBar(this.sendMeter / 4 * 100)
 
         this.perlin.amplitude = 1.1 + (floor * 0.05);
         const maxAttack = this.attackCaps[floor];

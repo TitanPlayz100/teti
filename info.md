@@ -88,6 +88,14 @@ Zenith mode additions
 ***
 
 ## Updates
+#### v1.4.5
+- ui text and icons are now properly scaled for different resolutions
+- fixed pressing spacebar in main menu causing bugs (accidentally switched replay state)
+- fixed main menu rows not aligning correctly (br no longer worked)
+- fixed errors hapenning when resizing during an animation
+- removed commented debug graphs
+- slightly changed addGarbage function
+
 #### v1.4.4
 - added sfx for ready set go
 - option to pause on focus loss

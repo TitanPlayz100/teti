@@ -19,10 +19,11 @@ export class Replay {
     }
 
     togglePause() {
-        this.state = (this.state == "replaying") ? "idle" : "replaying";
-        if (this.state == "idle") {
+        if (this.state == "replaying") {
+            this.state = "idle"
             Game.stopGameTimers();
-        } else {
+        } else if (this.state == "idle") {
+            this.state = "replaying";
             Game.movement.startTimers();
         }
     }

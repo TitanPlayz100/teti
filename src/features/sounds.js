@@ -27,7 +27,9 @@ export class Sounds {
         this.sfx[audioName].volume = Game.settings.volume.sfxLevel / 1000;
         if (!replace && !this.sfx[audioName].ended && this.sfx[audioName].currentTime != 0) return;
         this.sfx[audioName].currentTime = 0;
-        this.sfx[audioName].play();
+        try {
+            this.sfx[audioName].play();
+        } catch (error) {()=>{}}
     }
 
     startSong() {

@@ -36,7 +36,7 @@ export class Garbage {
     sendGarbageQueue() {
         const garbage = this.garbageQueue.filter(g => g.travel <= 0);
         garbage.forEach(g => {
-            Game.mechanics.addGarbage(g.damage, 0);
+            Game.mechanics.addGarbage(g.damage);
             Game.stats.recieved += g.damage;
         })
         this.garbageQueue = this.garbageQueue.filter(g => g.travel > 0);

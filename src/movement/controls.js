@@ -20,7 +20,7 @@ export class Controls {
 
         if (key == this.menuKey) Game.menuactions.toggleDialog();
         else if (key == keys.editMenuKey) Game.menuactions.openEditMenu();
-        if (key == keys.pauseReplayKey && Game.replay.state != "running") {
+        if (key == keys.pauseReplayKey && Game.replay.state != "running" && !Game.modals.open) {
             Game.replay.togglePause(); return;
         }
 

@@ -131,8 +131,9 @@ export class Modes {
 
     // GAMEMODE SPECIFIC FUNCTIONS
     diggerAddGarbage(removed) {
-        if (Game.stats.getRemainingGarbage() > 10 && Game.settings.game.gamemode == "digger")
-            Game.mechanics.addGarbage(removed);
+        if (Game.stats.getRemainingGarbage() > 10 && Game.settings.game.gamemode == "digger") {
+            for (let i = 0; i < removed; i++) Game.mechanics.addGarbage(1);
+        }
     }
 
     set4WCols(start) {
@@ -151,8 +152,9 @@ export class Modes {
             Game.settings.game.requiredGarbage < 10
                 ? Game.settings.game.requiredGarbage
                 : 10;
-        if (Game.stats.getRemainingGarbage() > 0 && start && Game.settings.game.gamemode == 'digger')
-            Game.mechanics.addGarbage(rows);
+        if (Game.stats.getRemainingGarbage() > 0 && start && Game.settings.game.gamemode == 'digger') {
+            for (let i = 0; i < rows; i++) Game.mechanics.addGarbage(1);
+        }
     }
 
     backfireGarbage(damage) {

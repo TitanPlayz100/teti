@@ -26,13 +26,16 @@ export class Visuals {
      * @param {{dx: number, dy: number, pivotdx: number, pivotdy: number}} scales 
      * @param {{sw:number, sh:number, bw:number, bh:number}} consts
     */
-    baseContainer(label, scales, consts, graphic = null, removeChildren = false) {
+    baseContainer(label, scales, consts, graphic = null) {
         const container = Game.pixi.app.stage.getChildByLabel(label);
-        if (removeChildren) {
-            container.children.forEach(child => child.destroy());
-            container.removeChildren();
-        }
-        if (graphic != null) container.addChild(graphic);
+
+        container.children.forEach(child => {
+            gsap.killTweensOf(child)
+            child.destroy();
+        });
+        container.removeChildren();
+
+        if (graphic) container.addChild(graphic);
 
         container.x = consts.sw + scales.dx;
         container.y = consts.sh + scales.dy;
@@ -66,18 +69,19 @@ export class Visuals {
         if (Game.settings.display.showIndicators == false) bagSeperator.visible = false
         Game.pixi.bagSeperator = bagSeperator
 
-        const garbBar = new PIXI.Graphics().rect(0, 0, width * 1 / 40, height).fill(0xffffff, 0.5);
+        // const garbBar = new PIXI.Graphics().rect(0, 0, width * 1 / 40, height).fill(0xffffff, 0.5);
+        Game.particles.clearParticles();
 
         this.baseContainer("board", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts, rect);
-        this.baseContainer("grid", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts, null, true);
+        this.baseContainer("grid", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts);
         this.baseContainer("hold", { dx: 0, dy: height * 2 / 20, pivotdx: width * 2 / 5, pivotdy: 0 }, consts, clickhold);
         this.baseContainer("next", { dx: 0, dy: height * 1 / 20, pivotdx: width * -11 / 10, pivotdy: 0 }, consts, clicknext);
-        this.baseContainer("clickArea", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts, null, true);
+        this.baseContainer("clickArea", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts);
         this.baseContainer("particles", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts);
-        this.baseContainer("textContainer", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts, null, true);
-        this.baseContainer("rotationCenterC", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts, rotationCenter, true);
-        this.baseContainer("bagSeperatorC", { dx: 0, dy: height * 1 / 20, pivotdx: width * -11 / 10, pivotdy: 0 }, consts, bagSeperator, true);
-        this.baseContainer("garbageBar", { dx: 0, dy: 0, pivotdx: width * 1 / 40, pivotdy: 0 }, consts, null);
+        this.baseContainer("textContainer", { dx: 0, dy: 0, pivotdx: 0, pivotdy: 0 }, consts);
+        this.baseContainer("rotationCenterC", { dx: 0, dy: 0, pivotdx: 0, pivotdy: height }, consts, rotationCenter);
+        this.baseContainer("bagSeperatorC", { dx: 0, dy: height * 1 / 20, pivotdx: width * -11 / 10, pivotdy: 0 }, consts, bagSeperator);
+        this.baseContainer("garbageBar", { dx: 0, dy: 0, pivotdx: width * 1 / 40, pivotdy: 0 }, consts);
     }
 
     /** @param {PixiRender} pixi */
@@ -129,6 +133,7 @@ export class Visuals {
         const text = new PIXI.Text({ text: msg, style });
         text.resolution = 2;
         text.alpha = alpha;
+        text.style.fontSize *= window.innerHeight * 0.0014 / 1.25
         text.position.set(this.textPosConsts.width * pos.x + pos.dx,
             this.textPosConsts.height * pos.y + pos.dy);
         text.anchor.set(pos.anchorX, pos.anchorY);
