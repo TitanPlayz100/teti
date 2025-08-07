@@ -60,7 +60,7 @@ export class BoardEditor {
                 if (col[0] == "A") col = "";
                 if (col[0] == "S") col = col[2];
                 if (col.trim() == "") col = "_";
-                return col;
+                return col.trim();
             })
         }).join("")
         return `${boardstring}?${currPiece},${next}?${hold}`

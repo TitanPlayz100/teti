@@ -5,13 +5,13 @@ export class Falling {
     piece = null;
     location = [];
     moved = false;
-    rotation = 1;
+    rotation = 0;
 
     spawn(piece) {
         const dx = piece.name == "o" ? 4 : 3;
         const dy = piece.name == "o" ? 21 : piece.name == "i" ? 19 : 20;
         const initialRotations = kicks[Game.settings.game.kicktable].spawn_rotation ?? {}
-        this.rotation = initialRotations[piece.name] ?? 1;
+        this.rotation = initialRotations[piece.name] ?? 0;
 
         const coords = Game.board.pieceToCoords(piece[`shape${this.rotation}`]);
         Game.board.addMinos("A " + piece.name, coords, [dx, dy]);
@@ -27,14 +27,15 @@ export class Falling {
         let iPiece = this.piece.name == "i" ? "i_kicks" : "kicks";
         const type = `${this.rotation}${newRotation}`;
         const kicktable = Game.settings.game.kicktable;
-        const kickdata = (kicks[kicktable][iPiece] ?? {})[type] ?? [];
+        let kickdata = (kicks[kicktable][iPiece] ?? {})[type] ?? [];
         kickdata.unshift([0, 0]);
+        kickdata = kickdata.map(([x, y]) => {return [x, -y]});
         return kickdata
     }
 
     getRotateState(type) {
-        const newState = (this.rotation + { CW: 1, CCW: -1, 180: 2 }[type]) % 4;
-        return newState == 0 ? 4 : newState;
+        const change = { CW: 1, CCW: -1, 180: 2 }[type]
+        return ((this.rotation + change) % 4 + 4) % 4;
     }
 
     getNewCoords(rotation) {

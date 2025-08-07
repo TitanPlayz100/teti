@@ -29,7 +29,7 @@ export class Renderer {
             let [dx, dy] = [0, 3 * (4 - idx)];
             if (piece.name == "o") [dx, dy] = [dx + 1, dy + 1]; // shift o piece
             const initialRotations = kicks[Game.settings.game.kicktable].spawn_rotation ?? {}
-            const rotation = initialRotations[piece.name] ?? 1;
+            const rotation = initialRotations[piece.name] ?? 0;
             const coords = Game.board.pieceToCoords(piece[`shape${rotation}`]);
             coords.forEach(([x, y]) => (this.nextQueueGrid[y + dy][x + dx] = "A " + piece.name));
         });
@@ -47,7 +47,7 @@ export class Renderer {
             isI = name == "i";
         const [dx, dy] = [isO ? 1 : 0, isO ? 1 : isI ? -1 : 0];
         const initialRotations = kicks[Game.settings.game.kicktable].spawn_rotation ?? {}
-        const rotation = initialRotations[name] ?? 1;
+        const rotation = initialRotations[name] ?? 0;
         const coords = Game.board.pieceToCoords(Game.hold.piece[`shape${rotation}`]);
         coords.forEach(([x, y]) => (this.holdQueueGrid[y + dy][x + dx] = "A " + name));
 

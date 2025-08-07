@@ -64,7 +64,7 @@ export class Mechanics {
         const next = Game.bag.getFirstN(1)[0];
         const x = next.name == "o" ? 4 : 3;
         const y = next.name == "o" ? 21 : next.name == "i" ? 19 : 20;
-        Game.board.pieceToCoords(next.shape1, [x, y]).forEach(([x, y]) => Game.board.addValue([x, y], "NP"));
+        Game.board.pieceToCoords(next.shape0, [x, y]).forEach(([x, y]) => Game.board.addValue([x, y], "NP"));
     }
 
     setShadow() {

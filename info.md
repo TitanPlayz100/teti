@@ -90,6 +90,12 @@ Zenith mode additions
 ***
 
 ## Updates
+#### v1.4.5.2
+- Updated spin counting to go from 0 to 3 just like tetrio
+- Updated kick tables to be exacly from tetrio
+- (kicks in tetrio use pos y down, so had to add code to mirror this)
+- Copying map data sometimes left spaces
+
 #### v1.4.5
 - ui text and icons are now properly scaled for different resolutions
 - fixed pressing spacebar in main menu causing bugs (accidentally switched replay state)

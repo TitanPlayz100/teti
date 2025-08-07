@@ -51,8 +51,8 @@ export class Movement {
     checkTspin(rotation, [x, y], [dx, dy]) {
         if (Game.falling.piece.name != "t") return false;
         Game.mechanics.isMini = false;
-        const minos = spinChecks[(rotation + 1) % 4]
-            .concat(spinChecks[rotation - 1])
+        const minos = spinChecks[(rotation + 2) % 4]
+            .concat(spinChecks[rotation])
             .map(([ddx, ddy]) => this.checkCollision([[ddx + x, ddy + y]], "ROTATE"));
         if (minos[2] && minos[3] && (minos[0] || minos[1])) return true;
         if ((minos[2] || minos[3]) && minos[0] && minos[1]) {
