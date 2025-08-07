@@ -1,4 +1,4 @@
-import { Bag } from "./mechanics/randomisers.js";
+import { Bag, getPiece } from "./mechanics/randomisers.js";
 import { Board } from "./mechanics/board.js";
 import { Controls } from "./movement/controls.js";
 import { Hold } from "./mechanics/hold.js";
@@ -72,6 +72,7 @@ export class GameClass {
         this.renderer.setEditPieceColours();
         this.sounds.initSounds();
         this.startGame();
+        this.loadStateFromString(new URLSearchParams(window.location.search).get("map"));
         this.menuactions.addRangeListener();
         this.modals.generate.addMenuListeners();
         this.modals.generate.generateGamemodeMenu();
@@ -133,6 +134,16 @@ export class GameClass {
         this.elementReason.textContent = top;
         this.elementResult.textContent = bottom;
         this.profilestats.saveSession();
+    }
+
+    loadStateFromString(input) {
+        if (input) {
+            const { board, next, hold } = this.boardeditor.convertFromMap(input);
+            this.board.boardState = board;
+            this.bag.setQueue(next.split(","));
+            this.hold.piece = getPiece(hold);
+            this.mechanics.spawnPiece(this.bag.cycleNext());
+        }
     }
 
     resetState(seed = undefined) {
