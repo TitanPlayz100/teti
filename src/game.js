@@ -143,6 +143,7 @@ export class GameClass {
             this.bag.setQueue(next.split(","));
             this.hold.piece = getPiece(hold);
             this.mechanics.spawnPiece(this.bag.cycleNext());
+            this.history.save();
         }
     }
 
