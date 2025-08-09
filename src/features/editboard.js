@@ -76,6 +76,9 @@ export class BoardEditor {
                 return col
             });
         })
+        while (board.length < 40) {
+            board.push(["", "", "", "", "", "", "", "", "", ""]);
+        }
         return { board, next, hold }
     }
 }

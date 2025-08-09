@@ -1,5 +1,4 @@
 import { Game } from "../main.js";
-import { getPiece } from "../mechanics/randomisers.js";
 import { toExpValue } from "./modals.js";
 
 export class MenuActions {
@@ -179,11 +178,7 @@ export class MenuActions {
 
     setBoard() {
         const input = prompt("Enter Map String Here:")
-        const { board, next, hold } = Game.boardeditor.convertFromMap(input);
-        Game.board.boardState = board;
-        Game.bag.setQueue(next.split(","));
-        Game.hold.piece = getPiece(hold);
-        Game.mechanics.spawnPiece(Game.bag.cycleNext());
+        Game.loadStateFromString(input);
         Game.modals.generate.notif("Map Loaded", "Custom map has successfully loaded", "message");
     }
 
