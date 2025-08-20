@@ -9,7 +9,7 @@ export class Movement {
         Game.started = true;
         Game.mechanics.startGravity();
         Game.modes.startSurvival();
-        Game.mechanics.locking.lockingResume();
+        Game.locking.lockingResume();
         Game.gameTimer = true;
     }
 
@@ -83,12 +83,12 @@ export class Movement {
         Game.mechanics.isTspin = this.checkTspin(newRotation, Game.falling.location, change);
         Game.mechanics.isAllspin = this.checkAllspin(Game.board.getMinos("A"));
         Game.falling.rotation = newRotation;
-        Game.mechanics.locking.incrementLock();
+        Game.locking.incrementLock();
         Game.stats.rotates++;
         Game.sounds.playSound("rotate");
         Game.mechanics.setShadow();
         if (Game.settings.game.gravitySpeed == 0) Game.mechanics.startGravity();
-        Game.controls.startArr("current");
+        Game.controls.startArr(Game.controls.getDirection());
         Game.controls.checkSD();
         if (Game.mechanics.isTspin || (Game.mechanics.isAllspin && Game.settings.game.allspin)) {
             Game.renderer.rotateBoard(type);
@@ -106,7 +106,7 @@ export class Movement {
         while (check(amount) && Math.abs(amount) < max) direction == "RIGHT" ? amount++ : amount--;
         if (!check(amount)) Game.renderer.bounceBoard(direction);
         if (amount == 0) {
-            Game.controls.stopInterval("arr");
+            Game.controls.timings.arr.reset()
             return;
         }
         Game.board.moveMinos(minos, "RIGHT", amount);
@@ -114,7 +114,7 @@ export class Movement {
         Game.mechanics.isTspin = false;
         Game.mechanics.isAllspin = false;
         Game.mechanics.isMini = false;
-        Game.mechanics.locking.incrementLock();
+        Game.locking.incrementLock();
         Game.sounds.playSound("move");
         Game.mechanics.setShadow();
         Game.controls.checkSD();
@@ -131,7 +131,7 @@ export class Movement {
         Game.mechanics.isMini = false;
         Game.falling.updateLocation([0, -1]);
         if (this.checkCollision(Game.board.getMinos("A"), "DOWN")) {
-            Game.mechanics.locking.scheduleLock();
+            Game.locking.scheduleLock();
             Game.renderer.bounceBoard("DOWN");
         }
         if (scoring && sonic) Game.stats.score += 1;
@@ -154,6 +154,6 @@ export class Movement {
         Game.renderer.bounceBoard('DOWN');
         const xvals = [...new Set(minos.map(([x, y]) => x))];
         Game.particles.spawnParticles(Math.min(...xvals), Game.falling.location[1], "drop", xvals.length);
-        Game.mechanics.locking.lockPiece();
+        Game.locking.lockPiece();
     }
 }

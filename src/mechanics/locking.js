@@ -1,30 +1,27 @@
 import { Game } from "../main.js";
-import { TetiTimeout } from "../movement/tetitimers.js";
 
 export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
     divLockCounter = document.getElementById("lockCounter");
     lockCount;
-    /**@type {?TetiTimeout} */
-    lockdelay = null
-    /**@type {?TetiTimeout} */
-    clearDelay = null
+    lockTimer;
+    clearTimer;
     isLocking = false;
 
     startTime = 0;
     remaining = 0;
 
     incrementLock() {
-        if (this.lockdelay != null) {
+        if (this.isLocking) {
             this.lockCount++;
-            Game.mechanics.locking.clearLockDelay(false);
+            Game.locking.clearLockDelay(false);
             if (Game.settings.game.maxLockMovements != 0 && Game.settings.display.lockBar) {
                 const amountToAdd = 100 / Game.settings.game.maxLockMovements;
                 this.divLockCounter.value += amountToAdd;
             }
         }
         if (Game.movement.checkCollision(Game.board.getMinos("A"), "DOWN")) {
-            Game.mechanics.locking.scheduleLock();
+            Game.locking.scheduleLock();
         }
     }
 
@@ -34,23 +31,16 @@ export class LockPiece {
                 ? Infinity
                 : Game.settings.game.maxLockMovements;
         if (this.lockCount >= LockMoves) {
-            Game.mechanics.locking.lockPiece();
+            Game.locking.lockPiece();
             return;
         }
         if (Game.settings.game.lockDelay == 0) return;
 
-        this.lockDelayStart(Game.settings.game.lockDelay);
+        this.lockDelayStart();
     }
 
-    lockDelayStart(delay) {
-        if (this.lockdelay != null) this.lockdelay.stopAuto();
-        this.isLocking = false;
-
-        this.startTime = Date.now();
-        this.lockdelay = new TetiTimeout(
-            () => Game.mechanics.locking.lockPiece(),
-            delay);
-        if (!Game.replay.seeking) this.lockdelay.startAuto();
+    lockDelayStart() {
+        this.lockTimer.reset();
         this.isLocking = true;
     }
 
@@ -58,18 +48,16 @@ export class LockPiece {
         if (!this.isLocking || !Game.settings.display.lockBar) return;
         const dx = dt * 100 / Game.settings.game.lockDelay;
         this.divLockTimer.value += dx;
+        this.lockTimer.tick(dt);
     }
 
     lockingPause() {
-        if (this.lockdelay == null) return;
-        this.remaining = Game.settings.game.lockDelay - (Date.now() - this.startTime);
-        this.lockdelay.stopAuto();
         this.isLocking = false;
     }
 
     lockingResume() {
-        if (this.lockdelay == null) return;
-        this.lockDelayStart(this.remaining);
+        if (this.lockTimer.progress == 0) return;
+        this.isLocking = true;
     }
 
     lockPiece() {
@@ -83,8 +71,8 @@ export class LockPiece {
         });
         Game.pixi.flash(lockCoords);
 
-        Game.mechanics.locking.clearLockDelay();
-        if (Game.gravityTimer) Game.gravityTimer.stopAuto()
+        Game.locking.clearLockDelay();
+        Game.gravityTimer.reset()
         const cleared = Game.mechanics.clear.clearLines(lockCoords);
         Game.endGame( // check stopped overlap next
             Game.mechanics.checkDeath(
@@ -112,25 +100,19 @@ export class LockPiece {
         Game.renderer.renderDanger();
 
         const delay = (cleared > 0) ? Game.settings.game.clearDelay : 0;
-        const onClear = () => {
+
+        if (delay == 0) {
             Game.mechanics.spawnPiece(Game.bag.cycleNext());
             Game.history.save();
-            this.clearDelay = null;
-        }
-
-        if (delay == 0) onClear();
-        else {
-            this.clearDelay = new TetiTimeout(() => onClear(), delay)
-            if (!Game.replay.seeking) this.clearDelay.startAuto();
+        } else {
+            this.clearTimer.reset();
+            this.clearTimer.startAuto();
         }
     }
 
     clearLockDelay(clearCount = true) {
         this.isLocking = false;
-        if (this.lockdelay != null) {
-            this.lockdelay.stopAuto()
-            this.lockdelay = null;
-        }
+        this.lockTimer.reset();
 
         this.divLockTimer.value = 0;
         if (!clearCount) return;

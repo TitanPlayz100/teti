@@ -22,13 +22,16 @@ import { PixiRender } from "./display/pixirender.js";
 import { Animations } from "./display/animations.js";
 import { Replay } from "./features/replays.js";
 import { Garbage } from "./mechanics/garbage.js";
+import { initTetiTimers, TetiTimer } from "./movement/tetitimers.js";
+import { LockPiece } from "./mechanics/locking.js";
 
 export class GameClass {
     started;
     ended;
     gameTimer = false; // is timer running
     survivalTimer = 0; // id of timeout
-    gravityTimer = null;
+    /**@type {TetiTimer} */
+    gravityTimer;
     zenithTimer = false
     grandmasterTimer = 0;
     version = '1.4.4';
@@ -47,6 +50,7 @@ export class GameClass {
         this.sounds = new Sounds();
         this.board = new Board();
         this.mechanics = new Mechanics();
+        this.locking = new LockPiece();
         this.menuactions = new MenuActions();
         this.modals = new ModalActions();
         this.movement = new Movement();
@@ -70,6 +74,7 @@ export class GameClass {
         this.renderer.renderStyles();
         this.renderer.setEditPieceColours();
         this.sounds.initSounds();
+        initTetiTimers();
         this.startGame();
         this.loadStateFromString(new URLSearchParams(window.location.search).get("map"));
         this.menuactions.addRangeListener();
@@ -93,12 +98,12 @@ export class GameClass {
     }
 
     stopGameTimers() { //stop all the game's timers
-        if (this.gravityTimer) this.gravityTimer.stopAuto();
+        this.gravityTimer.reset();
         this.gameTimer = false;
         clearInterval(this.survivalTimer);
         this.zenithTimer = false;
         clearInterval(this.grandmasterTimer);
-        this.mechanics.locking.lockingPause();
+        this.locking.lockingPause();
         clearTimeout(this.movement.startTimersTimeout);
     }
 
@@ -157,7 +162,7 @@ export class GameClass {
         this.ended = false;
 
         this.board.resetBoard();
-        this.mechanics.locking.clearLockDelay();
+        this.locking.clearLockDelay();
         this.controls.resetMovements();
         this.boardeffects.toggleRainbow(false);
         this.renderer.renderDanger();

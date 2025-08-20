@@ -1,18 +1,15 @@
 import { disabledKeys } from "../data/data.js";
 import { Game } from "../main.js";
-import { TetiInterval } from "./tetitimers.js";
+import { TetiTimer } from "./tetitimers.js";
 
 export class Controls {
-    /**
-     * @type {{RIGHT: boolean|string, LEFT: boolean|string, DOWN: boolean|string}}
-     */
+    /**@type {{RIGHT: boolean|string, LEFT: boolean|string, DOWN: boolean|string}} */
     directionState = { RIGHT: false, LEFT: false, DOWN: false };
-    /**@type {Record<string, TetiInterval? >} */
-    timings = { arr: null, sd: null };
+    /**@type {Record<"arr"|"sd", TetiTimer >} */
+    timings = {};
     menuKey = "Escape"; // html modals close using escape
     cursorVisible = true;
     resetting = false;
-
     keyDownQueue = [];
     keyUpQueue = [];
 
@@ -28,7 +25,7 @@ export class Controls {
 
         if (Game.replay.state == "replaying" | Game.replay.state == "paused") return;
 
-        if (Game.modals.open || Game.modals.closing || Game.mechanics.locking.clearDelay != null) return;
+        if (Game.modals.open || Game.modals.closing || Game.locking.clearTimer.progress != 0) return;
         if (event.key != this.menuKey && !Game.started && Game.settings.game.readysetgo == false) Game.movement.startTimers();
         if (key == keys.resetKey) this.retry(true);
         if (!Game.started && Game.settings.game.readysetgo == true) return;
@@ -83,7 +80,7 @@ export class Controls {
     startDas(direction, time) {
         Game.movement.movePieceSide(direction);
         this.directionState[direction] = "das";
-        this.stopInterval("arr");
+        this.timings.arr.reset();
         this.startedDas = time;
         this.currentDirection = direction;
     }
@@ -97,43 +94,30 @@ export class Controls {
     }
 
     startArr(direction) {
-        if (direction == "current") {
-            if (this.directionState["RIGHT"] == "arr" && this.directionState["LEFT"] == "arr")
-                return;
-            if (this.directionState["RIGHT"] == "arr") this.startArr("RIGHT");
-            if (this.directionState["LEFT"] == "arr") this.startArr("LEFT");
-            return;
-        }
+        if (direction == null) return;
         this.directionState[direction] = "arr";
-        this.stopInterval("arr");
+        this.timings.arr.reset();
         if (Game.settings.handling.arr == 0) {
-            this.timings.arr = null;
             Game.movement.movePieceSide(direction, Infinity);
         } else {
-            this.timings.arr = new TetiInterval(
-                () => Game.movement.movePieceSide(direction),
-                Game.settings.handling.arr
-            )
-            if (!Game.replay.seeking) this.timings.arr.startAuto();
+            this.timings.arr.startAuto();
         }
+    }
+
+    getDirection() {
+        if (this.directionState["RIGHT"] == "arr" && this.directionState["LEFT"] == "arr") return;
+        if (this.directionState["RIGHT"] == "arr") return "RIGHT";
+        if (this.directionState["LEFT"] == "arr") return "LEFT";
     }
 
     startArrSD() {
         this.directionState["DOWN"] = "arr";
-        clearInterval(this.timings.sd);
+        this.timings.sd.reset();
         if (Game.settings.handling.sdarr == 0) {
-            this.timings.sd = null;
             Game.movement.movePieceDown(true, true);
             return;
         }
-        this.timings.sd = new TetiInterval(
-            () => {
-                Game.movement.movePieceDown(false);
-                Game.stats.score += 1;
-            },
-            Game.settings.handling.sdarr
-        );
-        if (!Game.replay.seeking) this.timings.sd.startAuto();
+        this.timings.sd.startAuto();
     }
 
     endDasArr(direction) {
@@ -145,12 +129,11 @@ export class Controls {
                 this.startArr(oppDirection);
                 return;
             }
-            // this.stopTimeout("das");
             this.currentDirection = undefined;
             this.startedDas = undefined;
-            this.stopInterval("arr");
+            this.timings.arr.reset();
         }
-        if (direction == "DOWN") this.stopInterval("sd");
+        if (direction == "DOWN") this.timings.sd.reset()
     }
 
     resetMovements() {
@@ -163,13 +146,6 @@ export class Controls {
     checkSD() {
         if (this.directionState["DOWN"] == "arr")
             this.startArrSD();
-    }
-
-    stopInterval(name) {
-        if (this.timings[name] != null) {
-            this.timings[name].stopAuto();
-            this.timings[name] = null;
-        }
     }
 
     retry(animation) {

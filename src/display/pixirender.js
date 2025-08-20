@@ -86,7 +86,7 @@ export class PixiRender {
         Game.boardeffects.rainbowBoard();
         Game.mechanics.simulateGarbage(Game.zenith.tickPass);
         Game.garbage.tickGarbage(dt);
-        Game.mechanics.locking.tickLockTimer(dt);
+        Game.locking.tickLockTimer(dt);
     }
 
     resize() {

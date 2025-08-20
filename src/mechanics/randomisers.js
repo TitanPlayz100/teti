@@ -37,7 +37,7 @@ export class Bag {
         const pieces = value.split("").filter(p => pieceNames.includes(p));
         Game.bag.setQueue(pieces);
         Game.renderer.updateNext();
-        Game.mechanics.locking.clearLockDelay();
+        Game.locking.clearLockDelay();
         Game.board.MinoToNone("A");
         Game.mechanics.isTspin = false;
         Game.mechanics.isAllspin = false;

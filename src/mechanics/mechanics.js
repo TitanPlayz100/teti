@@ -1,7 +1,5 @@
 import { Game } from "../main.js";
-import { TetiInterval } from "../movement/tetitimers.js";
 import { ClearLines } from "./clearlines.js";
-import { LockPiece } from "./locking.js";
 import { PerlinNoise } from "./perlin.js";
 
 export class Mechanics {
@@ -17,7 +15,6 @@ export class Mechanics {
 
     constructor() {
         this.clear = new ClearLines();
-        this.locking = new LockPiece();
         this.perlin = new PerlinNoise(1, 0.2);
     }
 
@@ -52,10 +49,10 @@ export class Mechanics {
         Game.renderer.updateNext();
         Game.renderer.updateHold();
         this.setShadow();
-        this.locking.incrementLock();
+        Game.locking.incrementLock();
         Game.modes.diggerGarbageSet(start);
         Game.modes.set4WCols(start);
-        if (Game.settings.game.preserveARR) Game.controls.startArr("current");
+        if (Game.settings.game.preserveARR) Game.controls.startArr(Game.controls.getDirection());
         if (Game.started) this.startGravity();
         if (start == true && Game.settings.game.readysetgo) Game.movement.startCountdown();
     }
@@ -82,18 +79,14 @@ export class Mechanics {
     }
 
     startGravity() {
-        if (Game.gravityTimer) Game.gravityTimer.stopAuto()
+        Game.gravityTimer.reset()
         if (Game.settings.game.gravitySpeed > 1000) return;
         if (Game.settings.game.gravitySpeed == 0) {
             Game.movement.movePieceDown(true);
             return;
         }
         Game.movement.movePieceDown(false);
-        Game.gravityTimer = new TetiInterval(
-            () => Game.movement.movePieceDown(false),
-            Game.settings.game.gravitySpeed
-        );
-        if (!Game.replay.seeking) Game.gravityTimer.startAuto();
+        Game.gravityTimer.startAuto();
     }
 
     addGarbage(lines) {
@@ -116,7 +109,7 @@ export class Mechanics {
     addSingleGarbageLine(column) {
         const allminos = Game.board.getMinos("A"); // move all minos up
         if (Game.movement.checkCollision(allminos, "DOWN")) {
-            if (this.locking.lockdelay == null) this.locking.scheduleLock();
+            if (!Game.locking.isLocking) Game.locking.scheduleLock();
             Game.board.moveMinos(allminos, "UP", 1);
         }
 
@@ -128,7 +121,7 @@ export class Mechanics {
 
     switchHold() {
         if (Game.hold.occured || !Game.settings.game.allowHold) return;
-        this.locking.clearLockDelay();
+        Game.locking.clearLockDelay();
         Game.board.MinoToNone("A");
         this.isTspin = false;
         this.isAllspin = false;

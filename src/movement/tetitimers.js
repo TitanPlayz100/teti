@@ -1,56 +1,82 @@
-export class TetiInterval {
-    intervalProgress = 0;
-    intervalTime = 0;
-    fn;
-    autoIntervalId;
-    
-    constructor(fn, intervalTime) {
-        this.fn = fn;
-        this.intervalTime = intervalTime;
+import { Game } from "../main.js";
+
+export class TetiTimer {
+    progress = 0;
+    maxTime = 0;
+    callback;
+    timerId = 0;
+    static Timer = [];
+    type;
+
+    /**@param {"interval"|"timeout"} type   */
+    constructor(fn, intervalTime, type) {
+        this.callback = fn;
+        this.maxTime = intervalTime;
+        this.type = type
+        TetiTimer.Timer.push(this);
+    }
+
+    static tickAll() {
+        TetiTimer.Timer.forEach(tmr => tmr.tick());
     }
 
     tick(dt) {
-        this.intervalProgress += dt;
-        if (this.intervalProgress >= this.intervalTime) {
-            this.fn();
-            this.intervalProgress = 0;
+        this.progress += dt;
+        if (this.progress >= this.maxTime) {
+            this.callback();
+            if (this.type == "interval") this.progress = 0;
         }
     }
 
     startAuto() {
-        this.autoIntervalId = setInterval(this.fn, this.intervalTime);
-        return this;
+        if (Game.replay.seeking) return;
+        this.timerId = this.type == "interval"
+            ? setInterval(this.callback, this.maxTime)
+            : setTimeout(this.callback, this.maxTime)
     }
 
-    stopAuto() {
-        clearInterval(this.autoIntervalId);
-        return this;
+    reset() {
+        this.type == "interval"
+            ? clearInterval(this.timerId)
+            : clearTimeout(this.timerId);
+        this.timerId = 0;
+        this.progress = 0;
     }
 }
 
-export class TetiTimeout {
-    timeoutProgress = 0;
-    timeoutTime = 0;
-    fn;
-    autoTimeoutId;
-    
-    constructor(fn, timeoutTime) {
-        this.fn = fn;
-        this.timeoutTime = timeoutTime;
-    }
+export function initTetiTimers() {
+    Game.gravityTimer = new TetiTimer(
+        () => Game.movement.movePieceDown(false),
+        Game.settings.game.gravitySpeed,
+        "interval"
+    );
 
-    tick(dt) {
-        this.timeoutProgress += dt;
-        if (this.timeoutProgress >= this.timeoutTime) this.fn();
-    }
+    Game.controls.timings.arr = new TetiTimer(
+        () => Game.movement.movePieceSide(Game.controls.getDirection()),
+        Game.settings.handling.arr,
+        "interval"
+    );
+    Game.controls.timings.sd = new TetiTimer(
+        () => {
+            Game.movement.movePieceDown(false);
+            Game.stats.score += 1;
+        },
+        Game.settings.handling.sdarr,
+        "interval"
+    );
 
-    startAuto() {
-        this.autoTimeoutId = setTimeout(this.fn, this.timeoutTime);
-        return this;
-    }
-
-    stopAuto() {
-        clearTimeout(this.autoTimeoutId);
-        return this;
-    }
+    Game.locking.lockTimer = new TetiTimer(
+        () => Game.locking.lockPiece(),
+        Game.settings.game.lockDelay,
+        "timeout"
+    );
+    Game.locking.clearTimer = new TetiTimer(
+        () => {
+            Game.mechanics.spawnPiece(Game.bag.cycleNext());
+            Game.history.save();
+        },
+        Game.settings.game.clearDelay,
+        "timeout"
+    )
 }
+

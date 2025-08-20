@@ -1,4 +1,5 @@
 import { Game } from "../main.js";
+import { TetiTimer } from "../movement/tetitimers.js";
 
 export class Replay {
     events = {};
@@ -164,23 +165,8 @@ export class Replay {
 
             Game.controls.timer(curtime);
             Game.stats.updateStats(dt);
-            Game.mechanics.locking.tickLockTimer(dt);
-
-            if (Game.controls.timings.arr) {
-                Game.controls.timings.arr.tick(dt);
-            }
-            if (Game.controls.timings.sd) {
-                Game.controls.timings.sd.tick(dt);
-            }
-            if (Game.gravityTimer) {
-                Game.gravityTimer.tick(dt);
-            }
-            if (Game.mechanics.locking.lockdelay) {
-                Game.mechanics.locking.lockdelay.tick(dt);
-            }
-            if (Game.mechanics.locking.clearDelay) {
-                Game.mechanics.locking.clearDelay.tick(dt);
-            }
+            Game.locking.tickLockTimer(dt);
+            TetiTimer.tickAll();
             this.currentFrame++;
             curtime += dt;
         }
