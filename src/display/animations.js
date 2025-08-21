@@ -2,6 +2,10 @@ import { Game } from "../main.js";
 
 export class Animations {
     actionTexts = ["cleartext", "combotext", "btbtext", "spiketext", "pctext", "timelefttext"]
+    /**@type {PixiTexts} */
+    texts;
+    /**@type {{ sprite: PixiText, animation: gsap.Timeline }[]} */
+    timeLeftTextSplit;
 
     constructor() {
         this.texts = Game.pixi.texts;
@@ -83,14 +87,14 @@ export class Animations {
         });
     }
 
-    /** @param {PIXI.Text} textSprite */
+    /** @param {PixiText} textSprite */
     splitSprite(textSprite) {
         const target = textSprite;
         const textContent = textSprite.text;
         let currentX = target.x - target.width / 2;
         target.text = "";
         const textChars = textContent.split("");
-        /**@type {PIXI.Text[]} */
+        /**@type {PixiText[]} */
         let chars = []
         textChars.forEach((char) => {
             const charSprite = new PIXI.Text({ text: char, style: target.style });

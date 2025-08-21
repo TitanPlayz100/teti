@@ -1,3 +1,4 @@
+import { disabledKeys } from "./data/data.js";
 import { GameClass } from "./game.js";
 
 const elementSplashScreen = document.getElementById("splashScreen");
@@ -23,19 +24,22 @@ window["Game"] = Game;
 
 window.addEventListener("keydown", event => {
     if (event.key == undefined) return;
+    if (disabledKeys.includes(event.key)) event.preventDefault();
+
     let key = event.key.length > 1 ? event.key : event.key.toLowerCase(); // 1 letter words are lowercase
     if (event.altKey) key = "Alt+" + key;
     if (event.ctrlKey) key = "Ctrl+" + key;
 
-    Game.controls.onKeyDownRepeat(event, key);
+    Game.controls.onKeyDownRepeat(key);
     if (event.repeat) return;
-    Game.controls.onKeyDown(event, key);
+    Game.controls.pressMenuKey(key);
+    Game.controls.onKeyDown(key);
 });
 
 window.addEventListener("keyup", event => {
     if (event.key == undefined) return;
     let key = event.key.length > 1 ? event.key : event.key.toLowerCase();
-    Game.controls.onKeyUp(event, key);
+    Game.controls.onKeyUp(key);
 });
 
 window.addEventListener('mousemove', () => {

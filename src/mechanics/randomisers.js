@@ -1,20 +1,27 @@
 import { Game } from "../main.js";
 import { PIECES as pieces } from "../data/pieces.js";
 
+/**@type {PieceName[]} */
 const pieceNames = ["z", "l", "o", "s", "i", "j", "t"]; // THIS ORDER IS VERY IMPORTANT
 
 const maxInt = 2 ** 31 - 1;
 export const randomisers = ["7-bag", "total mayhem", "classic", "pairs", "14-bag", "7+1-bag", "7+2-bag", "7+x-bag", "tgm"];
 
+/**
+ * @param {PieceName} name 
+ * @returns {Piece}
+ */
 export function getPiece(name) {
-    if (name == "G") return { colour: "gray" }
+    if (name == "G") return { name: "G", colour: "gray", shape0: null }
     return pieces.find(p => p.name == name);
 }
 
 export class Bag {
     lastGenerated = null;
     bagid = 0;
+    /**@type {PieceName[]} */
     bagExtra = [];
+    /**@type {PieceName[]} */
     queue = [];
     history = ["s", "z", "s", "z"]
     type;
@@ -51,7 +58,7 @@ export class Bag {
         let piece = this.PullFromBag();
         if (this.stride && start) { // custom stride logic
             if (["o", "s", "z"].includes(piece)) {
-                Game.bag = new Bag(this.game);
+                Game.bag = new Bag();
                 return Game.bag.cycleNext(true);
             }
         }
@@ -62,6 +69,7 @@ export class Bag {
         return this.queue.slice(0, n).map(p => getPiece(p));
     }
 
+    /**@param {PieceName[]} value*/
     setQueue(value) {
         this.queue = value;
     }

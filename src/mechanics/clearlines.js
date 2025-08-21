@@ -3,6 +3,8 @@ import { ATTACK_TABLES as attackValues } from "../data/attacktable.js";
 import { Game } from "../main.js";
 
 export class ClearLines {
+
+    /** @param {[number, number][]} clearCoords */
     clearLines(clearCoords) {
         const clearRows = Game.board.getFullRows();
         let removedGarbage = 0;
@@ -64,7 +66,7 @@ export class ClearLines {
         // zenith
         Game.zenith.AwardLines(damage);
         if (linecount == 1) Game.zenith.AwardLines(1);
-        
+
         // render action text
         if (mech.isAllspin) damagetype = damagetype.replace("Tspin ", Game.falling.piece.name + " spin ");
         Game.renderer.renderActionText(damagetype, isBTB, isPC, damage, linecount);

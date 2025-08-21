@@ -20,7 +20,12 @@ export class Movement {
         }, 600);
     }
 
-    checkCollision(coords, action, collider) {
+    /**
+     * @param {[number, number][]} coords 
+     * @param {CollisionAction} action 
+     * @param {[number, number][]} collider 
+     */
+    checkCollision(coords, action, collider = undefined) {
         collider = collider ?? Game.board.getMinos("S");
         for (let [x, y] of coords) {
             if (
@@ -60,6 +65,7 @@ export class Movement {
         }
     }
 
+    /**@param {[number, number][]} pieceCoords  */
     checkAllspin(pieceCoords) {
         if (Game.falling.piece.name == "t") return false;
         const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
@@ -98,6 +104,7 @@ export class Movement {
         }
     }
 
+    /**@param {DirectionType} direction  */
     movePieceSide(direction, max = 1) {
         Game.controls.checkSD();
         const minos = Game.board.getMinos("A");

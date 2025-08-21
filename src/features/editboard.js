@@ -67,18 +67,19 @@ export class BoardEditor {
 
     }
 
+    /**@param {string} string  */
     convertFromMap(string) {
-        let [board, next, hold] = string.split("?");
-        board = board.match(/.{1,10}/g).toReversed().map(row => {
+        const [board, next, hold] = string.split("?");
+        const newboard = board.match(/.{1,10}/g).toReversed().map(row => {
             return row.split("").map(col => {
                 col = col.replace("#", "G").replace("_", "")
                 if (col != "") col = `S ${col}`
                 return col
             });
         })
-        while (board.length < 40) {
-            board.push(["", "", "", "", "", "", "", "", "", ""]);
+        while (newboard.length < 40) {
+            newboard.push(["", "", "", "", "", "", "", "", "", ""]);
         }
-        return { board, next, hold }
+        return { board: newboard, next, hold }
     }
 }

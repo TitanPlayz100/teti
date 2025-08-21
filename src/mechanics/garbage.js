@@ -1,7 +1,7 @@
 import { Game } from "../main.js";
 
 export class Garbage {
-    /** @type {Array<{damage: number, travel: number}>>} */
+    /** @type {GarbageQueue} */
     garbageQueue = [];
 
     constructor() {

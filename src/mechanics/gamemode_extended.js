@@ -6,7 +6,6 @@ export class Zenith {
         isHyperspeed = false;
         rankLock = 0;
         promotionFatigue = 0;
-        rankLock = 0;
         tickPass = 0;
         altitude = 0;
         bonusAltitude = 0;

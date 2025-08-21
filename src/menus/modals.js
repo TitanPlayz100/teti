@@ -26,7 +26,7 @@ export class ModalActions {
             let newval;
             if (Game.settings.hasOwnProperty(settingType)) newval = Game.settings[settingType][setting.id]
             if (setting.classList[2] == "exp") newval = toLogValue(newval);
-            if (setting.classList[2] == "statoption") newval = Game.settings.game.sidebar[setting.id[10]-1]; 
+            if (setting.classList[2] == "statoption") newval = Game.settings.game.sidebar[setting.id[10] - 1];
             if (setting.id == "nextQueue") newval = Game.bag.getQueue();
             if (setting.id == "holdQueue") newval = Game.hold.getHold();
             if (setting.id == "rowfillmode") newval = Game.boardeditor.fillRow;
@@ -61,16 +61,16 @@ export class ModalActions {
         bottom.forEach(el => el.style.transition = 'none');
         const resetTransition = (el) => el.style.transition = ''
 
-        gsap.timeline({onComplete: () => {top.forEach(resetTransition)}})
-            .set(top, {y: 50, immediateRender: true, opacity: 0})
-            .to(top, {duration: 0.5, y: 0, stagger: 0.04, opacity: 1, ease: "power2.out"})
-        gsap.timeline({onComplete: () => {bottom.forEach(resetTransition)}})
-            .set(bottom, {y: -50, immediateRender: true, opacity: 0})
-            .to(bottom, {duration: 0.5, y: 0, stagger: -0.04, opacity: 1,  ease: "power2.out"})
-        gsap.timeline({onComplete: () => {middle.forEach(resetTransition)}})
-            .set(middle, {x: 0, immediateRender: true, opacity: 0})
-            .to(middle.slice(0, 2), {duration: 0.6, x: -10, stagger: -0.2, opacity: 1,  ease: "power2.out"}, "0")
-            .to(middle.slice(2, 4), {duration: 0.6, x: 10, stagger: 0.2, opacity: 1,  ease: "power2.out"}, "0")
+        gsap.timeline({ onComplete: () => { top.forEach(resetTransition) } })
+            .set(top, { y: 50, immediateRender: true, opacity: 0 })
+            .to(top, { duration: 0.5, y: 0, stagger: 0.04, opacity: 1, ease: "power2.out" })
+        gsap.timeline({ onComplete: () => { bottom.forEach(resetTransition) } })
+            .set(bottom, { y: -50, immediateRender: true, opacity: 0 })
+            .to(bottom, { duration: 0.5, y: 0, stagger: -0.04, opacity: 1, ease: "power2.out" })
+        gsap.timeline({ onComplete: () => { middle.forEach(resetTransition) } })
+            .set(middle, { x: 0, immediateRender: true, opacity: 0 })
+            .to(middle.slice(0, 2), { duration: 0.6, x: -10, stagger: -0.2, opacity: 1, ease: "power2.out" }, "0")
+            .to(middle.slice(2, 4), { duration: 0.6, x: 10, stagger: 0.2, opacity: 1, ease: "power2.out" }, "0")
     }
 
     getOptions(id) {
@@ -96,7 +96,7 @@ export class ModalActions {
                     : setting.textContent.toLowerCase();
             }
             if (setting.classList[2] == "exp") val = toExpValue(val);
-            if (setting.classList[2] == "statoption") Game.settings.game.sidebar[setting.id[10]-1] = val;
+            if (setting.classList[2] == "statoption") Game.settings.game.sidebar[setting.id[10] - 1] = val;
             if (setting.id == "nextQueue") Game.bag.updateQueue(val);
             if (setting.id == "holdQueue") Game.hold.setNewHold(val);
             if (setting.id == "rowfillmode") Game.boardeditor.fillRow = val;

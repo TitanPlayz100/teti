@@ -109,6 +109,7 @@ export class History {
         button.classList.add("selected");
     }
 
+    /**@param {string} s */
     compress(s) {
         // saves anywhere from 50% worst case to 90% on average
         // 250 blocks is 30kB ~~ 5 min of 3.3pps play is 120kB
@@ -126,6 +127,7 @@ export class History {
         return cs;
     }
 
+    /**@param {string} s */
     decompress(s) {
         let ds = "";
         let int = '';
@@ -162,19 +164,25 @@ export class History {
 
     }
 
+    /**@param {string} string */
     convertFromMapCompressed(string) {
-        let [board, next, hold] = string.split("?");
-        board = this.decompress(board);
-        board = board.match(/.{1,10}/g).toReversed().map(row => {
+        const [board, next, hold] = string.split("?");
+        const decompressedBoard = this.decompress(board);
+        const newboard = decompressedBoard.match(/.{1,10}/g).toReversed().map(row => {
             return row.split("").map(col => {
                 col = col.replace("#", "G").replace("_", "")
                 if (col != "") col = `S ${col}`
                 return col
             });
         })
-        Game.board.boardState = board;
-        Game.bag.setQueue(next.split(","));
-        Game.hold.piece = getPiece(hold);
+        Game.board.boardState = newboard;
+        Game.bag.setQueue(next.split(",").filter(isPieceName));
+        Game.hold.piece = getPiece(isPieceName(hold) ? hold : null);
         Game.mechanics.spawnPiece(Game.bag.cycleNext());
     }
+}
+
+/** @returns {p is PieceName}*/
+export function isPieceName(p) {
+    return Game.hold.pieceNames.includes(/** @type {PieceName} */(p));
 }

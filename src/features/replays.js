@@ -2,15 +2,16 @@ import { Game } from "../main.js";
 import { TetiTimer } from "../movement/tetitimers.js";
 
 export class Replay {
+    /**@type {ReplayEvents} */
     events = {};
     currentFrame = 0;
     /**@type { "idle" | "running" | "replaying" | "paused" } */
     state = "idle";
     seeking = false;
-    fps = null;
+    fps = 60; // by default
 
     start() {
-        if (this.state == "replaying" | this.state == "paused") return;
+        if (this.state == "replaying" || this.state == "paused") return;
         this.state = "running";
         this.currentFrame = 0;
         this.events = {};
@@ -124,14 +125,14 @@ export class Replay {
     updateSeekPos(frame) {
         const frames = Object.keys(this.events)
         const max = frames[frames.length - 1];
-        const percent = frame/max;
+        const percent = frame/Number(max);
         Game.pixi.setSeekPos(percent);
     }
 
     seekToPercent(percent) {
         const frames = Object.keys(this.events)
         const max = frames[frames.length - 1];
-        const frame = Math.round(max * percent)
+        const frame = Math.round(Number(max) * percent)
         this.seekToFrame(frame);
         Game.pixi.setSeekPos(percent);
     }

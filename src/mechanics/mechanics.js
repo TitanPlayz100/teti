@@ -3,6 +3,7 @@ import { ClearLines } from "./clearlines.js";
 import { PerlinNoise } from "./perlin.js";
 
 export class Mechanics {
+    /**@type {BoardArray} */
     board;
     isTspin = false;
     isAllspin = false;
@@ -10,7 +11,7 @@ export class Mechanics {
     spikeCounter = 0;
     toppingOut = false;
 
-    curGarbageCol;
+    curGarbageCol = 0;
     garbageMessiness = 100;
 
     constructor() {
@@ -18,6 +19,10 @@ export class Mechanics {
         this.perlin = new PerlinNoise(1, 0.2);
     }
 
+    /**
+     * @param {[number, number][]} coords 
+     * @param {[number, number][]} collider 
+     */
     checkDeath(coords, collider) {
         if (coords.length == 0) return;
         const collision = coords.every(c => Game.movement.checkCollision([c], "PLACE", []));
@@ -42,6 +47,7 @@ export class Mechanics {
         }
     }
 
+    /** @param {Piece} piece */
     spawnPiece(piece, start = false) {
         if (Game.ended) return;
         Game.falling.spawn(piece);

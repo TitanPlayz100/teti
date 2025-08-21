@@ -1,35 +1,27 @@
-import { disabledKeys } from "../data/data.js";
+//@ts-check
+
 import { Game } from "../main.js";
-import { TetiTimer } from "./tetitimers.js";
 
 export class Controls {
-    /**@type {{RIGHT: boolean|string, LEFT: boolean|string, DOWN: boolean|string}} */
+    /**@type {DirectionStates} */
     directionState = { RIGHT: false, LEFT: false, DOWN: false };
-    /**@type {Record<"arr"|"sd", TetiTimer >} */
-    timings = {};
+    /**@type {ArrTimings} */
+    timings = { arr: null, sd: null };
     menuKey = "Escape"; // html modals close using escape
     cursorVisible = true;
     resetting = false;
+    /**@type {string[]} */
     keyDownQueue = [];
+    /**@type {string[]} */
     keyUpQueue = [];
 
-    onKeyDown(event, key) {
+    onKeyDown(key) {
         const keys = Game.settings.control;
-        if (disabledKeys.includes(event.key)) event.preventDefault();
-
-        if (key == this.menuKey) Game.menuactions.toggleDialog();
-        else if (key == keys.editMenuKey) Game.menuactions.openEditMenu();
-        if (key == keys.pauseReplayKey && Game.replay.state != "running" && !Game.modals.open) {
-            Game.replay.togglePause(); return;
-        }
-
-        if (Game.replay.state == "replaying" | Game.replay.state == "paused") return;
-
-        if (Game.modals.open || Game.modals.closing || Game.locking.clearTimer.progress != 0) return;
-        if (event.key != this.menuKey && !Game.started && Game.settings.game.readysetgo == false) Game.movement.startTimers();
-        if (key == keys.resetKey) this.retry(true);
-        if (!Game.started && Game.settings.game.readysetgo == true) return;
-        if (Game.ended) return;
+        if (!movementAllowed()) return;
+        if (!Game.started && Game.settings.game.readysetgo == false)
+            Game.movement.startTimers();
+        if (key == keys.resetKey)
+            this.retry(true);
 
         const keytype = Object.keys(keys).find(type => keys[type] == key);
         if (keytype == undefined) return;
@@ -38,23 +30,31 @@ export class Controls {
         Game.stats.inputs++;
     }
 
-    onKeyUp(event, key) {
+    onKeyUp(key) {
+        const keys = Game.settings.control;
         if (Game.replay.state == "replaying") return;
 
-        const keys = Game.settings.control;
         const keytype = Object.keys(keys).find(type => keys[type] == key);
         if (keytype == undefined) return;
         this.keyUpQueue.push(keytype);
     }
 
-    onKeyDownRepeat(event, key) { // allows for arr undo/redo
-        if (Game.replay.state == "replaying") return;
-
+    onKeyDownRepeat(key) { // allows for arr undo/redo
         const keys = Game.settings.control;
-        if (event.key == this.menuKey) event.preventDefault();
+        if (Game.replay.state == "replaying") return;
 
         if (key == keys.undoKey) Game.history.undo();
         else if (key == keys.redoKey) Game.history.redo()
+    }
+
+    pressMenuKey(key) {
+        const keys = Game.settings.control;
+        if (key == this.menuKey)
+            Game.menuactions.toggleDialog();
+        if (key == keys.editMenuKey)
+            Game.menuactions.openEditMenu();
+        if (key == keys.pauseReplayKey && Game.replay.state != "running" && !Game.modals.open)
+            Game.replay.togglePause();
     }
 
     runKeyQueue(curTime) {
@@ -77,25 +77,26 @@ export class Controls {
         this.keyUpQueue = [];
     }
 
+    /** @param {DirectionType} direction*/
     startDas(direction, time) {
         Game.movement.movePieceSide(direction);
         this.directionState[direction] = "das";
         this.timings.arr.reset();
         this.startedDas = time;
-        this.currentDirection = direction;
     }
 
     timer(curTime) {
-        if (this.currentDirection == undefined || this.startedDas == undefined) return;
+        const dir = this.getDasDirection();
+        if (dir == undefined || this.startedDas == undefined) return;
         if (curTime - this.startedDas < Game.settings.handling.das) return;
-        this.startArr(this.currentDirection)
-        this.currentDirection = undefined;
+        this.startArr(dir)
         this.startedDas = undefined;
     }
 
+    /** @param { "RIGHT" | "LEFT" | null } direction*/
     startArr(direction) {
         if (direction == null) return;
-        this.directionState[direction] = "arr";
+        this.directionState[direction] = "arr"
         this.timings.arr.reset();
         if (Game.settings.handling.arr == 0) {
             Game.movement.movePieceSide(direction, Infinity);
@@ -105,9 +106,15 @@ export class Controls {
     }
 
     getDirection() {
-        if (this.directionState["RIGHT"] == "arr" && this.directionState["LEFT"] == "arr") return;
+        if (this.directionState["RIGHT"] == "arr" && this.directionState["LEFT"] == "arr") return null;
         if (this.directionState["RIGHT"] == "arr") return "RIGHT";
         if (this.directionState["LEFT"] == "arr") return "LEFT";
+    }
+
+    getDasDirection() {
+        if (this.directionState["RIGHT"] == "das" && this.directionState["LEFT"] == "das") return null;
+        if (this.directionState["RIGHT"] == "das") return "RIGHT";
+        if (this.directionState["LEFT"] == "das") return "LEFT";
     }
 
     startArrSD() {
@@ -120,6 +127,7 @@ export class Controls {
         this.timings.sd.startAuto();
     }
 
+    /** @param {DirectionType} direction*/
     endDasArr(direction) {
         this.directionState[direction] = false;
         if (direction == "RIGHT" || direction == "LEFT") {
@@ -129,7 +137,6 @@ export class Controls {
                 this.startArr(oppDirection);
                 return;
             }
-            this.currentDirection = undefined;
             this.startedDas = undefined;
             this.timings.arr.reset();
         }
@@ -148,12 +155,12 @@ export class Controls {
             this.startArrSD();
     }
 
-    retry(animation) {
+    retry(showAnimation) {
         if (this.resetting) return; // no overlap
         Game.ended = true;
         Game.sounds.playSound("retry");
 
-        if (!animation || Game.settings.game.stride) {
+        if (!showAnimation || Game.settings.game.stride) {
             Game.startGame();
         } else {
             Game.animations.resetAnimation()
@@ -161,8 +168,16 @@ export class Controls {
     }
 
     toggleCursor(enable) {
-        if (!(this.cursorVisible ^ enable)) return; // only toggle when they are different
+        if (this.cursorVisible == enable) return; // only toggle when they are different
         this.cursorVisible = enable;
         document.body.style.cursor = enable ? 'auto' : 'none';
     }
+}
+
+
+function movementAllowed() {
+    return Game.replay.state != "replaying" && Game.replay.state != "paused"
+        && !Game.modals.open && !Game.modals.closing && !Game.ended
+        && Game.locking.clearTimer.progress == 0
+        && (Game.started || !Game.settings.game.readysetgo)
 }

@@ -2,6 +2,7 @@ import { lowerIsBetter } from "../data/data.js";
 import { Game } from "../main.js";
 
 export class ProfileStats {
+    /**@type {Record<string, PBType>} */
     personalBests = {};
     notSaved = ['game', 'level', 'combo']
     elementGameEndTitle = document.getElementById("gameEndTitle");
@@ -9,8 +10,8 @@ export class ProfileStats {
     setPB(score) {
         this.elementGameEndTitle.textContent = 'GAME ENDED';
         const gamemode = Game.settings.game.gamemode
-        const gamemodeStats = this.personalBests[gamemode] ?? {};
-        const currentScore = Number(gamemodeStats.score);
+        const gamemodeStats = this.personalBests[gamemode];
+        const currentScore = Number(gamemodeStats.score ?? 0);
         const lower = lowerIsBetter[Game.modes.modeJSON.result];
 
         if (!Game.settings.game.competitiveMode) return;
@@ -18,7 +19,7 @@ export class ProfileStats {
         if (isNaN(currentScore) || (lower && score < currentScore) || (!lower && score > currentScore)) {
             let gameStatsKeys = Object.getOwnPropertyNames(Game.stats)
             gameStatsKeys = gameStatsKeys.filter(key => key != 'game')
-            const gameStats = {};
+            /**@type {Record<string, any>} */ const gameStats = {};
             gameStatsKeys.forEach(key => gameStats[key] = Game.stats[key])
             const ts = new Date().toJSON();
             this.personalBests[gamemode] = { score, pbstats: gameStats, version: Game.version, ts };
@@ -34,6 +35,7 @@ export class ProfileStats {
         this.personalBests = stats.pbs ?? {};
     }
 
+    /**@param {ModeName} mode */
     removePB(mode) {
         delete this.personalBests[mode];
         this.saveSession();

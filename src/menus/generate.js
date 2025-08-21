@@ -2,6 +2,7 @@ import { defaultSkins } from "../data/data.js";
 import { Game } from "../main.js";
 import { randomisers } from "../mechanics/randomisers.js";
 import { KICKS as kicks } from "../data/kicks.js";
+import { GAMEMODES } from "../data/gamemodes.js";
 
 export class GenerateMenus {
     gamemodeStart = document.getElementById("startGamemodeList");
@@ -14,7 +15,7 @@ export class GenerateMenus {
 
     generateGamemodeMenu() {
         Game.modes.getGamemodeNames().forEach(name => {
-            const setting = Game.modes.getGamemodeJSON(name);
+            const setting = Game.modes.getGamemodeJSON(validMode(name));
             const button = document.createElement("button");
             button.id = name;
             button.classList.add("gamemodeSelect");
@@ -78,12 +79,12 @@ export class GenerateMenus {
             const text1 = document.createElement("h2")
             text1.textContent = mode[0].toUpperCase() + mode.slice(1) + ': ';
             const text2 = document.createElement("h2")
-            text2.textContent = score + Game.modes.getSuffix(mode);
+            text2.textContent = score + Game.modes.getSuffix(validMode(mode));
             const clearbutton = document.createElement("button");
             clearbutton.textContent = "X";
             clearbutton.addEventListener("click", (event) => {
                 event.stopPropagation();
-                Game.profilestats.removePB(mode);
+                Game.profilestats.removePB(validMode(mode));
                 pbbox.remove()
             });
             pbbox.appendChild(text1);
@@ -224,4 +225,10 @@ export class GenerateMenus {
         notif.addEventListener("click", () => remove())
 
     }
+}
+
+
+/** @returns {ModeName}*/
+function validMode(str) {
+    return Object.keys(GAMEMODES).includes(/** @type {ModeName} */(str)) ? str : "*";
 }

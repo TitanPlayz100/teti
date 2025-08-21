@@ -1,3 +1,4 @@
+/**@type {Piece[]} */
 export const PIECES = [{
     "name": "z",
     "shape0": [[1, 1, 0], [0, 1, 1], [0, 0, 0]],

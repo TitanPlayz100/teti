@@ -2,6 +2,7 @@ import { Game } from "../main.js";
 import { toExpValue } from "./modals.js";
 
 export class MenuActions {
+    /**@type {string} */
     bindingKey;
     elementSelectKeyText = document.getElementById("selectkeytext");
     controlUsed = false;

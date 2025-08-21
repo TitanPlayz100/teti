@@ -1,11 +1,10 @@
 import { Game } from "../main.js";
-import { PixiRender } from "./pixirender.js";
 
 export class Visuals {
     textSprites = {};
 
     generateContainers(labels) {
-        /**@type {Record<string, PIXI.Container>} */
+        /**@type {Record<string, Container>} */
         const containers = {};
         labels.forEach(label => {
             const container = new PIXI.Container();
@@ -114,11 +113,14 @@ export class Visuals {
         container.visible = false;
     }
 
+    /**
+     * @param {{ settings: Sprite; reset: Sprite; edit: Sprite; }} icons
+     */
     createGridGraphics(consts, icons) {
         const width = consts.bw;
         const height = consts.bh;
 
-        /**@type {PIXI.Container} */
+        /**@type {Container} */
         const grid = Game.pixi.app.stage.getChildByLabel("grid");
 
         Game.pixi.boardBG = new PIXI.Graphics()

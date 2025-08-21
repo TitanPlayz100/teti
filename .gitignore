@@ -1,4 +1,3 @@
 .vscode/
 Cargo.lock
-*.d.ts
-jsconfig.json
+pixi.js.d.ts

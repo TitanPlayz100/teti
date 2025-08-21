@@ -1,13 +1,15 @@
 import { Game } from "../main.js";
+import { TetiTimer } from "../movement/tetitimers.js";
 
 export class LockPiece {
     divLockTimer = document.getElementById("lockTimer");
     divLockCounter = document.getElementById("lockCounter");
-    lockCount;
+    lockCount = 999;
+    /**@type {TetiTimer} */
     lockTimer;
+    /**@type {TetiTimer} */
     clearTimer;
     isLocking = false;
-
     startTime = 0;
     remaining = 0;
 

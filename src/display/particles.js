@@ -48,6 +48,8 @@ class Point {
 export class Particles {
     /** @type {Point[]} */
     particles = [];
+    /**@type {Texture} */
+    texture;
 
     initBoard() {
         this.container = Game.pixi.particleContainer;

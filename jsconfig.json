@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    // "checkJs": true,
+  },
+  "typeAcquisition": {
+    "include": [
+      "pixi.js.d.ts",
+      "types.d.ts"
+    ]
+  }
+}

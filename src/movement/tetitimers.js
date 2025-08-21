@@ -5,14 +5,20 @@ export class TetiTimer {
     maxTime = 0;
     callback;
     timerId = 0;
+    /**@type {TetiTimer[]} */
     static Timer = [];
     type;
 
-    /**@param {"interval"|"timeout"} type   */
+    /**
+     * 
+     * @param {() => void} fn 
+     * @param {number} intervalTime 
+     * @param {"interval" | "timeout"} type 
+     */
     constructor(fn, intervalTime, type) {
         this.callback = fn;
         this.maxTime = intervalTime;
-        this.type = type
+        this.type = type;
         TetiTimer.Timer.push(this);
     }
 

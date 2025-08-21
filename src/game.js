@@ -12,7 +12,7 @@ import { Sounds } from "./features/sounds.js";
 import { Falling } from "./mechanics/fallingpiece.js";
 import { GameStats } from "./features/stats.js";
 import { BoardEditor } from "./features/editboard.js";
-import { History } from "./features/history.js";
+import { History, isPieceName } from "./features/history.js";
 import { BoardEffects } from "./display/boardEffects.js";
 import { ProfileStats } from "./features/profileStats.js";
 import { Modes } from "./features/modes.js";
@@ -26,8 +26,8 @@ import { initTetiTimers, TetiTimer } from "./movement/tetitimers.js";
 import { LockPiece } from "./mechanics/locking.js";
 
 export class GameClass {
-    started;
-    ended;
+    started = false;
+    ended = false;
     gameTimer = false; // is timer running
     survivalTimer = 0; // id of timeout
     /**@type {TetiTimer} */
@@ -87,6 +87,7 @@ export class GameClass {
         this.versionChecker();
     }
 
+    /**@param {number|undefined} [seed]  */
     startGame(seed = undefined) {
         this.menuactions.loadSettings();
         this.modes.loadModes();
@@ -145,13 +146,14 @@ export class GameClass {
         if (input) {
             const { board, next, hold } = this.boardeditor.convertFromMap(input);
             this.board.boardState = board;
-            this.bag.setQueue(next.split(","));
-            this.hold.piece = getPiece(hold);
+            this.bag.setQueue(next.split(",").filter(isPieceName));
+            this.hold.piece = getPiece(isPieceName(hold) ? hold : null);
             this.mechanics.spawnPiece(this.bag.cycleNext());
             this.history.save();
         }
     }
 
+    /**@param {number|undefined} [seed]  */
     resetState(seed = undefined) {
         this.boardeffects.hasPace = true;
         this.boardeffects.paceCooldown = 0;

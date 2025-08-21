@@ -2,11 +2,14 @@ import { Game } from "../main.js";
 import { KICKS as kicks } from "../data/kicks.js";
 
 export class Falling {
+    /**@type {Piece} */
     piece = null;
-    location = [];
+    /**@type {[number, number]} */
+    location = [0, 0];
     moved = false;
     rotation = 0;
 
+    /**@param {Piece} piece */
     spawn(piece) {
         const dx = piece.name == "o" ? 4 : 3;
         const dy = piece.name == "o" ? 21 : piece.name == "i" ? 19 : 20;
@@ -33,6 +36,7 @@ export class Falling {
         return kickdata
     }
 
+    /**@param {RotationType} type */
     getRotateState(type) {
         const change = { CW: 1, CCW: -1, 180: 2 }[type]
         return ((this.rotation + change) % 4 + 4) % 4;
@@ -50,11 +54,9 @@ export class Falling {
             this.location[0] + dx,
             this.location[1] + dy,
         ];
-        if (dx != 0 || dy != 0) {
+        if (dx != 0 || (dy != -1 && dy != 0)) {
             this.moved = true;
             Game.pixi.setRotationCenterPos(this.location, this.piece.name);
         }
     }
-
-
 }

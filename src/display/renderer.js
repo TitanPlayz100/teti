@@ -2,20 +2,25 @@ import { Game } from "../main.js";
 import { statDecimals, statsSecondary as statsSecondaries } from "../data/data.js";
 import { getPiece } from "../mechanics/randomisers.js";
 import { KICKS as kicks } from "../data/kicks.js";
+import { isPieceName } from "../features/history.js";
 
 export class Renderer {
+    /**@type {BoardArray} */
     holdQueueGrid = [];
+    /**@type {BoardArray} */
     nextQueueGrid = [];
+    /**@type {boolean} */
     inDanger;
-    texttimeouts = {};
-
+    /**@type {string[]} */
     sidebarStats;
+    /**@type {(0 | 1 | 2)[]} */
     sidebarFixed;
+    /**@type {string[]} */
     sidebarSecondary;
 
     divBoard = document.getElementById("board");
     elementEditPieces = document.getElementById("editMenuPieces");
-    
+
     constructor() {
         this.nextQueueGrid = [...Array(15)].map(() => [...Array(4)].map(() => ""));
         this.holdQueueGrid = [...Array(3)].map(() => [...Array(4)].map(() => ""));
@@ -105,7 +110,7 @@ export class Renderer {
     }
 
     renderStyles(settings = false) {
-        const bg = Game.settings.display.background;
+        let bg = Game.settings.display.background;
         if (bg == "") bg = "#080B0C";
         document.body.style.background = (bg[0] == "#") ? bg : `url("${bg}") no-repeat center center`
         document.body.style.backgroundSize = "cover";
@@ -150,7 +155,7 @@ export class Renderer {
     formatTime(s, d) {
         const minutes = Math.floor(s / 60);
         const seconds = (s - minutes * 60).toFixed(d)
-        return `${minutes > 0 ? minutes : ""}:${seconds < 10 ? "0" : ""}${seconds}`
+        return `${minutes > 0 ? minutes : ""}:${Number(seconds) < 10 ? "0" : ""}${seconds}`
     }
 
     renderTimeLeft(text) {
@@ -161,7 +166,8 @@ export class Renderer {
         const elPieces = [...this.elementEditPieces.children];
         elPieces.forEach(elpiece => {
             const pieceid = elpiece.id.split("_")[0];
-            elpiece.style.backgroundColor = getPiece(pieceid).colour
+            const piece = isPieceName(pieceid) ? pieceid : "G"
+            elpiece.style.backgroundColor = getPiece(piece).colour
         })
     }
 
@@ -178,12 +184,21 @@ export class Renderer {
     }
 }
 
+/**
+ * @template {string|number} K
+ * @template {string|number} V
+ * @param {Record<K, V[]>} obj
+ * @returns {Record<V, K>}
+ */
 export function reverseLookup(obj) {
-    const reverseLookup = {}
-    for (const [key, array] of Object.entries(obj)) {
+    const result = /** @type {Record<V, K>} */({});
+
+    for (const key in obj) {
+        const array = obj[key];
         array.forEach(item => {
-            reverseLookup[item] = key;
+            result[item] = key;
         });
     }
-    return reverseLookup
+
+    return result;
 }

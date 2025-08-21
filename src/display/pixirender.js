@@ -7,24 +7,37 @@ import { getPiece } from '../mechanics/randomisers.js';
 import { Visuals } from './visuals.js';
 
 export class PixiRender {
-    textures = {};
-    minoSize;
-    width;
-    height;
+    /**@type {MinoTextures} */
+    textures;
+    minoSize = 0;
+    width = 0;
+    height = 0;
     boardAlpha = 1;
     queueAlpha = 1;
+    /**@type {[number, number][]} */
     justPlacedCoords = [];
     justPlacedAlpha = 1;
-    minoSprites = {};
+    /**@type {MinoSprites} */
+    minoSprites = {board:null, hold:null, next:null};
     editButtonVisible = false;
+    /**@type {MinoFlashing} */
     currentlyFlashing = {}
+    /**@type {PixiStatTexts} */
     statTexts = [];
-    /**@type {Record<string,{sprite:PIXI.Text, animation:any}>} */
+    /**@type {PixiTexts} */
     texts = {};
-    /** @type {PIXI.Graphics} */
+    /** @type {Graphics} */
     rotationCenter;
-    /** @type {PIXI.Graphics} */
+    /** @type {Graphics} */
     bagSeperator;
+    /**@type {Sprite} */
+    editButton;
+    /**@type {Graphics} */
+    boardBG;
+    /**@type {Graphics} */
+    boardDanger;
+    /**@type {Graphics} */
+    border;
 
     divlock = document.getElementById("lockTimer");
 
@@ -192,6 +205,10 @@ export class PixiRender {
         clearSplash();
     }
 
+    /**
+     * @param {[number, number]} coords  
+     * @param {PieceName} piece 
+     */
     setRotationCenterPos([x, y], piece) {
         let posX = (x + 1) * this.minoSize + this.minoSize / 2;
         let posY = (38 - y) * this.minoSize + this.minoSize / 2;
@@ -219,6 +236,10 @@ export class PixiRender {
         this.seekBar.children[0].position.x = percent * this.seekBar.width - this.width / 2;
     }
 
+    /**
+     * @param {BoardType} type 
+     * @param {BoardArray} array 
+     */
     generateAllSprites(type, array, yPosChange) {
         const container = this.app.stage.getChildByLabel(type);
         const shadowArray = [];
@@ -295,6 +316,11 @@ export class PixiRender {
     }
 
     // RENDERING
+
+    /**
+     * @param {BoardType} type 
+     * @param {BoardArray} array 
+     */
     render(type, array) {
         const container = this.app.stage.getChildByLabel(type);
         const shadowArray = this.minoSprites[type];
@@ -370,16 +396,16 @@ export class PixiRender {
         if (Game.settings.game.gamemode == "lookahead") {
             for (let [posX, posY] of this.justPlacedCoords) {
                 if (posX == x && posY == y) {
-                    return Math.max(this.justPlacedAlpha, this.boardAlpha).toFixed(2);
+                    return Math.max(this.justPlacedAlpha, this.boardAlpha)
                 }
             }
         }
-        return this.boardAlpha.toFixed(2);
+        return this.boardAlpha
     }
 
     getShadowOpacity() {
         const opacity = Game.settings.display.shadowOpacity / 100;
-        if (Game.settings.game.gamemode == "lookahead") return (opacity * this.boardAlpha).toFixed(2);
+        if (Game.settings.game.gamemode == "lookahead") return (opacity * this.boardAlpha)
         return opacity;
     }
 
@@ -432,6 +458,7 @@ export class PixiRender {
             .to(garbRect, { duration: 0.3, pixi: { y: yPos }, ease: "bounce.out" })
     }
 
+    /** @param {GarbageQueue} queue */
     updateGarbageBar(queue) {
         if (this.garbageBar == undefined) return; // bandage patch
 

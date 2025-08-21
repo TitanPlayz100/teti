@@ -4,8 +4,8 @@ import { gameoverResultText, gameoverText, resultSuffix, statDecimals } from "..
 import { reverseLookup } from "../display/renderer.js";
 
 export class Modes {
+    /** @type {ModeData<"*">} */
     modeJSON;
-    customSettings;
 
     checkFinished() {
         const goals = Game.settings.game;
@@ -29,7 +29,7 @@ export class Modes {
         }
 
         if (Game.settings.game.gamemode == 'ultra') { // changes ultra sidebar
-            stat = stats.score;
+            stat = stats.score
             goal = undefined
         }
         this.setObjectiveText(this.modeJSON.goalstat, stat, goal);
@@ -61,6 +61,7 @@ export class Modes {
         Game.pixi.toggleEditButton(Game.settings.game.gamemode == 'custom');
     }
 
+    /**@param {ModeName} mode  */
     setGamemode(mode) {
         Game.settings.game.gamemode = mode;
         const competitive = Game.settings.game.competitiveMode;
@@ -117,23 +118,31 @@ export class Modes {
         document.getElementById('handling').disabled = (enabled && mode == 'classic');
     }
 
+    /**
+     * @param {ModeName} mode 
+     * @returns {ModeData<"*">}
+     */
     getGamemodeJSON(mode) {
         const modeinfo = gamemodeJSON[mode];
         const allinfo = gamemodeJSON["*"];
 
-        let info = {}
-        Object.keys(allinfo).forEach(key => info[key] = modeinfo[key] ?? allinfo[key]);
-        info.settings = { ...allinfo.settings, ...modeinfo.settings }
-
-        return info;
+        return {
+            ...allinfo,
+            ...modeinfo,
+            settings: {
+                ...allinfo.settings,
+                ...(modeinfo.settings ?? {})
+            }
+        }
     }
 
     getGamemodeNames() {
         return Object.keys(gamemodeJSON).filter(key => key != "*");
     }
 
+    /**@param {ModeName} mode  */
     getSuffix(mode) {
-        const modeinfo = gamemodeJSON[mode] ?? {};
+        const modeinfo = gamemodeJSON[mode];
         return resultSuffix[modeinfo.result] ?? " (legacy)";
     }
 

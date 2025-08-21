@@ -1,9 +1,7 @@
 import { Game } from "../main.js";
 
 export class Board {
-    /**
-     * @type {string[][]}
-     */
+    /** @type {BoardArray}*/
     boardState = [];
 
     // modify board
@@ -65,6 +63,12 @@ export class Board {
             .toReversed();
     }
 
+    /**
+     * @template T
+     * @param {T[][]} array
+     * @param {(value: T) => boolean} filter
+     * @returns {[number, number][]}
+    */
     getCoords(array, filter, [dx, dy]) {
         const coords = [];
         array.forEach((row, y) =>
@@ -75,7 +79,14 @@ export class Board {
         return coords;
     }
 
+    /**
+     * @param {[number, number][]} coords 
+     * @param {AllDirectionType} dir 
+     * @param {number} size
+     * @param {string} value 
+     */
     moveMinos(coords, dir, size, value = "") {
+        /** @returns {Record<AllDirectionType, [number, number]>}*/
         const getChange = ([x, y], a) => {
             return { RIGHT: [x + a, y], LEFT: [x - a, y], DOWN: [x, y - a], UP: [x, y + a] };
         };
@@ -97,8 +108,7 @@ export class Board {
 
     setComboBoard(start) {
         // 4w sides
-
-        const board = JSON.parse(JSON.stringify(this.boardState));          
+        const board = JSON.parse(JSON.stringify(this.boardState));
         board.forEach((row, y) => {
             row.forEach((col, x) => {
                 if ((x > 2 && x < 7) || y > 30) return;
