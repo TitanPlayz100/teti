@@ -27,9 +27,6 @@
         <progress id="lockTimer" max="100" value="50"></progress>
         <progress id="lockCounter" max="100" value="50"></progress>
         <progress id="climbSpeedBar" max="100" value="0"></progress>
-        <button id="aiToggleButton" class="settingPanelButton smallPanelButton" style="display: none; position: absolute; top: 10px; right: 10px; z-index: 1000;" onclick="Game.toggleAI()" title="Toggle AI Control">
-            <img src="./assets/icons/next.svg" id="aiToggleIcon" style="transform: rotate(90deg);"/>
-        </button>
     </div>
 
     <!-- INFO OVERLAYS -->
@@ -414,5 +411,13 @@
             <button class="closeDialogButton" onclick="modal.closeModal('gameEnd')">Play Again</button>
         </div>
     </dialog>
+
+    <!-- AI TOGGLE BUTTON - Fixed position bottom right -->
+    <button id="aiToggleButton" onclick="Game.toggleAI()" title="Toggle AI Control" style="display: none;">
+        <div id="aiToggleContent">
+            <span id="aiToggleText">AI</span>
+            <div id="aiToggleIcon">🤖</div>
+        </div>
+    </button>
 </body>
 </html>

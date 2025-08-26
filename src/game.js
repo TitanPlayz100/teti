@@ -198,25 +198,25 @@ export class GameClass {
     toggleAI() {
         const isActive = this.tetrisAI.toggle();
         const button = document.getElementById('aiToggleButton');
-        const icon = document.getElementById('aiToggleIcon');
+        const text = document.getElementById('aiToggleText');
         
-        if (button && icon) {
+        if (button && text) {
             if (isActive) {
                 button.classList.add('ai-active');
-                button.title = 'AI Active - Click to return to manual control';
-                icon.style.transform = 'rotate(270deg)';
+                button.title = 'AI Active - Click to stop AI control';
+                text.textContent = 'STOP';
             } else {
                 button.classList.remove('ai-active');
-                button.title = 'Toggle AI Control';
-                icon.style.transform = 'rotate(90deg)';
+                button.title = 'Click to enable AI control';
+                text.textContent = 'AI';
             }
         }
 
         // Show notification
         if (isActive) {
-            this.renderer.renderTimeLeft("AI CONTROL ENABLED");
+            this.renderer.renderTimeLeft("🤖 AI CONTROL ENABLED");
         } else {
-            this.renderer.renderTimeLeft("MANUAL CONTROL");
+            this.renderer.renderTimeLeft("👤 MANUAL CONTROL");
         }
 
         return isActive;
