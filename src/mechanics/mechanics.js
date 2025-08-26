@@ -92,8 +92,8 @@ export class Mechanics {
         Game.gravityTimer = new TetiInterval(
             () => {
                 Game.movement.movePieceDown(false);
-                // Update AI on each gravity tick
-                if (Game.tetrisAI && Game.tetrisAI.isActive && Game.settings.game.gamemode === "zenith") {
+                // Update AI on each gravity tick in zen mode
+                if (Game.tetrisAI && Game.tetrisAI.isActive && Game.settings.game.gamemode === "custom") {
                     Game.updateAI();
                 }
             },

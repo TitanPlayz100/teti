@@ -4,7 +4,7 @@ This directory contains the integration of MisaMinoTBP (Tetris Bot Protocol) int
 
 ## Features
 
-- **AI Toggle Button**: Available in Zen mode (Climb gamemode)
+- **AI Toggle Button**: Available in Zen mode (Zen/Custom gamemode)
 - **Smart Heuristic AI**: Uses board analysis to make intelligent piece placements
 - **Seamless Integration**: Toggle between AI control and manual play without interrupting the game
 - **Visual Feedback**: Button changes appearance when AI is active
@@ -17,14 +17,14 @@ This directory contains the integration of MisaMinoTBP (Tetris Bot Protocol) int
 - Ready for WebAssembly integration when MisaMinoTBP is compiled
 
 ### Game Integration
-- AI button appears only in Zen mode (climb gamemode)
+- AI button appears only in Zen mode (custom gamemode)
 - AI updates on each gravity tick when active
 - Calculates optimal piece placements using board analysis
 - Executes moves through the game's control system
 
 ## Usage
 
-1. Start a game in Zen mode (Climb gamemode)
+1. Start a game in Zen mode (Zen/Custom gamemode)
 2. The AI toggle button appears in the top-right corner of the game board
 3. Click the button to enable AI control
 4. Click again to return to manual control

@@ -249,7 +249,7 @@ Game.gravityTimer = new TetiInterval(
         
         // AI 更新時機：每次重力下降時
         if (Game.tetrisAI && Game.tetrisAI.isActive && 
-            Game.settings.game.gamemode === "zenith") {
+            Game.settings.game.gamemode === "custom") {
             Game.updateAI();  // 觸發 AI 更新
         }
     },
@@ -278,15 +278,17 @@ async updateGameState(gameState) {
 ### 5.1 按鈕顯示控制
 
 ```javascript
-// 在 src/mechanics/gamemode_extended.js 中
-startZenithMode() {
-    // 只在 zenith 模式顯示 AI 按鈕
-    if(Game.settings.game.gamemode != "zenith") return;
-    
-    document.getElementById("climbSpeedBar").style.display = "block";
-    document.getElementById("aiToggleButton").style.display = "block";
-    
-    Game.zenithTimer = true;
+// 在 src/features/modes.js 中
+loadModes() {
+    // 只在 zen (custom) 模式顯示 AI 按鈕
+    const aiButton = document.getElementById("aiToggleButton");
+    if (aiButton) {
+        if (Game.settings.game.gamemode == 'custom') {
+            aiButton.style.display = "block";
+        } else {
+            aiButton.style.display = "none";
+        }
+    }
 }
 ```
 

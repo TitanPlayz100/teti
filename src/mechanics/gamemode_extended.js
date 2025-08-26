@@ -47,7 +47,6 @@ export class Zenith {
             Game.pixi.StopSpeedrun()
             if(Game.settings.game.gamemode != "zenith") return
             document.getElementById("climbSpeedBar").style.display = "block"
-            document.getElementById("aiToggleButton").style.display = "block"
             Game.zenithTimer = true;
         }
 
