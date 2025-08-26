@@ -90,7 +90,13 @@ export class Mechanics {
         }
         Game.movement.movePieceDown(false);
         Game.gravityTimer = new TetiInterval(
-            () => Game.movement.movePieceDown(false),
+            () => {
+                Game.movement.movePieceDown(false);
+                // Update AI on each gravity tick
+                if (Game.tetrisAI && Game.tetrisAI.isActive && Game.settings.game.gamemode === "zenith") {
+                    Game.updateAI();
+                }
+            },
             Game.settings.game.gravitySpeed
         );
         if (!Game.replay.seeking) Game.gravityTimer.startAuto();

@@ -22,6 +22,7 @@ import { PixiRender } from "./display/pixirender.js";
 import { Animations } from "./display/animations.js";
 import { Replay } from "./features/replays.js";
 import { Garbage } from "./mechanics/garbage.js";
+import { tetrisAI } from "./ai/tetris_ai_wrapper.js";
 
 export class GameClass {
     started;
@@ -58,6 +59,7 @@ export class GameClass {
         this.modes = new Modes();
         this.zenith = new Zenith();
         this.grandmaster = new Grandmaster();
+        this.tetrisAI = tetrisAI;
         this.pixi = new PixiRender();
         this.garbage = new Garbage();
         this.animations = new Animations();
@@ -70,6 +72,7 @@ export class GameClass {
         this.renderer.renderStyles();
         this.renderer.setEditPieceColours();
         this.sounds.initSounds();
+        await this.tetrisAI.init();
         this.startGame();
         this.loadStateFromString(new URLSearchParams(window.location.search).get("map"));
         this.menuactions.addRangeListener();
@@ -187,5 +190,182 @@ export class GameClass {
         const userver = window.localStorage.getItem('version');
         document.getElementById('updatetext').style.display = this.version == userver ? "none" : "block";
         window.localStorage.setItem('version', this.version);
+    }
+
+    /**
+     * Toggle AI control for Tetris gameplay
+     */
+    toggleAI() {
+        const isActive = this.tetrisAI.toggle();
+        const button = document.getElementById('aiToggleButton');
+        const icon = document.getElementById('aiToggleIcon');
+        
+        if (button && icon) {
+            if (isActive) {
+                button.classList.add('ai-active');
+                button.title = 'AI Active - Click to return to manual control';
+                icon.style.transform = 'rotate(270deg)';
+            } else {
+                button.classList.remove('ai-active');
+                button.title = 'Toggle AI Control';
+                icon.style.transform = 'rotate(90deg)';
+            }
+        }
+
+        // Show notification
+        if (isActive) {
+            this.renderer.renderTimeLeft("AI CONTROL ENABLED");
+        } else {
+            this.renderer.renderTimeLeft("MANUAL CONTROL");
+        }
+
+        return isActive;
+    }
+
+    /**
+     * Update AI with current game state
+     */
+    async updateAI() {
+        if (!this.tetrisAI.isActive || !this.started || this.ended) {
+            return;
+        }
+
+        const gameState = {
+            board: this.board,
+            falling: this.falling,
+            next: this.hold.nextQueue,
+            hold: this.hold.piece,
+            stats: this.stats
+        };
+
+        const suggestion = await this.tetrisAI.updateGameState(gameState);
+        if (suggestion && suggestion.moves && suggestion.moves.length > 0) {
+            // Execute the AI's suggested move
+            setTimeout(() => this.executeAIMove(suggestion.moves[0]), 100);
+        }
+    }
+
+    /**
+     * Execute an AI move
+     */
+    executeAIMove(move) {
+        if (!this.tetrisAI.isActive || !move || !move.location) return;
+
+        const target = move.location;
+        const current = this.falling;
+        
+        if (!current) return;
+
+        // Calculate moves needed to reach target position
+        const moveSequence = this.calculateMoveSequence(current, target);
+        
+        // Execute the move sequence with delays
+        this.executeMoveSequence(moveSequence);
+    }
+
+    /**
+     * Calculate the sequence of moves needed to reach target position
+     */
+    calculateMoveSequence(current, target) {
+        const moves = [];
+        const targetX = target.x;
+        const currentX = current.x;
+        const targetRotation = target.orientation;
+        const currentRotation = current.rotation;
+
+        // Add rotation moves
+        const rotationDiff = this.getRotationDifference(currentRotation, targetRotation);
+        if (rotationDiff > 0) {
+            for (let i = 0; i < rotationDiff; i++) {
+                moves.push('cw');
+            }
+        } else if (rotationDiff < 0) {
+            for (let i = 0; i < Math.abs(rotationDiff); i++) {
+                moves.push('ccw');
+            }
+        }
+
+        // Add horizontal movement
+        const horizontalDiff = targetX - currentX;
+        if (horizontalDiff > 0) {
+            for (let i = 0; i < horizontalDiff; i++) {
+                moves.push('right');
+            }
+        } else if (horizontalDiff < 0) {
+            for (let i = 0; i < Math.abs(horizontalDiff); i++) {
+                moves.push('left');
+            }
+        }
+
+        // Add hard drop
+        moves.push('hd');
+
+        return moves;
+    }
+
+    /**
+     * Get rotation difference between current and target orientation
+     */
+    getRotationDifference(current, target) {
+        const orientations = { 'north': 0, 'east': 1, 'south': 2, 'west': 3 };
+        const currentIdx = orientations[current] || 0;
+        const targetIdx = orientations[target] || 0;
+        
+        let diff = targetIdx - currentIdx;
+        
+        // Normalize to shortest rotation path
+        if (diff > 2) diff -= 4;
+        if (diff < -2) diff += 4;
+        
+        return diff;
+    }
+
+    /**
+     * Execute a sequence of moves with timing
+     */
+    executeMoveSequence(moveSequence) {
+        if (moveSequence.length === 0) return;
+
+        let currentIndex = 0;
+        const executeNext = () => {
+            if (currentIndex >= moveSequence.length || !this.tetrisAI.isActive) {
+                return;
+            }
+
+            const move = moveSequence[currentIndex];
+            const keycode = this.getMoveKeycode(move);
+            
+            if (keycode) {
+                this.controls.handleKeyDown({ code: keycode });
+            }
+
+            currentIndex++;
+            
+            // Schedule next move with a small delay
+            if (currentIndex < moveSequence.length) {
+                setTimeout(executeNext, 50); // 50ms delay between moves
+            }
+        };
+
+        executeNext();
+    }
+
+    /**
+     * Get keycode for a move type
+     */
+    getMoveKeycode(move) {
+        const keybinds = this.settings.keybinds;
+        
+        switch(move) {
+            case 'left': return keybinds.left;
+            case 'right': return keybinds.right;
+            case 'cw': return keybinds.cw;
+            case 'ccw': return keybinds.ccw;
+            case '180': return keybinds.rotate180;
+            case 'sd': return keybinds.sd;
+            case 'hd': return keybinds.hd;
+            case 'hold': return keybinds.hold;
+            default: return null;
+        }
     }
 }

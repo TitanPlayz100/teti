@@ -210,3 +210,34 @@ body {
         opacity: 1;
     }
 }
+
+/* AI Toggle Button Styling */
+#aiToggleButton {
+    background: rgba(172, 203, 225, 0.1);
+    border: 2px solid var(--c-blue);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(172, 203, 225, 0.3);
+}
+
+#aiToggleButton:hover {
+    background: rgba(172, 203, 225, 0.2);
+    box-shadow: 0 0 15px rgba(172, 203, 225, 0.5);
+    transform: scale(1.05);
+}
+
+#aiToggleButton.ai-active {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: #4CAF50;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+}
+
+#aiToggleButton.ai-active:hover {
+    background: rgba(76, 175, 80, 0.4);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+}
+
+#aiToggleIcon {
+    filter: brightness(1.2);
+    transition: transform 0.3s ease;
+}

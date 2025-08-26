@@ -42,10 +42,12 @@ export class Zenith {
         startZenithMode() {
             Game.zenithTimer = false;
             document.getElementById("climbSpeedBar").style.display = "none"
+            document.getElementById("aiToggleButton").style.display = "none"
             Game.pixi.CreateSpeedrunContainer()
             Game.pixi.StopSpeedrun()
             if(Game.settings.game.gamemode != "zenith") return
             document.getElementById("climbSpeedBar").style.display = "block"
+            document.getElementById("aiToggleButton").style.display = "block"
             Game.zenithTimer = true;
         }
 
