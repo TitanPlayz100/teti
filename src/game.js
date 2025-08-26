@@ -227,6 +227,18 @@ export class GameClass {
      */
     async updateAI() {
         if (!this.tetrisAI.isActive || !this.started || this.ended) {
+            console.log('🚫 AI update skipped:', {
+                aiActive: this.tetrisAI?.isActive,
+                gameStarted: this.started,
+                gameEnded: this.ended,
+                gamemode: this.settings?.game?.gamemode
+            });
+            return;
+        }
+
+        // Check if we have a falling piece
+        if (!this.falling || !this.falling.piece) {
+            console.log('⏸️ AI waiting: No falling piece');
             return;
         }
 
@@ -238,10 +250,19 @@ export class GameClass {
             stats: this.stats
         };
 
+        console.log('🎮 AI updating with game state:', {
+            hasFallingPiece: !!this.falling.piece,
+            pieceType: this.falling.piece?.name,
+            position: {x: this.falling.x, y: this.falling.y}
+        });
+
         const suggestion = await this.tetrisAI.updateGameState(gameState);
         if (suggestion && suggestion.moves && suggestion.moves.length > 0) {
+            console.log('🎯 AI suggestion:', suggestion.moves[0]);
             // Execute the AI's suggested move
-            setTimeout(() => this.executeAIMove(suggestion.moves[0]), 100);
+            setTimeout(() => this.executeAIMove(suggestion.moves[0]), 50);
+        } else {
+            console.log('❌ AI no suggestion');
         }
     }
 
@@ -249,18 +270,27 @@ export class GameClass {
      * Execute an AI move
      */
     executeAIMove(move) {
-        if (!this.tetrisAI.isActive || !move || !move.location) return;
+        if (!this.tetrisAI.isActive || !move || !move.location) {
+            console.log('❌ AI executeAIMove skipped:', {
+                aiActive: this.tetrisAI?.isActive,
+                hasMove: !!move,
+                hasLocation: !!move?.location
+            });
+            return;
+        }
 
-        const target = move.location;
-        const current = this.falling;
-        
-        if (!current) return;
+        console.log('🎮 AI executing move:', move);
 
-        // Calculate moves needed to reach target position
-        const moveSequence = this.calculateMoveSequence(current, target);
+        // For now, just do a simple hard drop
+        const hardDropKey = this.settings.keybinds.hd;
+        console.log('🔽 AI executing hard drop with key:', hardDropKey);
         
-        // Execute the move sequence with delays
-        this.executeMoveSequence(moveSequence);
+        if (hardDropKey && this.controls) {
+            this.controls.handleKeyDown({ code: hardDropKey });
+            console.log('✅ AI hard drop executed');
+        } else {
+            console.log('❌ AI could not execute hard drop - missing key or controls');
+        }
     }
 
     /**

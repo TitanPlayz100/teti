@@ -87,7 +87,8 @@ export class TetrisAI {
     start() {
         this.isActive = true;
         this.moveQueue = [];
-        console.log('Tetris AI started');
+        this.lastUpdateTime = 0;
+        console.log('🤖 Tetris AI started - isActive:', this.isActive);
     }
 
     /**
@@ -116,29 +117,36 @@ export class TetrisAI {
      * Update game state and get AI suggestion
      */
     async updateGameState(gameState) {
-        if (!this.isActive) return null;
+        if (!this.isActive) {
+            console.log('🚫 AI updateGameState: not active');
+            return null;
+        }
 
         // Throttle AI updates for performance
         const now = Date.now();
         if (now - this.lastUpdateTime < this.updateThrottle) {
+            console.log('⏸️ AI throttled, returning last suggestion');
             return this.lastSuggestion;
         }
 
         this.currentGameState = gameState;
         
         if (this.isCalculating) {
+            console.log('🔄 AI already calculating');
             return this.lastSuggestion;
         }
 
         this.lastUpdateTime = now;
+        console.log('🧠 AI calculating move for piece:', gameState.falling?.piece?.name);
 
         try {
             this.isCalculating = true;
             const suggestion = await this.calculateMove(gameState);
             this.lastSuggestion = suggestion;
+            console.log('✅ AI suggestion generated:', suggestion);
             return suggestion;
         } catch (error) {
-            console.error('AI calculation error:', error);
+            console.error('❌ AI calculation error:', error);
             return null;
         } finally {
             this.isCalculating = false;
@@ -149,14 +157,32 @@ export class TetrisAI {
      * Calculate the best move for the current game state
      */
     async calculateMove(gameState) {
-        // Extract relevant game information
-        const board = this.convertBoard(gameState.board);
-        const currentPiece = gameState.falling;
-        const nextPieces = gameState.next;
-        const holdPiece = gameState.hold;
+        console.log('🎯 AI calculateMove called with:', {
+            hasFalling: !!gameState.falling,
+            fallingPiece: gameState.falling?.piece?.name,
+            position: {x: gameState.falling?.x, y: gameState.falling?.y}
+        });
 
-        // Simple heuristic AI logic
-        return this.simpleHeuristicMove(board, currentPiece, nextPieces, holdPiece);
+        // For now, use a very simple strategy: just hard drop
+        if (gameState.falling && gameState.falling.piece) {
+            const simpleSuggestion = {
+                type: 'suggestion',
+                moves: [{
+                    location: {
+                        type: gameState.falling.piece.name,
+                        x: gameState.falling.x,
+                        y: gameState.falling.y + 10, // Drop down
+                        orientation: gameState.falling.rotation || 'north'
+                    },
+                    spin: 'none'
+                }]
+            };
+            console.log('🎲 AI simple suggestion:', simpleSuggestion);
+            return simpleSuggestion;
+        }
+
+        console.log('❌ AI no falling piece to suggest for');
+        return null;
     }
 
     /**
