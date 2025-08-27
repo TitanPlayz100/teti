@@ -282,7 +282,7 @@ export class GameClass {
         console.log('🎮 AI executing move:', move);
 
         // For now, just do a simple hard drop
-        const hardDropKey = this.settings.keybinds.hd;
+        const hardDropKey = this.settings.control.hdKey;
         console.log('🔽 AI executing hard drop with key:', hardDropKey);
         
         if (hardDropKey && this.controls) {
@@ -384,17 +384,17 @@ export class GameClass {
      * Get keycode for a move type
      */
     getMoveKeycode(move) {
-        const keybinds = this.settings.keybinds;
+        const keybinds = this.settings.control;
         
         switch(move) {
-            case 'left': return keybinds.left;
-            case 'right': return keybinds.right;
-            case 'cw': return keybinds.cw;
-            case 'ccw': return keybinds.ccw;
-            case '180': return keybinds.rotate180;
-            case 'sd': return keybinds.sd;
-            case 'hd': return keybinds.hd;
-            case 'hold': return keybinds.hold;
+            case 'left': return keybinds.leftKey;
+            case 'right': return keybinds.rightKey;
+            case 'cw': return keybinds.cwKey;
+            case 'ccw': return keybinds.ccwKey;
+            case '180': return keybinds.rotate180Key;
+            case 'sd': return keybinds.sdKey;
+            case 'hd': return keybinds.hdKey;
+            case 'hold': return keybinds.holdKey;
             default: return null;
         }
     }
