@@ -42,7 +42,10 @@ export class Zenith {
         startZenithMode() {
             Game.zenithTimer = false;
             document.getElementById("climbSpeedBar").style.display = "none"
-            document.getElementById("aiToggleButton").style.display = "none"
+            // Only hide AI button when actually in zenith mode
+            if (Game.settings.game.gamemode === "zenith") {
+                document.getElementById("aiToggleButton").style.display = "none"
+            }
             Game.pixi.CreateSpeedrunContainer()
             Game.pixi.StopSpeedrun()
             if(Game.settings.game.gamemode != "zenith") return
