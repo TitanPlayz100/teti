@@ -59,6 +59,16 @@ export class Modes {
 
         Game.pixi.texts.objectiveNameText.sprite.text = this.modeJSON.objectiveText.toUpperCase();
         Game.pixi.toggleEditButton(Game.settings.game.gamemode == 'custom');
+        
+        // Show AI toggle button in zen mode
+        const aiButton = document.getElementById("aiToggleButton");
+        if (aiButton) {
+            if (Game.settings.game.gamemode == 'custom') {
+                aiButton.style.display = "block";
+            } else {
+                aiButton.style.display = "none";
+            }
+        }
     }
 
     setGamemode(mode) {
