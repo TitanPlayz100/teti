@@ -70,6 +70,9 @@
              <button id="competitive" class="settingPanelButton smallPanelButton" onclick="modal.openModal('competitiveDialog')" title="Toggle competitive mode and view PBs">
                  <img src="./assets/icons/medal.svg" style="transform: translateY(-8%); height: 140%;">
              </button>
+             <button id="puzzles" class="settingPanelButton smallPanelButton" onclick="modal.openModal('puzzlesDialog')" title="Choose puzzles for PC Puzzle mode">
+                 <img src="./assets/icons/goal.svg" style="transform: translateY(0%); height: 130%;">
+             </button>
              <button id="replays" class="settingPanelButton smallPanelButton" onclick="modal.openModal('replaysDialog')" title="Play replay">
                  <img src="./assets/icons/history.svg" style="transform: translateY(10%); height: 100%;">
              </button>
@@ -291,6 +294,20 @@
         <input id="limiter" type="range" min="1" max="9999" style="display: none;"/>
         <input id="limiter2" type="range" min="0.1" max="9999" style="display: none;"/>
     </dialog>
+
+    <dialog id="puzzlesDialog" class="scrollSettings">
+        <div class="settingsTop"><h1>PUZZLES</h1></div>
+        <div class="settingsBox">
+            <template id="puzzle-setting">
+                <div class="settingRow"><p>PCO</p><input class="option check" type="checkbox" /></div>
+            </template>
+        </div>
+        <div class="settingsFooter">
+            <p>Press Esc to close without saving</p>
+            <button class="closeDialogButton" onclick="modal.closeModal('puzzlesDialog')">Save and Close</button>
+        </div>
+    </dialog>
+
 
     <dialog id="competitiveDialog" class="scrollSettings">
         <div class="settingsTop"><h2>PBs & COMPETITIVE MODE<h2></div>
