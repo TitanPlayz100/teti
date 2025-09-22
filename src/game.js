@@ -17,7 +17,7 @@ import { BoardEffects } from "./display/boardEffects.js";
 import { ProfileStats } from "./features/profileStats.js";
 import { Modes } from "./features/modes.js";
 import { Particles } from "./display/particles.js";
-import { Zenith, Grandmaster } from "./mechanics/gamemode_extended.js";
+import { Zenith, Grandmaster, Puzzle } from "./mechanics/gamemode_extended.js";
 import { PixiRender } from "./display/pixirender.js";
 import { Animations } from "./display/animations.js";
 import { Replay } from "./features/replays.js";
@@ -58,6 +58,7 @@ export class GameClass {
         this.modes = new Modes();
         this.zenith = new Zenith();
         this.grandmaster = new Grandmaster();
+        this.puzzle = new Puzzle();
         this.pixi = new PixiRender();
         this.garbage = new Garbage();
         this.animations = new Animations();
@@ -87,7 +88,11 @@ export class GameClass {
         this.modes.loadModes();
         this.resetState(seed);
         this.renderer.renderStyles();
-        this.mechanics.spawnPiece(this.bag.cycleNext(true), true);
+        if (this.settings.game.gamemode === 'puzzle') {
+            this.puzzle.startNewPuzzle();
+        } else {
+            this.mechanics.spawnPiece(this.bag.cycleNext(true), true);
+        }
         this.history.save();
         this.replay.start();
     }
@@ -175,6 +180,7 @@ export class GameClass {
         this.history = new History();
         this.zenith = new Zenith();
         this.grandmaster = new Grandmaster();
+        // keep this.puzzle
 
         this.renderer.renderSidebar();
         this.modes.checkFinished();

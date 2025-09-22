@@ -111,9 +111,16 @@ export class LockPiece {
         Game.particles.spawnParticles(Math.min(...xvals), yval, "lock", xvals.length);
         Game.renderer.renderDanger();
 
-        const delay = (cleared > 0) ? Game.settings.game.clearDelay : 0;
+        const isPC = Game.board.getMinos("S").length == 0;
+        const doNewPuzzle = isPC && Game.settings.game.gamemode === 'puzzle';
+        const delay = doNewPuzzle ? 500 : (cleared > 0) ? Game.settings.game.clearDelay : 0;
+
         const onClear = () => {
-            Game.mechanics.spawnPiece(Game.bag.cycleNext());
+            if (doNewPuzzle) {
+                Game.animations.resetAnimation();
+            } else {
+                Game.mechanics.spawnPiece(Game.bag.cycleNext());
+            }
             Game.history.save();
             this.clearDelay = null;
         }

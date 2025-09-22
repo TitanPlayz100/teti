@@ -157,6 +157,13 @@ export const GAMEMODES = {
             "garbageTravelTime": 1
         }
     },
+    "puzzle": {
+        "displayName": "PC Puzzle",
+        "objectiveText": "PC",
+        "settings": {
+            "gravitySpeed": 1001,
+        }
+    },
     "classic": {
         "displayName": "Classic",
         "objectiveText": "Score",

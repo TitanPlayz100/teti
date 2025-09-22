@@ -1,4 +1,5 @@
 import { Game } from "../main.js";
+import { RNG } from "../mechanics/randomisers.js";
 
 export class Zenith {
         climbPoints = 0;
@@ -255,6 +256,128 @@ export class Grandmaster {
                 Game.renderer.renderTimeLeft("COOL!");
                 this.coolsCount++;
             }
+        }
+    }
+}
+
+
+const puzzleTemplates = {
+    // Basics
+    // ------
+    pco: `
+        GG_____GGG
+        GGG____GGG
+        GGGG___GGG
+        GGG____GGG`,
+
+    jaws: `
+        GGGG______
+        GGG_______
+        GGGGG_____
+        GGGG______
+    `,
+
+    // Second PC patterns
+    // ------------------
+
+    tub: `
+        _________G
+        ____G___GG
+        ____GGGGGG
+        ____GGGGGG`,
+
+    cat: `
+        _________G
+        ____G_G__G
+        ____GGGGGG
+        ____GGGGGG`,
+
+    sleeper: `
+        _______G__
+        __GGG__GGG
+        _GGGGGGGGG`,
+
+    fedora: `
+        __GG______
+        __GGGGG___
+        _GGGGGGGGG`,
+
+    dolphin: `
+        ___G______
+        GGGGGGG___
+        GGGGGGGG__`,
+
+    boxes: `
+        ____GGGG__
+        ____GGGGGG
+        ____GGGGGG`,
+
+    frog: `
+        ____G__G__
+        ___GGGGGGG
+        ___GGGGGGG`,
+
+    snail: `
+        ______G__G
+        ____GGGGGG
+        __GGGGGGGG`,
+
+    factory: `
+        _________G
+        _____GG__G
+        ____GGGGGG
+        ____GGGGGG`,
+
+    dog: `
+        G_________
+        G___G_____
+        GGGGGGG___
+        GGGGGG____`,
+}
+
+const puzzleInitialQueue = {
+    pco: ['i'],
+    jaws: ['t', 'j', 'o'],
+}
+
+export class Puzzle {
+
+    constructor(seed = null) {
+        this.genseed = seed ?? Math.floor((2 ** 31) * Math.random() + 1);
+        this.rng = new RNG(this.genseed);
+        this.selectedPuzzles = Object.fromEntries(Object.keys(puzzleTemplates).map(key => [key, true]));
+        this.populateUI();
+    }
+
+    startNewPuzzle() {
+
+        const puzzlePool = Object.entries(this.selectedPuzzles).filter(([k, v]) => v).map(([k, v]) => k);
+        const puzzleName = this.rng.pick(puzzlePool);
+        const mapTemplate = puzzleTemplates[puzzleName];
+        const mapStr = mapTemplate.replace(/\s/g, '');
+
+        const queue = puzzleInitialQueue[puzzleName] || ['i', 'l', 'j', 't', 'o', 's', 'z'];
+        this.rng.shuffleArray(queue);
+        const queueStr = queue.join(',');
+
+        Game.loadStateFromString(`${mapStr}?${queueStr}?`);
+    }
+
+    populateUI() {
+        const container = document.querySelector("#puzzlesDialog .settingsBox");
+        const template = container.querySelector("template");
+        container.innerHTML = '';
+        container.appendChild(template);
+        for (let key of Object.keys(puzzleTemplates)) {
+            const item = template.content.cloneNode(true);
+            const p = item.querySelector("p");
+            const checkbox = item.querySelector("input")
+            p.innerText = key;
+            checkbox.checked = this.selectedPuzzles[key];
+            checkbox.addEventListener("change", () => {
+                this.selectedPuzzles[key] = checkbox.checked;
+            });
+            container.appendChild(item);
         }
     }
 }

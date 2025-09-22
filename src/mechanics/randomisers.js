@@ -179,7 +179,7 @@ export class Bag {
 }
 
 
-class RNG {
+export class RNG {
     constructor(seed) {
         this.seed = parseInt(seed) % maxInt;
         if (this.seed <= 0) {
@@ -195,6 +195,13 @@ class RNG {
 
     nextFloat() {
         return (this.next() - 1) / (maxInt - 1)
+    }
+
+    pick(arr) {
+        let len = arr.length;
+        if (0 == len) return null;
+        const ind = Math.floor(this.nextFloat() * len);
+        return arr[ind];
     }
 
     shuffleArray(arr) {
