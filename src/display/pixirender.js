@@ -165,7 +165,11 @@ export class PixiRender {
 
     async generateTextures() {
         let url = Game.settings.display.skin;
-        if (defaultSkins.includes(url)) url = `./assets/skins/${url}.png`;
+        if (!/^https?:\/\//.test(url) && /\.[a-zA-Z0-9]+$/.test(url)){
+            url = localStorage.getItem("customSkin");
+        }else if (defaultSkins.includes(url)){
+            url = `./assets/skins/${url}.png`;
+        }
         let texture;
         try {
             texture = await PIXI.Assets.load(url);

@@ -250,4 +250,18 @@ export class MenuActions {
         };
     }
 
+    uploadSkin(el) {
+        const reader = new FileReader();
+        //read skin as base64 and save it in localStorage
+        const file = el.files[0]
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            const base64 = reader.result;
+            localStorage.setItem("customSkin", base64);
+            Game.modals.generate.notif("Skin Uploaded", "Skin successfully uploaded", "message");
+            el.value = "";
+            document.getElementById("skin").value = `${file.name}`;
+        };
+    }
+
 }
