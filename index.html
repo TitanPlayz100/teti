@@ -138,6 +138,12 @@
         <div class="settingsBox">
             <div class="settingRow"><p>Background URL/Hex</p> <input class="option textInput" type="text" id="background" /></div>
             <div class="settingRow"><p>Block Skin URL/Name</p> <input class="option textInput" type="text" id="skin" list="options"/></div>
+            <div class="settingRow"><p>Upload Block Skin (.png)</p> 
+                <div id="uploadSettings" class="settingPanelButton smallerPanelButton fileInputContainer" style="box-sizing: border-box;" onclick="document.getElementById('uploadSkin').click()">
+                    <input type="file" id="uploadSkin" onchange="menu.uploadSkin(this)" hidden accept=".png">
+                    <div class="img"></div>
+                </div>
+            </div>
             <div class="settingRow"><p>High Resolution<br>(reload after)</p> <input class="option check" type="checkbox" id="highRes" /></div>
             <div class="settingRow"><p>Board Opacity</p> <input class="option range" type="range" id="boardOpacity" min="0" max="100" step="1"/></div>
             <div class="settingRow"><p>Board Size</p> <input class="option range" type="range" id="boardHeight" min="0" max="130" step="1" /></div>

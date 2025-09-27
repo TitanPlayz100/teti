@@ -115,11 +115,18 @@ export class ModalActions {
         this.closeDialog(document.getElementById(id));
         if (id != 'changeRangeValue' && id != "frontdrop" && Game.started && !Game.ended) Game.movement.startTimers();
         Game.menuactions.saveSettings();
-        if (id == "displayDialog") Game.renderer.renderStyles(true);
+        if (id == "displayDialog"){
+            Game.renderer.renderStyles(true);
+            setTimeout(() => {
+                Game.renderer.updateNext();
+                Game.renderer.updateHold();
+            }, 1);
+        }
 
         const restartMenus = ["gameDialog", "gamemodeDialog", "gameEnd", "goalsDialog", "competitiveDialog"];
         if (restartMenus.includes(id)) Game.controls.retry(false);
         if (id == "changeRangeValue") this.open = true;
+
     }
 
     closeDialog(element) {

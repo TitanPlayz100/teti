@@ -228,6 +228,31 @@ button>img {
     border-color: var(--p-green);
 }
 
+.fileInputContainer{
+    border: 0.1vmin solid white;
+}
+
+.fileInputContainer:hover{
+    border-color: var(--p-green);
+}
+
+.fileInputContainer .img{
+    -webkit-mask-image: url('../assets/icons/upload.svg');
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-image: url('../assets/icons/upload.svg');
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    background: white;
+    height: 90%;
+    width: 75%;
+    transform: translateY(10%);
+}
+
+.fileInputContainer:hover .img{
+    background: var(--p-green);
+}
+
 .keybind {
     padding: 0.5vh;
     background-color: var(--invis);
