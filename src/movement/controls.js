@@ -120,7 +120,7 @@ export class Controls {
 
     startArrSD() {
         this.directionState["DOWN"] = "arr";
-        clearInterval(this.timings.sd);
+        this.stopInterval("sd")
         if (Game.settings.handling.sdarr == 0) {
             this.timings.sd = null;
             Game.movement.movePieceDown(true, true);
